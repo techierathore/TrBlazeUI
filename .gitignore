@@ -1,0 +1,45 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+.vs/
+*.dll
+*.exe
+*.pdb
+TestResults/
+*.csproj.user
+.dotnet/
+packages/
+
+# Blazor
+**/wwwroot/css/app.css*
+
+# Tailwind
+node_modules/
+tailwindcss.exe
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+NUL
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Development Tools
+.playwright-mcp
+.devflow
+.claude
+DEV-TASKS.md
+.instructions
+.reviews

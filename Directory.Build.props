@@ -1,0 +1,26 @@
+<Project>
+  <PropertyGroup>
+    <!-- Package Metadata - Common to all TrBlazeUI packages -->
+    <Authors>TrBlazeUI Contributors</Authors>
+    <Company>TrBlazeUI</Company>
+    <Copyright>Copyright (c) 2025 TrBlazeUI Contributors</Copyright>
+
+    <!-- License and Repository -->
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <!-- TODO: Update with your project URL -->
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryUrl></RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <!-- Build Configuration -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <!-- Suppress missing XML comment warnings for internal enums and lifecycle methods -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+
+    <!-- Code Style Enforcement -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+  </PropertyGroup>
+</Project>

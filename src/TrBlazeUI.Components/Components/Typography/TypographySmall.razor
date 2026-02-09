@@ -1,0 +1,16 @@
+@namespace TrBlazeUI.Components.Typography
+
+<small class="@CssClass">@ChildContent</small>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "text-sm font-medium leading-none",
+        Class
+    );
+}

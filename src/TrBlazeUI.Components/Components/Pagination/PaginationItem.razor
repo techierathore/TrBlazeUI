@@ -1,0 +1,13 @@
+@namespace TrBlazeUI.Components.Pagination
+
+<li class="@Class">
+    @ChildContent
+</li>
+
+@code {
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

@@ -1,0 +1,9 @@
+@namespace TrBlazeUI.Components.Collapsible
+@using TrBlazeUI.Primitives.Collapsible
+
+<TrBlazeUI.Primitives.Collapsible.Collapsible Open="@_isOpen"
+                      OpenChanged="@HandleOpenChanged"
+                      Disabled="@Disabled"
+                      class="@Class">
+    @ChildContent
+</TrBlazeUI.Primitives.Collapsible.Collapsible>

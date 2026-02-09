@@ -1,0 +1,14 @@
+@namespace TrBlazeUI.Components.Switch
+@using TrBlazeUI.Primitives.Switch
+
+<TrBlazeUI.Primitives.Switch.Switch Checked="@Checked"
+                 CheckedChanged="@HandleCheckedChanged"
+                 Disabled="@Disabled"
+                 Id="@Id"
+                 aria-label="@AriaLabel"
+                 aria-required="@(CheckedExpression != null ? "true" : null)"
+                 aria-invalid="@(IsInvalid ? "true" : null)"
+                 class="@CssClass">
+    <span data-state="@(Checked ? "checked" : "unchecked")" class="@ThumbCssClass">
+    </span>
+</TrBlazeUI.Primitives.Switch.Switch>

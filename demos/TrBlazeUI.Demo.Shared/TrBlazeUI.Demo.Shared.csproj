@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>TrBlazeUI.Demo</RootNamespace>
+    <AssemblyName>TrBlazeUI.Demo.Shared</AssemblyName>
+    <NoWarn>CS1591;CA1716</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TrBlazeUI.Components\TrBlazeUI.Components.csproj" />
+    <ProjectReference Include="..\..\src\TrBlazeUI.Icons.Lucide\TrBlazeUI.Icons.Lucide.csproj" />
+    <ProjectReference Include="..\..\src\TrBlazeUI.Icons.Heroicons\TrBlazeUI.Icons.Heroicons.csproj" />
+    <ProjectReference Include="..\..\src\TrBlazeUI.Icons.Feather\TrBlazeUI.Icons.Feather.csproj" />
+    <ProjectReference Include="..\..\src\TrBlazeUI.Primitives\TrBlazeUI.Primitives.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.14" />
+  </ItemGroup>
+
+  <!-- Build Tailwind CSS -->
+  <Target Name="BuildTailwindCSS" BeforeTargets="BeforeBuild" Condition="'$(OS)' == 'Windows_NT' AND '$(CI)' != 'true'">
+    <Message Text="Building Tailwind CSS..." Importance="high" />
+    <Exec Command="$(MSBuildProjectDirectory)\..\..\tools\tailwindcss.exe -i wwwroot/css/app-input.css -o wwwroot/css/app.css" />
+  </Target>
+
+</Project>

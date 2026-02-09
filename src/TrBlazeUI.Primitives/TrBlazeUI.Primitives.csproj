@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+
+    <!-- NuGet Package Configuration -->
+    <PackageId>TrBlazeUI.Primitives</PackageId>
+    <RootNamespace>TrBlazeUI.Primitives</RootNamespace>
+    <AssemblyName>TrBlazeUI.Primitives</AssemblyName>
+    <Description>Headless, unstyled Blazor primitive components with full accessibility support. Build your own component library using these composable primitives.</Description>
+    <PackageTags>blazor;primitives;headless;ui;components;accessibility;radix;unstyled;wcag</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <!-- <PackageIcon>icon.png</PackageIcon> -->
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryUrl></RepositoryUrl>
+    <Authors>Mathew Taylor</Authors>
+    <Copyright>Copyright (c) 2025-present Mathew Taylor</Copyright>
+
+    <!-- MinVer Configuration - Version from git tags -->
+    <MinVerTagPrefix>primitives/v</MinVerTagPrefix>
+    <MinVerDefaultPreReleaseIdentifiers>beta.0</MinVerDefaultPreReleaseIdentifiers>
+
+    <!-- Suppress CA1716: 'Select' namespace matches a keyword but is a domain term -->
+    <NoWarn>$(NoWarn);CA1716</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.14" />
+    <PackageReference Include="MinVer" Version="5.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

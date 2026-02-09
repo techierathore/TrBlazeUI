@@ -1,0 +1,13 @@
+@typeparam TValue
+@namespace TrBlazeUI.Components.RadioGroup
+@using TrBlazeUI.Primitives.RadioGroup
+
+<TrBlazeUI.Primitives.RadioGroup.RadioGroupItem TValue="TValue"
+    @ref="primitiveRef"
+    Value="@Value"
+    Disabled="@Disabled"
+    Id="@Id"
+    AriaLabel="@AriaLabel"
+    class="@CssClass">
+    <span class="@CircleIndicatorClass"></span>
+</TrBlazeUI.Primitives.RadioGroup.RadioGroupItem>
