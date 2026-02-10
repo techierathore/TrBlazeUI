@@ -1,0 +1,613 @@
+@page "/dynamic-theme"
+@using System.Globalization
+@using TrBlazeUI.Components.Card
+@using TrBlazeUI.Components.Input
+@using TrBlazeUI.Components.Textarea
+@using TrBlazeUI.Components.Tabs
+@using TrBlazeUI.Components.Avatar
+@using TrBlazeUI.Components.Rating
+@using TrBlazeUI.Components.RangeSlider
+@using TrBlazeUI.Components.Label
+@using TrBlazeUI.Components.NativeSelect
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<PageTitle>Dynamic Theme - TrBlazeUI</PageTitle>
+
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight">Dynamic Theme Preview</h1>
+            <p class="text-muted-foreground">Click a color to change the accent theme in real-time.</p>
+        </div>
+        <div class="flex items-center gap-2">
+            @foreach (var preset in _presets)
+            {
+                <button
+                    class="@GetCircleClasses(preset.Name)"
+                    style="background-color: @preset.PreviewColor"
+                    title="@preset.Name"
+                    @onclick="() => ApplyPreset(preset)">
+                </button>
+            }
+        </div>
+    </div>
+
+    <!-- 3-column grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- ============ LEFT COLUMN ============ -->
+        <div class="space-y-6">
+
+            <!-- Login Card -->
+            <Card>
+                <CardHeader>
+                    <CardTitle>Welcome back</CardTitle>
+                    <CardDescription>Enter your credentials to sign in</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <Label>Email</Label>
+                            <Input Type="InputType.Email" Placeholder="m@example.com" @bind-Value="_loginEmail" />
+                        </div>
+                        <div class="space-y-2">
+                            <Label>Password</Label>
+                            <Input Type="InputType.Password" Placeholder="Enter password" @bind-Value="_loginPassword" />
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <Checkbox @bind-Checked="_rememberMe" Id="remember" />
+                            <label for="remember" class="text-sm font-medium leading-none">Remember me</label>
+                        </div>
+                    </div>
+                </CardContent>
+                <CardFooter>
+                    <Button Class="w-full">Sign In</Button>
+                </CardFooter>
+            </Card>
+
+            <!-- Form Controls Card -->
+            <Card>
+                <CardHeader>
+                    <CardTitle>Form Controls</CardTitle>
+                    <CardDescription>Various input elements</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <Label>Framework</Label>
+                            <NativeSelect TValue="string" @bind-Value="_selectedFramework" Placeholder="Select a framework">
+                                <option value="blazor">Blazor</option>
+                                <option value="react">React</option>
+                                <option value="vue">Vue</option>
+                                <option value="angular">Angular</option>
+                            </NativeSelect>
+                        </div>
+                        <div class="space-y-3">
+                            <Label>Interests</Label>
+                            <div class="flex items-center space-x-2">
+                                <Checkbox @bind-Checked="_checkDesign" Id="chk-design" />
+                                <label for="chk-design" class="text-sm">Design</label>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <Checkbox @bind-Checked="_checkDev" Id="chk-dev" />
+                                <label for="chk-dev" class="text-sm">Development</label>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <Checkbox @bind-Checked="_checkTest" Id="chk-test" />
+                                <label for="chk-test" class="text-sm">Testing</label>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <Label>Notes</Label>
+                            <Textarea Placeholder="Add any notes..." @bind-Value="_formNotes" />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+        </div>
+
+        <!-- ============ MIDDLE COLUMN ============ -->
+        <div class="space-y-6">
+
+            <!-- Stats Cards 2x2 -->
+            <div class="grid grid-cols-2 gap-4">
+                <Card>
+                    <CardHeader Class="pb-2">
+                        <CardDescription>Total Revenue</CardDescription>
+                        <CardTitle Class="text-2xl">$150K</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Badge Variant="BadgeVariant.Default">+12.5%</Badge>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader Class="pb-2">
+                        <CardDescription>Conversion</CardDescription>
+                        <CardTitle Class="text-2xl">44.6%</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Badge Variant="BadgeVariant.Default">+4.1%</Badge>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader Class="pb-2">
+                        <CardDescription>Avg. Order</CardDescription>
+                        <CardTitle Class="text-2xl">$146</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Badge Variant="BadgeVariant.Secondary">+2.3%</Badge>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader Class="pb-2">
+                        <CardDescription>Total Sales</CardDescription>
+                        <CardTitle Class="text-2xl">$4.2M</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Badge Variant="BadgeVariant.Default">+8.7%</Badge>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <!-- Plan Cards -->
+            <div class="grid grid-cols-2 gap-4">
+                <Card Class="border-primary">
+                    <CardHeader>
+                        <CardTitle>Free Plan</CardTitle>
+                        <CardDescription>Get started for free</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p class="text-3xl font-bold">$0<span class="text-sm font-normal text-muted-foreground">/mo</span></p>
+                    </CardContent>
+                    <CardFooter>
+                        <Button Variant="ButtonVariant.Default" Class="w-full">Current Plan</Button>
+                    </CardFooter>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Pro Plan</CardTitle>
+                        <CardDescription>For professionals</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p class="text-3xl font-bold">$19<span class="text-sm font-normal text-muted-foreground">/mo</span></p>
+                    </CardContent>
+                    <CardFooter>
+                        <Button Variant="ButtonVariant.Outline" Class="w-full">Upgrade</Button>
+                    </CardFooter>
+                </Card>
+            </div>
+
+            <!-- Account Form Card -->
+            <Card>
+                <CardHeader>
+                    <CardTitle>Account</CardTitle>
+                    <CardDescription>Update your account settings</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <Label>Name</Label>
+                            <Input Type="InputType.Text" Placeholder="Your name" @bind-Value="_accountName" />
+                        </div>
+                        <div class="space-y-2">
+                            <Label>Email</Label>
+                            <Input Type="InputType.Email" Placeholder="you@example.com" @bind-Value="_accountEmail" />
+                        </div>
+                        <div class="space-y-2">
+                            <Label>Role</Label>
+                            <NativeSelect TValue="string" @bind-Value="_accountRole" Placeholder="Select role">
+                                <option value="admin">Admin</option>
+                                <option value="editor">Editor</option>
+                                <option value="viewer">Viewer</option>
+                            </NativeSelect>
+                        </div>
+                    </div>
+                </CardContent>
+                <CardFooter>
+                    <Button>Save Changes</Button>
+                </CardFooter>
+            </Card>
+
+            <!-- Commands Card -->
+            <Card>
+                <CardHeader>
+                    <CardTitle>Quick Actions</CardTitle>
+                </CardHeader>
+                <CardContent Class="p-0">
+                    <div class="divide-y">
+                        <button class="flex w-full items-center gap-3 px-6 py-3 text-sm hover:bg-accent hover:text-accent-foreground transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                            Create New Project
+                        </button>
+                        <button class="flex w-full items-center gap-3 px-6 py-3 text-sm hover:bg-accent hover:text-accent-foreground transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            Import Data
+                        </button>
+                        <button class="flex w-full items-center gap-3 px-6 py-3 text-sm hover:bg-accent hover:text-accent-foreground transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+                            Invite Team
+                        </button>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Team Members -->
+            <Card>
+                <CardHeader>
+                    <CardTitle>Team Members</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div class="flex items-center gap-4">
+                        <div class="flex flex-col items-center gap-1">
+                            <Avatar>
+                                <AvatarFallback>SC</AvatarFallback>
+                            </Avatar>
+                            <span class="text-xs text-muted-foreground">Sarah</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <Avatar>
+                                <AvatarFallback>JD</AvatarFallback>
+                            </Avatar>
+                            <span class="text-xs text-muted-foreground">John</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <Avatar>
+                                <AvatarFallback>AS</AvatarFallback>
+                            </Avatar>
+                            <span class="text-xs text-muted-foreground">Alex</span>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Send Message -->
+            <Card>
+                <CardContent Class="pt-6">
+                    <div class="space-y-3">
+                        <Textarea Placeholder="Type your message..." @bind-Value="_messageText" />
+                        <Button Class="w-full">Send Message</Button>
+                    </div>
+                </CardContent>
+            </Card>
+
+        </div>
+
+        <!-- ============ RIGHT COLUMN ============ -->
+        <div class="space-y-6">
+
+            <!-- Comments Card with Tabs -->
+            <Card>
+                <CardHeader>
+                    <CardTitle>Comments</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Tabs @bind-Value="_commentsTab">
+                        <TabsList Class="grid w-full grid-cols-3">
+                            <TabsTrigger Value="pending">Pending</TabsTrigger>
+                            <TabsTrigger Value="approved">Approved</TabsTrigger>
+                            <TabsTrigger Value="spam">Spam</TabsTrigger>
+                        </TabsList>
+                        <TabsContent Value="pending">
+                            <div class="space-y-3 pt-2">
+                                <div class="flex items-start gap-3">
+                                    <Avatar Size="AvatarSize.Small">
+                                        <AvatarFallback>AK</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p class="text-sm font-medium">Alex Kim <span class="text-xs text-muted-foreground font-normal">2h ago</span></p>
+                                        <p class="text-sm text-muted-foreground">This design looks beautiful!</p>
+                                    </div>
+                                </div>
+                                <Separator />
+                                <div class="flex items-start gap-3">
+                                    <Avatar Size="AvatarSize.Small">
+                                        <AvatarFallback>JR</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p class="text-sm font-medium">Jamie Ross <span class="text-xs text-muted-foreground font-normal">4h ago</span></p>
+                                        <p class="text-sm text-muted-foreground">Can we adjust the color palette?</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </TabsContent>
+                        <TabsContent Value="approved">
+                            <div class="space-y-3 pt-2">
+                                <div class="flex items-start gap-3">
+                                    <Avatar Size="AvatarSize.Small">
+                                        <AvatarFallback>CP</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p class="text-sm font-medium">Chris Park <span class="text-xs text-muted-foreground font-normal">1d ago</span></p>
+                                        <p class="text-sm text-muted-foreground">Great implementation, approved!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </TabsContent>
+                        <TabsContent Value="spam">
+                            <div class="space-y-3 pt-2">
+                                <div class="flex items-start gap-3">
+                                    <Avatar Size="AvatarSize.Small">
+                                        <AvatarFallback Class="bg-destructive/10 text-destructive">!</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p class="text-sm font-medium">Unknown <span class="text-xs text-muted-foreground font-normal">5h ago</span></p>
+                                        <p class="text-sm text-muted-foreground">Buy cheap products now...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </TabsContent>
+                    </Tabs>
+                </CardContent>
+            </Card>
+
+            <!-- Weekly Activity Card -->
+            <Card>
+                <CardHeader>
+                    <CardTitle>Weekly Activity</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div class="space-y-2">
+                        <div class="flex items-end gap-1.5" style="height: 100px">
+                            @foreach (var (day, percent) in _weeklyData)
+                            {
+                                <div class="flex-1 bg-primary rounded-t-sm transition-colors" style="height: @(percent)%"></div>
+                            }
+                        </div>
+                        <div class="flex gap-1.5">
+                            @foreach (var (day, _) in _weeklyData)
+                            {
+                                <div class="flex-1 text-center text-xs text-muted-foreground">@day</div>
+                            }
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Profile Photo Card -->
+            <Card>
+                <CardHeader>
+                    <CardTitle>Profile Photo</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div class="space-y-4">
+                        <div class="flex justify-center">
+                            <Avatar Size="AvatarSize.ExtraLarge">
+                                <AvatarFallback>SC</AvatarFallback>
+                            </Avatar>
+                        </div>
+                        <div class="space-y-2">
+                            <Label>Name</Label>
+                            <Input Type="InputType.Text" @bind-Value="_profileName" />
+                        </div>
+                        <div class="space-y-2">
+                            <Label>Username</Label>
+                            <Input Type="InputType.Text" @bind-Value="_profileUsername" />
+                        </div>
+                        <div class="space-y-2">
+                            <Label>Bio</Label>
+                            <Textarea Placeholder="Tell us about yourself..." @bind-Value="_profileBio" />
+                        </div>
+                    </div>
+                </CardContent>
+                <CardFooter>
+                    <Button Class="w-full">Save Profile</Button>
+                </CardFooter>
+            </Card>
+
+            <!-- Send Feedback Card -->
+            <Card>
+                <CardHeader>
+                    <CardTitle>Send Feedback</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div class="space-y-3">
+                        <Textarea Placeholder="Your feedback..." @bind-Value="_feedbackText" />
+                        <Button>Submit Feedback</Button>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Search Input -->
+            <Card>
+                <CardContent Class="pt-6">
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </span>
+                        <Input Type="InputType.Search" Placeholder="Search components..." @bind-Value="_searchQuery" Class="pl-9" />
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Price Range -->
+            <Card>
+                <CardContent Class="pt-6">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <Label>Price Range</Label>
+                            <span class="text-sm text-muted-foreground">$@((int)_priceRange.Start) - $@((int)_priceRange.End)</span>
+                        </div>
+                        <RangeSlider @bind-Value="_priceRange" Min="0" Max="100" />
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Rating -->
+            <Card>
+                <CardContent Class="pt-6">
+                    <div class="space-y-2">
+                        <Label>Rating</Label>
+                        <Rating @bind-Value="_rating" Max="5" />
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Email Updates Checkbox -->
+            <div class="flex items-center space-x-2 px-1">
+                <Checkbox @bind-Checked="_emailUpdates" Id="email-updates" />
+                <label for="email-updates" class="text-sm font-medium leading-none">
+                    Email me about product updates
+                </label>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _selectedTheme = "Default";
+    private IJSObjectReference? _jsModule;
+
+    // Login form
+    private string? _loginEmail;
+    private string? _loginPassword;
+    private bool _rememberMe;
+
+    // Form controls
+    private string? _selectedFramework;
+    private bool _checkDesign = true;
+    private bool _checkDev = true;
+    private bool _checkTest;
+    private string? _formNotes;
+
+    // Account form
+    private string? _accountName = "John Doe";
+    private string? _accountEmail = "john@example.com";
+    private string? _accountRole = "admin";
+
+    // Message
+    private string? _messageText;
+
+    // Comments tab
+    private string? _commentsTab = "pending";
+
+    // Profile
+    private string? _profileName = "Sarah Connor";
+    private string? _profileUsername = "@@sarahconnor";
+    private string? _profileBio;
+
+    // Feedback
+    private string? _feedbackText;
+
+    // Search
+    private string? _searchQuery;
+
+    // Range
+    private (double Start, double End) _priceRange = (20, 80);
+
+    // Rating
+    private double _rating = 3;
+
+    // Newsletter
+    private bool _emailUpdates;
+
+    // Weekly activity data
+    private static readonly (string Day, int Percent)[] _weeklyData =
+    [
+        ("Mon", 40), ("Tue", 70), ("Wed", 55), ("Thu", 85), ("Fri", 60), ("Sat", 30), ("Sun", 45)
+    ];
+
+    // Theme presets
+    private record ThemePreset(string Name, string PreviewColor,
+        Dictionary<string, string>? LightVars, Dictionary<string, string>? DarkVars);
+
+    private static string Oklch(double l, double c, double h) =>
+        string.Create(CultureInfo.InvariantCulture, $"oklch({l:F2} {c:F2} {h:F0})");
+
+    private static ThemePreset CreateColorPreset(string name, string preview,
+        double lightL, double darkL, double chroma, double hue)
+    {
+        return new ThemePreset(name, preview,
+            new Dictionary<string, string>
+            {
+                ["--primary"] = Oklch(lightL, chroma, hue),
+                ["--primary-foreground"] = Oklch(0.98, 0.01, hue),
+                ["--ring"] = Oklch(lightL, chroma, hue),
+                ["--accent"] = Oklch(0.95, 0.04, hue),
+                ["--accent-foreground"] = Oklch(0.40, 0.16, hue)
+            },
+            new Dictionary<string, string>
+            {
+                ["--primary"] = Oklch(darkL, chroma, hue),
+                ["--primary-foreground"] = Oklch(0.15, 0.03, hue),
+                ["--ring"] = Oklch(darkL, chroma, hue),
+                ["--accent"] = Oklch(0.25, 0.05, hue),
+                ["--accent-foreground"] = Oklch(0.90, 0.05, hue)
+            });
+    }
+
+    private static readonly ThemePreset[] _presets =
+    [
+        CreateColorPreset("Rose",   "#e11d48", 0.50, 0.65, 0.20, 350),
+        CreateColorPreset("Blue",   "#3b82f6", 0.50, 0.65, 0.18, 250),
+        CreateColorPreset("Green",  "#22c55e", 0.50, 0.65, 0.18, 155),
+        CreateColorPreset("Orange", "#f97316", 0.55, 0.70, 0.18, 55),
+        CreateColorPreset("Purple", "#a855f7", 0.45, 0.60, 0.20, 290),
+        new ThemePreset("Default", "#71717a", null, null)
+    ];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _jsModule = await JS.InvokeAsync<IJSObjectReference>("import",
+                "./_content/TrBlazeUI.Demo.Shared/js/theme-color.js");
+
+            var saved = await _jsModule.InvokeAsync<string?>("getThemeColor");
+            if (!string.IsNullOrEmpty(saved))
+            {
+                var preset = Array.Find(_presets, p => p.Name == saved);
+                if (preset is not null && preset.LightVars is not null)
+                {
+                    _selectedTheme = preset.Name;
+                    await _jsModule.InvokeVoidAsync("applyThemeColor", preset.LightVars, preset.DarkVars);
+                    StateHasChanged();
+                }
+            }
+        }
+    }
+
+    private async Task ApplyPreset(ThemePreset preset)
+    {
+        if (_jsModule is null) return;
+
+        _selectedTheme = preset.Name;
+
+        if (preset.LightVars is not null && preset.DarkVars is not null)
+        {
+            await _jsModule.InvokeVoidAsync("applyThemeColor", preset.LightVars, preset.DarkVars);
+        }
+        else
+        {
+            await _jsModule.InvokeVoidAsync("resetThemeColor");
+        }
+
+        await _jsModule.InvokeVoidAsync("saveThemeColor", preset.Name);
+    }
+
+    private string GetCircleClasses(string name)
+    {
+        const string baseClasses = "w-8 h-8 rounded-full cursor-pointer border-2 border-transparent transition-all hover:scale-110 focus:outline-none";
+        if (_selectedTheme == name)
+            return $"{baseClasses} ring-2 ring-offset-2 ring-offset-background ring-foreground scale-110";
+        return baseClasses;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule is not null)
+        {
+            try
+            {
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit disconnected, safe to ignore
+            }
+        }
+    }
+}

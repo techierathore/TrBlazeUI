@@ -506,8 +506,8 @@ If you're upgrading from the `BlazorUI.*` packages (v1.x), here's what you need 
 2. **Update namespaces** in your `_Imports.razor` and code files:
    ```razor
    @* Old *@
-   @using BlazorUI.Components
-   @using BlazorUI.Primitives.Services
+   @using BlazorBlueprint.Components
+   @using BlazorBlueprint.Primitives.Services
 
    @* New *@
    @using TrBlazeUI.Components
@@ -517,7 +517,7 @@ If you're upgrading from the `BlazorUI.*` packages (v1.x), here's what you need 
 3. **Update CSS references** in your `App.razor`:
    ```razor
    <!-- Old -->
-   <link href="_content/BlazorUI.Components/blazorui.css" rel="stylesheet" />
+   <link href="_content/BlazorBlueprint.Components/blazorblueprint.css" rel="stylesheet" />
 
    <!-- New -->
    <link href="_content/TrBlazeUI.Components/trblazeui.css" rel="stylesheet" />
@@ -526,7 +526,7 @@ If you're upgrading from the `BlazorUI.*` packages (v1.x), here's what you need 
 4. **Update service registration** in `Program.cs`:
    ```csharp
    // Old
-   builder.Services.AddBlazorUIPrimitives();
+   builder.Services.AddBlazorBlueprintPrimitives();
 
    // New
    builder.Services.AddTrBlazeUIPrimitives();
@@ -534,8 +534,8 @@ If you're upgrading from the `BlazorUI.*` packages (v1.x), here's what you need 
 
 ### Breaking Changes
 
-- All namespaces changed from `BlazorUI.*` to `TrBlazeUI.*`
-- CSS file renamed from `blazorui.css` to `trblazeui.css`
+- All namespaces changed from `BlazorBlueprint.*` to `TrBlazeUI.*`
+- CSS file renamed from `blazorblueprint.css` to `trblazeui.css`
 - Service extension method renamed to `AddTrBlazeUIPrimitives()`
 
 The component APIs remain unchanged—only the namespaces and package names have been updated.
