@@ -8,8 +8,8 @@ namespace TrBlazeUI.Primitives.Services;
 /// </summary>
 public class FocusManager : IFocusManager, IAsyncDisposable
 {
-    private readonly IJSRuntime _jsRuntime;
-    private IJSObjectReference? _module;
+    private readonly IJSRuntime objJsRuntime;
+    private IJSObjectReference? objModule;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FocusManager"/> class.
@@ -17,36 +17,36 @@ public class FocusManager : IFocusManager, IAsyncDisposable
     /// <param name="jsRuntime">The JavaScript runtime for invoking focus management functions.</param>
     public FocusManager(IJSRuntime jsRuntime)
     {
-        _jsRuntime = jsRuntime;
+        objJsRuntime = jsRuntime;
     }
 
     private async Task<IJSObjectReference> GetModuleAsync()
     {
-        if (_module == null)
+        if (objModule == null)
         {
-            _module = await _jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import", "./_content/TrBlazeUI.Primitives/js/primitives/focus-trap.js");
+            objModule = await objJsRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/TrBlazeUI.Primitives/js/primitives/focus-trap.js").ConfigureAwait(false);
         }
-        return _module;
+        return objModule;
     }
 
     /// <inheritdoc />
-    public async Task<IAsyncDisposable> TrapFocus(ElementReference container)
+    public async Task<IAsyncDisposable> TrapFocusAsync(ElementReference container)
     {
-        var module = await GetModuleAsync();
-        var cleanupFunction = await module.InvokeAsync<IJSObjectReference>("createFocusTrap", container);
+        var module = await GetModuleAsync().ConfigureAwait(false);
+        var cleanupFunction = await module.InvokeAsync<IJSObjectReference>("createFocusTrap", container).ConfigureAwait(false);
         return new FocusTrapHandle(cleanupFunction);
     }
 
     /// <inheritdoc />
-    public async Task RestoreFocus(ElementReference? previousElement)
+    public async Task RestoreFocusAsync(ElementReference? previousElement)
     {
         if (previousElement.HasValue)
         {
             try
             {
                 // Use Blazor's built-in FocusAsync instead of eval for security
-                await previousElement.Value.FocusAsync();
+                await previousElement.Value.FocusAsync().ConfigureAwait(false);
             }
             catch
             {
@@ -56,17 +56,17 @@ public class FocusManager : IFocusManager, IAsyncDisposable
     }
 
     /// <inheritdoc />
-    public async Task FocusFirst(ElementReference container)
+    public async Task FocusFirstAsync(ElementReference container)
     {
-        var module = await GetModuleAsync();
-        await module.InvokeVoidAsync("focusFirst", container);
+        var module = await GetModuleAsync().ConfigureAwait(false);
+        await module.InvokeVoidAsync("focusFirst", container).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public async Task FocusLast(ElementReference container)
+    public async Task FocusLastAsync(ElementReference container)
     {
-        var module = await GetModuleAsync();
-        await module.InvokeVoidAsync("focusLast", container);
+        var module = await GetModuleAsync().ConfigureAwait(false);
+        await module.InvokeVoidAsync("focusLast", container).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -76,26 +76,26 @@ public class FocusManager : IFocusManager, IAsyncDisposable
     {
         GC.SuppressFinalize(this);
 
-        if (_module != null)
+        if (objModule != null)
         {
-            await _module.DisposeAsync();
+            await objModule.DisposeAsync().ConfigureAwait(false);
         }
     }
 
     private sealed class FocusTrapHandle : IAsyncDisposable
     {
-        private readonly IJSObjectReference _cleanupFunction;
+        private readonly IJSObjectReference objCleanupFunction;
 
         public FocusTrapHandle(IJSObjectReference cleanupFunction)
         {
-            _cleanupFunction = cleanupFunction;
+            objCleanupFunction = cleanupFunction;
         }
 
         public async ValueTask DisposeAsync()
         {
             try
             {
-                await _cleanupFunction.InvokeVoidAsync("apply");
+                await objCleanupFunction.InvokeVoidAsync("apply").ConfigureAwait(false);
             }
             catch
             {

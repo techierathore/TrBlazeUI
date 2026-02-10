@@ -5,7 +5,7 @@
 @if (Menu?.IsOpen == true)
 {
     <div class="fixed inset-0 z-40" @onclick="HandleOverlayClick" @onclick:stopPropagation="true"></div>
-    <div @ref="_contentRef"
+    <div @ref="objContentRef"
          class="@CssClass"
          data-state="open"
          role="menu"
@@ -14,7 +14,7 @@
          @onclick:stopPropagation="true"
          @onkeydown="HandleKeyDown"
          @onkeydown:stopPropagation="true"
-         @onkeydown:preventDefault="@_shouldPreventDefault">
+         @onkeydown:preventDefault="@objShouldPreventDefault">
         @ChildContent
     </div>
 }
@@ -38,22 +38,22 @@
     [Parameter]
     public bool Loop { get; set; } = true;
 
-    private ElementReference _contentRef;
-    private bool _wasClosed = true;
-    private bool _shouldPreventDefault = true;
-    private IJSObjectReference? _portalModule;
+    private ElementReference objContentRef;
+    private bool objWasClosed = true;
+    private bool objShouldPreventDefault = true;
+    private IJSObjectReference? objPortalModule;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (Menu?.IsOpen == true && _wasClosed)
+        if (Menu?.IsOpen == true && objWasClosed)
         {
-            _wasClosed = false;
+            objWasClosed = false;
             try
             {
                 // Load portal module and trigger autofocus
-                _portalModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+                objPortalModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "import", "./_content/TrBlazeUI.Primitives/js/primitives/portal.js");
-                await _portalModule.InvokeVoidAsync("triggerAutofocus", _contentRef);
+                await objPortalModule.InvokeVoidAsync("triggerAutofocus", objContentRef);
             }
             catch
             {
@@ -62,15 +62,15 @@
         }
         else if (Menu?.IsOpen != true)
         {
-            _wasClosed = true;
+            objWasClosed = true;
         }
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (_portalModule != null)
+        if (objPortalModule != null)
         {
-            await _portalModule.DisposeAsync();
+            await objPortalModule.DisposeAsync();
         }
     }
 
@@ -90,19 +90,19 @@
                 break;
 
             case "ArrowDown":
-                await NavigateNext();
+                await NavigateNextAsync();
                 break;
 
             case "ArrowUp":
-                await NavigatePrevious();
+                await NavigatePreviousAsync();
                 break;
 
             case "Home":
-                await FocusFirst();
+                await FocusFirstAsync();
                 break;
 
             case "End":
-                await FocusLast();
+                await FocusLastAsync();
                 break;
 
             case "ArrowRight":
@@ -115,7 +115,7 @@
         }
     }
 
-    private async Task NavigateNext()
+    private async Task NavigateNextAsync()
     {
         if (Menu == null) return;
 
@@ -149,10 +149,10 @@
             }
         }
 
-        await FocusEnabledItem(enabledItems, items, nextIndex);
+        await FocusEnabledItemAsync(enabledItems, items, nextIndex);
     }
 
-    private async Task NavigatePrevious()
+    private async Task NavigatePreviousAsync()
     {
         if (Menu == null) return;
 
@@ -186,10 +186,10 @@
             }
         }
 
-        await FocusEnabledItem(enabledItems, items, prevIndex);
+        await FocusEnabledItemAsync(enabledItems, items, prevIndex);
     }
 
-    private async Task FocusFirst()
+    private async Task FocusFirstAsync()
     {
         if (Menu == null) return;
 
@@ -197,10 +197,10 @@
         var enabledItems = items.Where(i => !i.IsDisabled).ToList();
         if (enabledItems.Count == 0) return;
 
-        await FocusEnabledItem(enabledItems, items, 0);
+        await FocusEnabledItemAsync(enabledItems, items, 0);
     }
 
-    private async Task FocusLast()
+    private async Task FocusLastAsync()
     {
         if (Menu == null) return;
 
@@ -208,10 +208,10 @@
         var enabledItems = items.Where(i => !i.IsDisabled).ToList();
         if (enabledItems.Count == 0) return;
 
-        await FocusEnabledItem(enabledItems, items, enabledItems.Count - 1);
+        await FocusEnabledItemAsync(enabledItems, items, enabledItems.Count - 1);
     }
 
-    private async Task FocusEnabledItem(List<IMenubarItem> enabledItems, List<IMenubarItem> allItems, int enabledIndex)
+    private async Task FocusEnabledItemAsync(List<IMenubarItem> enabledItems, List<IMenubarItem> allItems, int enabledIndex)
     {
         if (enabledIndex < 0 || enabledIndex >= enabledItems.Count) return;
 

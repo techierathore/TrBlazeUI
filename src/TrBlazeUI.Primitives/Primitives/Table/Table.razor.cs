@@ -9,17 +9,17 @@ namespace TrBlazeUI.Primitives.Table;
 /// <typeparam name="TData">The type of data items in the table.</typeparam>
 public partial class Table<TData> : ComponentBase, IDisposable where TData : class
 {
-    private TableContext<TData> _context = null!;
-    private TableState<TData> _internalState = new();
-    private IEnumerable<TData> _processedData = Array.Empty<TData>();
-    private int _stateVersion;
-    private readonly List<Task> _pendingTasks = new();
+    private TableContext<TData> objContext = null!;
+    private TableState<TData> objInternalState = new();
+    private IEnumerable<TData> objProcessedData = Array.Empty<TData>();
+    private int objStateVersion;
+    private readonly List<Task> objPendingTasks = new();
 
     // ShouldRender tracking fields
-    private int _lastRenderVersion;
-    private IEnumerable<TData>? _lastData;
-    private SelectionMode _lastSelectionMode;
-    private bool _lastManualPagination;
+    private int objLastRenderVersion;
+    private IEnumerable<TData>? objLastData;
+    private SelectionMode objLastSelectionMode;
+    private bool objLastManualPagination;
 
     /// <summary>
     /// The data source for the table.
@@ -123,12 +123,12 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
     /// <summary>
     /// Gets the current effective state (external or internal).
     /// </summary>
-    private TableState<TData> EffectiveState => IsControlled ? State! : _internalState;
+    private TableState<TData> EffectiveState => IsControlled ? State! : objInternalState;
 
     /// <summary>
     /// Gets the table context provided to child components.
     /// </summary>
-    private TableContext<TData> Context => _context;
+    private TableContext<TData> Context => objContext;
 
     /// <summary>
     /// Initializes the table component, setting up context, event handlers, and processing initial data.
@@ -145,7 +145,7 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
     /// </summary>
     private void InitializeContext()
     {
-        _context = new TableContext<TData>(EffectiveState)
+        objContext = new TableContext<TData>(EffectiveState)
         {
             SelectionMode = SelectionMode,
             EnableKeyboardNavigation = EnableKeyboardNavigation
@@ -167,7 +167,7 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
     /// </summary>
     private void SetupEventHandlers()
     {
-        _context.OnSortChange = (columnId, direction) =>
+        objContext.OnSortChange = (columnId, direction) =>
         {
             var task = InvokeAsync(async () =>
             {
@@ -178,17 +178,17 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
                         await OnSortChange.InvokeAsync((columnId, direction));
                     }
 
-                    await NotifyStateChanged();
+                    await NotifyStateChangedAsync();
                 }
                 catch (Exception ex)
                 {
                     Console.Error.WriteLine($"Error in OnSortChange: {ex.Message}");
                 }
             });
-            _pendingTasks.Add(task);
+            objPendingTasks.Add(task);
         };
 
-        _context.OnPageChange = (page) =>
+        objContext.OnPageChange = (page) =>
         {
             var task = InvokeAsync(async () =>
             {
@@ -199,17 +199,17 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
                         await OnPageChange.InvokeAsync(page);
                     }
 
-                    await NotifyStateChanged();
+                    await NotifyStateChangedAsync();
                 }
                 catch (Exception ex)
                 {
                     Console.Error.WriteLine($"Error in OnPageChange: {ex.Message}");
                 }
             });
-            _pendingTasks.Add(task);
+            objPendingTasks.Add(task);
         };
 
-        _context.OnPageSizeChange = (pageSize) =>
+        objContext.OnPageSizeChange = (pageSize) =>
         {
             var task = InvokeAsync(async () =>
             {
@@ -220,17 +220,17 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
                         await OnPageSizeChange.InvokeAsync(pageSize);
                     }
 
-                    await NotifyStateChanged();
+                    await NotifyStateChangedAsync();
                 }
                 catch (Exception ex)
                 {
                     Console.Error.WriteLine($"Error in OnPageSizeChange: {ex.Message}");
                 }
             });
-            _pendingTasks.Add(task);
+            objPendingTasks.Add(task);
         };
 
-        _context.OnRowSelect = (item) =>
+        objContext.OnRowSelect = (item) =>
         {
             var task = InvokeAsync(async () =>
             {
@@ -246,10 +246,10 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
                     Console.Error.WriteLine($"Error in OnRowSelect: {ex.Message}");
                 }
             });
-            _pendingTasks.Add(task);
+            objPendingTasks.Add(task);
         };
 
-        _context.OnSelectionChange = (selectedItems) =>
+        objContext.OnSelectionChange = (selectedItems) =>
         {
             var task = InvokeAsync(async () =>
             {
@@ -260,17 +260,17 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
                         await OnSelectionChange.InvokeAsync(selectedItems);
                     }
 
-                    await NotifyStateChanged();
+                    await NotifyStateChangedAsync();
                 }
                 catch (Exception ex)
                 {
                     Console.Error.WriteLine($"Error in OnSelectionChange: {ex.Message}");
                 }
             });
-            _pendingTasks.Add(task);
+            objPendingTasks.Add(task);
         };
 
-        _context.OnStateChanged += HandleContextStateChanged;
+        objContext.OnStateChanged += HandleContextStateChanged;
     }
 
     /// <summary>
@@ -280,17 +280,17 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
     protected override void OnParametersSet()
     {
         // Update context with new parameters
-        _context.SelectionMode = SelectionMode;
-        _context.EnableKeyboardNavigation = EnableKeyboardNavigation;
+        objContext.SelectionMode = SelectionMode;
+        objContext.EnableKeyboardNavigation = EnableKeyboardNavigation;
 
         // Sync SelectionMode to the actual TableState
         SyncSelectionMode();
 
         // If controlled mode and state changed, update context
-        if (IsControlled && _context.State != State)
+        if (IsControlled && objContext.State != State)
         {
-            _context.State = State!;
-            _stateVersion++;
+            objContext.State = State!;
+            objStateVersion++;
         }
 
         // Reprocess data when parameters change
@@ -313,12 +313,12 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
         }
 
         // Apply pagination (skip if parent already paginated the data)
-        _processedData = ManualPagination
+        objProcessedData = ManualPagination
             ? data.ToArray()
             : data.ApplyPagination(currentState.Pagination) ?? Array.Empty<TData>();
 
         // Update context with processed data
-        _context.ProcessedData = _processedData;
+        objContext.ProcessedData = objProcessedData;
     }
 
     /// <summary>
@@ -326,7 +326,7 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
     /// </summary>
     private void HandleContextStateChanged()
     {
-        _stateVersion++;
+        objStateVersion++;
         ProcessData();
 
         // Notify parent if in controlled mode
@@ -341,9 +341,9 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
     /// <summary>
     /// Notifies that state has changed and triggers re-processing.
     /// </summary>
-    private async Task NotifyStateChanged()
+    private async Task NotifyStateChangedAsync()
     {
-        _stateVersion++;
+        objStateVersion++;
         ProcessData();
 
         // Notify parent if in controlled mode
@@ -370,17 +370,17 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
         }
 
         // For uncontrolled mode, check if anything relevant has changed
-        var dataChanged = !ReferenceEquals(_lastData, Data);
-        var selectionModeChanged = _lastSelectionMode != SelectionMode;
-        var paginationChanged = _lastManualPagination != ManualPagination;
-        var versionChanged = _lastRenderVersion != _stateVersion;
+        var dataChanged = !ReferenceEquals(objLastData, Data);
+        var selectionModeChanged = objLastSelectionMode != SelectionMode;
+        var paginationChanged = objLastManualPagination != ManualPagination;
+        var versionChanged = objLastRenderVersion != objStateVersion;
 
         if (dataChanged || selectionModeChanged || paginationChanged || versionChanged)
         {
-            _lastData = Data;
-            _lastSelectionMode = SelectionMode;
-            _lastManualPagination = ManualPagination;
-            _lastRenderVersion = _stateVersion;
+            objLastData = Data;
+            objLastSelectionMode = SelectionMode;
+            objLastManualPagination = ManualPagination;
+            objLastRenderVersion = objStateVersion;
             return true;
         }
 
@@ -398,17 +398,17 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-        _context.OnStateChanged -= HandleContextStateChanged;
+        objContext.OnStateChanged -= HandleContextStateChanged;
 
         // Wait for pending tasks with timeout to prevent memory leaks
         // Note: Task.WaitAll with timeout is not supported in browser/WASM context
-        if (_pendingTasks.Count > 0)
+        if (objPendingTasks.Count > 0)
         {
             try
             {
                 if (!OperatingSystem.IsBrowser())
                 {
-                    Task.WaitAll(_pendingTasks.ToArray(), TimeSpan.FromSeconds(1));
+                    Task.WaitAll(objPendingTasks.ToArray(), TimeSpan.FromSeconds(1));
                 }
             }
             catch (AggregateException)
@@ -417,7 +417,7 @@ public partial class Table<TData> : ComponentBase, IDisposable where TData : cla
             }
             finally
             {
-                _pendingTasks.Clear();
+                objPendingTasks.Clear();
             }
         }
     }

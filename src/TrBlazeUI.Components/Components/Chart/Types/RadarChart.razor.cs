@@ -79,7 +79,7 @@ public partial class RadarChart<TItem> : ChartBase<TItem> where TItem : class
     [Parameter]
     public double FillOpacity { get; set; } = 0.25;
 
-    private ApexChartOptions<TItem> _options = new();
+    private ApexChartOptions<TItem> objOptions = new();
 
     /// <summary>
     /// Gets the computed CSS classes for the chart container.
@@ -97,13 +97,13 @@ public partial class RadarChart<TItem> : ChartBase<TItem> where TItem : class
 
     private void ConfigureOptions()
     {
-        _options = CreateBaseOptions();
+        objOptions = CreateBaseOptions();
 
         // Set colors from config or defaults
-        _options.Colors = ChartColor.DefaultColors.ToList();
+        objOptions.Colors = ChartColor.DefaultColors.ToList();
 
         // Configure radar-specific plot options
-        _options.PlotOptions = new PlotOptions
+        objOptions.PlotOptions = new PlotOptions
         {
             Radar = new PlotOptionsRadar
             {
@@ -118,33 +118,33 @@ public partial class RadarChart<TItem> : ChartBase<TItem> where TItem : class
         // Configure fill based on variant
         if (Variant == RadarChartVariant.PolygonFill || Variant == RadarChartVariant.MultiSeries)
         {
-            _options.Fill = new Fill
+            objOptions.Fill = new Fill
             {
                 Opacity = FillOpacity
             };
         }
         else
         {
-            _options.Fill = new Fill
+            objOptions.Fill = new Fill
             {
                 Opacity = 0
             };
         }
 
         // Stroke configuration
-        _options.Stroke = new Stroke
+        objOptions.Stroke = new Stroke
         {
             Width = 2
         };
 
         // Markers
-        _options.Markers = new Markers
+        objOptions.Markers = new Markers
         {
             Size = ShowMarkers ? MarkerSize : 0
         };
 
         // X-Axis (categories) styling
-        _options.Xaxis = new XAxis
+        objOptions.Xaxis = new XAxis
         {
             Labels = new XAxisLabels
             {
@@ -157,7 +157,7 @@ public partial class RadarChart<TItem> : ChartBase<TItem> where TItem : class
         };
 
         // Y-Axis styling
-        _options.Yaxis =
+        objOptions.Yaxis =
         [
             new YAxis
             {

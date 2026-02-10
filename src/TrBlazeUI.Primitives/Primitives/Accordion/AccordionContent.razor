@@ -1,7 +1,7 @@
 @namespace TrBlazeUI.Primitives.Accordion
 
 @* AccordionContent primitive - collapsible content region for accordion item *@
-@if (_shouldRender)
+@if (objShouldRender)
 {
     <div id="@Item.ContentId"
          role="region"
@@ -13,7 +13,7 @@
 }
 
 @code {
-    private bool _shouldRender => ForceMount || Item.IsOpen;
+    private bool objShouldRender => ForceMount || Item.IsOpen;
 
     /// <summary>
     /// Cascading parameter to receive the parent accordion item.

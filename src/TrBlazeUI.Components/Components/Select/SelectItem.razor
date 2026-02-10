@@ -23,7 +23,7 @@
 
 @code {
     [CascadingParameter]
-    private SelectContext<TValue>? _context { get; set; }
+    private SelectContext<TValue>? objContext { get; set; }
 
     /// <summary>
     /// Gets or sets the value of this item.
@@ -63,8 +63,8 @@
     {
         get
         {
-            if (_context == null) return false;
-            return EqualityComparer<TValue?>.Default.Equals(_context.Value, Value);
+            if (objContext == null) return false;
+            return EqualityComparer<TValue?>.Default.Equals(objContext.Value, Value);
         }
     }
 

@@ -128,17 +128,17 @@ public partial class Combobox<TItem> : ComponentBase
     /// <summary>
     /// Tracks whether the popover is currently open.
     /// </summary>
-    private bool _isOpen { get; set; }
+    private bool objIsOpen { get; set; }
 
     /// <summary>
     /// Reference to the CommandInput for focus management.
     /// </summary>
-    private CommandInput? _commandInputRef;
+    private CommandInput? objCommandInputRef;
 
     /// <summary>
     /// Tracks whether focus has been done for the current open.
     /// </summary>
-    private bool _focusDone;
+    private bool objFocusDone;
 
     /// <summary>
     /// Gets a unique identifier for this combobox instance.
@@ -148,7 +148,7 @@ public partial class Combobox<TItem> : ComponentBase
     /// <summary>
     /// Gets whether the popover is currently open.
     /// </summary>
-    private bool GetIsOpen() => _isOpen;
+    private bool GetIsOpen() => objIsOpen;
 
     /// <summary>
     /// Validates required parameters.
@@ -197,14 +197,14 @@ public partial class Combobox<TItem> : ComponentBase
     private async Task HandleContentReady()
     {
         // Guard against multiple calls per open
-        if (_focusDone)
+        if (objFocusDone)
         {
             return;
         }
 
-        _focusDone = true;
+        objFocusDone = true;
 
-        if (_commandInputRef == null)
+        if (objCommandInputRef == null)
         {
             return;
         }
@@ -213,7 +213,7 @@ public partial class Combobox<TItem> : ComponentBase
         {
             // Small delay to let browser finish processing DOM changes
             await Task.Delay(50);
-            await _commandInputRef.FocusAsync();
+            await objCommandInputRef.FocusAsync();
         }
         catch
         {
@@ -228,10 +228,10 @@ public partial class Combobox<TItem> : ComponentBase
     /// <param name="isOpen">Whether the popover is now open.</param>
     private void HandleOpenChanged(bool isOpen)
     {
-        _isOpen = isOpen;
+        objIsOpen = isOpen;
         if (!isOpen)
         {
-            _focusDone = false; // Reset for next open
+            objFocusDone = false; // Reset for next open
         }
     }
 
@@ -250,8 +250,8 @@ public partial class Combobox<TItem> : ComponentBase
         await ValueChanged.InvokeAsync(newValue);
 
         // Close the popover after selection
-        _isOpen = false;
-        // Note: _focusDone is reset by HandleOpenChanged
+        objIsOpen = false;
+        // Note: objFocusDone is reset by HandleOpenChanged
     }
 
     /// <summary>

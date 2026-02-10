@@ -13,8 +13,8 @@
 </li>
 
 @code {
-    private NavigationMenuTrigger? _trigger;
-    private NavigationMenuContent? _content;
+    private NavigationMenuTrigger? objTrigger;
+    private NavigationMenuContent? objContent;
 
     /// <summary>
     /// Reference to the parent navigation menu.
@@ -60,7 +60,7 @@
     /// </summary>
     internal void RegisterTrigger(NavigationMenuTrigger trigger)
     {
-        _trigger = trigger;
+        objTrigger = trigger;
     }
 
     /// <summary>
@@ -68,7 +68,7 @@
     /// </summary>
     internal void RegisterContent(NavigationMenuContent content)
     {
-        _content = content;
+        objContent = content;
     }
 
     /// <summary>
@@ -76,9 +76,9 @@
     /// </summary>
     internal async Task FocusTriggerAsync()
     {
-        if (_trigger != null)
+        if (objTrigger != null)
         {
-            await _trigger.FocusAsync();
+            await objTrigger.FocusAsync();
         }
     }
 
@@ -87,9 +87,9 @@
     /// </summary>
     internal async Task FocusFirstContentItemAsync()
     {
-        if (_content != null)
+        if (objContent != null)
         {
-            await _content.FocusFirstItemAsync();
+            await objContent.FocusFirstItemAsync();
         }
     }
 

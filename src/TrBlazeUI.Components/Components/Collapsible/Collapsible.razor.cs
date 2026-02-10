@@ -78,7 +78,7 @@ namespace TrBlazeUI.Components.Collapsible;
 /// </example>
 public partial class Collapsible : ComponentBase
 {
-    private bool _isOpen;
+    private bool objIsOpen;
 
     /// <summary>
     /// Gets or sets a value indicating whether the collapsible is currently expanded.
@@ -161,7 +161,7 @@ public partial class Collapsible : ComponentBase
     /// <inheritdoc />
     protected override void OnInitialized() =>
         // Initialize with DefaultOpen if not controlled
-        _isOpen = OpenChanged.HasDelegate ? Open : DefaultOpen;
+        objIsOpen = OpenChanged.HasDelegate ? Open : DefaultOpen;
 
     /// <inheritdoc />
     protected override void OnParametersSet()
@@ -169,13 +169,13 @@ public partial class Collapsible : ComponentBase
         // If controlled (has callback), sync with Open parameter
         if (OpenChanged.HasDelegate)
         {
-            _isOpen = Open;
+            objIsOpen = Open;
         }
     }
 
     private async Task HandleOpenChanged(bool newValue)
     {
-        _isOpen = newValue;
+        objIsOpen = newValue;
 
         if (OpenChanged.HasDelegate)
         {

@@ -13,9 +13,9 @@
         @if (ShowToolbar)
         {
             <DataTableToolbar TData="TData"
-                              GlobalSearchValue="@_globalSearchValue"
+                              GlobalSearchValue="@objGlobalSearchValue"
                               OnGlobalSearchChanged="HandleGlobalSearchChanged"
-                              Columns="@_columns"
+                              Columns="@objColumns"
                               OnColumnVisibilityChanged="HandleColumnVisibilityChanged">
                 @ToolbarActions
             </DataTableToolbar>
@@ -35,7 +35,7 @@
                     </div>
                 }
             }
-            else if (!_processedData.Any())
+            else if (!objProcessedData.Any())
             {
                 @if (EmptyTemplate != null)
                 {
@@ -49,8 +49,8 @@
             else
             {
                 <TrBlazeUI.Primitives.Table.Table TData="TData"
-                                                 Data="@_processedData"
-                                                 @bind-State="@_tableState"
+                                                 Data="@objProcessedData"
+                                                 @bind-State="@objTableState"
                                                  SelectionMode="@GetPrimitiveSelectionMode()"
                                                  ManualPagination="true"
                                                  EnableKeyboardNavigation="@EnableKeyboardNavigation"
@@ -66,7 +66,7 @@
                                     <div @onclick:stopPropagation="true">
                                         @if (ShouldShowSelectAllPrompt())
                                         {
-                                            <DropdownMenu @bind-Open="_selectAllDropdownOpen">
+                                            <DropdownMenu @bind-Open="objSelectAllDropdownOpen">
                                                 <DropdownMenuTrigger Class="inline-flex items-center justify-center p-0 bg-transparent border-0 hover:bg-transparent focus:outline-none">
                                                     <Checkbox Checked="@IsAllSelected()"
                                                               Indeterminate="@IsSomeSelected()"
@@ -75,12 +75,12 @@
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent Side="PopoverSide.Bottom" Align="PopoverAlign.Start">
                                                     <DropdownMenuItem OnClick="@HandleSelectAllOnCurrentPage">
-                                                        Select all on this page (@_processedData.Count() items)
+                                                        Select all on this page (@objProcessedData.Count() items)
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem OnClick="@HandleSelectAllItems">
                                                         Select all @GetTotalFilteredItemCount() items
                                                     </DropdownMenuItem>
-                                                    @if (_tableState.Selection.HasSelection)
+                                                    @if (objTableState.Selection.HasSelection)
                                                     {
                                                         <DropdownMenuSeparator />
                                                         <DropdownMenuItem OnClick="@HandleClearSelection">
@@ -100,10 +100,10 @@
                                     </div>
                                 </TableHeaderCell>
                             }
-                            @foreach (var column in _columns.Where(c => c.Visible))
+                            @foreach (var column in objColumns.Where(c => c.Visible))
                             {
-                                var ariaSortValue = column.Sortable && _tableState.Sorting.SortedColumn == column.Id
-                                    ? (_tableState.Sorting.Direction == SortDirection.Ascending ? "ascending" : "descending")
+                                var ariaSortValue = column.Sortable && objTableState.Sorting.SortedColumn == column.Id
+                                    ? (objTableState.Sorting.Direction == SortDirection.Ascending ? "ascending" : "descending")
                                     : (column.Sortable ? "none" : null);
 
                                 <TableHeaderCell TData="TData" ColumnId="@(column.Sortable ? column.Id : null)"
@@ -112,15 +112,15 @@
                                                  aria-sort="@ariaSortValue">
                                     <div class="flex items-center gap-2">
                                         <span>@column.Header</span>
-                                        @if (column.Sortable && _tableState.Sorting.SortedColumn == column.Id)
+                                        @if (column.Sortable && objTableState.Sorting.SortedColumn == column.Id)
                                         {
-                                            @if (_tableState.Sorting.Direction == SortDirection.Ascending)
+                                            @if (objTableState.Sorting.Direction == SortDirection.Ascending)
                                             {
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
                                                 </svg>
                                             }
-                                            else if (_tableState.Sorting.Direction == SortDirection.Descending)
+                                            else if (objTableState.Sorting.Direction == SortDirection.Descending)
                                             {
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -139,9 +139,9 @@
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        @foreach (var item in _processedData)
+                        @foreach (var item in objProcessedData)
                         {
-                            var isSelected = _tableState.Selection.IsSelected(item);
+                            var isSelected = objTableState.Selection.IsSelected(item);
                             <TableRow TData="TData" Item="@item" Class="@ClassNames.cn("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", isSelected ? "bg-muted" : "")">
                                 @if (SelectionMode == DataTableSelectionMode.Multiple)
                                 {
@@ -153,7 +153,7 @@
                                         </div>
                                     </TableCell>
                                 }
-                                @foreach (var column in _columns.Where(c => c.Visible))
+                                @foreach (var column in objColumns.Where(c => c.Visible))
                                 {
                                     <TableCell Class="@ClassNames.cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", column.CellClass)">
                                         @if (column.CellTemplate != null)
@@ -174,9 +174,9 @@
             }
         </div>
 
-        @if (ShowPagination && !IsLoading && _processedData.Any())
+        @if (ShowPagination && !IsLoading && objProcessedData.Any())
         {
-            <Pagination State="@_tableState.Pagination"
+            <Pagination State="@objTableState.Pagination"
                         PageSizes="@PageSizes"
                         OnPageChanged="@HandlePageChanged"
                         OnPageSizeChanged="@HandlePageSizeChanged"

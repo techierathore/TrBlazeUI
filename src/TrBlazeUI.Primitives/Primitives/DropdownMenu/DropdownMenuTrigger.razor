@@ -13,7 +13,7 @@ else
 {
     <button type="button"
             id="@Context.TriggerId"
-            @ref="@_triggerRef"
+            @ref="@objTriggerRef"
             @onclick="HandleClick"
             @onkeydown="HandleKeyDown"
             @attributes="AdditionalAttributes"
@@ -28,7 +28,7 @@ else
     [CascadingParameter]
     private DropdownMenuContext Context { get; set; } = null!;
 
-    private ElementReference _triggerRef;
+    private ElementReference objTriggerRef;
 
     /// <summary>
     /// The content to display inside the trigger button.
@@ -73,7 +73,7 @@ else
     /// <summary>
     /// Stores the trigger element reference when using AsChild pattern.
     /// </summary>
-    private ElementReference? _asChildTriggerRef;
+    private ElementReference? objAsChildTriggerRef;
 
     /// <summary>
     /// Context passed to child components when AsChild is true.
@@ -82,13 +82,13 @@ else
     {
         TriggerId = Context.TriggerId,
         IsOpen = Context.IsOpen,
-        Toggle = () => Context.Toggle(_asChildTriggerRef),
-        Open = () => Context.Open(_asChildTriggerRef),
+        Toggle = () => Context.Toggle(objAsChildTriggerRef),
+        Open = () => Context.Open(objAsChildTriggerRef),
         Close = () => Context.Close(),
         AriaHasPopup = "menu",
         AriaControls = Context.ContentId,
         OnKeyDown = HandleKeyDownAsync,
-        SetTriggerElement = (ElementReference el) => _asChildTriggerRef = el
+        SetTriggerElement = (ElementReference el) => objAsChildTriggerRef = el
     };
 
     private async Task HandleClick(MouseEventArgs args)
@@ -103,7 +103,7 @@ else
         else
         {
             // Default: toggle dropdown menu and store trigger element for positioning
-            Context.Toggle(_triggerRef);
+            Context.Toggle(objTriggerRef);
 
             // Also invoke custom handler if provided
             if (OnClick.HasDelegate)
@@ -120,18 +120,18 @@ else
         // Enter or Space to toggle
         if (args.Key == "Enter" || args.Key == " ")
         {
-            Context.Toggle(_triggerRef);
+            Context.Toggle(objTriggerRef);
         }
         // Arrow Down to open and focus first item
         else if (args.Key == "ArrowDown" && !Context.IsOpen)
         {
-            Context.Open(_triggerRef);
+            Context.Open(objTriggerRef);
             Context.SetFocusedIndex(0);
         }
         // Arrow Up to open and focus last item
         else if (args.Key == "ArrowUp" && !Context.IsOpen)
         {
-            Context.Open(_triggerRef);
+            Context.Open(objTriggerRef);
             // Will be set to last item by DropdownMenuContent
             Context.SetFocusedIndex(-1);
         }
@@ -144,18 +144,18 @@ else
         // Enter or Space to toggle
         if (args.Key == "Enter" || args.Key == " ")
         {
-            Context.Toggle(_asChildTriggerRef);
+            Context.Toggle(objAsChildTriggerRef);
         }
         // Arrow Down to open and focus first item
         else if (args.Key == "ArrowDown" && !Context.IsOpen)
         {
-            Context.Open(_asChildTriggerRef);
+            Context.Open(objAsChildTriggerRef);
             Context.SetFocusedIndex(0);
         }
         // Arrow Up to open and focus last item
         else if (args.Key == "ArrowUp" && !Context.IsOpen)
         {
-            Context.Open(_asChildTriggerRef);
+            Context.Open(objAsChildTriggerRef);
             Context.SetFocusedIndex(-1);
         }
         return Task.CompletedTask;
@@ -178,14 +178,14 @@ else
         // This runs after every render to ensure the reference stays current
         if (!AsChild)
         {
-            Context.SetTriggerElement(_triggerRef);
+            Context.SetTriggerElement(objTriggerRef);
         }
-        else if (_asChildTriggerRef.HasValue)
+        else if (objAsChildTriggerRef.HasValue)
         {
             // When using AsChild pattern, the child component (e.g., Button) sets
-            // _asChildTriggerRef via TriggerContext.SetTriggerElement. We need to
+            // objAsChildTriggerRef via TriggerContext.SetTriggerElement. We need to
             // propagate this to the context so Content can position relative to it.
-            Context.SetTriggerElement(_asChildTriggerRef.Value);
+            Context.SetTriggerElement(objAsChildTriggerRef.Value);
         }
     }
 }

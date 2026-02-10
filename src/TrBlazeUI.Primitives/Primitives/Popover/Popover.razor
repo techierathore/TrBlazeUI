@@ -2,13 +2,13 @@
 @implements IDisposable
 
 @* Popover primitive root component - headless, unstyled behavior only *@
-<CascadingValue Value="@_context" IsFixed="false">
+<CascadingValue Value="@objContext" IsFixed="false">
     @ChildContent
 </CascadingValue>
 
 @code {
-    private PopoverContext _context = new();
-    private UseControllableState<bool> _state = null!;
+    private PopoverContext objContext = new();
+    private UseControllableState<bool> objState = null!;
 
     /// <summary>
     /// The child content to render within the popover context.
@@ -54,7 +54,7 @@
     protected override void OnInitialized()
     {
         // Initialize controllable state
-        _state = new UseControllableState<bool>(DefaultOpen)
+        objState = new UseControllableState<bool>(DefaultOpen)
         {
             ControlledValue = Open ?? DefaultOpen,
             OnValueChanged = OpenChanged,
@@ -62,19 +62,19 @@
         };
 
         // Sync initial state to context
-        _context.State.IsOpen = _state.Value;
+        objContext.State.IsOpen = objState.Value;
 
         // Subscribe to context state changes
-        _context.OnStateChanged += HandleContextStateChanged;
+        objContext.OnStateChanged += HandleContextStateChanged;
     }
 
     protected override void OnParametersSet()
     {
         // Update controlled value if it changed
-        if (_state.IsControlled && Open.HasValue)
+        if (objState.IsControlled && Open.HasValue)
         {
-            _state.ControlledValue = Open.Value;
-            _context.State.IsOpen = Open.Value;
+            objState.ControlledValue = Open.Value;
+            objContext.State.IsOpen = Open.Value;
         }
     }
 
@@ -82,11 +82,11 @@
     {
         // When context state changes (e.g., from PopoverTrigger or click outside),
         // update the controllable state
-        var newOpenState = _context.State.IsOpen;
+        var newOpenState = objContext.State.IsOpen;
 
-        if (_state.Value != newOpenState)
+        if (objState.Value != newOpenState)
         {
-            _ = _state.SetValueAsync(newOpenState);
+            _ = objState.SetValueAsync(newOpenState);
 
             // Invoke additional callback if provided
             if (OnOpenChange.HasDelegate)
@@ -100,6 +100,6 @@
 
     public void Dispose()
     {
-        _context.OnStateChanged -= HandleContextStateChanged;
+        objContext.OnStateChanged -= HandleContextStateChanged;
     }
 }

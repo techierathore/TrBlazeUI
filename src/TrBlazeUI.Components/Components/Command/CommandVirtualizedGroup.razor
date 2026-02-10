@@ -5,33 +5,33 @@
 @inject IJSRuntime JS
 
 @* CommandVirtualizedGroup - A virtualized group for efficiently rendering large item collections *@
-<div id="@($"vgroup-container-{_id}")"
+<div id="@($"vgroup-container-{objId}")"
      class="@CssClass"
-     style="@(_hasVisibleItems ? null : "display: none")"
+     style="@(objHasVisibleItems ? null : "display: none")"
      role="group"
-     aria-labelledby="@(string.IsNullOrWhiteSpace(Heading) ? null : $"command-group-{_id}")">
+     aria-labelledby="@(string.IsNullOrWhiteSpace(Heading) ? null : $"command-group-{objId}")">
     @if (!string.IsNullOrWhiteSpace(Heading))
     {
-        <div id="@($"command-group-{_id}")"
+        <div id="@($"command-group-{objId}")"
              class="px-2 py-1.5 text-xs font-medium text-muted-foreground">
             @Heading
-            @if (_totalCount > 0)
+            @if (objTotalCount > 0)
             {
-                var displayedCount = EnableLazyLoading ? _filteredCount : (_filteredItems?.Count ?? 0);
-                @if (displayedCount != _totalCount)
+                var displayedCount = EnableLazyLoading ? objFilteredCount : (objFilteredItems?.Count ?? 0);
+                @if (displayedCount != objTotalCount)
                 {
-                    <span class="ml-1 opacity-70">(@displayedCount of @_totalCount)</span>
+                    <span class="ml-1 opacity-70">(@displayedCount of @objTotalCount)</span>
                 }
             }
         </div>
     }
 
-    @if (_hasVisibleItems)
+    @if (objHasVisibleItems)
     {
         @if (EnableLazyLoading)
         {
             <Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize
-                @ref="_virtualizeRef"
+                @ref="objVirtualizeRef"
                 ItemsProvider="LoadItemsAsync"
                 ItemSize="32"
                 OverscanCount="5">
@@ -40,7 +40,7 @@
                          role="option"
                          aria-selected="@(IsItemFocusedByIndex(indexed.Index) ? "true" : "false")"
                          data-focused="@(IsItemFocusedByIndex(indexed.Index) ? "true" : "false")"
-                         @onclick="@(() => SelectItem(indexed.Item))"
+                         @onclick="@(() => SelectItemAsync(indexed.Item))"
                          @onmouseenter="@(() => FocusItemByIndex(indexed.Index))"
                          @onmousemove="HandleMouseMove"
                          class="@GetItemCssClassByIndex(indexed.Index)">
@@ -52,10 +52,10 @@
                 </Placeholder>
             </Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize>
         }
-        else if (_indexedItems != null && _indexedItems.Count > 0)
+        else if (objIndexedItems != null && objIndexedItems.Count > 0)
         {
             <Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize
-                Items="_indexedItems"
+                Items="objIndexedItems"
                 ItemSize="32"
                 OverscanCount="5">
                 <ItemContent Context="indexed">
@@ -63,7 +63,7 @@
                          role="option"
                          aria-selected="@(IsItemFocusedByIndex(indexed.Index) ? "true" : "false")"
                          data-focused="@(IsItemFocusedByIndex(indexed.Index) ? "true" : "false")"
-                         @onclick="@(() => SelectItem(indexed.Item))"
+                         @onclick="@(() => SelectItemAsync(indexed.Item))"
                          @onmouseenter="@(() => FocusItemByIndex(indexed.Index))"
                          @onmousemove="HandleMouseMove"
                          class="@GetItemCssClassByIndex(indexed.Index)">
@@ -139,21 +139,21 @@
     [Parameter]
     public int LazyLoadBatchSize { get; set; } = 50;
 
-    private readonly string _id = Guid.NewGuid().ToString("N");
-    private List<TItem>? _filteredItems;
-    private List<IndexedItem>? _indexedItems;
-    private int _totalCount;
-    private int _filteredCount; // Total count after filtering (for lazy loading)
-    private bool _hasVisibleItems = true;
-    private int _focusedIndex = -1;
-    private bool _shouldScrollIntoView;
-    private Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<IndexedItem>? _virtualizeRef;
+    private readonly string objId = Guid.NewGuid().ToString("N");
+    private List<TItem>? objFilteredItems;
+    private List<IndexedItem>? objIndexedItems;
+    private int objTotalCount;
+    private int objFilteredCount; // Total count after filtering (for lazy loading)
+    private bool objHasVisibleItems = true;
+    private int objFocusedIndex = -1;
+    private bool objShouldScrollIntoView;
+    private Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<IndexedItem>? objVirtualizeRef;
 
     // Caching to avoid expensive re-computation in WASM
-    private IReadOnlyList<TItem>? _cachedItems;
-    private string? _cachedSearchQuery;
-    private List<TItem>? _lazyFilteredSource; // Full filtered list for lazy loading
-    private int _lazyLoadedCount; // How many items currently loaded for lazy loading
+    private IReadOnlyList<TItem>? objCachedItems;
+    private string? objCachedSearchQuery;
+    private List<TItem>? objLazyFilteredSource; // Full filtered list for lazy loading
+    private int objLazyLoadedCount; // How many items currently loaded for lazy loading
 
     private readonly struct IndexedItem
     {
@@ -163,17 +163,17 @@
     }
 
     // IVirtualizedGroupHandler implementation
-    int IVirtualizedGroupHandler.VisibleItemCount => EnableLazyLoading ? _filteredCount : (_indexedItems?.Count ?? 0);
+    int IVirtualizedGroupHandler.VisibleItemCount => EnableLazyLoading ? objFilteredCount : (objIndexedItems?.Count ?? 0);
 
     int IVirtualizedGroupHandler.FocusedIndex
     {
-        get => _focusedIndex;
+        get => objFocusedIndex;
         set
         {
-            if (_focusedIndex != value)
+            if (objFocusedIndex != value)
             {
-                _focusedIndex = value;
-                _shouldScrollIntoView = value >= 0; // Scroll when focus is set via keyboard
+                objFocusedIndex = value;
+                objShouldScrollIntoView = value >= 0; // Scroll when focus is set via keyboard
             }
         }
     }
@@ -184,15 +184,15 @@
     {
         if (EnableLazyLoading)
         {
-            var source = _lazyFilteredSource ?? (IReadOnlyList<TItem>)Items;
-            if (source != null && _focusedIndex >= 0 && _focusedIndex < source.Count)
+            var source = objLazyFilteredSource ?? (IReadOnlyList<TItem>)Items;
+            if (source != null && objFocusedIndex >= 0 && objFocusedIndex < source.Count)
             {
-                await SelectItem(source[_focusedIndex]);
+                await SelectItemAsync(source[objFocusedIndex]);
             }
         }
-        else if (_indexedItems != null && _focusedIndex >= 0 && _focusedIndex < _indexedItems.Count)
+        else if (objIndexedItems != null && objFocusedIndex >= 0 && objFocusedIndex < objIndexedItems.Count)
         {
-            await SelectItem(_indexedItems[_focusedIndex].Item);
+            await SelectItemAsync(objIndexedItems[objFocusedIndex].Item);
         }
     }
 
@@ -200,13 +200,13 @@
     {
         if (index < 0) return;
 
-        var totalItems = EnableLazyLoading ? _filteredCount : (_indexedItems?.Count ?? 0);
+        var totalItems = EnableLazyLoading ? objFilteredCount : (objIndexedItems?.Count ?? 0);
         if (index >= totalItems) index = totalItems - 1;
         if (index < 0) return;
 
         // Set the focused index
-        _focusedIndex = index;
-        _shouldScrollIntoView = true;
+        objFocusedIndex = index;
+        objShouldScrollIntoView = true;
 
         // Scroll the container to bring the target item into view
         // This is needed for both lazy loading AND regular virtualization
@@ -216,7 +216,7 @@
             try
             {
                 var listId = Context.ListId;
-                var containerId = $"vgroup-container-{_id}";
+                var containerId = $"vgroup-container-{objId}";
 
                 // Scroll using the virtualization-scroll module
                 var virtualizationScrollModule = await JS.InvokeAsync<IJSObjectReference>(
@@ -246,7 +246,7 @@
         }
     }
 
-    private string GetItemId(int index) => $"vgroup-{_id}-item-{index}";
+    private string GetItemId(int index) => $"vgroup-{objId}-item-{index}";
 
     protected override void OnInitialized()
     {
@@ -256,7 +256,7 @@
             Context.OnKeyboardNavigationChanged += HandleKeyboardNavigationChanged;
             Context.RegisterVirtualizedGroup(this);
         }
-        _cachedItems = Items;
+        objCachedItems = Items;
 
         if (EnableLazyLoading)
         {
@@ -271,18 +271,18 @@
     protected override async Task OnParametersSetAsync()
     {
         // Only re-filter if Items reference actually changed
-        if (!ReferenceEquals(Items, _cachedItems))
+        if (!ReferenceEquals(Items, objCachedItems))
         {
-            _cachedItems = Items;
-            _cachedSearchQuery = null; // Force rebuild
+            objCachedItems = Items;
+            objCachedSearchQuery = null; // Force rebuild
 
             if (EnableLazyLoading)
             {
                 UpdateLazyFilteredSource();
-                _lazyLoadedCount = 0;
-                if (_virtualizeRef != null)
+                objLazyLoadedCount = 0;
+                if (objVirtualizeRef != null)
                 {
-                    await _virtualizeRef.RefreshDataAsync();
+                    await objVirtualizeRef.RefreshDataAsync();
                 }
             }
             else
@@ -294,14 +294,14 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (_shouldScrollIntoView && _focusedIndex >= 0)
+        if (objShouldScrollIntoView && objFocusedIndex >= 0)
         {
-            _shouldScrollIntoView = false;
-            var elementId = GetItemId(_focusedIndex);
+            objShouldScrollIntoView = false;
+            var elementId = GetItemId(objFocusedIndex);
             try
             {
                 // Use 'start' for first item in first group to show group heading
-                var isFirstGroupFirstItem = _focusedIndex == 0 && Context != null && IsFirstVisibleGroup();
+                var isFirstGroupFirstItem = objFocusedIndex == 0 && Context != null && IsFirstVisibleGroup();
                 var scrollBlock = isFirstGroupFirstItem ? "start" : "nearest";
                 var virtualizationScrollModule = await JS.InvokeAsync<IJSObjectReference>(
                     "import", "./_content/TrBlazeUI.Components/js/virtualization-scroll.js");
@@ -335,52 +335,52 @@
     {
         if (Items == null || Items.Count == 0)
         {
-            _filteredItems = new List<TItem>();
-            _indexedItems = new List<IndexedItem>();
-            _totalCount = 0;
-            _hasVisibleItems = false;
-            _cachedSearchQuery = null;
+            objFilteredItems = new List<TItem>();
+            objIndexedItems = new List<IndexedItem>();
+            objTotalCount = 0;
+            objHasVisibleItems = false;
+            objCachedSearchQuery = null;
             return;
         }
 
         var searchQuery = Context?.SearchQuery ?? "";
 
         // Skip if search query hasn't changed (cache hit)
-        if (string.Equals(_cachedSearchQuery, searchQuery, StringComparison.Ordinal) && _indexedItems != null)
+        if (string.Equals(objCachedSearchQuery, searchQuery, StringComparison.Ordinal) && objIndexedItems != null)
         {
             return;
         }
 
-        _cachedSearchQuery = searchQuery;
-        _totalCount = Items.Count;
+        objCachedSearchQuery = searchQuery;
+        objTotalCount = Items.Count;
 
         if (string.IsNullOrWhiteSpace(searchQuery))
         {
             // No search - show first MaxDisplayCount items
             var count = MaxDisplayCount > 0 ? Math.Min(MaxDisplayCount, Items.Count) : Items.Count;
-            _filteredItems = new List<TItem>(count);
-            _indexedItems = new List<IndexedItem>(count);
+            objFilteredItems = new List<TItem>(count);
+            objIndexedItems = new List<IndexedItem>(count);
 
             for (int i = 0; i < count; i++)
             {
-                _filteredItems.Add(Items[i]);
-                _indexedItems.Add(new IndexedItem(Items[i], i));
+                objFilteredItems.Add(Items[i]);
+                objIndexedItems.Add(new IndexedItem(Items[i], i));
             }
         }
         else
         {
             // Filter by search query - use pre-sized lists to avoid resizing
             var searchTextFunc = ItemSearchText ?? ItemValue;
-            _filteredItems = new List<TItem>();
-            _indexedItems = new List<IndexedItem>();
+            objFilteredItems = new List<TItem>();
+            objIndexedItems = new List<IndexedItem>();
             var index = 0;
 
             foreach (var item in Items)
             {
                 if (searchTextFunc(item).Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
                 {
-                    _filteredItems.Add(item);
-                    _indexedItems.Add(new IndexedItem(item, index));
+                    objFilteredItems.Add(item);
+                    objIndexedItems.Add(new IndexedItem(item, index));
                     index++;
 
                     if (MaxDisplayCount > 0 && index >= MaxDisplayCount)
@@ -389,53 +389,53 @@
             }
         }
 
-        _hasVisibleItems = _indexedItems.Count > 0;
+        objHasVisibleItems = objIndexedItems.Count > 0;
     }
 
     private void UpdateLazyFilteredSource()
     {
         if (Items == null || Items.Count == 0)
         {
-            _lazyFilteredSource = new List<TItem>();
-            _filteredCount = 0;
-            _totalCount = 0;
-            _hasVisibleItems = false;
+            objLazyFilteredSource = new List<TItem>();
+            objFilteredCount = 0;
+            objTotalCount = 0;
+            objHasVisibleItems = false;
                         return;
         }
 
-        _totalCount = Items.Count;
+        objTotalCount = Items.Count;
         var searchQuery = Context?.SearchQuery ?? "";
 
         if (string.IsNullOrWhiteSpace(searchQuery))
         {
             // No search - use all items (lazy loaded on demand)
-            _lazyFilteredSource = null; // null means use Items directly
-            _filteredCount = Items.Count;
+            objLazyFilteredSource = null; // null means use Items directly
+            objFilteredCount = Items.Count;
                     }
         else
         {
             // Filter by search query
             var searchTextFunc = ItemSearchText ?? ItemValue;
-            _lazyFilteredSource = new List<TItem>();
+            objLazyFilteredSource = new List<TItem>();
 
             foreach (var item in Items)
             {
                 if (searchTextFunc(item).Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
                 {
-                    _lazyFilteredSource.Add(item);
+                    objLazyFilteredSource.Add(item);
                 }
             }
-            _filteredCount = _lazyFilteredSource.Count;
+            objFilteredCount = objLazyFilteredSource.Count;
                     }
 
-        _hasVisibleItems = _filteredCount > 0;
+        objHasVisibleItems = objFilteredCount > 0;
     }
 
     private ValueTask<Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<IndexedItem>> LoadItemsAsync(
         Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderRequest request)
     {
         // Determine the source list
-        var source = _lazyFilteredSource ?? (IReadOnlyList<TItem>)Items;
+        var source = objLazyFilteredSource ?? (IReadOnlyList<TItem>)Items;
         var totalItems = source.Count;
 
         // Calculate the range to return
@@ -459,7 +459,7 @@
         }
 
         // Track loaded count for keyboard navigation
-        _lazyLoadedCount = Math.Max(_lazyLoadedCount, startIndex + count);
+        objLazyLoadedCount = Math.Max(objLazyLoadedCount, startIndex + count);
 
         
         return ValueTask.FromResult(new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<IndexedItem>(
@@ -468,15 +468,15 @@
 
     private async void HandleSearchChanged()
     {
-        _cachedSearchQuery = null; // Force rebuild
+        objCachedSearchQuery = null; // Force rebuild
 
         if (EnableLazyLoading)
         {
             UpdateLazyFilteredSource();
-            _lazyLoadedCount = 0;
-            if (_virtualizeRef != null)
+            objLazyLoadedCount = 0;
+            if (objVirtualizeRef != null)
             {
-                await _virtualizeRef.RefreshDataAsync();
+                await objVirtualizeRef.RefreshDataAsync();
             }
         }
         else
@@ -484,7 +484,7 @@
             UpdateFilteredItems();
         }
 
-        _focusedIndex = -1;
+        objFocusedIndex = -1;
         StateHasChanged();
     }
 
@@ -496,7 +496,7 @@
 
     private bool IsItemFocusedByIndex(int index)
     {
-        return _focusedIndex >= 0 && _focusedIndex == index;
+        return objFocusedIndex >= 0 && objFocusedIndex == index;
     }
 
     private void HandleMouseMove()
@@ -510,9 +510,9 @@
         // Ignore hover during keyboard navigation
         if (Context?.IsKeyboardNavigating == true) return;
 
-        if (index >= 0 && index != _focusedIndex)
+        if (index >= 0 && index != objFocusedIndex)
         {
-            _focusedIndex = index;
+            objFocusedIndex = index;
             // Notify context to clear focus from other groups
             Context?.SetVirtualizedGroupFocus(this, index);
             // Don't scroll on mouse hover
@@ -520,7 +520,7 @@
         }
     }
 
-    private async Task SelectItem(TItem item)
+    private async Task SelectItemAsync(TItem item)
     {
         if (Context != null)
         {

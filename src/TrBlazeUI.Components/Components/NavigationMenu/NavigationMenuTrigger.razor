@@ -7,7 +7,7 @@
     Navigation Menu Trigger - opens a dropdown content panel.
 *@
 
-<button @ref="_buttonRef"
+<button @ref="objButtonRef"
         type="button"
         class="@CssClass"
         data-state="@(MenuItem?.IsOpen == true ? "open" : "closed")"
@@ -15,7 +15,7 @@
         aria-expanded="@(MenuItem?.IsOpen == true ? "true" : "false")"
         @onclick="HandleClick"
         @onkeydown="HandleKeyDown"
-        @onkeydown:preventDefault="_preventKeyDefault"
+        @onkeydown:preventDefault="objPreventKeyDefault"
         @onmouseenter="HandleMouseEnter"
         @onmouseleave="HandleMouseLeave">
     @ChildContent
@@ -24,10 +24,10 @@
 </button>
 
 @code {
-    private ElementReference _buttonRef;
-    private int _triggerIndex = -1;
-    private bool _preventKeyDefault = false;
-    private IJSObjectReference? _navModule;
+    private ElementReference objButtonRef;
+    private int objTriggerIndex = -1;
+    private bool objPreventKeyDefault = false;
+    private IJSObjectReference? objNavModule;
 
     /// <summary>
     /// Reference to the parent menu item.
@@ -56,28 +56,28 @@
     /// <summary>
     /// Gets the element reference for focus management.
     /// </summary>
-    internal ElementReference ButtonRef => _buttonRef;
+    internal ElementReference ButtonRef => objButtonRef;
 
     protected override void OnInitialized()
     {
         if (Menu != null)
         {
-            _triggerIndex = Menu.RegisterTrigger(_buttonRef);
+            objTriggerIndex = Menu.RegisterTrigger(objButtonRef);
         }
         MenuItem?.RegisterTrigger(this);
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender && Menu != null && _triggerIndex >= 0)
+        if (firstRender && Menu != null && objTriggerIndex >= 0)
         {
             // Re-register with the actual element reference after render
             var triggers = typeof(NavigationMenu)
                 .GetField("_triggerRefs", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?
                 .GetValue(Menu) as List<ElementReference>;
-            if (triggers != null && _triggerIndex < triggers.Count)
+            if (triggers != null && objTriggerIndex < triggers.Count)
             {
-                triggers[_triggerIndex] = _buttonRef;
+                triggers[objTriggerIndex] = objButtonRef;
             }
         }
     }
@@ -93,20 +93,20 @@
 
     private async Task HandleKeyDown(KeyboardEventArgs args)
     {
-        _preventKeyDefault = false;
+        objPreventKeyDefault = false;
 
         switch (args.Key)
         {
             case "ArrowRight":
-                _preventKeyDefault = true;
-                await FocusTriggerAtOffset(1);
+                objPreventKeyDefault = true;
+                await FocusTriggerAtOffsetAsync(1);
                 break;
             case "ArrowLeft":
-                _preventKeyDefault = true;
-                await FocusTriggerAtOffset(-1);
+                objPreventKeyDefault = true;
+                await FocusTriggerAtOffsetAsync(-1);
                 break;
             case "ArrowDown":
-                _preventKeyDefault = true;
+                objPreventKeyDefault = true;
                 if (MenuItem != null)
                 {
                     MenuItem.CancelCloseTimer();
@@ -116,15 +116,15 @@
                 }
                 break;
             case "ArrowUp":
-                _preventKeyDefault = true;
+                objPreventKeyDefault = true;
                 break;
             case "Enter":
             case " ":
-                _preventKeyDefault = true;
+                objPreventKeyDefault = true;
                 MenuItem?.Toggle();
                 break;
             case "Escape":
-                _preventKeyDefault = true;
+                objPreventKeyDefault = true;
                 if (MenuItem != null)
                 {
                     MenuItem.IsOpen = false;
@@ -133,32 +133,32 @@
         }
     }
 
-    private async Task FocusTriggerAtOffset(int offset)
+    private async Task FocusTriggerAtOffsetAsync(int offset)
     {
-        if (Menu == null || _triggerIndex < 0) return;
+        if (Menu == null || objTriggerIndex < 0) return;
 
-        var newIndex = _triggerIndex + offset;
+        var newIndex = objTriggerIndex + offset;
         if (newIndex < 0) newIndex = Menu.TriggerCount - 1;
         if (newIndex >= Menu.TriggerCount) newIndex = 0;
 
         var targetRef = Menu.GetTriggerAt(newIndex);
         if (targetRef.HasValue)
         {
-            await EnsureModuleLoaded();
-            if (_navModule != null)
+            await EnsureModuleLoadedAsync();
+            if (objNavModule != null)
             {
-                await _navModule.InvokeVoidAsync("focusElement", targetRef.Value);
+                await objNavModule.InvokeVoidAsync("focusElement", targetRef.Value);
             }
         }
     }
 
-    private async Task EnsureModuleLoaded()
+    private async Task EnsureModuleLoadedAsync()
     {
-        if (_navModule == null)
+        if (objNavModule == null)
         {
             try
             {
-                _navModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                objNavModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "import", "./_content/TrBlazeUI.Components/js/navigation-menu.js");
             }
             catch { }
@@ -184,10 +184,10 @@
     /// </summary>
     internal async Task FocusAsync()
     {
-        await EnsureModuleLoaded();
-        if (_navModule != null)
+        await EnsureModuleLoadedAsync();
+        if (objNavModule != null)
         {
-            await _navModule.InvokeVoidAsync("focusElement", _buttonRef);
+            await objNavModule.InvokeVoidAsync("focusElement", objButtonRef);
         }
     }
 

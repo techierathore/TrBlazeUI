@@ -32,7 +32,7 @@ namespace TrBlazeUI.Components.InputGroup;
 /// </example>
 public partial class InputGroupInput : ComponentBase
 {
-    private ElementReference _inputRef;
+    private ElementReference objInputRef;
 
     /// <summary>
     /// Gets or sets the type of input.
@@ -180,7 +180,7 @@ public partial class InputGroupInput : ComponentBase
     {
         if (firstRender && OnInputRef != null)
         {
-            OnInputRef.Invoke(_inputRef);
+            OnInputRef.Invoke(objInputRef);
         }
     }
 }

@@ -16,7 +16,7 @@
 </div>
 
 @code {
-    private System.Timers.Timer? _autoCloseTimer;
+    private System.Timers.Timer? objAutoCloseTimer;
 
     /// <summary>
     /// The position of the toast container on the screen.
@@ -55,8 +55,8 @@
 
     private void StartAutoCloseTimer()
     {
-        _autoCloseTimer = new System.Timers.Timer(1000);
-        _autoCloseTimer.Elapsed += (sender, args) =>
+        objAutoCloseTimer = new System.Timers.Timer(1000);
+        objAutoCloseTimer.Elapsed += (sender, args) =>
         {
             var now = DateTime.Now;
             var toastsToRemove = ToastService.Toasts
@@ -69,7 +69,7 @@
                 ToastService.Dismiss(id);
             }
         };
-        _autoCloseTimer.Start();
+        objAutoCloseTimer.Start();
     }
 
     /// <summary>
@@ -93,7 +93,7 @@
     public void Dispose()
     {
         ToastService.OnChange -= HandleToastsChanged;
-        _autoCloseTimer?.Stop();
-        _autoCloseTimer?.Dispose();
+        objAutoCloseTimer?.Stop();
+        objAutoCloseTimer?.Dispose();
     }
 }

@@ -3,7 +3,7 @@
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 
-<div @ref="_trackRef"
+<div @ref="objTrackRef"
      role="slider"
      aria-valuemin="@Min"
      aria-valuemax="@Max"
@@ -50,20 +50,20 @@
     [Parameter]
     public string? Class { get; set; }
 
-    private ElementReference _trackRef;
-    private double _internalValue;
-    private IJSObjectReference? _jsModule;
-    private DotNetObjectReference<Slider>? _dotNetRef;
-    private string _sliderId = Guid.NewGuid().ToString("N");
-    private bool _jsInitialized;
+    private ElementReference objTrackRef;
+    private double objInternalValue;
+    private IJSObjectReference? objJsModule;
+    private DotNetObjectReference<Slider>? objDotNetRef;
+    private string objSliderId = Guid.NewGuid().ToString("N");
+    private bool objJsInitialized;
 
     private bool IsControlled => ValueChanged.HasDelegate;
-    private double CurrentValue => IsControlled ? Value : _internalValue;
+    private double CurrentValue => IsControlled ? Value : objInternalValue;
     private double Percentage => ((CurrentValue - Min) / (Max - Min)) * 100;
 
     protected override void OnInitialized()
     {
-        _internalValue = DefaultValue;
+        objInternalValue = DefaultValue;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -76,15 +76,15 @@
 
     private async Task InitializeJsAsync()
     {
-        if (_jsInitialized) return;
+        if (objJsInitialized) return;
 
         try
         {
-            _jsModule = await JS.InvokeAsync<IJSObjectReference>("import",
+            objJsModule = await JS.InvokeAsync<IJSObjectReference>("import",
                 "./_content/TrBlazeUI.Components/js/slider.js");
-            _dotNetRef = DotNetObjectReference.Create(this);
-            await _jsModule.InvokeVoidAsync("initializeSlider", _trackRef, _dotNetRef, _sliderId);
-            _jsInitialized = true;
+            objDotNetRef = DotNetObjectReference.Create(this);
+            await objJsModule.InvokeVoidAsync("initializeSlider", objTrackRef, objDotNetRef, objSliderId);
+            objJsInitialized = true;
         }
         catch (Exception ex)
         {
@@ -105,10 +105,10 @@
         percentage = Math.Max(0, Math.Min(1, percentage));
 
         var newValue = Min + (percentage * (Max - Min));
-        await SetValue(newValue);
+        await SetValueAsync(newValue);
     }
 
-    private async Task SetValue(double value)
+    private async Task SetValueAsync(double value)
     {
         value = Math.Round(value / Step) * Step;
         value = Math.Max(Min, Math.Min(Max, value));
@@ -119,7 +119,7 @@
         }
         else
         {
-            _internalValue = value;
+            objInternalValue = value;
             StateHasChanged();
         }
     }
@@ -135,23 +135,23 @@
         {
             case "ArrowRight":
             case "ArrowUp":
-                await SetValue(CurrentValue + stepSize);
+                await SetValueAsync(CurrentValue + stepSize);
                 break;
             case "ArrowLeft":
             case "ArrowDown":
-                await SetValue(CurrentValue - stepSize);
+                await SetValueAsync(CurrentValue - stepSize);
                 break;
             case "PageUp":
-                await SetValue(CurrentValue + largeStep);
+                await SetValueAsync(CurrentValue + largeStep);
                 break;
             case "PageDown":
-                await SetValue(CurrentValue - largeStep);
+                await SetValueAsync(CurrentValue - largeStep);
                 break;
             case "Home":
-                await SetValue(Min);
+                await SetValueAsync(Min);
                 break;
             case "End":
-                await SetValue(Max);
+                await SetValueAsync(Max);
                 break;
         }
     }
@@ -172,15 +172,15 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
             try
             {
-                await _jsModule.InvokeVoidAsync("disposeSlider", _sliderId);
-                await _jsModule.DisposeAsync();
+                await objJsModule.InvokeVoidAsync("disposeSlider", objSliderId);
+                await objJsModule.DisposeAsync();
             }
             catch { }
         }
-        _dotNetRef?.Dispose();
+        objDotNetRef?.Dispose();
     }
 }

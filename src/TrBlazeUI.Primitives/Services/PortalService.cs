@@ -9,7 +9,7 @@ namespace TrBlazeUI.Primitives.Services;
 /// </summary>
 public class PortalService : IPortalService
 {
-    private readonly ConcurrentDictionary<string, RenderFragment> _portals = new();
+    private readonly ConcurrentDictionary<string, RenderFragment> objPortals = new();
 
     /// <inheritdoc />
     public event Action? OnPortalsChanged;
@@ -31,14 +31,14 @@ public class PortalService : IPortalService
 
         ArgumentNullException.ThrowIfNull(content);
 
-        _portals[id] = content;
+        objPortals[id] = content;
         OnPortalsChanged?.Invoke();
     }
 
     /// <inheritdoc />
     public void UnregisterPortal(string id)
     {
-        if (_portals.TryRemove(id, out _))
+        if (objPortals.TryRemove(id, out _))
         {
             OnPortalsChanged?.Invoke();
         }
@@ -49,7 +49,7 @@ public class PortalService : IPortalService
     {
         ArgumentNullException.ThrowIfNull(content);
 
-        if (!_portals.TryUpdate(id, content, _portals.GetValueOrDefault(id)!))
+        if (!objPortals.TryUpdate(id, content, objPortals.GetValueOrDefault(id)!))
         {
             throw new InvalidOperationException($"Portal with ID '{id}' is not registered.");
         }
@@ -60,7 +60,7 @@ public class PortalService : IPortalService
     /// <inheritdoc />
     public void RefreshPortal(string id)
     {
-        if (_portals.ContainsKey(id))
+        if (objPortals.ContainsKey(id))
         {
             // Notify PortalHost to re-render WITHOUT replacing the RenderFragment
             // This allows the existing fragment to pick up new captured values
@@ -71,5 +71,5 @@ public class PortalService : IPortalService
 
     /// <inheritdoc />
     public IReadOnlyDictionary<string, RenderFragment> GetPortals() =>
-        _portals;
+        objPortals;
 }

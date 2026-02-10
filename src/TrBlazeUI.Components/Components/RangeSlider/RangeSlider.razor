@@ -3,7 +3,7 @@
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 
-<div @ref="_trackRef"
+<div @ref="objTrackRef"
      class="@CssClass"
      tabindex="-1">
     @* Track background *@
@@ -66,14 +66,14 @@
 </div>
 
 @code {
-    private ElementReference _trackRef;
-    private IJSObjectReference? _jsModule;
-    private DotNetObjectReference<RangeSlider>? _dotNetRef;
-    private string _sliderId = Guid.NewGuid().ToString("N");
-    private bool _jsInitialized;
+    private ElementReference objTrackRef;
+    private IJSObjectReference? objJsModule;
+    private DotNetObjectReference<RangeSlider>? objDotNetRef;
+    private string objSliderId = Guid.NewGuid().ToString("N");
+    private bool objJsInitialized;
 
-    private double _internalStart;
-    private double _internalEnd;
+    private double objInternalStart;
+    private double objInternalEnd;
 
     /// <summary>
     /// Gets or sets the range value as a tuple (Start, End).
@@ -178,15 +178,15 @@
     public Func<double, string>? FormatValueFunc { get; set; }
 
     private bool IsControlled => ValueChanged.HasDelegate;
-    private double StartValue => IsControlled ? Value.Start : _internalStart;
-    private double EndValue => IsControlled ? Value.End : _internalEnd;
+    private double StartValue => IsControlled ? Value.Start : objInternalStart;
+    private double EndValue => IsControlled ? Value.End : objInternalEnd;
     private double StartPercentage => ((StartValue - Min) / (Max - Min)) * 100;
     private double EndPercentage => ((EndValue - Min) / (Max - Min)) * 100;
 
     protected override void OnInitialized()
     {
-        _internalStart = DefaultStart;
-        _internalEnd = DefaultEnd;
+        objInternalStart = DefaultStart;
+        objInternalEnd = DefaultEnd;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -199,15 +199,15 @@
 
     private async Task InitializeJsAsync()
     {
-        if (_jsInitialized) return;
+        if (objJsInitialized) return;
 
         try
         {
-            _jsModule = await JS.InvokeAsync<IJSObjectReference>("import",
+            objJsModule = await JS.InvokeAsync<IJSObjectReference>("import",
                 "./_content/TrBlazeUI.Components/js/range-slider.js");
-            _dotNetRef = DotNetObjectReference.Create(this);
-            await _jsModule.InvokeVoidAsync("initializeRangeSlider", _trackRef, _dotNetRef, _sliderId);
-            _jsInitialized = true;
+            objDotNetRef = DotNetObjectReference.Create(this);
+            await objJsModule.InvokeVoidAsync("initializeRangeSlider", objTrackRef, objDotNetRef, objSliderId);
+            objJsInitialized = true;
         }
         catch (Exception ex)
         {
@@ -217,14 +217,14 @@
 
     private async Task StartThumbDrag(PointerEventArgs e)
     {
-        if (Disabled || _jsModule == null) return;
-        await _jsModule.InvokeVoidAsync("startDrag", _sliderId, "start", e.PointerId);
+        if (Disabled || objJsModule == null) return;
+        await objJsModule.InvokeVoidAsync("startDrag", objSliderId, "start", e.PointerId);
     }
 
     private async Task EndThumbDrag(PointerEventArgs e)
     {
-        if (Disabled || _jsModule == null) return;
-        await _jsModule.InvokeVoidAsync("startDrag", _sliderId, "end", e.PointerId);
+        if (Disabled || objJsModule == null) return;
+        await objJsModule.InvokeVoidAsync("startDrag", objSliderId, "end", e.PointerId);
     }
 
     [JSInvokable]
@@ -242,11 +242,11 @@
 
         if (thumb == "start")
         {
-            await SetStartValue(newValue);
+            await SetStartValueAsync(newValue);
         }
         else
         {
-            await SetEndValue(newValue);
+            await SetEndValueAsync(newValue);
         }
     }
 
@@ -275,7 +275,7 @@
         }
     }
 
-    private async Task SetStartValue(double value)
+    private async Task SetStartValueAsync(double value)
     {
         // Enforce MinRange and don't cross end
         var maxStart = EndValue - MinRange;
@@ -288,12 +288,12 @@
         }
         else
         {
-            _internalStart = value;
+            objInternalStart = value;
             StateHasChanged();
         }
     }
 
-    private async Task SetEndValue(double value)
+    private async Task SetEndValueAsync(double value)
     {
         // Enforce MinRange and don't cross start
         var minEnd = StartValue + MinRange;
@@ -306,7 +306,7 @@
         }
         else
         {
-            _internalEnd = value;
+            objInternalEnd = value;
             StateHasChanged();
         }
     }
@@ -321,23 +321,23 @@
         {
             case "ArrowRight":
             case "ArrowUp":
-                await SetStartValue(StartValue + Step);
+                await SetStartValueAsync(StartValue + Step);
                 break;
             case "ArrowLeft":
             case "ArrowDown":
-                await SetStartValue(StartValue - Step);
+                await SetStartValueAsync(StartValue - Step);
                 break;
             case "PageUp":
-                await SetStartValue(StartValue + largeStep);
+                await SetStartValueAsync(StartValue + largeStep);
                 break;
             case "PageDown":
-                await SetStartValue(StartValue - largeStep);
+                await SetStartValueAsync(StartValue - largeStep);
                 break;
             case "Home":
-                await SetStartValue(Min);
+                await SetStartValueAsync(Min);
                 break;
             case "End":
-                await SetStartValue(EndValue - MinRange);
+                await SetStartValueAsync(EndValue - MinRange);
                 break;
         }
     }
@@ -352,23 +352,23 @@
         {
             case "ArrowRight":
             case "ArrowUp":
-                await SetEndValue(EndValue + Step);
+                await SetEndValueAsync(EndValue + Step);
                 break;
             case "ArrowLeft":
             case "ArrowDown":
-                await SetEndValue(EndValue - Step);
+                await SetEndValueAsync(EndValue - Step);
                 break;
             case "PageUp":
-                await SetEndValue(EndValue + largeStep);
+                await SetEndValueAsync(EndValue + largeStep);
                 break;
             case "PageDown":
-                await SetEndValue(EndValue - largeStep);
+                await SetEndValueAsync(EndValue - largeStep);
                 break;
             case "Home":
-                await SetEndValue(StartValue + MinRange);
+                await SetEndValueAsync(StartValue + MinRange);
                 break;
             case "End":
-                await SetEndValue(Max);
+                await SetEndValueAsync(Max);
                 break;
         }
     }
@@ -413,15 +413,15 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
             try
             {
-                await _jsModule.InvokeVoidAsync("disposeRangeSlider", _sliderId);
-                await _jsModule.DisposeAsync();
+                await objJsModule.InvokeVoidAsync("disposeRangeSlider", objSliderId);
+                await objJsModule.DisposeAsync();
             }
             catch { }
         }
-        _dotNetRef?.Dispose();
+        objDotNetRef?.Dispose();
     }
 }

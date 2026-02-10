@@ -67,7 +67,7 @@ namespace TrBlazeUI.Primitives.Collapsible;
 /// </example>
 public partial class CollapsibleContent : ComponentBase
 {
-    private bool _shouldRender => ForceMount || (Context?.Open ?? false);
+    private bool objShouldRender => ForceMount || (Context?.Open ?? false);
 
     /// <summary>
     /// Gets the cascaded collapsible context from the parent Collapsible component.

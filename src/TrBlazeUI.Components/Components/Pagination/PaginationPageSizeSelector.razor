@@ -7,7 +7,7 @@
         <p class="text-sm font-medium">@Label</p>
     }
     <Select TValue="string"
-            Value="@_pageSizeValue"
+            Value="@objPageSizeValue"
             ValueChanged="@HandlePageSizeChanged">
         <SelectTrigger Class="@TriggerCssClass">
             <SelectValue />
@@ -22,8 +22,8 @@
 </div>
 
 @code {
-    private string _pageSizeValue = "10";
-    private bool _initialized = false;
+    private string objPageSizeValue = "10";
+    private bool objInitialized = false;
 
     [CascadingParameter]
     private PaginationContext? Context { get; set; }
@@ -66,23 +66,23 @@
     protected override void OnInitialized()
     {
         if (Context?.State != null)
-            _pageSizeValue = Context.State.PageSize.ToString();
-        _initialized = true;
+            objPageSizeValue = Context.State.PageSize.ToString();
+        objInitialized = true;
     }
 
     protected override void OnParametersSet()
     {
-        if (_initialized && Context?.State != null)
+        if (objInitialized && Context?.State != null)
         {
             var currentPageSize = Context.State.PageSize.ToString();
-            if (_pageSizeValue != currentPageSize)
-                _pageSizeValue = currentPageSize;
+            if (objPageSizeValue != currentPageSize)
+                objPageSizeValue = currentPageSize;
         }
     }
 
     private async Task HandlePageSizeChanged(string newValue)
     {
-        _pageSizeValue = newValue;
+        objPageSizeValue = newValue;
 
         if (int.TryParse(newValue, out var newSize))
         {

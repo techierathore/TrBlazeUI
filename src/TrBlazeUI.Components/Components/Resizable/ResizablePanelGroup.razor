@@ -3,7 +3,7 @@
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 
-<div @ref="_groupRef" class="@CssClass" style="@Style">
+<div @ref="objGroupRef" class="@CssClass" style="@Style">
     <CascadingValue Value="this" IsFixed="false">
         @ChildContent
     </CascadingValue>
@@ -28,31 +28,31 @@
     [Parameter]
     public string? Class { get; set; }
 
-    private ElementReference _groupRef;
-    private IJSObjectReference? _jsModule;
-    private DotNetObjectReference<ResizablePanelGroup>? _dotNetRef;
-    private string _groupId = Guid.NewGuid().ToString("N");
-    private bool _jsInitialized;
+    private ElementReference objGroupRef;
+    private IJSObjectReference? objJsModule;
+    private DotNetObjectReference<ResizablePanelGroup>? objDotNetRef;
+    private string objGroupId = Guid.NewGuid().ToString("N");
+    private bool objJsInitialized;
 
-    private List<double> _panelSizes = new();
-    private List<double> _panelDefaultSizes = new();
-    private List<double> _panelMinSizes = new();
-    private List<double> _panelMaxSizes = new();
-    private int _panelCount = 0;
-    private int _handleCount = 0;
+    private List<double> objPanelSizes = new();
+    private List<double> objPanelDefaultSizes = new();
+    private List<double> objPanelMinSizes = new();
+    private List<double> objPanelMaxSizes = new();
+    private int objPanelCount = 0;
+    private int objHandleCount = 0;
 
     internal ResizableDirection GetDirection() => Direction;
 
     internal int RegisterPanel(double defaultSize, double minSize, double maxSize)
     {
-        var index = _panelCount++;
-        _panelDefaultSizes.Add(defaultSize);
-        _panelMinSizes.Add(minSize);
-        _panelMaxSizes.Add(maxSize);
+        var index = objPanelCount++;
+        objPanelDefaultSizes.Add(defaultSize);
+        objPanelMinSizes.Add(minSize);
+        objPanelMaxSizes.Add(maxSize);
 
-        if (_panelSizes.Count <= index)
+        if (objPanelSizes.Count <= index)
         {
-            _panelSizes.Add(defaultSize);
+            objPanelSizes.Add(defaultSize);
         }
 
         return index;
@@ -60,23 +60,23 @@
 
     internal double GetPanelSize(int index)
     {
-        if (index >= 0 && index < _panelSizes.Count)
+        if (index >= 0 && index < objPanelSizes.Count)
         {
-            return _panelSizes[index];
+            return objPanelSizes[index];
         }
-        return index < _panelDefaultSizes.Count ? _panelDefaultSizes[index] : 50;
+        return index < objPanelDefaultSizes.Count ? objPanelDefaultSizes[index] : 50;
     }
 
     internal int RegisterHandle()
     {
-        return _handleCount++;
+        return objHandleCount++;
     }
 
-    internal async Task StartResize(int handleIndex, double clientX, double clientY, long pointerId)
+    internal async Task StartResizeAsync(int handleIndex, double clientX, double clientY, long pointerId)
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
-            await _jsModule.InvokeVoidAsync("startResize", _groupId, handleIndex, clientX, clientY, _panelSizes.ToArray(), pointerId);
+            await objJsModule.InvokeVoidAsync("startResize", objGroupId, handleIndex, clientX, clientY, objPanelSizes.ToArray(), pointerId);
         }
     }
 
@@ -91,15 +91,15 @@
         if (newSizes.Length > 100)
             return;
 
-        for (int i = 0; i < newSizes.Length && i < _panelSizes.Count; i++)
+        for (int i = 0; i < newSizes.Length && i < objPanelSizes.Count; i++)
         {
             // Skip invalid values
             if (double.IsNaN(newSizes[i]) || double.IsInfinity(newSizes[i]))
                 continue;
 
             // Apply min/max constraints
-            var size = Math.Max(_panelMinSizes[i], Math.Min(_panelMaxSizes[i], newSizes[i]));
-            _panelSizes[i] = size;
+            var size = Math.Max(objPanelMinSizes[i], Math.Min(objPanelMaxSizes[i], newSizes[i]));
+            objPanelSizes[i] = size;
         }
         StateHasChanged();
     }
@@ -114,17 +114,17 @@
 
     private async Task InitializeJsAsync()
     {
-        if (_jsInitialized) return;
+        if (objJsInitialized) return;
 
         try
         {
-            _jsModule = await JS.InvokeAsync<IJSObjectReference>("import",
+            objJsModule = await JS.InvokeAsync<IJSObjectReference>("import",
                 "./_content/TrBlazeUI.Components/js/resizable.js");
-            _dotNetRef = DotNetObjectReference.Create(this);
+            objDotNetRef = DotNetObjectReference.Create(this);
 
             var isHorizontal = Direction == ResizableDirection.Horizontal;
-            await _jsModule.InvokeVoidAsync("initializeResizable", _groupRef, _dotNetRef, _groupId, isHorizontal);
-            _jsInitialized = true;
+            await objJsModule.InvokeVoidAsync("initializeResizable", objGroupRef, objDotNetRef, objGroupId, isHorizontal);
+            objJsInitialized = true;
         }
         catch (Exception ex)
         {
@@ -143,15 +143,15 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
             try
             {
-                await _jsModule.InvokeVoidAsync("disposeResizable", _groupId);
-                await _jsModule.DisposeAsync();
+                await objJsModule.InvokeVoidAsync("disposeResizable", objGroupId);
+                await objJsModule.DisposeAsync();
             }
             catch { }
         }
-        _dotNetRef?.Dispose();
+        objDotNetRef?.Dispose();
     }
 }

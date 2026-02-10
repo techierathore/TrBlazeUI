@@ -84,7 +84,7 @@ public partial class BarChart<TItem> : ChartBase<TItem> where TItem : class
     [Parameter]
     public int BarWidth { get; set; } = 70;
 
-    private ApexChartOptions<TItem> _options = new();
+    private ApexChartOptions<TItem> objOptions = new();
 
     /// <summary>
     /// Gets the computed CSS classes for the chart container.
@@ -102,10 +102,10 @@ public partial class BarChart<TItem> : ChartBase<TItem> where TItem : class
 
     private void ConfigureOptions()
     {
-        _options = CreateBaseOptions();
+        objOptions = CreateBaseOptions();
 
         // Configure bar-specific options
-        _options.PlotOptions = new PlotOptions
+        objOptions.PlotOptions = new PlotOptions
         {
             Bar = new PlotOptionsBar
             {
@@ -118,21 +118,21 @@ public partial class BarChart<TItem> : ChartBase<TItem> where TItem : class
 
         // Configure stacking
         var (stacked, stackType) = GetStackingConfig();
-        _options.Chart!.Stacked = stacked;
-        _options.Chart.StackType = stackType;
+        objOptions.Chart!.Stacked = stacked;
+        objOptions.Chart.StackType = stackType;
 
         // Set colors from config or defaults
-        _options.Colors = ChartColor.DefaultColors.ToList();
+        objOptions.Colors = ChartColor.DefaultColors.ToList();
 
         // Grid styling
-        _options.Grid = new Grid
+        objOptions.Grid = new Grid
         {
             BorderColor = "var(--border)",
             StrokeDashArray = 4
         };
 
         // X-Axis styling
-        _options.Xaxis = new XAxis
+        objOptions.Xaxis = new XAxis
         {
             Labels = new XAxisLabels
             {
@@ -152,7 +152,7 @@ public partial class BarChart<TItem> : ChartBase<TItem> where TItem : class
         };
 
         // Y-Axis styling
-        _options.Yaxis =
+        objOptions.Yaxis =
         [
             new YAxis
             {

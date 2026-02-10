@@ -9,7 +9,7 @@
 
 @if (Context.IsOpen)
 {
-    <div @ref="_overlayRef"
+    <div @ref="objOverlayRef"
          id="@(Context.Id)-overlay"
          @onclick="HandleClick"
          @attributes="AdditionalAttributes"
@@ -47,7 +47,7 @@
     [Parameter]
     public EventCallback<MouseEventArgs> OnClick { get; set; }
 
-    private ElementReference _overlayRef;
+    private ElementReference objOverlayRef;
 
     protected override void OnInitialized()
     {

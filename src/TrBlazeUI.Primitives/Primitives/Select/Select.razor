@@ -4,15 +4,15 @@
 @inject TrBlazeUI.Primitives.Services.DropdownManagerService? DropdownManager
 
 @* Select root component - headless, unstyled behavior only *@
-<CascadingValue Value="@_context" IsFixed="false">
+<CascadingValue Value="@objContext" IsFixed="false">
     <div @attributes="AdditionalAttributes">
         @ChildContent
     </div>
 </CascadingValue>
 
 @code {
-    private SelectContext<TValue> _context = new();
-    private UseControllableState<TValue?> _state = null!;
+    private SelectContext<TValue> objContext = new();
+    private UseControllableState<TValue?> objState = null!;
 
     /// <summary>
     /// The child content to render within the select context.
@@ -92,7 +92,7 @@
     protected override void OnInitialized()
     {
         // Initialize controllable state for value
-        _state = new UseControllableState<TValue?>(DefaultValue)
+        objState = new UseControllableState<TValue?>(DefaultValue)
         {
             ControlledValue = Value,
             OnValueChanged = ValueChanged,
@@ -100,16 +100,16 @@
         };
 
         // Sync initial value to context
-        _context.State.Value = _state.Value;
-        _context.State.Disabled = Disabled;
+        objContext.State.Value = objState.Value;
+        objContext.State.Disabled = Disabled;
         // Set initial DisplayText - use DisplayTextSelector if provided, otherwise fall back to Value.ToString()
         // (will be updated when items register with correct display text if dropdown is opened)
-        _context.State.DisplayText = GetDisplayText(_state.Value);
+        objContext.State.DisplayText = GetDisplayText(objState.Value);
 
         // Subscribe to context value changes
-        _context.OnValueChange = async (newValue) =>
+        objContext.OnValueChange = async (newValue) =>
         {
-            await _state.SetValueAsync(newValue);
+            await objState.SetValueAsync(newValue);
 
             if (OnValueChange.HasDelegate)
             {
@@ -120,37 +120,37 @@
         };
 
         // Subscribe to context state changes
-        _context.OnStateChanged += HandleContextStateChanged;
+        objContext.OnStateChanged += HandleContextStateChanged;
     }
 
     protected override void OnParametersSet()
     {
         // Update disabled state
-        if (_context.Disabled != Disabled)
+        if (objContext.Disabled != Disabled)
         {
-            _context.SetDisabled(Disabled);
+            objContext.SetDisabled(Disabled);
         }
 
         // Update controlled value if it changed
-        if (_state.IsControlled)
+        if (objState.IsControlled)
         {
-            _state.ControlledValue = Value;
-            _context.State.Value = Value;
+            objState.ControlledValue = Value;
+            objContext.State.Value = Value;
             // Update DisplayText - try to look up from registered items first,
             // then use DisplayTextSelector if provided, finally fall back to Value.ToString()
-            _context.State.DisplayText = _context.GetDisplayTextForValue(Value) ?? GetDisplayText(Value);
+            objContext.State.DisplayText = objContext.GetDisplayTextForValue(Value) ?? GetDisplayText(Value);
         }
 
         // Handle controlled open state
-        if (Open.HasValue && _context.IsOpen != Open.Value)
+        if (Open.HasValue && objContext.IsOpen != Open.Value)
         {
             if (Open.Value)
             {
-                _context.Open();
+                objContext.Open();
             }
             else
             {
-                _context.Close();
+                objContext.Close();
             }
         }
     }
@@ -160,19 +160,19 @@
         // Register/unregister with dropdown manager when open state changes
         if (DropdownManager != null)
         {
-            if (_context.IsOpen)
+            if (objContext.IsOpen)
             {
                 // Register this dropdown as open; if another is open, it will be closed
-                DropdownManager.RegisterOpen(_context.ContentId, () =>
+                DropdownManager.RegisterOpen(objContext.ContentId, () =>
                 {
-                    _context.Close();
+                    objContext.Close();
                     InvokeAsync(StateHasChanged); // Ensure UI thread synchronization
                 });
             }
             else
             {
                 // Unregister when closed naturally
-                DropdownManager.Unregister(_context.ContentId);
+                DropdownManager.Unregister(objContext.ContentId);
             }
         }
 
@@ -180,7 +180,7 @@
         // notify parent if Open is being controlled
         if (OpenChanged.HasDelegate)
         {
-            var newOpenState = _context.IsOpen;
+            var newOpenState = objContext.IsOpen;
             if (!Open.HasValue || Open.Value != newOpenState)
             {
                 _ = OpenChanged.InvokeAsync(newOpenState);
@@ -203,12 +203,12 @@
 
     public void Dispose()
     {
-        _context.OnStateChanged -= HandleContextStateChanged;
+        objContext.OnStateChanged -= HandleContextStateChanged;
 
         // Unregister from dropdown manager on dispose
-        if (DropdownManager != null && _context?.IsOpen == true)
+        if (DropdownManager != null && objContext?.IsOpen == true)
         {
-            DropdownManager.Unregister(_context.ContentId);
+            DropdownManager.Unregister(objContext.ContentId);
         }
     }
 }

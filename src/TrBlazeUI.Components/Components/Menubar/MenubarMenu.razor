@@ -17,7 +17,7 @@
     internal bool IsOpen => Context?.ActiveMenu == MenuId;
     internal int FocusedIndex { get; private set; } = -1;
 
-    private List<IMenubarItem> _menuItems = new();
+    private List<IMenubarItem> objMenuItems = new();
 
     protected override void OnInitialized()
     {
@@ -26,18 +26,18 @@
 
     internal void RegisterMenuItem(IMenubarItem item)
     {
-        if (!_menuItems.Contains(item))
+        if (!objMenuItems.Contains(item))
         {
-            _menuItems.Add(item);
+            objMenuItems.Add(item);
         }
     }
 
     internal void UnregisterMenuItem(IMenubarItem item)
     {
-        _menuItems.Remove(item);
+        objMenuItems.Remove(item);
     }
 
-    internal List<IMenubarItem> GetMenuItems() => _menuItems;
+    internal List<IMenubarItem> GetMenuItems() => objMenuItems;
 
     internal void SetFocusedIndex(int index)
     {

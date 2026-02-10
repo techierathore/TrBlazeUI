@@ -6,7 +6,7 @@
 
 <CascadingValue Value="this" IsFixed="false">
     <div class="@ContainerClass">
-        <Popover Open="_isOpen" OpenChanged="HandleOpenChanged">
+        <Popover Open="objIsOpen" OpenChanged="HandleOpenChanged">
             <PopoverTrigger role="combobox"
                            aria-expanded="@GetIsOpen().ToString().ToLower()"
                            aria-controls="@($"{Id}-listbox")"
@@ -31,7 +31,7 @@
             </PopoverTrigger>
             <PopoverContent Side="@PopoverSide.Bottom" Align="@PopoverAlign.Start" MatchTriggerWidth="@MatchTriggerWidth" OnContentReady="@HandleContentReady" Class="@(MatchTriggerWidth ? "!p-0" : $"{PopoverWidth} !p-0")">
                 <Command>
-                    <CommandInput @ref="_commandInputRef" Placeholder="@SearchPlaceholder" />
+                    <CommandInput @ref="objCommandInputRef" Placeholder="@SearchPlaceholder" />
                     <CommandList>
                         <CommandEmpty>@EmptyMessage</CommandEmpty>
                         <CommandGroup>

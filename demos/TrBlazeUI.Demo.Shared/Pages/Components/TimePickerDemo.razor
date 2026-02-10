@@ -21,9 +21,9 @@
                 Standard 12-hour format with AM/PM toggle.
             </p>
         </div>
-        <TimePicker @bind-Value="_time12" />
+        <TimePicker @bind-Value="objTime12" />
         <p class="text-sm text-muted-foreground">
-            Selected: @(_time12.HasValue ? FormatTime12(_time12.Value) : "None")
+            Selected: @(objTime12.HasValue ? FormatTime12(objTime12.Value) : "None")
         </p>
     </div>
 
@@ -35,9 +35,9 @@
                 Military/international time format.
             </p>
         </div>
-        <TimePicker @bind-Value="_time24" Format="TimeFormat.Hour24" />
+        <TimePicker @bind-Value="objTime24" Format="TimeFormat.Hour24" />
         <p class="text-sm text-muted-foreground">
-            Selected: @(_time24.HasValue ? _time24.Value.ToString(@"hh\:mm") : "None")
+            Selected: @(objTime24.HasValue ? objTime24.Value.ToString(@"hh\:mm") : "None")
         </p>
     </div>
 
@@ -49,9 +49,9 @@
                 Shows seconds selector for precise time selection.
             </p>
         </div>
-        <TimePicker @bind-Value="_timeSeconds" ShowSeconds="true" />
+        <TimePicker @bind-Value="objTimeSeconds" ShowSeconds="true" />
         <p class="text-sm text-muted-foreground">
-            Selected: @(_timeSeconds.HasValue ? FormatTime12WithSeconds(_timeSeconds.Value) : "None")
+            Selected: @(objTimeSeconds.HasValue ? FormatTime12WithSeconds(objTimeSeconds.Value) : "None")
         </p>
     </div>
 
@@ -60,9 +60,9 @@
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">24-Hour with Seconds</h2>
         </div>
-        <TimePicker @bind-Value="_time24Seconds" Format="TimeFormat.Hour24" ShowSeconds="true" />
+        <TimePicker @bind-Value="objTime24Seconds" Format="TimeFormat.Hour24" ShowSeconds="true" />
         <p class="text-sm text-muted-foreground">
-            Selected: @(_time24Seconds.HasValue ? _time24Seconds.Value.ToString(@"hh\:mm\:ss") : "None")
+            Selected: @(objTime24Seconds.HasValue ? objTime24Seconds.Value.ToString(@"hh\:mm\:ss") : "None")
         </p>
     </div>
 
@@ -74,9 +74,9 @@
                 Minutes increment by 15 (0, 15, 30, 45).
             </p>
         </div>
-        <TimePicker @bind-Value="_timeStep15" MinuteStep="15" />
+        <TimePicker @bind-Value="objTimeStep15" MinuteStep="15" />
         <p class="text-sm text-muted-foreground">
-            Selected: @(_timeStep15.HasValue ? FormatTime12(_timeStep15.Value) : "None")
+            Selected: @(objTimeStep15.HasValue ? FormatTime12(objTimeStep15.Value) : "None")
         </p>
     </div>
 
@@ -85,9 +85,9 @@
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">5-Minute Intervals</h2>
         </div>
-        <TimePicker @bind-Value="_timeStep5" MinuteStep="5" />
+        <TimePicker @bind-Value="objTimeStep5" MinuteStep="5" />
         <p class="text-sm text-muted-foreground">
-            Selected: @(_timeStep5.HasValue ? FormatTime12(_timeStep5.Value) : "None")
+            Selected: @(objTimeStep5.HasValue ? FormatTime12(objTimeStep5.Value) : "None")
         </p>
     </div>
 
@@ -99,11 +99,11 @@
                 Time is constrained to business hours.
             </p>
         </div>
-        <TimePicker @bind-Value="_timeConstrained"
+        <TimePicker @bind-Value="objTimeConstrained"
                     MinTime="@(new TimeSpan(9, 0, 0))"
                     MaxTime="@(new TimeSpan(17, 0, 0))" />
         <p class="text-sm text-muted-foreground">
-            Selected: @(_timeConstrained.HasValue ? FormatTime12(_timeConstrained.Value) : "None") (9:00 AM - 5:00 PM)
+            Selected: @(objTimeConstrained.HasValue ? FormatTime12(objTimeConstrained.Value) : "None") (9:00 AM - 5:00 PM)
         </p>
     </div>
 
@@ -115,9 +115,9 @@
                 Initialized with 2:30 PM.
             </p>
         </div>
-        <TimePicker @bind-Value="_timePreset" />
+        <TimePicker @bind-Value="objTimePreset" />
         <p class="text-sm text-muted-foreground">
-            Selected: @(_timePreset.HasValue ? FormatTime12(_timePreset.Value) : "None")
+            Selected: @(objTimePreset.HasValue ? FormatTime12(objTimePreset.Value) : "None")
         </p>
     </div>
 
@@ -126,9 +126,9 @@
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">Custom Placeholder</h2>
         </div>
-        <TimePicker @bind-Value="_timePlaceholder" Placeholder="Choose meeting time" />
+        <TimePicker @bind-Value="objTimePlaceholder" Placeholder="Choose meeting time" />
         <p class="text-sm text-muted-foreground">
-            Selected: @(_timePlaceholder.HasValue ? FormatTime12(_timePlaceholder.Value) : "None")
+            Selected: @(objTimePlaceholder.HasValue ? FormatTime12(objTimePlaceholder.Value) : "None")
         </p>
     </div>
 
@@ -151,18 +151,18 @@
         <div class="flex items-center gap-4">
             <div>
                 <label class="text-sm font-medium mb-1 block">Start</label>
-                <TimePicker @bind-Value="_startTime" />
+                <TimePicker @bind-Value="objStartTime" />
             </div>
             <span class="mt-6">to</span>
             <div>
                 <label class="text-sm font-medium mb-1 block">End</label>
-                <TimePicker @bind-Value="_endTime" />
+                <TimePicker @bind-Value="objEndTime" />
             </div>
         </div>
         <p class="text-sm text-muted-foreground">
-            @if (_startTime.HasValue && _endTime.HasValue)
+            @if (objStartTime.HasValue && objEndTime.HasValue)
             {
-                var duration = _endTime.Value - _startTime.Value;
+                var duration = objEndTime.Value - objStartTime.Value;
                 if (duration < TimeSpan.Zero) duration += TimeSpan.FromHours(24);
                 @($"Duration: {duration.Hours}h {duration.Minutes}m")
             }
@@ -206,17 +206,17 @@
 </div>
 
 @code {
-    private TimeSpan? _time12;
-    private TimeSpan? _time24;
-    private TimeSpan? _timeSeconds;
-    private TimeSpan? _time24Seconds;
-    private TimeSpan? _timeStep15;
-    private TimeSpan? _timeStep5;
-    private TimeSpan? _timeConstrained;
-    private TimeSpan? _timePreset = new TimeSpan(14, 30, 0);
-    private TimeSpan? _timePlaceholder;
-    private TimeSpan? _startTime = new TimeSpan(9, 0, 0);
-    private TimeSpan? _endTime = new TimeSpan(17, 0, 0);
+    private TimeSpan? objTime12;
+    private TimeSpan? objTime24;
+    private TimeSpan? objTimeSeconds;
+    private TimeSpan? objTime24Seconds;
+    private TimeSpan? objTimeStep15;
+    private TimeSpan? objTimeStep5;
+    private TimeSpan? objTimeConstrained;
+    private TimeSpan? objTimePreset = new TimeSpan(14, 30, 0);
+    private TimeSpan? objTimePlaceholder;
+    private TimeSpan? objStartTime = new TimeSpan(9, 0, 0);
+    private TimeSpan? objEndTime = new TimeSpan(17, 0, 0);
 
     private string FormatTime12(TimeSpan time)
     {

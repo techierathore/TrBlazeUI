@@ -6,7 +6,7 @@ namespace TrBlazeUI.Primitives.Utilities;
 /// </summary>
 public static class IdGenerator
 {
-    private static int _counter;
+    private static int objCounter;
 
     /// <summary>
     /// Generates a unique ID with the specified prefix.
@@ -16,7 +16,7 @@ public static class IdGenerator
     /// <returns>A unique ID string in the format "prefix-{counter}".</returns>
     public static string GenerateId(string prefix = "shadcn")
     {
-        var id = Interlocked.Increment(ref _counter);
+        var id = Interlocked.Increment(ref objCounter);
         return $"{prefix}-{id}";
     }
 
@@ -41,5 +41,5 @@ public static class IdGenerator
     /// WARNING: Only use in testing scenarios.
     /// </summary>
     internal static void Reset() =>
-        Interlocked.Exchange(ref _counter, 0);
+        Interlocked.Exchange(ref objCounter, 0);
 }

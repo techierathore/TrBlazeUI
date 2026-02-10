@@ -24,17 +24,17 @@
         </div>
         <ChartContainer>
             <LineChart TItem="TrendData"
-                       Items="@_trendData"
+                       Items="@objTrendData"
                        Variant="LineChartVariant.Default"
                        Height="300px">
                 <ApexPointSeries TItem="TrendData"
-                                 Items="@_trendData"
+                                 Items="@objTrendData"
                                  Name="Desktop"
                                  SeriesType="SeriesType.Line"
                                  XValue="@(item => item.Month)"
                                  YValue="@(item => (decimal)item.Desktop)" />
                 <ApexPointSeries TItem="TrendData"
-                                 Items="@_trendData"
+                                 Items="@objTrendData"
                                  Name="Mobile"
                                  SeriesType="SeriesType.Line"
                                  XValue="@(item => item.Month)"
@@ -53,17 +53,17 @@
         </div>
         <ChartContainer>
             <LineChart TItem="TrendData"
-                       Items="@_trendData"
+                       Items="@objTrendData"
                        Variant="LineChartVariant.Spline"
                        Height="300px">
                 <ApexPointSeries TItem="TrendData"
-                                 Items="@_trendData"
+                                 Items="@objTrendData"
                                  Name="Desktop"
                                  SeriesType="SeriesType.Line"
                                  XValue="@(item => item.Month)"
                                  YValue="@(item => (decimal)item.Desktop)" />
                 <ApexPointSeries TItem="TrendData"
-                                 Items="@_trendData"
+                                 Items="@objTrendData"
                                  Name="Mobile"
                                  SeriesType="SeriesType.Line"
                                  XValue="@(item => item.Month)"
@@ -82,11 +82,11 @@
         </div>
         <ChartContainer>
             <LineChart TItem="TrendData"
-                       Items="@_trendData"
+                       Items="@objTrendData"
                        Variant="LineChartVariant.Stepline"
                        Height="300px">
                 <ApexPointSeries TItem="TrendData"
-                                 Items="@_trendData"
+                                 Items="@objTrendData"
                                  Name="Desktop"
                                  SeriesType="SeriesType.Line"
                                  XValue="@(item => item.Month)"
@@ -105,11 +105,11 @@
         </div>
         <ChartContainer>
             <LineChart TItem="TrendData"
-                       Items="@_trendData"
+                       Items="@objTrendData"
                        Variant="LineChartVariant.Gradient"
                        Height="300px">
                 <ApexPointSeries TItem="TrendData"
-                                 Items="@_trendData"
+                                 Items="@objTrendData"
                                  Name="Desktop"
                                  SeriesType="SeriesType.Line"
                                  XValue="@(item => item.Month)"
@@ -128,18 +128,18 @@
         </div>
         <ChartContainer>
             <LineChart TItem="TrendData"
-                       Items="@_trendData"
+                       Items="@objTrendData"
                        Variant="LineChartVariant.Spline"
                        ShowMarkers="false"
                        Height="300px">
                 <ApexPointSeries TItem="TrendData"
-                                 Items="@_trendData"
+                                 Items="@objTrendData"
                                  Name="Desktop"
                                  SeriesType="SeriesType.Line"
                                  XValue="@(item => item.Month)"
                                  YValue="@(item => (decimal)item.Desktop)" />
                 <ApexPointSeries TItem="TrendData"
-                                 Items="@_trendData"
+                                 Items="@objTrendData"
                                  Name="Mobile"
                                  SeriesType="SeriesType.Line"
                                  XValue="@(item => item.Month)"
@@ -205,7 +205,7 @@
         public int Mobile { get; set; }
     }
 
-    private List<TrendData> _trendData =
+    private List<TrendData> objTrendData =
     [
         new() { Month = "Jan", Desktop = 186, Mobile = 80 },
         new() { Month = "Feb", Desktop = 305, Mobile = 200 },

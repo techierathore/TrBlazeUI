@@ -2,18 +2,18 @@
 @namespace TrBlazeUI.Primitives.Select
 
 @* SelectTrigger primitive - headless button that opens the select dropdown *@
-@if (_context != null)
+@if (objContext != null)
 {
     <button type="button"
-            id="@_context.TriggerId"
-            @ref="_buttonElement"
+            id="@objContext.TriggerId"
+            @ref="objButtonElement"
             role="combobox"
-            aria-expanded="@_context.IsOpen.ToString().ToLower()"
-            aria-controls="@_context.ContentId"
+            aria-expanded="@objContext.IsOpen.ToString().ToLower()"
+            aria-controls="@objContext.ContentId"
             aria-haspopup="listbox"
-            aria-disabled="@_context.Disabled.ToString().ToLower()"
-            disabled="@_context.Disabled"
-            data-state="@(_context.IsOpen ? "open" : "closed")"
+            aria-disabled="@objContext.Disabled.ToString().ToLower()"
+            disabled="@objContext.Disabled"
+            data-state="@(objContext.IsOpen ? "open" : "closed")"
             @onclick="HandleClick"
             @onkeydown="HandleKeyDown"
             @onkeydown:preventDefault="true"
@@ -24,9 +24,9 @@
 
 @code {
     [CascadingParameter]
-    private SelectContext<TValue>? _context { get; set; }
+    private SelectContext<TValue>? objContext { get; set; }
 
-    private ElementReference _buttonElement;
+    private ElementReference objButtonElement;
 
     /// <summary>
     /// Content to render inside the trigger button.
@@ -42,12 +42,12 @@
 
     private void HandleClick()
     {
-        _context?.Toggle(_buttonElement);
+        objContext?.Toggle(objButtonElement);
     }
 
     private void HandleKeyDown(KeyboardEventArgs args)
     {
-        if (_context == null || _context.Disabled) return;
+        if (objContext == null || objContext.Disabled) return;
 
         switch (args.Key)
         {
@@ -55,12 +55,12 @@
             case " ": // Space
             case "ArrowDown":
             case "ArrowUp":
-                _context.Open(_buttonElement);
+                objContext.Open(objButtonElement);
                 break;
             case "Escape":
-                if (_context.IsOpen)
+                if (objContext.IsOpen)
                 {
-                    _context.Close();
+                    objContext.Close();
                 }
                 break;
         }

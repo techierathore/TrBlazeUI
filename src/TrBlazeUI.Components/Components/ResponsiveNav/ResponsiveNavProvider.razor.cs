@@ -6,8 +6,8 @@ namespace TrBlazeUI.Components.ResponsiveNav;
 public partial class ResponsiveNavProvider
 {
     private ResponsiveNavContext Context { get; set; } = new();
-    private IJSObjectReference? _module;
-    private DotNetObjectReference<ResponsiveNavProvider>? _dotNetRef;
+    private IJSObjectReference? objModule;
+    private DotNetObjectReference<ResponsiveNavProvider>? objDotNetRef;
 
     [Inject]
     private IJSRuntime JSRuntime { get; set; } = default!;
@@ -19,14 +19,14 @@ public partial class ResponsiveNavProvider
             try
             {
                 // Load the responsive nav JavaScript module
-                _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                objModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "import", "./_content/TrBlazeUI.Components/js/responsive-nav.js");
 
                 // Create a reference to this component for JS callbacks
-                _dotNetRef = DotNetObjectReference.Create(this);
+                objDotNetRef = DotNetObjectReference.Create(this);
 
                 // Initialize mobile detection
-                await _module.InvokeVoidAsync("initialize", _dotNetRef);
+                await objModule.InvokeVoidAsync("initialize", objDotNetRef);
 
                 // Subscribe to state changes
                 Context.StateChanged += OnStateChanged;
@@ -59,12 +59,12 @@ public partial class ResponsiveNavProvider
             Context.StateChanged -= OnStateChanged;
         }
 
-        if (_module != null)
+        if (objModule != null)
         {
             try
             {
-                await _module.InvokeVoidAsync("cleanup");
-                await _module.DisposeAsync();
+                await objModule.InvokeVoidAsync("cleanup");
+                await objModule.DisposeAsync();
             }
             catch (JSDisconnectedException)
             {
@@ -72,7 +72,7 @@ public partial class ResponsiveNavProvider
             }
         }
 
-        _dotNetRef?.Dispose();
+        objDotNetRef?.Dispose();
 
         GC.SuppressFinalize(this);
     }

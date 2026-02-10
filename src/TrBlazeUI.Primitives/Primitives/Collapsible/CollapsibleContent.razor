@@ -1,7 +1,7 @@
 @namespace TrBlazeUI.Primitives.Collapsible
 
 @* CollapsibleContent primitive - collapsible content region *@
-@if (_shouldRender)
+@if (objShouldRender)
 {
     <div role="region"
          data-state="@(Context?.Open ?? false ? "open" : "closed")"

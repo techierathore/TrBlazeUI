@@ -52,9 +52,9 @@
                 </ContextMenuItem>
             </ContextMenuContent>
         </ContextMenu>
-        @if (!string.IsNullOrEmpty(_lastAction))
+        @if (!string.IsNullOrEmpty(objLastAction))
         {
-            <p class="text-sm text-muted-foreground">Last action: @_lastAction</p>
+            <p class="text-sm text-muted-foreground">Last action: @objLastAction</p>
         }
     </div>
 
@@ -118,10 +118,10 @@
 </div>
 
 @code {
-    private string? _lastAction;
+    private string? objLastAction;
 
     private void HandleAction(string action)
     {
-        _lastAction = action;
+        objLastAction = action;
     }
 }

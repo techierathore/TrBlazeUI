@@ -5,7 +5,7 @@
 @using TrBlazeUI.Icons.Lucide.Components
 @using TrBlazeUI.Primitives.Services
 
-<Popover @bind-Open="_isOpen">
+<Popover @bind-Open="objIsOpen">
     <PopoverTrigger AsChild="true">
         <Button Variant="ButtonVariant.Outline"
                 Class="@ButtonCssClass"
@@ -30,7 +30,7 @@
                     <div class="flex flex-col items-center border rounded-md">
                         <button type="button"
                                 class="@ScrollButtonClass"
-                                @onclick="IncrementHour"
+                                @onclick="IncrementHourAsync"
                                 disabled="@Disabled">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                                 <path d="m18 15-6-6-6 6"/>
@@ -41,7 +41,7 @@
                         </span>
                         <button type="button"
                                 class="@ScrollButtonClass"
-                                @onclick="DecrementHour"
+                                @onclick="DecrementHourAsync"
                                 disabled="@Disabled">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                                 <path d="m6 9 6 6 6-6"/>
@@ -58,7 +58,7 @@
                     <div class="flex flex-col items-center border rounded-md">
                         <button type="button"
                                 class="@ScrollButtonClass"
-                                @onclick="IncrementMinute"
+                                @onclick="IncrementMinuteAsync"
                                 disabled="@Disabled">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                                 <path d="m18 15-6-6-6 6"/>
@@ -69,7 +69,7 @@
                         </span>
                         <button type="button"
                                 class="@ScrollButtonClass"
-                                @onclick="DecrementMinute"
+                                @onclick="DecrementMinuteAsync"
                                 disabled="@Disabled">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                                 <path d="m6 9 6 6 6-6"/>
@@ -88,7 +88,7 @@
                         <div class="flex flex-col items-center border rounded-md">
                             <button type="button"
                                     class="@ScrollButtonClass"
-                                    @onclick="IncrementSecond"
+                                    @onclick="IncrementSecondAsync"
                                     disabled="@Disabled">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                                     <path d="m18 15-6-6-6 6"/>
@@ -99,7 +99,7 @@
                             </span>
                             <button type="button"
                                     class="@ScrollButtonClass"
-                                    @onclick="DecrementSecond"
+                                    @onclick="DecrementSecondAsync"
                                     disabled="@Disabled">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                                     <path d="m6 9 6 6 6-6"/>
@@ -117,13 +117,13 @@
                         <div class="flex flex-col border rounded-md overflow-hidden">
                             <button type="button"
                                     class="@GetAmPmButtonClass(true)"
-                                    @onclick="() => SetAmPm(true)"
+                                    @onclick="() => SetAmPmAsync(true)"
                                     disabled="@Disabled">
                                 AM
                             </button>
                             <button type="button"
                                     class="@GetAmPmButtonClass(false)"
-                                    @onclick="() => SetAmPm(false)"
+                                    @onclick="() => SetAmPmAsync(false)"
                                     disabled="@Disabled">
                                 PM
                             </button>
@@ -137,13 +137,13 @@
                 <button type="button"
                         class="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3"
                         disabled="@Disabled"
-                        @onclick="SetNow">
+                        @onclick="SetNowAsync">
                     Now
                 </button>
                 <button type="button"
                         class="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3"
                         disabled="@(Disabled || !Value.HasValue)"
-                        @onclick="Clear">
+                        @onclick="ClearAsync">
                     Clear
                 </button>
             </div>
@@ -152,11 +152,11 @@
 </Popover>
 
 @code {
-    private bool _isOpen;
-    private int _internalHour = 12;
-    private int _internalMinute = 0;
-    private int _internalSecond = 0;
-    private bool _isAm = true;
+    private bool objIsOpen;
+    private int objInternalHour = 12;
+    private int objInternalMinute = 0;
+    private int objInternalSecond = 0;
+    private bool objIsAm = true;
 
     /// <summary>
     /// The selected time value.
@@ -218,9 +218,9 @@
     [Parameter]
     public string? Class { get; set; }
 
-    private int CurrentHour => Value?.Hours ?? _internalHour;
-    private int CurrentMinute => Value?.Minutes ?? _internalMinute;
-    private int CurrentSecond => Value?.Seconds ?? _internalSecond;
+    private int CurrentHour => Value?.Hours ?? objInternalHour;
+    private int CurrentMinute => Value?.Minutes ?? objInternalMinute;
+    private int CurrentSecond => Value?.Seconds ?? objInternalSecond;
 
     private int DisplayHour
     {
@@ -240,18 +240,18 @@
     {
         if (Value.HasValue)
         {
-            _internalHour = Value.Value.Hours;
-            _internalMinute = Value.Value.Minutes;
-            _internalSecond = Value.Value.Seconds;
-            _isAm = Value.Value.Hours < 12;
+            objInternalHour = Value.Value.Hours;
+            objInternalMinute = Value.Value.Minutes;
+            objInternalSecond = Value.Value.Seconds;
+            objIsAm = Value.Value.Hours < 12;
         }
         else
         {
             // Set appropriate default based on format
-            _internalHour = Format == TimeFormat.Hour24 ? 0 : 12;
-            _internalMinute = 0;
-            _internalSecond = 0;
-            _isAm = true;
+            objInternalHour = Format == TimeFormat.Hour24 ? 0 : 12;
+            objInternalMinute = 0;
+            objInternalSecond = 0;
+            objIsAm = true;
         }
     }
 
@@ -276,9 +276,9 @@
         }
     }
 
-    private async Task UpdateValue()
+    private async Task UpdateValueAsync()
     {
-        var newTime = new TimeSpan(_internalHour, _internalMinute, _internalSecond);
+        var newTime = new TimeSpan(objInternalHour, objInternalMinute, objInternalSecond);
 
         // Apply constraints
         if (MinTime.HasValue && newTime < MinTime.Value)
@@ -291,94 +291,94 @@
         StateHasChanged();
     }
 
-    private async Task IncrementHour()
+    private async Task IncrementHourAsync()
     {
         if (Format == TimeFormat.Hour24)
         {
-            _internalHour = (_internalHour + 1) % 24;
+            objInternalHour = (objInternalHour + 1) % 24;
         }
         else
         {
-            var hour12 = _internalHour % 12;
+            var hour12 = objInternalHour % 12;
             hour12 = (hour12 + 1) % 12;
-            _internalHour = _isAm ? hour12 : hour12 + 12;
-            if (_internalHour == 12 && _isAm) _internalHour = 0;
-            if (_internalHour == 0 && !_isAm) _internalHour = 12;
+            objInternalHour = objIsAm ? hour12 : hour12 + 12;
+            if (objInternalHour == 12 && objIsAm) objInternalHour = 0;
+            if (objInternalHour == 0 && !objIsAm) objInternalHour = 12;
         }
-        await UpdateValue();
+        await UpdateValueAsync();
     }
 
-    private async Task DecrementHour()
+    private async Task DecrementHourAsync()
     {
         if (Format == TimeFormat.Hour24)
         {
-            _internalHour = (_internalHour - 1 + 24) % 24;
+            objInternalHour = (objInternalHour - 1 + 24) % 24;
         }
         else
         {
-            var hour12 = _internalHour % 12;
+            var hour12 = objInternalHour % 12;
             hour12 = (hour12 - 1 + 12) % 12;
-            _internalHour = _isAm ? hour12 : hour12 + 12;
-            if (_internalHour == 12 && _isAm) _internalHour = 0;
-            if (_internalHour == 0 && !_isAm) _internalHour = 12;
+            objInternalHour = objIsAm ? hour12 : hour12 + 12;
+            if (objInternalHour == 12 && objIsAm) objInternalHour = 0;
+            if (objInternalHour == 0 && !objIsAm) objInternalHour = 12;
         }
-        await UpdateValue();
+        await UpdateValueAsync();
     }
 
-    private async Task IncrementMinute()
+    private async Task IncrementMinuteAsync()
     {
-        _internalMinute = (_internalMinute + MinuteStep) % 60;
-        await UpdateValue();
+        objInternalMinute = (objInternalMinute + MinuteStep) % 60;
+        await UpdateValueAsync();
     }
 
-    private async Task DecrementMinute()
+    private async Task DecrementMinuteAsync()
     {
-        _internalMinute = (_internalMinute - MinuteStep + 60) % 60;
-        await UpdateValue();
+        objInternalMinute = (objInternalMinute - MinuteStep + 60) % 60;
+        await UpdateValueAsync();
     }
 
-    private async Task IncrementSecond()
+    private async Task IncrementSecondAsync()
     {
-        _internalSecond = (_internalSecond + 1) % 60;
-        await UpdateValue();
+        objInternalSecond = (objInternalSecond + 1) % 60;
+        await UpdateValueAsync();
     }
 
-    private async Task DecrementSecond()
+    private async Task DecrementSecondAsync()
     {
-        _internalSecond = (_internalSecond - 1 + 60) % 60;
-        await UpdateValue();
+        objInternalSecond = (objInternalSecond - 1 + 60) % 60;
+        await UpdateValueAsync();
     }
 
-    private async Task SetAmPm(bool isAm)
+    private async Task SetAmPmAsync(bool isAm)
     {
-        _isAm = isAm;
-        if (isAm && _internalHour >= 12)
-            _internalHour -= 12;
-        else if (!isAm && _internalHour < 12)
-            _internalHour += 12;
+        objIsAm = isAm;
+        if (isAm && objInternalHour >= 12)
+            objInternalHour -= 12;
+        else if (!isAm && objInternalHour < 12)
+            objInternalHour += 12;
 
-        await UpdateValue();
+        await UpdateValueAsync();
     }
 
-    private async Task SetNow()
+    private async Task SetNowAsync()
     {
         var now = DateTime.Now.TimeOfDay;
-        _internalHour = now.Hours;
-        _internalMinute = (now.Minutes / MinuteStep) * MinuteStep;
-        _internalSecond = ShowSeconds ? now.Seconds : 0;
-        _isAm = _internalHour < 12;
-        await UpdateValue();
+        objInternalHour = now.Hours;
+        objInternalMinute = (now.Minutes / MinuteStep) * MinuteStep;
+        objInternalSecond = ShowSeconds ? now.Seconds : 0;
+        objIsAm = objInternalHour < 12;
+        await UpdateValueAsync();
         StateHasChanged();
     }
 
-    private async Task Clear()
+    private async Task ClearAsync()
     {
         Value = null;
         // Reset to appropriate default based on format
-        _internalHour = Format == TimeFormat.Hour24 ? 0 : 12;
-        _internalMinute = 0;
-        _internalSecond = 0;
-        _isAm = true;
+        objInternalHour = Format == TimeFormat.Hour24 ? 0 : 12;
+        objInternalMinute = 0;
+        objInternalSecond = 0;
+        objIsAm = true;
         await ValueChanged.InvokeAsync(null);
         StateHasChanged();
     }

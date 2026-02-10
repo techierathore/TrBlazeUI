@@ -1,14 +1,14 @@
 @namespace TrBlazeUI.Components.Pagination
 @using TrBlazeUI.Primitives.Table
 
-<CascadingValue Value="@_context" IsFixed="false">
+<CascadingValue Value="@objContext" IsFixed="false">
     <nav role="navigation" aria-label="pagination" class="@CssClass">
         @ChildContent
     </nav>
 </CascadingValue>
 
 @code {
-    private PaginationContext _context = new();
+    private PaginationContext objContext = new();
 
     [Parameter]
     public string? Class { get; set; }
@@ -43,14 +43,14 @@
 
     protected override void OnParametersSet()
     {
-        _context.State = State;
-        _context.PageSizes = PageSizes;
-        _context.OnPageChanged = async (page) =>
+        objContext.State = State;
+        objContext.PageSizes = PageSizes;
+        objContext.OnPageChanged = async (page) =>
         {
             if (OnPageChanged.HasDelegate)
                 await OnPageChanged.InvokeAsync(page);
         };
-        _context.OnPageSizeChanged = async (size) =>
+        objContext.OnPageSizeChanged = async (size) =>
         {
             if (OnPageSizeChanged.HasDelegate)
                 await OnPageSizeChanged.InvokeAsync(size);

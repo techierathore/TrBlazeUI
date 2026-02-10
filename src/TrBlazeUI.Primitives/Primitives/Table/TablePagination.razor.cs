@@ -9,8 +9,8 @@ namespace TrBlazeUI.Primitives.Table;
 /// <typeparam name="TData">The type of data displayed in the table.</typeparam>
 public partial class TablePagination<TData> : ComponentBase, IDisposable
 {
-    private bool _disposed;
-    private PaginationContext _context = default!;
+    private bool objDisposed;
+    private PaginationContext objContext = default!;
 
     /// <summary>
     /// Gets or sets the pagination state to control and display.
@@ -73,14 +73,14 @@ public partial class TablePagination<TData> : ComponentBase, IDisposable
     /// <summary>
     /// Gets the pagination context for the template.
     /// </summary>
-    private PaginationContext Context => _context;
+    private PaginationContext Context => objContext;
 
     /// <summary>
     /// Initializes the component and creates the pagination context.
     /// </summary>
     protected override void OnInitialized()
     {
-        _context = new PaginationContext
+        objContext = new PaginationContext
         {
             State = State,
             PageSizeOptions = PageSizeOptions,
@@ -106,7 +106,7 @@ public partial class TablePagination<TData> : ComponentBase, IDisposable
         }
 
         State.FirstPage();
-        await NotifyPageChange();
+        await NotifyPageChangeAsync();
     }
 
     /// <summary>
@@ -120,7 +120,7 @@ public partial class TablePagination<TData> : ComponentBase, IDisposable
         }
 
         State.PreviousPage();
-        await NotifyPageChange();
+        await NotifyPageChangeAsync();
     }
 
     /// <summary>
@@ -134,7 +134,7 @@ public partial class TablePagination<TData> : ComponentBase, IDisposable
         }
 
         State.NextPage();
-        await NotifyPageChange();
+        await NotifyPageChangeAsync();
     }
 
     /// <summary>
@@ -148,7 +148,7 @@ public partial class TablePagination<TData> : ComponentBase, IDisposable
         }
 
         State.LastPage();
-        await NotifyPageChange();
+        await NotifyPageChangeAsync();
     }
 
     /// <summary>
@@ -163,7 +163,7 @@ public partial class TablePagination<TData> : ComponentBase, IDisposable
         }
 
         State.GoToPage(page);
-        await NotifyPageChange();
+        await NotifyPageChangeAsync();
     }
 
     /// <summary>
@@ -184,20 +184,20 @@ public partial class TablePagination<TData> : ComponentBase, IDisposable
             await OnPageSizeChange.InvokeAsync(newPageSize);
         }
 
-        await NotifyPageChange();
+        await NotifyPageChangeAsync();
     }
 
     /// <summary>
     /// Notifies listeners that the page has changed.
     /// </summary>
-    private async Task NotifyPageChange()
+    private async Task NotifyPageChangeAsync()
     {
         if (OnPageChange.HasDelegate)
         {
             await OnPageChange.InvokeAsync(State.CurrentPage);
         }
 
-        if (!_disposed)
+        if (!objDisposed)
         {
             StateHasChanged();
         }
@@ -209,7 +209,7 @@ public partial class TablePagination<TData> : ComponentBase, IDisposable
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-        _disposed = true;
+        objDisposed = true;
     }
 }
 

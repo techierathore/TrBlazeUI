@@ -12,9 +12,9 @@ namespace TrBlazeUI.Components.NumericInput;
 /// <typeparam name="TValue">The numeric type (must implement INumber&lt;TValue&gt;).</typeparam>
 public partial class NumericInput<TValue> : ComponentBase where TValue : struct, INumber<TValue>
 {
-    private ElementReference _inputRef;
-    private string _editingValue = string.Empty;
-    private bool _isEditing;
+    private ElementReference objInputRef;
+    private string objEditingValue = string.Empty;
+    private bool objIsEditing;
 
     /// <summary>
     /// Gets or sets the current value.
@@ -127,9 +127,9 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
     {
         get
         {
-            if (_isEditing)
+            if (objIsEditing)
             {
-                return _editingValue;
+                return objEditingValue;
             }
 
             if (Format != null)
@@ -182,8 +182,8 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
     private void HandleInput(ChangeEventArgs args)
     {
         var inputValue = args.Value?.ToString() ?? string.Empty;
-        _editingValue = inputValue;
-        _isEditing = true;
+        objEditingValue = inputValue;
+        objIsEditing = true;
 
         // Try to parse and update value in real-time
         if (TryParseValue(inputValue, out var parsedValue))
@@ -199,10 +199,10 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
 
     private void HandleBlur(FocusEventArgs args)
     {
-        _isEditing = false;
+        objIsEditing = false;
 
         // On blur, ensure we have a valid value
-        if (TryParseValue(_editingValue, out var parsedValue))
+        if (TryParseValue(objEditingValue, out var parsedValue))
         {
             var clampedValue = ClampValue(parsedValue);
             if (!clampedValue.Equals(Value))
@@ -217,8 +217,8 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
 
     private void HandleFocus(FocusEventArgs args)
     {
-        _editingValue = Value.ToString() ?? string.Empty;
-        _isEditing = true;
+        objEditingValue = Value.ToString() ?? string.Empty;
+        objIsEditing = true;
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
@@ -231,76 +231,76 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
         switch (e.Key)
         {
             case "ArrowUp":
-                await Increment();
+                await IncrementAsync();
                 break;
             case "ArrowDown":
-                await Decrement();
+                await DecrementAsync();
                 break;
             case "PageUp":
-                await IncrementBy(TValue.CreateChecked(10) * StepValue);
+                await IncrementByAsync(TValue.CreateChecked(10) * StepValue);
                 break;
             case "PageDown":
-                await DecrementBy(TValue.CreateChecked(10) * StepValue);
+                await DecrementByAsync(TValue.CreateChecked(10) * StepValue);
                 break;
             case "Home":
                 if (Min.HasValue)
                 {
-                    await SetValue(Min.Value);
+                    await SetValueAsync(Min.Value);
                 }
                 break;
             case "End":
                 if (Max.HasValue)
                 {
-                    await SetValue(Max.Value);
+                    await SetValueAsync(Max.Value);
                 }
                 break;
         }
     }
 
-    private async Task Increment()
+    private async Task IncrementAsync()
     {
         if (Disabled || IsAtMax)
         {
             return;
         }
-        await SetValue(Value + StepValue);
+        await SetValueAsync(Value + StepValue);
     }
 
-    private async Task Decrement()
+    private async Task DecrementAsync()
     {
         if (Disabled || IsAtMin)
         {
             return;
         }
-        await SetValue(Value - StepValue);
+        await SetValueAsync(Value - StepValue);
     }
 
-    private async Task IncrementBy(TValue amount)
+    private async Task IncrementByAsync(TValue amount)
     {
         if (Disabled)
         {
             return;
         }
-        await SetValue(Value + amount);
+        await SetValueAsync(Value + amount);
     }
 
-    private async Task DecrementBy(TValue amount)
+    private async Task DecrementByAsync(TValue amount)
     {
         if (Disabled)
         {
             return;
         }
-        await SetValue(Value - amount);
+        await SetValueAsync(Value - amount);
     }
 
-    private async Task SetValue(TValue value)
+    private async Task SetValueAsync(TValue value)
     {
         var clampedValue = ClampValue(value);
 
         if (!clampedValue.Equals(Value))
         {
             Value = clampedValue;
-            _editingValue = clampedValue.ToString() ?? string.Empty;
+            objEditingValue = clampedValue.ToString() ?? string.Empty;
             await ValueChanged.InvokeAsync(clampedValue);
         }
     }

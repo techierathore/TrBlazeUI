@@ -82,8 +82,8 @@
                 Click the button to simulate a loading operation.
             </p>
         </div>
-        <Button Disabled="@_isLoading" OnClick="@SimulateLoading">
-            @if (_isLoading)
+        <Button Disabled="@objIsLoading" OnClick="@SimulateLoading">
+            @if (objIsLoading)
             {
                 <Spinner Size="SpinnerSize.Small" Class="mr-2" />
                 <span>Processing...</span>
@@ -188,12 +188,12 @@
 </div>
 
 @code {
-    private bool _isLoading;
+    private bool objIsLoading;
 
     private async Task SimulateLoading()
     {
-        _isLoading = true;
+        objIsLoading = true;
         await Task.Delay(2000);
-        _isLoading = false;
+        objIsLoading = false;
     }
 }

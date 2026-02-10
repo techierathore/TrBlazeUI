@@ -2,7 +2,7 @@
 @implements IDisposable
 
 <div class="@CssClass"
-     style="@(_isVisible ? null : "display: none")"
+     style="@(objIsVisible ? null : "display: none")"
      role="separator"
      aria-orientation="horizontal">
 </div>
@@ -17,7 +17,7 @@
     [Parameter]
     public string? Class { get; set; }
 
-    private bool _isVisible = true;
+    private bool objIsVisible = true;
 
     /// <summary>
     /// Gets the computed CSS classes for the separator.
@@ -44,7 +44,7 @@
         if (Context == null) return;
 
         // Hide separator when there are no visible items (during filtering)
-        _isVisible = Context.HasVisibleItems();
+        objIsVisible = Context.HasVisibleItems();
         StateHasChanged();
     }
 

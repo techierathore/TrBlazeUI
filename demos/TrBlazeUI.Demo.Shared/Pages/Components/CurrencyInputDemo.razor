@@ -22,9 +22,9 @@
             </p>
         </div>
         <div class="w-64">
-            <CurrencyInput @bind-Value="_usdValue" CurrencyCode="USD" Placeholder="0.00" />
+            <CurrencyInput @bind-Value="objUsdValue" CurrencyCode="USD" Placeholder="0.00" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: $@_usdValue.ToString("F2")</p>
+        <p class="text-sm text-muted-foreground">Value: $@objUsdValue.ToString("F2")</p>
     </div>
 
     <!-- Euro -->
@@ -36,9 +36,9 @@
             </p>
         </div>
         <div class="w-64">
-            <CurrencyInput @bind-Value="_eurValue" CurrencyCode="EUR" Placeholder="0,00" />
+            <CurrencyInput @bind-Value="objEurValue" CurrencyCode="EUR" Placeholder="0,00" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_eurValue.ToString("F2")</p>
+        <p class="text-sm text-muted-foreground">Value: @objEurValue.ToString("F2")</p>
     </div>
 
     <!-- British Pound -->
@@ -47,9 +47,9 @@
             <h2 class="text-2xl font-semibold">British Pound (GBP)</h2>
         </div>
         <div class="w-64">
-            <CurrencyInput @bind-Value="_gbpValue" CurrencyCode="GBP" />
+            <CurrencyInput @bind-Value="objGbpValue" CurrencyCode="GBP" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_gbpValue.ToString("F2")</p>
+        <p class="text-sm text-muted-foreground">Value: @objGbpValue.ToString("F2")</p>
     </div>
 
     <!-- Japanese Yen (0 decimals) -->
@@ -61,9 +61,9 @@
             </p>
         </div>
         <div class="w-64">
-            <CurrencyInput @bind-Value="_jpyValue" CurrencyCode="JPY" />
+            <CurrencyInput @bind-Value="objJpyValue" CurrencyCode="JPY" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_jpyValue.ToString("F0")</p>
+        <p class="text-sm text-muted-foreground">Value: @objJpyValue.ToString("F0")</p>
     </div>
 
     <!-- Kuwaiti Dinar (3 decimals) -->
@@ -75,9 +75,9 @@
             </p>
         </div>
         <div class="w-64">
-            <CurrencyInput @bind-Value="_kwdValue" CurrencyCode="KWD" />
+            <CurrencyInput @bind-Value="objKwdValue" CurrencyCode="KWD" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_kwdValue.ToString("F3")</p>
+        <p class="text-sm text-muted-foreground">Value: @objKwdValue.ToString("F3")</p>
     </div>
 
     <!-- Swiss Franc (symbol after) -->
@@ -89,9 +89,9 @@
             </p>
         </div>
         <div class="w-64">
-            <CurrencyInput @bind-Value="_chfValue" CurrencyCode="CHF" />
+            <CurrencyInput @bind-Value="objChfValue" CurrencyCode="CHF" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_chfValue.ToString("F2")</p>
+        <p class="text-sm text-muted-foreground">Value: @objChfValue.ToString("F2")</p>
     </div>
 
     <!-- Brazilian Real -->
@@ -100,9 +100,9 @@
             <h2 class="text-2xl font-semibold">Brazilian Real (BRL)</h2>
         </div>
         <div class="w-64">
-            <CurrencyInput @bind-Value="_brlValue" CurrencyCode="BRL" />
+            <CurrencyInput @bind-Value="objBrlValue" CurrencyCode="BRL" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_brlValue.ToString("F2")</p>
+        <p class="text-sm text-muted-foreground">Value: @objBrlValue.ToString("F2")</p>
     </div>
 
     <!-- Indian Rupee -->
@@ -111,9 +111,9 @@
             <h2 class="text-2xl font-semibold">Indian Rupee (INR)</h2>
         </div>
         <div class="w-64">
-            <CurrencyInput @bind-Value="_inrValue" CurrencyCode="INR" />
+            <CurrencyInput @bind-Value="objInrValue" CurrencyCode="INR" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_inrValue.ToString("F2")</p>
+        <p class="text-sm text-muted-foreground">Value: @objInrValue.ToString("F2")</p>
     </div>
 
     <!-- Without Symbol -->
@@ -125,9 +125,9 @@
             </p>
         </div>
         <div class="w-64">
-            <CurrencyInput @bind-Value="_noSymbolValue" CurrencyCode="USD" ShowSymbol="false" />
+            <CurrencyInput @bind-Value="objNoSymbolValue" CurrencyCode="USD" ShowSymbol="false" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_noSymbolValue.ToString("F2")</p>
+        <p class="text-sm text-muted-foreground">Value: @objNoSymbolValue.ToString("F2")</p>
     </div>
 
     <!-- With Min/Max -->
@@ -139,9 +139,9 @@
             </p>
         </div>
         <div class="w-64">
-            <CurrencyInput @bind-Value="_constrainedValue" CurrencyCode="USD" Min="0" Max="1000" />
+            <CurrencyInput @bind-Value="objConstrainedValue" CurrencyCode="USD" Min="0" Max="1000" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: $@_constrainedValue.ToString("F2") (min: $0, max: $1,000)</p>
+        <p class="text-sm text-muted-foreground">Value: $@objConstrainedValue.ToString("F2") (min: $0, max: $1,000)</p>
     </div>
 
     <!-- Positive Only -->
@@ -153,9 +153,9 @@
             </p>
         </div>
         <div class="w-64">
-            <CurrencyInput @bind-Value="_positiveValue" CurrencyCode="USD" AllowNegative="false" />
+            <CurrencyInput @bind-Value="objPositiveValue" CurrencyCode="USD" AllowNegative="false" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: $@_positiveValue.ToString("F2")</p>
+        <p class="text-sm text-muted-foreground">Value: $@objPositiveValue.ToString("F2")</p>
     </div>
 
     <!-- Disabled -->
@@ -178,7 +178,7 @@
         </div>
         <div class="flex gap-4 items-end">
             <div class="w-64">
-                <CurrencyInput @bind-Value="_dynamicValue" CurrencyCode="@_selectedCurrency" />
+                <CurrencyInput @bind-Value="objDynamicValue" CurrencyCode="@objSelectedCurrency" />
             </div>
             <select class="h-10 px-3 rounded-md border border-input bg-background text-sm"
                     @onchange="HandleCurrencyChange">
@@ -193,7 +193,7 @@
                 <option value="KWD">KWD - Kuwaiti Dinar</option>
             </select>
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_dynamicValue (@_selectedCurrency)</p>
+        <p class="text-sm text-muted-foreground">Value: @objDynamicValue (@objSelectedCurrency)</p>
     </div>
 
     <!-- API Reference -->
@@ -226,22 +226,22 @@
 </div>
 
 @code {
-    private decimal _usdValue = 1234.56m;
-    private decimal _eurValue = 999.99m;
-    private decimal _gbpValue = 500.00m;
-    private decimal _jpyValue = 15000m;
-    private decimal _kwdValue = 100.500m;
-    private decimal _chfValue = 750.00m;
-    private decimal _brlValue = 1500.00m;
-    private decimal _inrValue = 10000.00m;
-    private decimal _noSymbolValue = 250.00m;
-    private decimal _constrainedValue = 500.00m;
-    private decimal _positiveValue = 100.00m;
-    private decimal _dynamicValue = 1000.00m;
-    private string _selectedCurrency = "USD";
+    private decimal objUsdValue = 1234.56m;
+    private decimal objEurValue = 999.99m;
+    private decimal objGbpValue = 500.00m;
+    private decimal objJpyValue = 15000m;
+    private decimal objKwdValue = 100.500m;
+    private decimal objChfValue = 750.00m;
+    private decimal objBrlValue = 1500.00m;
+    private decimal objInrValue = 10000.00m;
+    private decimal objNoSymbolValue = 250.00m;
+    private decimal objConstrainedValue = 500.00m;
+    private decimal objPositiveValue = 100.00m;
+    private decimal objDynamicValue = 1000.00m;
+    private string objSelectedCurrency = "USD";
 
     private void HandleCurrencyChange(ChangeEventArgs e)
     {
-        _selectedCurrency = e.Value?.ToString() ?? "USD";
+        objSelectedCurrency = e.Value?.ToString() ?? "USD";
     }
 }

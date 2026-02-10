@@ -74,7 +74,7 @@ public enum AriaCurrent
 /// </summary>
 public class AriaBuilder
 {
-    private readonly Dictionary<string, object?> _attributes = new();
+    private readonly Dictionary<string, object?> objAttributes = new();
 
     /// <summary>
     /// Sets the ARIA role attribute.
@@ -281,7 +281,7 @@ public class AriaBuilder
     {
         if (!string.IsNullOrWhiteSpace(name))
         {
-            _attributes[name] = value;
+            objAttributes[name] = value;
         }
         return this;
     }
@@ -292,7 +292,7 @@ public class AriaBuilder
     /// <returns>Dictionary suitable for @attributes in Blazor components.</returns>
     public Dictionary<string, object> Build()
     {
-        return _attributes
+        return objAttributes
             .Where(x => x.Value != null)
             .ToDictionary(x => x.Key, x => x.Value!);
     }

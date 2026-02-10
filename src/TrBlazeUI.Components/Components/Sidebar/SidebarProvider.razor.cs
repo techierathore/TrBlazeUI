@@ -6,8 +6,8 @@ namespace TrBlazeUI.Components.Sidebar;
 public partial class SidebarProvider
 {
     private SidebarContext Context { get; set; } = new();
-    private IJSObjectReference? _module;
-    private DotNetObjectReference<SidebarProvider>? _dotNetRef;
+    private IJSObjectReference? objModule;
+    private DotNetObjectReference<SidebarProvider>? objDotNetRef;
 
     [Inject]
     private IJSRuntime JSRuntime { get; set; } = default!;
@@ -26,17 +26,17 @@ public partial class SidebarProvider
             try
             {
                 // Load the sidebar JavaScript module
-                _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                objModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "import", "./_content/TrBlazeUI.Components/js/sidebar.js");
 
                 // Create a reference to this component for JS callbacks
-                _dotNetRef = DotNetObjectReference.Create(this);
+                objDotNetRef = DotNetObjectReference.Create(this);
 
                 // Initialize sidebar state from cookie if persistence is enabled
                 bool? savedOpen = null;
                 if (!string.IsNullOrEmpty(CookieKey))
                 {
-                    savedOpen = await _module.InvokeAsync<bool?>("getSidebarState", CookieKey);
+                    savedOpen = await objModule.InvokeAsync<bool?>("getSidebarState", CookieKey);
                 }
 
                 // Initialize context with saved state or defaults
@@ -47,7 +47,7 @@ public partial class SidebarProvider
                 );
 
                 // Set up mobile detection and keyboard shortcuts
-                await _module.InvokeVoidAsync("initializeSidebar", _dotNetRef, CookieKey);
+                await objModule.InvokeVoidAsync("initializeSidebar", objDotNetRef, CookieKey);
 
                 // Subscribe to state changes for persistence
                 Context.StateChanged += OnStateChanged;
@@ -66,11 +66,11 @@ public partial class SidebarProvider
     private async void OnStateChanged(object? sender, EventArgs e)
     {
         // Persist sidebar state to cookie when it changes
-        if (_module != null && !string.IsNullOrEmpty(CookieKey))
+        if (objModule != null && !string.IsNullOrEmpty(CookieKey))
         {
             try
             {
-                await _module.InvokeVoidAsync("saveSidebarState", CookieKey, Context.Open);
+                await objModule.InvokeVoidAsync("saveSidebarState", CookieKey, Context.Open);
             }
             catch (JSException)
             {
@@ -106,12 +106,12 @@ public partial class SidebarProvider
             Context.StateChanged -= OnStateChanged;
         }
 
-        if (_module != null)
+        if (objModule != null)
         {
             try
             {
-                await _module.InvokeVoidAsync("cleanup");
-                await _module.DisposeAsync();
+                await objModule.InvokeVoidAsync("cleanup");
+                await objModule.DisposeAsync();
             }
             catch (JSDisconnectedException)
             {
@@ -119,7 +119,7 @@ public partial class SidebarProvider
             }
         }
 
-        _dotNetRef?.Dispose();
+        objDotNetRef?.Dispose();
 
         GC.SuppressFinalize(this);
     }

@@ -2,22 +2,22 @@
 @implements IDisposable
 
 @* TabsContent primitive - content panel for a tab *@
-@if (_isActive || ForceMount)
+@if (objIsActive || ForceMount)
 {
-    <div id="@_contentId"
+    <div id="@objContentId"
          role="tabpanel"
-         aria-labelledby="@_triggerId"
+         aria-labelledby="@objTriggerId"
          tabindex="0"
-         hidden="@(!_isActive)"
+         hidden="@(!objIsActive)"
          @attributes="AdditionalAttributes">
         @ChildContent
     </div>
 }
 
 @code {
-    private string _contentId => Context.GetContentId(Value);
-    private string _triggerId => Context.GetTriggerId(Value);
-    private bool _isActive => Context.IsTabActive(Value);
+    private string objContentId => Context.GetContentId(Value);
+    private string objTriggerId => Context.GetTriggerId(Value);
+    private bool objIsActive => Context.IsTabActive(Value);
 
     /// <summary>
     /// Cascading parameter to receive the tabs context.

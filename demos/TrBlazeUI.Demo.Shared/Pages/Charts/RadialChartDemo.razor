@@ -25,13 +25,13 @@
         <div class="max-w-sm mx-auto">
             <ChartContainer>
                 <RadialChart TItem="ProgressData"
-                             Items="@_progressData"
+                             Items="@objProgressData"
                              Variant="RadialChartVariant.Default"
                              CenterLabel="Progress"
                              CenterValue="75%"
                              Height="300px">
                     <ApexPointSeries TItem="ProgressData"
-                                     Items="@_progressData"
+                                     Items="@objProgressData"
                                      Name="Progress"
                                      SeriesType="SeriesType.RadialBar"
                                      XValue="@(item => item.Label)"
@@ -52,13 +52,13 @@
         <div class="max-w-sm mx-auto">
             <ChartContainer>
                 <RadialChart TItem="ProgressData"
-                             Items="@_progressData"
+                             Items="@objProgressData"
                              Variant="RadialChartVariant.SemiCircle"
                              CenterLabel="Complete"
                              CenterValue="75%"
                              Height="250px">
                     <ApexPointSeries TItem="ProgressData"
-                                     Items="@_progressData"
+                                     Items="@objProgressData"
                                      Name="Progress"
                                      SeriesType="SeriesType.RadialBar"
                                      XValue="@(item => item.Label)"
@@ -79,13 +79,13 @@
         <div class="max-w-sm mx-auto">
             <ChartContainer>
                 <RadialChart TItem="ProgressData"
-                             Items="@_progressData"
+                             Items="@objProgressData"
                              Variant="RadialChartVariant.Gauge"
                              CenterLabel="Speed"
                              CenterValue="75"
                              Height="300px">
                     <ApexPointSeries TItem="ProgressData"
-                                     Items="@_progressData"
+                                     Items="@objProgressData"
                                      Name="Speed"
                                      SeriesType="SeriesType.RadialBar"
                                      XValue="@(item => item.Label)"
@@ -106,13 +106,13 @@
         <div class="max-w-sm mx-auto">
             <ChartContainer>
                 <RadialChart TItem="ProgressData"
-                             Items="@_progressData"
+                             Items="@objProgressData"
                              Variant="RadialChartVariant.Gradient"
                              CenterLabel="Score"
                              CenterValue="75"
                              Height="300px">
                     <ApexPointSeries TItem="ProgressData"
-                                     Items="@_progressData"
+                                     Items="@objProgressData"
                                      Name="Score"
                                      SeriesType="SeriesType.RadialBar"
                                      XValue="@(item => item.Label)"
@@ -133,11 +133,11 @@
         <div class="max-w-sm mx-auto">
             <ChartContainer>
                 <RadialChart TItem="ProgressData"
-                             Items="@_multiProgressData"
+                             Items="@objMultiProgressData"
                              Variant="RadialChartVariant.Default"
                              Height="300px">
                     <ApexPointSeries TItem="ProgressData"
-                                     Items="@_multiProgressData"
+                                     Items="@objMultiProgressData"
                                      Name="Progress"
                                      SeriesType="SeriesType.RadialBar"
                                      XValue="@(item => item.Label)"
@@ -158,14 +158,14 @@
         <div class="max-w-sm mx-auto">
             <ChartContainer>
                 <RadialChart TItem="ProgressData"
-                             Items="@_progressData"
+                             Items="@objProgressData"
                              StartAngle="-180"
                              EndAngle="0"
                              CenterLabel="Battery"
                              CenterValue="75%"
                              Height="250px">
                     <ApexPointSeries TItem="ProgressData"
-                                     Items="@_progressData"
+                                     Items="@objProgressData"
                                      Name="Battery"
                                      SeriesType="SeriesType.RadialBar"
                                      XValue="@(item => item.Label)"
@@ -241,12 +241,12 @@
         public int Value { get; set; }
     }
 
-    private List<ProgressData> _progressData =
+    private List<ProgressData> objProgressData =
     [
         new() { Label = "Progress", Value = 75 }
     ];
 
-    private List<ProgressData> _multiProgressData =
+    private List<ProgressData> objMultiProgressData =
     [
         new() { Label = "Tasks", Value = 85 },
         new() { Label = "Goals", Value = 65 },

@@ -3,7 +3,7 @@
 
 <CascadingValue Value="Id" Name="CommandGroupId">
     <div class="@CssClass"
-         style="@(_isVisible ? null : "display: none")"
+         style="@(objIsVisible ? null : "display: none")"
          role="group"
          aria-labelledby="@(string.IsNullOrWhiteSpace(Heading) ? null : $"command-group-{Id}")">
         @if (!string.IsNullOrWhiteSpace(Heading))
@@ -44,7 +44,7 @@
     /// </summary>
     private string Id { get; } = Guid.NewGuid().ToString("N");
 
-    private bool _isVisible = true;
+    private bool objIsVisible = true;
 
     /// <summary>
     /// Gets the computed CSS classes for the group container.
@@ -71,7 +71,7 @@
         if (Context == null) return;
 
         // Show the group only if it has visible items (items that pass the current filter)
-        _isVisible = Context.GroupHasVisibleItems(Id);
+        objIsVisible = Context.GroupHasVisibleItems(Id);
         StateHasChanged();
     }
 

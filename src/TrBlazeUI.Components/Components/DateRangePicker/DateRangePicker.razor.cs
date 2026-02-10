@@ -9,11 +9,11 @@ namespace TrBlazeUI.Components.DateRangePicker;
 /// </summary>
 public partial class DateRangePicker : ComponentBase
 {
-    private bool _isOpen;
-    private DateTime _displayMonth1;
-    private DateTime _displayMonth2;
-    private DateTime? _selectionStart;
-    private DateTime? _selectionEnd;
+    private bool objIsOpen;
+    private DateTime objDisplayMonth1;
+    private DateTime objDisplayMonth2;
+    private DateTime? objSelectionStart;
+    private DateTime? objSelectionEnd;
 
     /// <summary>
     /// The selected date range.
@@ -103,15 +103,15 @@ public partial class DateRangePicker : ComponentBase
     private static readonly string[] MonthNames = { "January", "February", "March", "April", "May", "June",
                                                      "July", "August", "September", "October", "November", "December" };
 
-    private bool CanApply => _selectionStart.HasValue && _selectionEnd.HasValue;
+    private bool CanApply => objSelectionStart.HasValue && objSelectionEnd.HasValue;
 
     protected override void OnInitialized()
     {
         InitializeDisplayMonths();
         if (Value != null)
         {
-            _selectionStart = Value.Start;
-            _selectionEnd = Value.End;
+            objSelectionStart = Value.Start;
+            objSelectionEnd = Value.End;
         }
     }
 
@@ -119,8 +119,8 @@ public partial class DateRangePicker : ComponentBase
     {
         if (Value != null)
         {
-            _selectionStart = Value.Start;
-            _selectionEnd = Value.End;
+            objSelectionStart = Value.Start;
+            objSelectionEnd = Value.End;
         }
     }
 
@@ -128,13 +128,13 @@ public partial class DateRangePicker : ComponentBase
     {
         if (Value != null)
         {
-            _displayMonth1 = new DateTime(Value.Start.Year, Value.Start.Month, 1);
+            objDisplayMonth1 = new DateTime(Value.Start.Year, Value.Start.Month, 1);
         }
         else
         {
-            _displayMonth1 = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            objDisplayMonth1 = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
         }
-        _displayMonth2 = _displayMonth1.AddMonths(1);
+        objDisplayMonth2 = objDisplayMonth1.AddMonths(1);
     }
 
     private string FormatRange(DateRange range) =>
@@ -142,15 +142,15 @@ public partial class DateRangePicker : ComponentBase
 
     private void PreviousMonth()
     {
-        _displayMonth1 = _displayMonth1.AddMonths(-1);
-        _displayMonth2 = _displayMonth2.AddMonths(-1);
+        objDisplayMonth1 = objDisplayMonth1.AddMonths(-1);
+        objDisplayMonth2 = objDisplayMonth2.AddMonths(-1);
         StateHasChanged();
     }
 
     private void NextMonth()
     {
-        _displayMonth1 = _displayMonth1.AddMonths(1);
-        _displayMonth2 = _displayMonth2.AddMonths(1);
+        objDisplayMonth1 = objDisplayMonth1.AddMonths(1);
+        objDisplayMonth2 = objDisplayMonth2.AddMonths(1);
         StateHasChanged();
     }
 
@@ -161,38 +161,38 @@ public partial class DateRangePicker : ComponentBase
             return;
         }
 
-        if (!_selectionStart.HasValue || (_selectionStart.HasValue && _selectionEnd.HasValue))
+        if (!objSelectionStart.HasValue || (objSelectionStart.HasValue && objSelectionEnd.HasValue))
         {
             // Start new selection
-            _selectionStart = date;
-            _selectionEnd = null;
+            objSelectionStart = date;
+            objSelectionEnd = null;
         }
         else
         {
             // Complete selection
-            _selectionEnd = date;
+            objSelectionEnd = date;
 
             // Ensure start is before end
-            if (_selectionEnd < _selectionStart)
+            if (objSelectionEnd < objSelectionStart)
             {
-                (_selectionStart, _selectionEnd) = (_selectionEnd, _selectionStart);
+                (objSelectionStart, objSelectionEnd) = (objSelectionEnd, objSelectionStart);
             }
 
             // Validate range constraints
-            var days = (_selectionEnd.Value - _selectionStart.Value).Days + 1;
+            var days = (objSelectionEnd.Value - objSelectionStart.Value).Days + 1;
             if (MinDays.HasValue && days < MinDays.Value)
             {
                 // Reset selection
-                _selectionStart = date;
-                _selectionEnd = null;
+                objSelectionStart = date;
+                objSelectionEnd = null;
                 StateHasChanged();
                 return;
             }
             if (MaxDays.HasValue && days > MaxDays.Value)
             {
                 // Reset selection
-                _selectionStart = date;
-                _selectionEnd = null;
+                objSelectionStart = date;
+                objSelectionEnd = null;
                 StateHasChanged();
                 return;
             }
@@ -200,21 +200,21 @@ public partial class DateRangePicker : ComponentBase
         StateHasChanged();
     }
 
-    private async Task Apply()
+    private async Task ApplyAsync()
     {
-        if (_selectionStart.HasValue && _selectionEnd.HasValue)
+        if (objSelectionStart.HasValue && objSelectionEnd.HasValue)
         {
-            var range = DateRange.Create(_selectionStart.Value, _selectionEnd.Value);
+            var range = DateRange.Create(objSelectionStart.Value, objSelectionEnd.Value);
             Value = range;
             await ValueChanged.InvokeAsync(range);
-            _isOpen = false;
+            objIsOpen = false;
         }
     }
 
-    private async Task Clear()
+    private async Task ClearAsync()
     {
-        _selectionStart = null;
-        _selectionEnd = null;
+        objSelectionStart = null;
+        objSelectionEnd = null;
         Value = null;
         await ValueChanged.InvokeAsync(null);
     }
@@ -224,10 +224,10 @@ public partial class DateRangePicker : ComponentBase
         var range = GetPresetRange(preset);
         if (range != null)
         {
-            _selectionStart = range.Start;
-            _selectionEnd = range.End;
-            _displayMonth1 = new DateTime(range.Start.Year, range.Start.Month, 1);
-            _displayMonth2 = _displayMonth1.AddMonths(1);
+            objSelectionStart = range.Start;
+            objSelectionEnd = range.End;
+            objDisplayMonth1 = new DateTime(range.Start.Year, range.Start.Month, 1);
+            objDisplayMonth2 = objDisplayMonth1.AddMonths(1);
             StateHasChanged();
         }
     }
@@ -295,45 +295,45 @@ public partial class DateRangePicker : ComponentBase
 
     private bool IsInRange(DateTime date)
     {
-        if (!_selectionStart.HasValue)
+        if (!objSelectionStart.HasValue)
         {
             return false;
         }
 
-        if (_selectionEnd.HasValue)
+        if (objSelectionEnd.HasValue)
         {
-            var start = _selectionStart.Value < _selectionEnd.Value ? _selectionStart.Value : _selectionEnd.Value;
-            var end = _selectionStart.Value > _selectionEnd.Value ? _selectionStart.Value : _selectionEnd.Value;
+            var start = objSelectionStart.Value < objSelectionEnd.Value ? objSelectionStart.Value : objSelectionEnd.Value;
+            var end = objSelectionStart.Value > objSelectionEnd.Value ? objSelectionStart.Value : objSelectionEnd.Value;
             return date.Date >= start.Date && date.Date <= end.Date;
         }
 
-        return date.Date == _selectionStart.Value.Date;
+        return date.Date == objSelectionStart.Value.Date;
     }
 
     private bool IsRangeStart(DateTime date)
     {
-        if (!_selectionStart.HasValue)
+        if (!objSelectionStart.HasValue)
         {
             return false;
         }
 
-        if (!_selectionEnd.HasValue)
+        if (!objSelectionEnd.HasValue)
         {
-            return date.Date == _selectionStart.Value.Date;
+            return date.Date == objSelectionStart.Value.Date;
         }
 
-        var start = _selectionStart.Value < _selectionEnd.Value ? _selectionStart.Value : _selectionEnd.Value;
+        var start = objSelectionStart.Value < objSelectionEnd.Value ? objSelectionStart.Value : objSelectionEnd.Value;
         return date.Date == start.Date;
     }
 
     private bool IsRangeEnd(DateTime date)
     {
-        if (!_selectionEnd.HasValue)
+        if (!objSelectionEnd.HasValue)
         {
             return false;
         }
 
-        var end = _selectionStart!.Value > _selectionEnd.Value ? _selectionStart.Value : _selectionEnd.Value;
+        var end = objSelectionStart!.Value > objSelectionEnd.Value ? objSelectionStart.Value : objSelectionEnd.Value;
         return date.Date == end.Date;
     }
 
@@ -389,8 +389,8 @@ public partial class DateRangePicker : ComponentBase
     private string GetPresetButtonClass(DateRangePreset preset)
     {
         var range = GetPresetRange(preset);
-        var isSelected = range != null && _selectionStart.HasValue && _selectionEnd.HasValue &&
-                         range.Start == _selectionStart.Value && range.End == _selectionEnd.Value;
+        var isSelected = range != null && objSelectionStart.HasValue && objSelectionEnd.HasValue &&
+                         range.Start == objSelectionStart.Value && range.End == objSelectionEnd.Value;
 
         return ClassNames.cn(
             "text-left px-2 py-1.5 text-sm rounded-md transition-colors",

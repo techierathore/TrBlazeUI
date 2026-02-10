@@ -13,7 +13,7 @@ else
 {
     <button type="button"
             id="@Context.TriggerId"
-            @ref="@_triggerRef"
+            @ref="@objTriggerRef"
             @onclick="HandleClick"
             @attributes="AdditionalAttributes"
             aria-haspopup="true"
@@ -28,7 +28,7 @@ else
     [CascadingParameter]
     private PopoverContext Context { get; set; } = null!;
 
-    private ElementReference _triggerRef;
+    private ElementReference objTriggerRef;
 
     /// <summary>
     /// The content to display inside the trigger button.
@@ -66,7 +66,7 @@ else
     /// <summary>
     /// Stores the trigger element reference when using AsChild pattern.
     /// </summary>
-    private ElementReference? _asChildTriggerRef;
+    private ElementReference? objAsChildTriggerRef;
 
     /// <summary>
     /// Context passed to child components when AsChild is true.
@@ -76,12 +76,12 @@ else
         TriggerId = Context.TriggerId,
         IsOpen = Context.IsOpen,
         // Toggle now only opens when closed (to prevent Blazor event routing edge cases)
-        Toggle = () => { if (!Context.IsOpen) Context.Open(_asChildTriggerRef); },
-        Open = () => Context.Open(_asChildTriggerRef),
+        Toggle = () => { if (!Context.IsOpen) Context.Open(objAsChildTriggerRef); },
+        Open = () => Context.Open(objAsChildTriggerRef),
         Close = () => Context.Close(),
         AriaHasPopup = "true",
         AriaControls = Context.ContentId,
-        SetTriggerElement = (ElementReference el) => _asChildTriggerRef = el
+        SetTriggerElement = (ElementReference el) => objAsChildTriggerRef = el
     };
 
     private async Task HandleClick(MouseEventArgs args)
@@ -104,7 +104,7 @@ else
         else
         {
             // Default: open popover and store trigger element for positioning
-            Context.Open(_triggerRef);
+            Context.Open(objTriggerRef);
 
             // Also invoke custom handler if provided
             if (OnClick.HasDelegate)
@@ -131,14 +131,14 @@ else
         // This runs after every render to ensure the reference stays current
         if (!AsChild)
         {
-            Context.SetTriggerElement(_triggerRef);
+            Context.SetTriggerElement(objTriggerRef);
         }
-        else if (_asChildTriggerRef.HasValue)
+        else if (objAsChildTriggerRef.HasValue)
         {
             // When using AsChild pattern, the child component (e.g., Button) sets
-            // _asChildTriggerRef via TriggerContext.SetTriggerElement. We need to
+            // objAsChildTriggerRef via TriggerContext.SetTriggerElement. We need to
             // propagate this to the context so Content can position relative to it.
-            Context.SetTriggerElement(_asChildTriggerRef.Value);
+            Context.SetTriggerElement(objAsChildTriggerRef.Value);
         }
     }
 }

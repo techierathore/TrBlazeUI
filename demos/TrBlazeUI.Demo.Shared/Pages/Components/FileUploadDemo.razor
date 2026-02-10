@@ -21,9 +21,9 @@
                 Drag and drop files or click to browse.
             </p>
         </div>
-        <FileUpload @bind-Files="_basicFiles" />
+        <FileUpload @bind-Files="objBasicFiles" />
         <p class="text-sm text-muted-foreground">
-            Files: @(_basicFiles?.Count ?? 0)
+            Files: @(objBasicFiles?.Count ?? 0)
         </p>
     </div>
 
@@ -35,9 +35,9 @@
                 Upload up to 5 files at once.
             </p>
         </div>
-        <FileUpload @bind-Files="_multipleFiles" Multiple="true" MaxFileCount="5" />
+        <FileUpload @bind-Files="objMultipleFiles" Multiple="true" MaxFileCount="5" />
         <p class="text-sm text-muted-foreground">
-            Files: @(_multipleFiles?.Count ?? 0) / 5
+            Files: @(objMultipleFiles?.Count ?? 0) / 5
         </p>
     </div>
 
@@ -49,7 +49,7 @@
                 Only accepts image files with preview.
             </p>
         </div>
-        <FileUpload @bind-Files="_imageFiles"
+        <FileUpload @bind-Files="objImageFiles"
                     Multiple="true"
                     Accept="image/*"
                     MaxFileCount="4" />
@@ -63,7 +63,7 @@
                 Accepts PDF, Word, and Excel files.
             </p>
         </div>
-        <FileUpload @bind-Files="_docFiles"
+        <FileUpload @bind-Files="objDocFiles"
                     Multiple="true"
                     Accept=".pdf,.doc,.docx,.xls,.xlsx"
                     MaxFileSize="@(20 * 1024 * 1024)" />
@@ -77,13 +77,13 @@
                 Files larger than 1MB will be rejected.
             </p>
         </div>
-        <FileUpload @bind-Files="_smallFiles"
+        <FileUpload @bind-Files="objSmallFiles"
                     Multiple="true"
                     MaxFileSize="@(1 * 1024 * 1024)"
                     OnValidationError="HandleValidationError" />
-        @if (!string.IsNullOrEmpty(_lastError))
+        @if (!string.IsNullOrEmpty(objLastError))
         {
-            <p class="text-sm text-destructive">Last error: @_lastError</p>
+            <p class="text-sm text-destructive">Last error: @objLastError</p>
         }
     </div>
 
@@ -95,7 +95,7 @@
                 Image previews are disabled.
             </p>
         </div>
-        <FileUpload @bind-Files="_noPreviewFiles" Multiple="true" ShowPreview="false" />
+        <FileUpload @bind-Files="objNoPreviewFiles" Multiple="true" ShowPreview="false" />
     </div>
 
     <!-- Single File -->
@@ -106,7 +106,7 @@
                 Only one file at a time.
             </p>
         </div>
-        <FileUpload @bind-Files="_singleFile" Multiple="false" />
+        <FileUpload @bind-Files="objSingleFile" Multiple="false" />
     </div>
 
     <!-- Disabled -->
@@ -162,17 +162,17 @@
 </div>
 
 @code {
-    private IReadOnlyList<FileUploadItem>? _basicFiles;
-    private IReadOnlyList<FileUploadItem>? _multipleFiles;
-    private IReadOnlyList<FileUploadItem>? _imageFiles;
-    private IReadOnlyList<FileUploadItem>? _docFiles;
-    private IReadOnlyList<FileUploadItem>? _smallFiles;
-    private IReadOnlyList<FileUploadItem>? _noPreviewFiles;
-    private IReadOnlyList<FileUploadItem>? _singleFile;
-    private string? _lastError;
+    private IReadOnlyList<FileUploadItem>? objBasicFiles;
+    private IReadOnlyList<FileUploadItem>? objMultipleFiles;
+    private IReadOnlyList<FileUploadItem>? objImageFiles;
+    private IReadOnlyList<FileUploadItem>? objDocFiles;
+    private IReadOnlyList<FileUploadItem>? objSmallFiles;
+    private IReadOnlyList<FileUploadItem>? objNoPreviewFiles;
+    private IReadOnlyList<FileUploadItem>? objSingleFile;
+    private string? objLastError;
 
     private void HandleValidationError(FileValidationError error)
     {
-        _lastError = error.Message;
+        objLastError = error.Message;
     }
 }

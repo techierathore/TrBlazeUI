@@ -22,28 +22,28 @@
     internal double Y { get; private set; }
     internal int FocusedIndex { get; private set; } = -1;
 
-    private DotNetObjectReference<ContextMenu>? _dotNetRef;
-    private List<ContextMenuItem> _menuItems = new();
+    private DotNetObjectReference<ContextMenu>? objDotNetRef;
+    private List<ContextMenuItem> objMenuItems = new();
 
     protected override void OnInitialized()
     {
-        _dotNetRef = DotNetObjectReference.Create(this);
+        objDotNetRef = DotNetObjectReference.Create(this);
     }
 
     internal void RegisterMenuItem(ContextMenuItem item)
     {
-        if (!_menuItems.Contains(item))
+        if (!objMenuItems.Contains(item))
         {
-            _menuItems.Add(item);
+            objMenuItems.Add(item);
         }
     }
 
     internal void UnregisterMenuItem(ContextMenuItem item)
     {
-        _menuItems.Remove(item);
+        objMenuItems.Remove(item);
     }
 
-    internal List<ContextMenuItem> GetMenuItems() => _menuItems;
+    internal List<ContextMenuItem> GetMenuItems() => objMenuItems;
 
     internal void SetFocusedIndex(int index)
     {
@@ -51,7 +51,7 @@
         StateHasChanged();
     }
 
-    internal async Task OpenAt(double x, double y)
+    internal async Task OpenAtAsync(double x, double y)
     {
         X = x;
         Y = y;
@@ -66,7 +66,7 @@
         StateHasChanged();
     }
 
-    internal async Task Close()
+    internal async Task CloseAsync()
     {
         IsOpen = false;
         FocusedIndex = -1;
@@ -82,12 +82,12 @@
     [JSInvokable]
     public async Task HandleClickOutside()
     {
-        await Close();
+        await CloseAsync();
     }
 
     public ValueTask DisposeAsync()
     {
-        _dotNetRef?.Dispose();
+        objDotNetRef?.Dispose();
         return ValueTask.CompletedTask;
     }
 }

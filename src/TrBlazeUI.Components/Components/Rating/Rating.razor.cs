@@ -10,8 +10,8 @@ namespace TrBlazeUI.Components.Rating;
 /// </summary>
 public partial class Rating : ComponentBase
 {
-    private readonly string _instanceId = Guid.NewGuid().ToString("N")[..8];
-    private double _hoverValue;
+    private readonly string objInstanceId = Guid.NewGuid().ToString("N")[..8];
+    private double objHoverValue;
 
     /// <summary>
     /// Gets or sets the current rating value.
@@ -126,7 +126,7 @@ public partial class Rating : ComponentBase
 
     private double GetFillPercentage(int index)
     {
-        var currentValue = _hoverValue > 0 ? _hoverValue : Value;
+        var currentValue = objHoverValue > 0 ? objHoverValue : Value;
 
         if (currentValue >= index)
         {
@@ -197,15 +197,15 @@ public partial class Rating : ComponentBase
         {
             // Determine if hovering over the left or right half of the icon
             // This is a simplified approach - in practice you'd need JS to get exact position
-            _hoverValue = index;
+            objHoverValue = index;
         }
         else
         {
-            _hoverValue = index;
+            objHoverValue = index;
         }
     }
 
-    private void HandleMouseLeave() => _hoverValue = 0;
+    private void HandleMouseLeave() => objHoverValue = 0;
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {

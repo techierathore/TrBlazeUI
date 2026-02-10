@@ -83,7 +83,7 @@ public partial class PieChart<TItem> : ChartBase<TItem> where TItem : class
     [Parameter]
     public string? CenterValue { get; set; }
 
-    private ApexChartOptions<TItem> _options = new();
+    private ApexChartOptions<TItem> objOptions = new();
 
     /// <summary>
     /// Gets the computed CSS classes for the chart container.
@@ -101,13 +101,13 @@ public partial class PieChart<TItem> : ChartBase<TItem> where TItem : class
 
     private void ConfigureOptions()
     {
-        _options = CreateBaseOptions();
+        objOptions = CreateBaseOptions();
 
         // Set colors from config or defaults
-        _options.Colors = ChartColor.DefaultColors.ToList();
+        objOptions.Colors = ChartColor.DefaultColors.ToList();
 
         // Configure pie/donut specific options
-        _options.PlotOptions = new PlotOptions
+        objOptions.PlotOptions = new PlotOptions
         {
             Pie = new PlotOptionsPie
             {
@@ -145,7 +145,7 @@ public partial class PieChart<TItem> : ChartBase<TItem> where TItem : class
         // Configure fill for gradient variant
         if (Variant == PieChartVariant.GradientDonut)
         {
-            _options.Fill = new Fill
+            objOptions.Fill = new Fill
             {
                 Type = FillType.Gradient,
                 Gradient = new FillGradient
@@ -161,7 +161,7 @@ public partial class PieChart<TItem> : ChartBase<TItem> where TItem : class
         }
 
         // Stroke between slices
-        _options.Stroke = new Stroke
+        objOptions.Stroke = new Stroke
         {
             Width = 2,
             Colors = ["var(--background)"]

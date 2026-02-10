@@ -3,7 +3,7 @@
 @implements IDisposable
 
 @* Command - self-contained searchable/filterable list component *@
-<CascadingValue Value="_context" IsFixed="false">
+<CascadingValue Value="objContext" IsFixed="false">
     <div class="@CssClass"
          role="listbox"
          aria-label="Command menu"
@@ -13,9 +13,7 @@
 </CascadingValue>
 
 @code {
-    private CommandContext _context = new();
-    private string _searchQuery = string.Empty;
-
+    private CommandContext objContext = new();
     /// <summary>
     /// Gets or sets additional CSS classes to apply to the command container.
     /// </summary>
@@ -31,21 +29,8 @@
     /// <summary>
     /// Gets or sets the current search query.
     /// </summary>
-#pragma warning disable BL0007 // Custom setter needed to sync with context
     [Parameter]
-    public string SearchQuery
-    {
-        get => _searchQuery;
-        set
-        {
-            if (_searchQuery != value)
-            {
-                _searchQuery = value;
-                _context.SetSearchQuery(value);
-            }
-        }
-    }
-#pragma warning restore BL0007
+    public string SearchQuery { get; set; } = string.Empty;
 
     /// <summary>
     /// Event callback invoked when the search query changes.
@@ -95,36 +80,36 @@
 
     protected override void OnInitialized()
     {
-        _context.OnValueChange = OnValueChange;
-        _context.FilterFunction = FilterFunction;
-        _context.CloseOnSelect = CloseOnSelect;
-        _context.Disabled = Disabled;
-        _context.OnStateChanged += HandleContextStateChanged;
+        objContext.OnValueChange = OnValueChange;
+        objContext.FilterFunction = FilterFunction;
+        objContext.CloseOnSelect = CloseOnSelect;
+        objContext.Disabled = Disabled;
+        objContext.OnStateChanged += HandleContextStateChanged;
     }
 
     protected override void OnParametersSet()
     {
-        _context.OnValueChange = OnValueChange;
-        _context.FilterFunction = FilterFunction;
-        _context.CloseOnSelect = CloseOnSelect;
-        _context.Disabled = Disabled;
+        objContext.OnValueChange = OnValueChange;
+        objContext.FilterFunction = FilterFunction;
+        objContext.CloseOnSelect = CloseOnSelect;
+        objContext.Disabled = Disabled;
 
         // Sync search query from parameter
-        if (_context.SearchQuery != _searchQuery)
+        if (objContext.SearchQuery != SearchQuery)
         {
-            _context.SetSearchQuery(_searchQuery);
+            objContext.SetSearchQuery(SearchQuery);
         }
     }
 
     private async void HandleContextStateChanged()
     {
         // Sync search query back to parameter
-        if (_searchQuery != _context.SearchQuery)
+        if (SearchQuery != objContext.SearchQuery)
         {
-            _searchQuery = _context.SearchQuery;
+            SearchQuery = objContext.SearchQuery;
             if (SearchQueryChanged.HasDelegate)
             {
-                await InvokeAsync(async () => await SearchQueryChanged.InvokeAsync(_searchQuery));
+                await InvokeAsync(async () => await SearchQueryChanged.InvokeAsync(SearchQuery));
             }
         }
         await InvokeAsync(StateHasChanged);
@@ -132,6 +117,6 @@
 
     public void Dispose()
     {
-        _context.OnStateChanged -= HandleContextStateChanged;
+        objContext.OnStateChanged -= HandleContextStateChanged;
     }
 }

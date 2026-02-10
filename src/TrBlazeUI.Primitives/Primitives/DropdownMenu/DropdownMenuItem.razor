@@ -3,7 +3,7 @@
 @implements IDisposable
 
 @* Dropdown menu item - represents an individual menu action *@
-<div @ref="_itemRef"
+<div @ref="objItemRef"
      role="menuitem"
      tabindex="@(Disabled ? -1 : -1)"
      aria-disabled="@Disabled.ToString().ToLower()"
@@ -22,7 +22,7 @@
     [CascadingParameter(Name = "DropdownMenuContentContext")]
     private DropdownMenuContent? ContentContext { get; set; }
 
-    private ElementReference _itemRef;
+    private ElementReference objItemRef;
 
     /// <summary>
     /// The content to display inside the menu item.
@@ -102,7 +102,7 @@
     {
         try
         {
-            await _itemRef.FocusAsync();
+            await objItemRef.FocusAsync();
         }
         catch
         {

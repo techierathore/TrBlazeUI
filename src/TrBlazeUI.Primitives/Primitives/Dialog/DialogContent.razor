@@ -10,7 +10,7 @@
 
 @if (Context.IsOpen)
 {
-    <div @ref="_contentRef"
+    <div @ref="objContentRef"
          id="@Context.ContentId"
          role="dialog"
          aria-modal="true"
@@ -67,11 +67,11 @@
     [Parameter]
     public EventCallback<KeyboardEventArgs> OnEscapeKeyDown { get; set; }
 
-    private ElementReference _contentRef;
-    private IAsyncDisposable? _focusTrap;
-    private IJSObjectReference? _portalModule;
-    private IJSObjectReference? _scrollLockCleanup;
-    private bool _isInitialized = false;
+    private ElementReference objContentRef;
+    private IAsyncDisposable? objFocusTrap;
+    private IJSObjectReference? objPortalModule;
+    private IJSObjectReference? objScrollLockCleanup;
+    private bool objIsInitialized = false;
 
     protected override void OnInitialized()
     {
@@ -88,16 +88,16 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (Context.IsOpen && !_isInitialized)
+        if (Context.IsOpen && !objIsInitialized)
         {
-            _isInitialized = true;
+            objIsInitialized = true;
 
             // Set up focus trap
             if (TrapFocus)
             {
                 try
                 {
-                    _focusTrap = await FocusManager.TrapFocus(_contentRef);
+                    objFocusTrap = await FocusManager.TrapFocusAsync(objContentRef);
                 }
                 catch (Exception ex)
                 {
@@ -110,9 +110,9 @@
             {
                 try
                 {
-                    _portalModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    objPortalModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                         "import", "./_content/TrBlazeUI.Primitives/js/primitives/portal.js");
-                    _scrollLockCleanup = await _portalModule.InvokeAsync<IJSObjectReference>("lockBodyScroll");
+                    objScrollLockCleanup = await objPortalModule.InvokeAsync<IJSObjectReference>("lockBodyScroll");
                 }
                 catch (Exception ex)
                 {
@@ -120,7 +120,7 @@
                 }
             }
         }
-        else if (!Context.IsOpen && _isInitialized)
+        else if (!Context.IsOpen && objIsInitialized)
         {
             await CleanupAsync();
         }
@@ -128,7 +128,7 @@
 
     private void HandleContextStateChanged()
     {
-        if (!Context.IsOpen && _isInitialized)
+        if (!Context.IsOpen && objIsInitialized)
         {
             // Dialog closed, clean up
             _ = Task.Run(async () =>
@@ -161,36 +161,36 @@
     private async Task CleanupAsync()
     {
         // Dispose focus trap
-        if (_focusTrap != null)
+        if (objFocusTrap != null)
         {
-            await _focusTrap.DisposeAsync();
-            _focusTrap = null;
+            await objFocusTrap.DisposeAsync();
+            objFocusTrap = null;
         }
 
         // Unlock body scroll
-        if (_scrollLockCleanup != null)
+        if (objScrollLockCleanup != null)
         {
             try
             {
-                await _scrollLockCleanup.InvokeVoidAsync("apply");
+                await objScrollLockCleanup.InvokeVoidAsync("apply");
             }
             catch
             {
                 // Cleanup may already be disposed
             }
-            _scrollLockCleanup = null;
+            objScrollLockCleanup = null;
         }
 
-        _isInitialized = false;
+        objIsInitialized = false;
     }
 
     public async ValueTask DisposeAsync()
     {
         await CleanupAsync();
 
-        if (_portalModule != null)
+        if (objPortalModule != null)
         {
-            await _portalModule.DisposeAsync();
+            await objPortalModule.DisposeAsync();
         }
 
         if (Context != null)

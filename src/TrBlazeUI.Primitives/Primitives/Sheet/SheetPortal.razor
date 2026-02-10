@@ -32,8 +32,8 @@
     [Parameter]
     public bool ForceMount { get; set; } = false;
 
-    private string _portalId = string.Empty;
-    private bool _isRegistered = false;
+    private string objPortalId = string.Empty;
+    private bool objIsRegistered = false;
 
     protected override void OnInitialized()
     {
@@ -44,7 +44,7 @@
                 "Ensure SheetPortal is a child of a Sheet component.");
         }
 
-        _portalId = $"{Context.Id}-portal";
+        objPortalId = $"{Context.Id}-portal";
 
         // Subscribe to context changes to update portal content
         Context.OnStateChanged += HandleStateChanged;
@@ -61,7 +61,7 @@
         // Update portal registration based on open state
         if (Context.IsOpen || ForceMount)
         {
-            if (_isRegistered)
+            if (objIsRegistered)
             {
                 UpdatePortal();
             }
@@ -83,18 +83,18 @@
 
     private void RegisterPortal()
     {
-        if (!_isRegistered && ChildContent != null)
+        if (!objIsRegistered && ChildContent != null)
         {
-            PortalService.RegisterPortal(_portalId, GetPortalContent());
-            _isRegistered = true;
+            PortalService.RegisterPortal(objPortalId, GetPortalContent());
+            objIsRegistered = true;
         }
     }
 
     private void UpdatePortal()
     {
-        if (_isRegistered && ChildContent != null)
+        if (objIsRegistered && ChildContent != null)
         {
-            PortalService.UpdatePortalContent(_portalId, GetPortalContent());
+            PortalService.UpdatePortalContent(objPortalId, GetPortalContent());
         }
     }
 
@@ -109,10 +109,10 @@
 
     private void UnregisterPortal()
     {
-        if (_isRegistered)
+        if (objIsRegistered)
         {
-            PortalService.UnregisterPortal(_portalId);
-            _isRegistered = false;
+            PortalService.UnregisterPortal(objPortalId);
+            objIsRegistered = false;
         }
     }
 

@@ -82,16 +82,16 @@
             </p>
         </div>
         <div class="space-y-4">
-            <Progress Value="@_progressValue" />
+            <Progress Value="@objProgressValue" />
             <div class="flex items-center gap-4">
-                <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Small" OnClick="@(() => _progressValue = Math.Max(0, _progressValue - 10))">
+                <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Small" OnClick="@(() => objProgressValue = Math.Max(0, objProgressValue - 10))">
                     -10
                 </Button>
-                <span class="text-sm font-medium w-12 text-center">@_progressValue%</span>
-                <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Small" OnClick="@(() => _progressValue = Math.Min(100, _progressValue + 10))">
+                <span class="text-sm font-medium w-12 text-center">@objProgressValue%</span>
+                <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Small" OnClick="@(() => objProgressValue = Math.Min(100, objProgressValue + 10))">
                     +10
                 </Button>
-                <Button Variant="ButtonVariant.Secondary" Size="ButtonSize.Small" OnClick="@(() => _progressValue = 0)">
+                <Button Variant="ButtonVariant.Secondary" Size="ButtonSize.Small" OnClick="@(() => objProgressValue = 0)">
                     Reset
                 </Button>
             </div>
@@ -198,5 +198,5 @@
 </div>
 
 @code {
-    private double _progressValue = 33;
+    private double objProgressValue = 33;
 }

@@ -14,7 +14,7 @@
         <circle cx="11" cy="11" r="8"></circle>
         <path d="m21 21-4.35-4.35"></path>
     </svg>
-    <input @ref="_inputRef"
+    <input @ref="objInputRef"
            type="text"
            placeholder="@Placeholder"
            disabled="@Disabled"
@@ -56,9 +56,9 @@
     [Parameter]
     public bool AutoFocus { get; set; }
 
-    private ElementReference _inputRef;
-    private bool _previousAutoFocus;
-    private bool _shouldFocus;
+    private ElementReference objInputRef;
+    private bool objPreviousAutoFocus;
+    private bool objShouldFocus;
 
     /// <summary>
     /// Focuses the input element.
@@ -67,7 +67,7 @@
     {
         try
         {
-            await _inputRef.FocusAsync();
+            await objInputRef.FocusAsync();
         }
         catch
         {
@@ -90,24 +90,24 @@
     protected override void OnParametersSet()
     {
         // Check if AutoFocus changed from false to true
-        if (AutoFocus && !_previousAutoFocus)
+        if (AutoFocus && !objPreviousAutoFocus)
         {
-            _shouldFocus = true;
+            objShouldFocus = true;
         }
-        _previousAutoFocus = AutoFocus;
+        objPreviousAutoFocus = AutoFocus;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // Focus when AutoFocus becomes true (either on first render or when popover opens)
-        if (_shouldFocus)
+        if (objShouldFocus)
         {
-            _shouldFocus = false;
+            objShouldFocus = false;
             try
             {
                 // Small delay to ensure the element is ready in the DOM (especially after portal rendering)
                 await Task.Delay(50);
-                await _inputRef.FocusAsync();
+                await objInputRef.FocusAsync();
             }
             catch
             {

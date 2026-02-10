@@ -8,4 +8,5 @@ agents:
   - sm
   - dev
   - qa
+  - trblazeui-designer
 workflows: null

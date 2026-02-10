@@ -2,7 +2,7 @@
 @implements IMenubarItem
 @implements IDisposable
 
-<div @ref="_itemRef"
+<div @ref="objItemRef"
      role="menuitemcheckbox"
      class="@CssClass"
      tabindex="-1"
@@ -50,7 +50,7 @@
     [Parameter]
     public EventCallback<bool> CheckedChanged { get; set; }
 
-    private ElementReference _itemRef;
+    private ElementReference objItemRef;
 
     public bool IsDisabled => Disabled;
 
@@ -63,7 +63,7 @@
     {
         try
         {
-            await _itemRef.FocusAsync();
+            await objItemRef.FocusAsync();
         }
         catch
         {

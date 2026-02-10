@@ -1,7 +1,7 @@
 @namespace TrBlazeUI.Components.Command
 @implements IDisposable
 
-@if (!_hasVisibleItems)
+@if (!objHasVisibleItems)
 {
     <div class="@CssClass">
         @ChildContent
@@ -24,7 +24,7 @@
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-    private bool _hasVisibleItems = true;
+    private bool objHasVisibleItems = true;
 
     /// <summary>
     /// Gets the computed CSS classes for the empty state container.
@@ -55,7 +55,7 @@
 
     private void UpdateVisibility()
     {
-        _hasVisibleItems = Context?.HasVisibleItems() ?? true;
+        objHasVisibleItems = Context?.HasVisibleItems() ?? true;
     }
 
     public void Dispose()

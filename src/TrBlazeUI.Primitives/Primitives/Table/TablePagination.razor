@@ -75,7 +75,7 @@ else
 @code {
     private async Task HandlePageSizeChangeEvent(ChangeEventArgs e)
     {
-        if (_disposed) return;
+        if (objDisposed) return;
 
         if (int.TryParse(e.Value?.ToString(), out var newSize))
         {

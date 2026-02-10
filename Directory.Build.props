@@ -7,9 +7,8 @@
 
     <!-- License and Repository -->
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <!-- TODO: Update with your project URL -->
-    <PackageProjectUrl></PackageProjectUrl>
-    <RepositoryUrl></RepositoryUrl>
+    <PackageProjectUrl>https://github.com/techierathore/TrBlazeUI</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/techierathore/TrBlazeUI</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
 
     <!-- Build Configuration -->

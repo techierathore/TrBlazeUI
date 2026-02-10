@@ -16,29 +16,29 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     [Inject]
     private IJSRuntime JSRuntime { get; set; } = default!;
 
-    private FieldIdentifier _fieldIdentifier;
-    private EditContext? _editContext;
-    private IJSObjectReference? _multiSelectModule;
-    private DotNetObjectReference<MultiSelect<TItem>>? _dotNetRef;
-    private ElementReference _searchInputRef;
-    private bool _jsSetupDone;
-    private bool _focusDone;
+    private FieldIdentifier objFieldIdentifier;
+    private EditContext? objEditContext;
+    private IJSObjectReference? objMultiSelectModule;
+    private DotNetObjectReference<MultiSelect<TItem>>? objDotNetRef;
+    private ElementReference objSearchInputRef;
+    private bool objJsSetupDone;
+    private bool objFocusDone;
 
     // ShouldRender tracking fields
-    private IEnumerable<TItem>? _lastItems;
-    private IEnumerable<string>? _lastValues;
-    private bool _lastIsOpen;
-    private string _lastSearchQuery = string.Empty;
-    private bool _lastDisabled;
+    private IEnumerable<TItem>? objLastItems;
+    private IEnumerable<string>? objLastValues;
+    private bool objLastIsOpen;
+    private string objLastSearchQuery = string.Empty;
+    private bool objLastDisabled;
 
     // Cached event handlers to avoid allocations on every render
-    private readonly Dictionary<string, Func<Task>> _toggleHandlerCache = new();
-    private readonly Dictionary<string, Func<Task>> _removeHandlerCache = new();
+    private readonly Dictionary<string, Func<Task>> objToggleHandlerCache = new();
+    private readonly Dictionary<string, Func<Task>> objRemoveHandlerCache = new();
 
     // Cached CSS class strings to avoid recomputation on every render
-    private string? _cachedTriggerCssClass;
-    private string? _lastPopoverWidth;
-    private string? _lastClass;
+    private string? objCachedTriggerCssClass;
+    private string? objLastPopoverWidth;
+    private string? objLastClass;
 
     /// <summary>
     /// Gets or sets the cascaded EditContext from a parent EditForm.
@@ -168,12 +168,12 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     /// <summary>
     /// Tracks whether the popover is currently open.
     /// </summary>
-    private bool _isOpen { get; set; }
+    private bool objIsOpen { get; set; }
 
     /// <summary>
     /// Tracks the current search query for filtering.
     /// </summary>
-    private string _searchQuery = string.Empty;
+    private string objSearchQuery = string.Empty;
 
     /// <summary>
     /// Gets a unique identifier for this multiselect instance.
@@ -210,13 +210,13 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     /// </summary>
     private IEnumerable<TItem> GetFilteredItems()
     {
-        if (string.IsNullOrWhiteSpace(_searchQuery))
+        if (string.IsNullOrWhiteSpace(objSearchQuery))
         {
             return Items;
         }
 
         return Items.Where(item =>
-            DisplaySelector(item).Contains(_searchQuery, StringComparison.OrdinalIgnoreCase));
+            DisplaySelector(item).Contains(objSearchQuery, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
@@ -226,9 +226,9 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     {
         get
         {
-            if (_editContext != null && ValuesExpression != null && _fieldIdentifier.FieldName != null)
+            if (objEditContext != null && ValuesExpression != null && objFieldIdentifier.FieldName != null)
             {
-                return _editContext.GetValidationMessages(_fieldIdentifier).Any();
+                return objEditContext.GetValidationMessages(objFieldIdentifier).Any();
             }
             return false;
         }
@@ -257,37 +257,37 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
         Items = Items?.Where(item => item != null) ?? Enumerable.Empty<TItem>();
 
         // Clear handler caches when Items reference changes to avoid stale delegates
-        if (!ReferenceEquals(_lastItems, Items))
+        if (!ReferenceEquals(objLastItems, Items))
         {
-            _toggleHandlerCache.Clear();
+            objToggleHandlerCache.Clear();
         }
 
         // Initialize EditContext integration if available
         if (CascadedEditContext != null && ValuesExpression != null)
         {
-            _editContext = CascadedEditContext;
-            _fieldIdentifier = FieldIdentifier.Create(ValuesExpression);
+            objEditContext = CascadedEditContext;
+            objFieldIdentifier = FieldIdentifier.Create(ValuesExpression);
         }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // Setup JS when popover opens
-        if (_isOpen && !_jsSetupDone)
+        if (objIsOpen && !objJsSetupDone)
         {
-            _jsSetupDone = true;
+            objJsSetupDone = true;
 
             try
             {
-                _multiSelectModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                objMultiSelectModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "import", "./_content/TrBlazeUI.Components/js/multiselect.js");
 
-                _dotNetRef = DotNetObjectReference.Create(this);
+                objDotNetRef = DotNetObjectReference.Create(this);
 
-                await _multiSelectModule.InvokeVoidAsync(
+                await objMultiSelectModule.InvokeVoidAsync(
                     "setupMultiSelectInput",
-                    _searchInputRef,
-                    _dotNetRef,
+                    objSearchInputRef,
+                    objDotNetRef,
                     $"{Id}-search",
                     $"{Id}-listbox");
             }
@@ -297,7 +297,7 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
             }
         }
         // Cleanup JS when popover closes
-        else if (!_isOpen && _jsSetupDone)
+        else if (!objIsOpen && objJsSetupDone)
         {
             await CleanupJsAsync();
         }
@@ -305,19 +305,19 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
 
     private async Task CleanupJsAsync()
     {
-        if (_multiSelectModule != null)
+        if (objMultiSelectModule != null)
         {
             try
             {
-                await _multiSelectModule.InvokeVoidAsync("removeMultiSelectInput", $"{Id}-search");
+                await objMultiSelectModule.InvokeVoidAsync("removeMultiSelectInput", $"{Id}-search");
             }
             catch
             {
                 // Module may already be disposed
             }
         }
-        _jsSetupDone = false;
-        _focusDone = false;
+        objJsSetupDone = false;
+        objFocusDone = false;
     }
 
     /// <summary>
@@ -327,10 +327,10 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     /// <param name="isOpen">Whether the popover is now open.</param>
     private void HandleOpenChanged(bool isOpen)
     {
-        _isOpen = isOpen;
+        objIsOpen = isOpen;
         if (!isOpen)
         {
-            _focusDone = false; // Reset for next open
+            objFocusDone = false; // Reset for next open
         }
     }
 
@@ -344,7 +344,7 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
             return;
         }
 
-        _isOpen = true;
+        objIsOpen = true;
     }
 
     /// <summary>
@@ -352,8 +352,8 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     /// </summary>
     private void Close()
     {
-        _isOpen = false;
-        _searchQuery = string.Empty;
+        objIsOpen = false;
+        objSearchQuery = string.Empty;
     }
 
     /// <summary>
@@ -379,18 +379,18 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     private async Task HandleContentReady()
     {
         // Guard against multiple calls per open
-        if (_focusDone)
+        if (objFocusDone)
         {
             return;
         }
 
-        _focusDone = true;
+        objFocusDone = true;
 
         try
         {
             // Small delay to let browser finish processing DOM changes
             await Task.Delay(50);
-            await _searchInputRef.FocusAsync();
+            await objSearchInputRef.FocusAsync();
         }
         catch
         {
@@ -402,7 +402,7 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     /// Handles search input changes.
     /// </summary>
     private void HandleSearchInput(ChangeEventArgs args) =>
-        _searchQuery = args.Value?.ToString() ?? string.Empty;
+        objSearchQuery = args.Value?.ToString() ?? string.Empty;
 
     /// <summary>
     /// Handles keyboard events on the search input.
@@ -434,7 +434,7 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
             currentValues.Add(itemValue);
         }
 
-        await UpdateValues(currentValues);
+        await UpdateValuesAsync(currentValues);
     }
 
     /// <summary>
@@ -443,10 +443,10 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     private Func<Task> GetToggleHandler(TItem item)
     {
         var key = ValueSelector(item);
-        if (!_toggleHandlerCache.TryGetValue(key, out var handler))
+        if (!objToggleHandlerCache.TryGetValue(key, out var handler))
         {
             handler = () => HandleToggle(item);
-            _toggleHandlerCache[key] = handler;
+            objToggleHandlerCache[key] = handler;
         }
         return handler;
     }
@@ -456,10 +456,10 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     /// </summary>
     private Func<Task> GetRemoveHandler(string value)
     {
-        if (!_removeHandlerCache.TryGetValue(value, out var handler))
+        if (!objRemoveHandlerCache.TryGetValue(value, out var handler))
         {
-            handler = () => RemoveValue(value);
-            _removeHandlerCache[value] = handler;
+            handler = () => RemoveValueAsync(value);
+            objRemoveHandlerCache[value] = handler;
         }
         return handler;
     }
@@ -489,37 +489,37 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
             }
         }
 
-        await UpdateValues(currentValues);
+        await UpdateValuesAsync(currentValues);
     }
 
     /// <summary>
     /// Removes a value from the selection.
     /// </summary>
-    private async Task RemoveValue(string value)
+    private async Task RemoveValueAsync(string value)
     {
         var currentValues = SelectedValues;
         currentValues.Remove(value);
-        await UpdateValues(currentValues);
+        await UpdateValuesAsync(currentValues);
     }
 
     /// <summary>
     /// Clears all selections.
     /// </summary>
-    private async Task ClearAll() =>
-        await UpdateValues(new List<string>());
+    private async Task ClearAllAsync() =>
+        await UpdateValuesAsync(new List<string>());
 
     /// <summary>
     /// Updates the selected values and notifies parent.
     /// </summary>
-    private async Task UpdateValues(List<string> values)
+    private async Task UpdateValuesAsync(List<string> values)
     {
         Values = values.Count > 0 ? values : null;
         await ValuesChanged.InvokeAsync(Values);
 
         // Notify EditContext of field change for validation
-        if (_editContext != null && ValuesExpression != null && _fieldIdentifier.FieldName != null)
+        if (objEditContext != null && ValuesExpression != null && objFieldIdentifier.FieldName != null)
         {
-            _editContext.NotifyFieldChanged(_fieldIdentifier);
+            objEditContext.NotifyFieldChanged(objFieldIdentifier);
         }
     }
 
@@ -588,14 +588,14 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
         GC.SuppressFinalize(this);
         await CleanupJsAsync();
 
-        if (_multiSelectModule != null)
+        if (objMultiSelectModule != null)
         {
-            await _multiSelectModule.DisposeAsync();
-            _multiSelectModule = null;
+            await objMultiSelectModule.DisposeAsync();
+            objMultiSelectModule = null;
         }
 
-        _dotNetRef?.Dispose();
-        _dotNetRef = null;
+        objDotNetRef?.Dispose();
+        objDotNetRef = null;
     }
 
     /// <summary>
@@ -604,19 +604,19 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     /// </summary>
     protected override bool ShouldRender()
     {
-        var itemsChanged = !ReferenceEquals(_lastItems, Items);
-        var valuesChanged = !ReferenceEquals(_lastValues, Values);
-        var openChanged = _lastIsOpen != _isOpen;
-        var searchChanged = _lastSearchQuery != _searchQuery;
-        var disabledChanged = _lastDisabled != Disabled;
+        var itemsChanged = !ReferenceEquals(objLastItems, Items);
+        var valuesChanged = !ReferenceEquals(objLastValues, Values);
+        var openChanged = objLastIsOpen != objIsOpen;
+        var searchChanged = objLastSearchQuery != objSearchQuery;
+        var disabledChanged = objLastDisabled != Disabled;
 
         if (itemsChanged || valuesChanged || openChanged || searchChanged || disabledChanged)
         {
-            _lastItems = Items;
-            _lastValues = Values;
-            _lastIsOpen = _isOpen;
-            _lastSearchQuery = _searchQuery;
-            _lastDisabled = Disabled;
+            objLastItems = Items;
+            objLastValues = Values;
+            objLastIsOpen = objIsOpen;
+            objLastSearchQuery = objSearchQuery;
+            objLastDisabled = Disabled;
             return true;
         }
 
@@ -637,11 +637,11 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
         get
         {
             // Return cached value if inputs haven't changed
-            if (_cachedTriggerCssClass != null &&
-                _lastPopoverWidth == PopoverWidth &&
-                _lastClass == Class)
+            if (objCachedTriggerCssClass != null &&
+                objLastPopoverWidth == PopoverWidth &&
+                objLastClass == Class)
             {
-                return _cachedTriggerCssClass;
+                return objCachedTriggerCssClass;
             }
 
             var builder = new StringBuilder();
@@ -669,11 +669,11 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
             }
 
             // Cache the result
-            _cachedTriggerCssClass = builder.ToString().Trim();
-            _lastPopoverWidth = PopoverWidth;
-            _lastClass = Class;
+            objCachedTriggerCssClass = builder.ToString().Trim();
+            objLastPopoverWidth = PopoverWidth;
+            objLastClass = Class;
 
-            return _cachedTriggerCssClass;
+            return objCachedTriggerCssClass;
         }
     }
 

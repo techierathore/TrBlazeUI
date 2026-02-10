@@ -59,25 +59,25 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         public string? HeaderClass { get; set; }
     }
 
-    private List<ColumnData> _columns = new();
-    private TableState<TData> _tableState = new();
-    private IEnumerable<TData> _processedData = Array.Empty<TData>();
-    private IEnumerable<TData> _filteredData = Array.Empty<TData>();
-    private string _globalSearchValue = string.Empty;
-    private int _columnsVersion;
-    private bool _selectAllDropdownOpen;
+    private List<ColumnData> objColumns = new();
+    private TableState<TData> objTableState = new();
+    private IEnumerable<TData> objProcessedData = Array.Empty<TData>();
+    private IEnumerable<TData> objFilteredData = Array.Empty<TData>();
+    private string objGlobalSearchValue = string.Empty;
+    private int objColumnsVersion;
+    private bool objSelectAllDropdownOpen;
 
     // ShouldRender tracking fields
-    private IEnumerable<TData>? _lastData;
-    private DataTableSelectionMode _lastSelectionMode;
-    private bool _lastIsLoading;
-    private int _lastColumnsVersion;
-    private string _lastGlobalSearchValue = string.Empty;
-    private int _selectionVersion;
-    private int _lastSelectionVersion;
-    private IReadOnlyCollection<TData>? _lastSelectedItems;
-    private int _paginationVersion;
-    private int _lastPaginationVersion;
+    private IEnumerable<TData>? objLastData;
+    private DataTableSelectionMode objLastSelectionMode;
+    private bool objLastIsLoading;
+    private int objLastColumnsVersion;
+    private string objLastGlobalSearchValue = string.Empty;
+    private int objSelectionVersion;
+    private int objLastSelectionVersion;
+    private IReadOnlyCollection<TData>? objLastSelectedItems;
+    private int objPaginationVersion;
+    private int objLastPaginationVersion;
 
     /// <summary>
     /// Gets or sets the data source for the table.
@@ -232,29 +232,29 @@ public partial class DataTable<TData> : ComponentBase where TData : class
 
     protected override void OnInitialized()
     {
-        _tableState.Pagination.PageSize = InitialPageSize;
-        _tableState.Pagination.CurrentPage = 1;
+        objTableState.Pagination.PageSize = InitialPageSize;
+        objTableState.Pagination.CurrentPage = 1;
         // Set selection mode on the state so Select/Deselect methods work correctly
-        _tableState.Selection.Mode = GetPrimitiveSelectionMode();
+        objTableState.Selection.Mode = GetPrimitiveSelectionMode();
     }
 
     protected override async Task OnParametersSetAsync()
     {
         // Keep selection mode in sync with parameter
-        _tableState.Selection.Mode = GetPrimitiveSelectionMode();
+        objTableState.Selection.Mode = GetPrimitiveSelectionMode();
 
         // Sync SelectedItems parameter to internal state if changed externally
         // Skip if SelectedItems is the same reference as our internal collection (shouldn't happen with the copy we make, but defensive)
-        if (!ReferenceEquals(SelectedItems, _lastSelectedItems) &&
-            !ReferenceEquals(SelectedItems, _tableState.Selection.SelectedItems))
+        if (!ReferenceEquals(SelectedItems, objLastSelectedItems) &&
+            !ReferenceEquals(SelectedItems, objTableState.Selection.SelectedItems))
         {
-            _tableState.Selection.Clear();
+            objTableState.Selection.Clear();
             foreach (var item in SelectedItems)
             {
-                _tableState.Selection.Select(item);
+                objTableState.Selection.Select(item);
             }
-            _lastSelectedItems = SelectedItems;
-            _selectionVersion++;
+            objLastSelectedItems = SelectedItems;
+            objSelectionVersion++;
         }
 
         await ProcessDataAsync();
@@ -284,7 +284,7 @@ public partial class DataTable<TData> : ComponentBase where TData : class
             HeaderClass = column.HeaderClass
         };
 
-        _columns.Add(columnData);
+        objColumns.Add(columnData);
     }
 
     /// <summary>
@@ -301,18 +301,18 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         }
 
         // 2. Apply filtering (column filters + global search)
-        _filteredData = ApplyFiltering(data);
+        objFilteredData = ApplyFiltering(data);
 
         // 3. Apply sorting
-        var sortedData = ApplySorting(_filteredData);
+        var sortedData = ApplySorting(objFilteredData);
 
         // 4. Update pagination total items BEFORE pagination
-        _tableState.Pagination.TotalItems = sortedData.Count();
+        objTableState.Pagination.TotalItems = sortedData.Count();
 
         // 5. Apply pagination
-        _processedData = sortedData
-            .Skip(_tableState.Pagination.StartIndex)
-            .Take(_tableState.Pagination.PageSize)
+        objProcessedData = sortedData
+            .Skip(objTableState.Pagination.StartIndex)
+            .Take(objTableState.Pagination.PageSize)
             .ToList();
     }
 
@@ -321,19 +321,19 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private IEnumerable<TData> ApplyFiltering(IEnumerable<TData> data)
     {
-        if (string.IsNullOrWhiteSpace(_globalSearchValue))
+        if (string.IsNullOrWhiteSpace(objGlobalSearchValue))
         {
             return data;
         }
 
         // Cache search value to avoid repeated property access in closure
-        var searchValue = _globalSearchValue;
+        var searchValue = objGlobalSearchValue;
 
         // Pre-filter to only filterable columns to reduce iterations
-        var filterableColumns = _columns.Where(c => c.Filterable).ToList();
+        var filterableColumns = objColumns.Where(c => c.Filterable).ToList();
         if (filterableColumns.Count == 0)
         {
-            filterableColumns = _columns; // Fall back to all columns if none marked filterable
+            filterableColumns = objColumns; // Fall back to all columns if none marked filterable
         }
 
         return data.Where(item => MatchesSearch(item, searchValue, filterableColumns));
@@ -375,18 +375,18 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private IEnumerable<TData> ApplySorting(IEnumerable<TData> data)
     {
-        if (_tableState.Sorting.Direction == SortDirection.None)
+        if (objTableState.Sorting.Direction == SortDirection.None)
         {
             return data;
         }
 
-        var column = _columns.FirstOrDefault(c => c.Id == _tableState.Sorting.SortedColumn);
+        var column = objColumns.FirstOrDefault(c => c.Id == objTableState.Sorting.SortedColumn);
         if (column == null)
         {
             return data;
         }
 
-        var sorted = _tableState.Sorting.Direction == SortDirection.Ascending
+        var sorted = objTableState.Sorting.Direction == SortDirection.Ascending
             ? data.OrderBy(item => column.Property(item))
             : data.OrderByDescending(item => column.Property(item));
 
@@ -414,16 +414,16 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private async Task HandleGlobalSearchChanged(string value)
     {
-        _globalSearchValue = value;
+        objGlobalSearchValue = value;
 
         // Invoke custom callback if provided
         if (OnFilter.HasDelegate)
         {
-            await OnFilter.InvokeAsync(_globalSearchValue);
+            await OnFilter.InvokeAsync(objGlobalSearchValue);
         }
 
         // Reset to first page when filtering
-        _tableState.Pagination.CurrentPage = 1;
+        objTableState.Pagination.CurrentPage = 1;
 
         await ProcessDataAsync();
         // StateHasChanged() not needed - Blazor auto-renders after async event handlers
@@ -434,13 +434,13 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private void HandleColumnVisibilityChanged(string columnId, bool visible)
     {
-        var column = _columns.FirstOrDefault(c => c.Id == columnId);
+        var column = objColumns.FirstOrDefault(c => c.Id == columnId);
         if (column != null)
         {
             column.Visible = visible;
 
             // Increment version to signal change without list recreation
-            _columnsVersion++;
+            objColumnsVersion++;
 
             StateHasChanged();
         }
@@ -464,20 +464,20 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// Returns true when total items exceed the current page count.
     /// </summary>
     private bool ShouldShowSelectAllPrompt() =>
-        _tableState.Pagination.TotalItems > _processedData.Count();
+        objTableState.Pagination.TotalItems > objProcessedData.Count();
 
     /// <summary>
     /// Gets the total count of filtered items across all pages.
     /// </summary>
     private int GetTotalFilteredItemCount() =>
-        _filteredData.Count();
+        objFilteredData.Count();
 
     /// <summary>
     /// Opens the select-all dropdown menu.
     /// </summary>
     private void OpenSelectAllDropdown()
     {
-        _selectAllDropdownOpen = true;
+        objSelectAllDropdownOpen = true;
         StateHasChanged();
     }
 
@@ -495,7 +495,7 @@ public partial class DataTable<TData> : ComponentBase where TData : class
 
         if (ShouldShowSelectAllPrompt())
         {
-            _selectAllDropdownOpen = true;
+            objSelectAllDropdownOpen = true;
             StateHasChanged();
             return;
         }
@@ -508,13 +508,13 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private async Task HandleSelectAllOnCurrentPage()
     {
-        foreach (var item in _processedData)
+        foreach (var item in objProcessedData)
         {
-            _tableState.Selection.Select(item);
+            objTableState.Selection.Select(item);
         }
-        _selectAllDropdownOpen = false;
-        _selectionVersion++;
-        await HandleSelectionChange(_tableState.Selection.SelectedItems);
+        objSelectAllDropdownOpen = false;
+        objSelectionVersion++;
+        await HandleSelectionChange(objTableState.Selection.SelectedItems);
         StateHasChanged();
     }
 
@@ -523,13 +523,13 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private async Task HandleSelectAllItems()
     {
-        foreach (var item in _filteredData)
+        foreach (var item in objFilteredData)
         {
-            _tableState.Selection.Select(item);
+            objTableState.Selection.Select(item);
         }
-        _selectAllDropdownOpen = false;
-        _selectionVersion++;
-        await HandleSelectionChange(_tableState.Selection.SelectedItems);
+        objSelectAllDropdownOpen = false;
+        objSelectionVersion++;
+        await HandleSelectionChange(objTableState.Selection.SelectedItems);
         StateHasChanged();
     }
 
@@ -538,10 +538,10 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private async Task HandleClearSelection()
     {
-        _tableState.Selection.Clear();
-        _selectAllDropdownOpen = false;
-        _selectionVersion++;
-        await HandleSelectionChange(_tableState.Selection.SelectedItems);
+        objTableState.Selection.Clear();
+        objSelectAllDropdownOpen = false;
+        objSelectionVersion++;
+        await HandleSelectionChange(objTableState.Selection.SelectedItems);
         StateHasChanged();
     }
 
@@ -552,15 +552,15 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     {
         if (isChecked)
         {
-            _tableState.Selection.Select(item);
+            objTableState.Selection.Select(item);
         }
         else
         {
-            _tableState.Selection.Deselect(item);
+            objTableState.Selection.Deselect(item);
         }
 
-        _selectionVersion++;  // Track selection change for ShouldRender
-        await HandleSelectionChange(_tableState.Selection.SelectedItems);
+        objSelectionVersion++;  // Track selection change for ShouldRender
+        await HandleSelectionChange(objTableState.Selection.SelectedItems);
         StateHasChanged();
     }
 
@@ -569,12 +569,12 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private bool IsAllSelected()
     {
-        if (!_processedData.Any())
+        if (!objProcessedData.Any())
         {
             return false;
         }
 
-        return _processedData.All(item => _tableState.Selection.IsSelected(item));
+        return objProcessedData.All(item => objTableState.Selection.IsSelected(item));
     }
 
     /// <summary>
@@ -583,13 +583,13 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private bool IsSomeSelected()
     {
-        if (!_processedData.Any())
+        if (!objProcessedData.Any())
         {
             return false;
         }
 
-        var selectedCount = _processedData.Count(item => _tableState.Selection.IsSelected(item));
-        return selectedCount > 0 && selectedCount < _processedData.Count();
+        var selectedCount = objProcessedData.Count(item => objTableState.Selection.IsSelected(item));
+        return selectedCount > 0 && selectedCount < objProcessedData.Count();
     }
 
     /// <summary>
@@ -636,7 +636,7 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private async Task HandlePageChanged(int newPage)
     {
-        _paginationVersion++;  // Track pagination change for ShouldRender
+        objPaginationVersion++;  // Track pagination change for ShouldRender
         await ProcessDataAsync();
         StateHasChanged();
     }
@@ -646,7 +646,7 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     private async Task HandlePageSizeChanged(int newPageSize)
     {
-        _paginationVersion++;  // Track pagination change for ShouldRender
+        objPaginationVersion++;  // Track pagination change for ShouldRender
         await ProcessDataAsync();
         StateHasChanged();
     }
@@ -657,23 +657,23 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     protected override bool ShouldRender()
     {
-        var dataChanged = !ReferenceEquals(_lastData, Data);
-        var selectionModeChanged = _lastSelectionMode != SelectionMode;
-        var loadingChanged = _lastIsLoading != IsLoading;
-        var columnsChanged = _lastColumnsVersion != _columnsVersion;
-        var searchChanged = _lastGlobalSearchValue != _globalSearchValue;
-        var selectionChanged = _lastSelectionVersion != _selectionVersion;
-        var paginationChanged = _lastPaginationVersion != _paginationVersion;
+        var dataChanged = !ReferenceEquals(objLastData, Data);
+        var selectionModeChanged = objLastSelectionMode != SelectionMode;
+        var loadingChanged = objLastIsLoading != IsLoading;
+        var columnsChanged = objLastColumnsVersion != objColumnsVersion;
+        var searchChanged = objLastGlobalSearchValue != objGlobalSearchValue;
+        var selectionChanged = objLastSelectionVersion != objSelectionVersion;
+        var paginationChanged = objLastPaginationVersion != objPaginationVersion;
 
         if (dataChanged || selectionModeChanged || loadingChanged || columnsChanged || searchChanged || selectionChanged || paginationChanged)
         {
-            _lastData = Data;
-            _lastSelectionMode = SelectionMode;
-            _lastIsLoading = IsLoading;
-            _lastColumnsVersion = _columnsVersion;
-            _lastGlobalSearchValue = _globalSearchValue;
-            _lastSelectionVersion = _selectionVersion;
-            _lastPaginationVersion = _paginationVersion;
+            objLastData = Data;
+            objLastSelectionMode = SelectionMode;
+            objLastIsLoading = IsLoading;
+            objLastColumnsVersion = objColumnsVersion;
+            objLastGlobalSearchValue = objGlobalSearchValue;
+            objLastSelectionVersion = objSelectionVersion;
+            objLastPaginationVersion = objPaginationVersion;
             return true;
         }
 

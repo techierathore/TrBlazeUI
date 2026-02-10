@@ -75,9 +75,9 @@
                     <MenubarTrigger>View</MenubarTrigger>
                     <MenubarContent>
                         <MenubarLabel>Appearance</MenubarLabel>
-                        <MenubarCheckboxItem @bind-Checked="_showStatusBar">Status Bar</MenubarCheckboxItem>
-                        <MenubarCheckboxItem @bind-Checked="_showActivityBar">Activity Bar</MenubarCheckboxItem>
-                        <MenubarCheckboxItem @bind-Checked="_showSidebar">Sidebar</MenubarCheckboxItem>
+                        <MenubarCheckboxItem @bind-Checked="objShowStatusBar">Status Bar</MenubarCheckboxItem>
+                        <MenubarCheckboxItem @bind-Checked="objShowActivityBar">Activity Bar</MenubarCheckboxItem>
+                        <MenubarCheckboxItem @bind-Checked="objShowSidebar">Sidebar</MenubarCheckboxItem>
                         <MenubarSeparator />
                         <MenubarLabel>Zoom</MenubarLabel>
                         <MenubarItem OnClick="@(() => HandleShortcutAction("Zoom In"))">
@@ -89,7 +89,7 @@
                             <MenubarShortcut>Ctrl+-</MenubarShortcut>
                         </MenubarItem>
                         <MenubarSeparator />
-                        <MenubarCheckboxItem @bind-Checked="_fullScreen">Full Screen</MenubarCheckboxItem>
+                        <MenubarCheckboxItem @bind-Checked="objFullScreen">Full Screen</MenubarCheckboxItem>
                     </MenubarContent>
                 </MenubarMenu>
                 <MenubarMenu>
@@ -105,11 +105,11 @@
                 </MenubarMenu>
             </Menubar>
 
-            @if (!string.IsNullOrEmpty(_shortcutAction))
+            @if (!string.IsNullOrEmpty(objShortcutAction))
             {
                 <div class="flex items-center gap-2 p-3 bg-primary/10 text-primary rounded-md animate-pulse">
                     <LucideIcon Name="check-circle" Size="16" />
-                    <span>Shortcut triggered: <strong>@_shortcutAction</strong></span>
+                    <span>Shortcut triggered: <strong>@objShortcutAction</strong></span>
                 </div>
             }
         </div>
@@ -185,55 +185,55 @@
 </div>
 
 @code {
-    private string? _shortcutAction;
+    private string? objShortcutAction;
 
     // View menu checkbox states
-    private bool _showStatusBar = true;
-    private bool _showActivityBar = true;
-    private bool _showSidebar = false;
-    private bool _fullScreen = false;
+    private bool objShowStatusBar = true;
+    private bool objShowActivityBar = true;
+    private bool objShowSidebar = false;
+    private bool objFullScreen = false;
 
     // Keyboard shortcut registrations
-    private IDisposable? _shortcutNewTab;
-    private IDisposable? _shortcutNewWindow;
-    private IDisposable? _shortcutPrint;
-    private IDisposable? _shortcutUndo;
-    private IDisposable? _shortcutRedo;
-    private IDisposable? _shortcutFind;
-    private IDisposable? _shortcutReplace;
-    private IDisposable? _shortcutDocs;
-    private CancellationTokenSource? _clearCts;
+    private IDisposable? objShortcutNewTab;
+    private IDisposable? objShortcutNewWindow;
+    private IDisposable? objShortcutPrint;
+    private IDisposable? objShortcutUndo;
+    private IDisposable? objShortcutRedo;
+    private IDisposable? objShortcutFind;
+    private IDisposable? objShortcutReplace;
+    private IDisposable? objShortcutDocs;
+    private CancellationTokenSource? objClearCts;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             // Register keyboard shortcuts
-            _shortcutNewTab = await KeyboardShortcuts.RegisterAsync("Ctrl+Shift+T", () => HandleShortcutAsync("New Tab"));
-            _shortcutNewWindow = await KeyboardShortcuts.RegisterAsync("Ctrl+Shift+N", () => HandleShortcutAsync("New Window"));
-            _shortcutPrint = await KeyboardShortcuts.RegisterAsync("Ctrl+Shift+P", () => HandleShortcutAsync("Print"));
-            _shortcutUndo = await KeyboardShortcuts.RegisterAsync("Ctrl+Z", () => HandleShortcutAsync("Undo"));
-            _shortcutRedo = await KeyboardShortcuts.RegisterAsync("Ctrl+Y", () => HandleShortcutAsync("Redo"));
-            _shortcutFind = await KeyboardShortcuts.RegisterAsync("Ctrl+F", () => HandleShortcutAsync("Find"));
-            _shortcutReplace = await KeyboardShortcuts.RegisterAsync("Ctrl+H", () => HandleShortcutAsync("Replace"));
-            _shortcutDocs = await KeyboardShortcuts.RegisterAsync("F1", () => HandleShortcutAsync("Documentation"));
+            objShortcutNewTab = await KeyboardShortcuts.RegisterAsync("Ctrl+Shift+T", () => HandleShortcutAsync("New Tab"));
+            objShortcutNewWindow = await KeyboardShortcuts.RegisterAsync("Ctrl+Shift+N", () => HandleShortcutAsync("New Window"));
+            objShortcutPrint = await KeyboardShortcuts.RegisterAsync("Ctrl+Shift+P", () => HandleShortcutAsync("Print"));
+            objShortcutUndo = await KeyboardShortcuts.RegisterAsync("Ctrl+Z", () => HandleShortcutAsync("Undo"));
+            objShortcutRedo = await KeyboardShortcuts.RegisterAsync("Ctrl+Y", () => HandleShortcutAsync("Redo"));
+            objShortcutFind = await KeyboardShortcuts.RegisterAsync("Ctrl+F", () => HandleShortcutAsync("Find"));
+            objShortcutReplace = await KeyboardShortcuts.RegisterAsync("Ctrl+H", () => HandleShortcutAsync("Replace"));
+            objShortcutDocs = await KeyboardShortcuts.RegisterAsync("F1", () => HandleShortcutAsync("Documentation"));
         }
     }
 
     private async Task HandleShortcutAsync(string action)
     {
-        _shortcutAction = action;
+        objShortcutAction = action;
         await InvokeAsync(StateHasChanged);
 
         // Cancel any previous clear timer
-        _clearCts?.Cancel();
-        _clearCts = new CancellationTokenSource();
+        objClearCts?.Cancel();
+        objClearCts = new CancellationTokenSource();
 
         // Clear after 2 seconds
         try
         {
-            await Task.Delay(2000, _clearCts.Token);
-            _shortcutAction = null;
+            await Task.Delay(2000, objClearCts.Token);
+            objShortcutAction = null;
             await InvokeAsync(StateHasChanged);
         }
         catch (TaskCanceledException)
@@ -249,16 +249,16 @@
 
     public ValueTask DisposeAsync()
     {
-        _clearCts?.Cancel();
-        _clearCts?.Dispose();
-        _shortcutNewTab?.Dispose();
-        _shortcutNewWindow?.Dispose();
-        _shortcutPrint?.Dispose();
-        _shortcutUndo?.Dispose();
-        _shortcutRedo?.Dispose();
-        _shortcutFind?.Dispose();
-        _shortcutReplace?.Dispose();
-        _shortcutDocs?.Dispose();
+        objClearCts?.Cancel();
+        objClearCts?.Dispose();
+        objShortcutNewTab?.Dispose();
+        objShortcutNewWindow?.Dispose();
+        objShortcutPrint?.Dispose();
+        objShortcutUndo?.Dispose();
+        objShortcutRedo?.Dispose();
+        objShortcutFind?.Dispose();
+        objShortcutReplace?.Dispose();
+        objShortcutDocs?.Dispose();
         return ValueTask.CompletedTask;
     }
 }

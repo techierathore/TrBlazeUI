@@ -7,12 +7,12 @@ namespace TrBlazeUI.Demo.Services;
 /// </summary>
 public class CollapsibleStateService
 {
-    private readonly IJSRuntime _jsRuntime;
+    private readonly IJSRuntime objJsRuntime;
     private const string LocalStoragePrefix = "trblazeui:collapsible:";
 
     public CollapsibleStateService(IJSRuntime jsRuntime)
     {
-        _jsRuntime = jsRuntime;
+        objJsRuntime = jsRuntime;
     }
 
     /// <summary>
@@ -26,7 +26,7 @@ public class CollapsibleStateService
         try
         {
             var storageKey = LocalStoragePrefix + key;
-            var value = await _jsRuntime.InvokeAsync<string?>("localStorage.getItem", storageKey);
+            var value = await objJsRuntime.InvokeAsync<string?>("localStorage.getItem", storageKey);
 
             if (string.IsNullOrEmpty(value))
             {
@@ -52,7 +52,7 @@ public class CollapsibleStateService
         try
         {
             var storageKey = LocalStoragePrefix + key;
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", storageKey, isOpen.ToString());
+            await objJsRuntime.InvokeVoidAsync("localStorage.setItem", storageKey, isOpen.ToString());
         }
         catch
         {
@@ -69,7 +69,7 @@ public class CollapsibleStateService
         try
         {
             var storageKey = LocalStoragePrefix + key;
-            await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", storageKey);
+            await objJsRuntime.InvokeVoidAsync("localStorage.removeItem", storageKey);
         }
         catch
         {
@@ -85,14 +85,14 @@ public class CollapsibleStateService
         try
         {
             // Get all keys from localStorage
-            var keys = await _jsRuntime.InvokeAsync<string[]>(
+            var keys = await objJsRuntime.InvokeAsync<string[]>(
                 "eval",
                 $"Object.keys(localStorage).filter(k => k.startsWith('{LocalStoragePrefix}'))");
 
             // Remove each key
             foreach (var key in keys)
             {
-                await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", key);
+                await objJsRuntime.InvokeVoidAsync("localStorage.removeItem", key);
             }
         }
         catch

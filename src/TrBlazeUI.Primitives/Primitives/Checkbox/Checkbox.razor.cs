@@ -192,7 +192,7 @@ public partial class Checkbox : ComponentBase
     {
         if (!Disabled)
         {
-            await ToggleChecked();
+            await ToggleCheckedAsync();
         }
     }
 
@@ -209,7 +209,7 @@ public partial class Checkbox : ComponentBase
         if (!Disabled && args.Key == " ")
         {
             shouldPreventDefault = true;
-            await ToggleChecked();
+            await ToggleCheckedAsync();
         }
         else
         {
@@ -223,7 +223,7 @@ public partial class Checkbox : ComponentBase
     /// <remarks>
     /// Clears the indeterminate state when toggling.
     /// </remarks>
-    private async Task ToggleChecked()
+    private async Task ToggleCheckedAsync()
     {
         // Clear indeterminate state when user clicks
         if (Indeterminate)

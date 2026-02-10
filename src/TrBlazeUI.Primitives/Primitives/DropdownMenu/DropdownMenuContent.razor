@@ -14,7 +14,7 @@
 {
     <FloatingPortal IsOpen="true"
                     AnchorElement="@Context.State.TriggerElement"
-                    PortalId="@_portalId"
+                    PortalId="@objPortalId"
                     Side="@Side"
                     Align="@Align"
                     Offset="@Offset"
@@ -119,19 +119,19 @@
     [Parameter]
     public PositioningStrategy Strategy { get; set; } = PositioningStrategy.Absolute;
 
-    private ElementReference _contentRef;
-    private IJSObjectReference? _clickOutsideModule;
-    private IJSObjectReference? _clickOutsideCleanup;
-    private IJSObjectReference? _keyboardNavModule;
-    private IJSObjectReference? _keyboardNavCleanup;
-    private IJSObjectReference? _matchWidthModule;
-    private IJSObjectReference? _matchWidthCleanup;
-    private DotNetObjectReference<DropdownMenuContent>? _dotNetRef;
-    private bool _disposed = false;
-    private string _portalId = "";
+    private ElementReference objContentRef;
+    private IJSObjectReference? objClickOutsideModule;
+    private IJSObjectReference? objClickOutsideCleanup;
+    private IJSObjectReference? objKeyboardNavModule;
+    private IJSObjectReference? objKeyboardNavCleanup;
+    private IJSObjectReference? objMatchWidthModule;
+    private IJSObjectReference? objMatchWidthCleanup;
+    private DotNetObjectReference<DropdownMenuContent>? objDotNetRef;
+    private bool objDisposed = false;
+    private string objPortalId = "";
 
     // Track menu items for keyboard navigation
-    private List<IDropdownMenuItem> _menuItems = new();
+    private List<IDropdownMenuItem> objMenuItems = new();
 
     protected override void OnInitialized()
     {
@@ -142,7 +142,7 @@
                 "Ensure DropdownMenuContent is a child of a DropdownMenu component.");
         }
 
-        _portalId = $"dropdown-portal-{Context.ContentId}";
+        objPortalId = $"dropdown-portal-{Context.ContentId}";
 
         // Subscribe to context changes
         Context.OnStateChanged += HandleContextStateChanged;
@@ -150,7 +150,7 @@
 
     private RenderFragment RenderDropdownContent() => __builder =>
     {
-        <div @ref="_contentRef"
+        <div @ref="objContentRef"
              id="@Context.ContentId"
              role="menu"
              tabindex="-1"
@@ -189,14 +189,14 @@
     {
         try
         {
-            _clickOutsideModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+            objClickOutsideModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/TrBlazeUI.Primitives/js/primitives/click-outside.js");
 
-            _dotNetRef = DotNetObjectReference.Create(this);
+            objDotNetRef = DotNetObjectReference.Create(this);
 
             // Pass trigger element to exclude it from click-outside detection
-            _clickOutsideCleanup = await _clickOutsideModule.InvokeAsync<IJSObjectReference>(
-                "onClickOutside", _contentRef, _dotNetRef, "HandleClickOutside", Context.State.TriggerElement);
+            objClickOutsideCleanup = await objClickOutsideModule.InvokeAsync<IJSObjectReference>(
+                "onClickOutside", objContentRef, objDotNetRef, "HandleClickOutside", Context.State.TriggerElement);
         }
         catch (Exception ex)
         {
@@ -208,13 +208,13 @@
     {
         try
         {
-            _keyboardNavModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+            objKeyboardNavModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/TrBlazeUI.Primitives/js/primitives/keyboard-nav.js");
 
-            _dotNetRef ??= DotNetObjectReference.Create(this);
+            objDotNetRef ??= DotNetObjectReference.Create(this);
 
-            _keyboardNavCleanup = await _keyboardNavModule.InvokeAsync<IJSObjectReference>(
-                "setupKeyboardNav", _contentRef, _dotNetRef);
+            objKeyboardNavCleanup = await objKeyboardNavModule.InvokeAsync<IJSObjectReference>(
+                "setupKeyboardNav", objContentRef, objDotNetRef);
         }
         catch (Exception ex)
         {
@@ -226,11 +226,11 @@
     {
         try
         {
-            _matchWidthModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+            objMatchWidthModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/TrBlazeUI.Primitives/js/primitives/match-trigger-width.js");
 
-            _matchWidthCleanup = await _matchWidthModule.InvokeAsync<IJSObjectReference>(
-                "matchTriggerWidth", Context.State.TriggerElement, _contentRef);
+            objMatchWidthCleanup = await objMatchWidthModule.InvokeAsync<IJSObjectReference>(
+                "matchTriggerWidth", Context.State.TriggerElement, objContentRef);
         }
         catch (Exception ex)
         {
@@ -242,7 +242,7 @@
     public async Task HandleClickOutside()
     {
         // Guard against callbacks after disposal
-        if (_disposed || !Context.IsOpen) return;
+        if (objDisposed || !Context.IsOpen) return;
 
         // Invoke custom handler if provided
         if (OnClickOutside.HasDelegate)
@@ -302,26 +302,26 @@
         }
 
         // Arrow navigation - use JS to navigate in DOM order
-        if (_keyboardNavModule == null) return;
+        if (objKeyboardNavModule == null) return;
 
         try
         {
             switch (args.Key)
             {
                 case "ArrowDown":
-                    await _keyboardNavModule.InvokeVoidAsync("navigateNext", _contentRef, Loop);
+                    await objKeyboardNavModule.InvokeVoidAsync("navigateNext", objContentRef, Loop);
                     break;
 
                 case "ArrowUp":
-                    await _keyboardNavModule.InvokeVoidAsync("navigatePrevious", _contentRef, Loop);
+                    await objKeyboardNavModule.InvokeVoidAsync("navigatePrevious", objContentRef, Loop);
                     break;
 
                 case "Home":
-                    await _keyboardNavModule.InvokeVoidAsync("navigateFirst", _contentRef);
+                    await objKeyboardNavModule.InvokeVoidAsync("navigateFirst", objContentRef);
                     break;
 
                 case "End":
-                    await _keyboardNavModule.InvokeVoidAsync("navigateLast", _contentRef);
+                    await objKeyboardNavModule.InvokeVoidAsync("navigateLast", objContentRef);
                     break;
             }
         }
@@ -333,79 +333,79 @@
 
     private async Task CleanupAsync()
     {
-        if (_clickOutsideCleanup != null)
+        if (objClickOutsideCleanup != null)
         {
             try
             {
-                await _clickOutsideCleanup.InvokeVoidAsync("dispose");
-                await _clickOutsideCleanup.DisposeAsync();
+                await objClickOutsideCleanup.InvokeVoidAsync("dispose");
+                await objClickOutsideCleanup.DisposeAsync();
             }
             catch
             {
                 // Cleanup may already be disposed
             }
-            _clickOutsideCleanup = null;
+            objClickOutsideCleanup = null;
         }
 
-        if (_keyboardNavCleanup != null)
+        if (objKeyboardNavCleanup != null)
         {
             try
             {
-                await _keyboardNavCleanup.InvokeVoidAsync("dispose");
-                await _keyboardNavCleanup.DisposeAsync();
+                await objKeyboardNavCleanup.InvokeVoidAsync("dispose");
+                await objKeyboardNavCleanup.DisposeAsync();
             }
             catch
             {
                 // Cleanup may already be disposed
             }
-            _keyboardNavCleanup = null;
+            objKeyboardNavCleanup = null;
         }
 
-        if (_matchWidthCleanup != null)
+        if (objMatchWidthCleanup != null)
         {
             try
             {
-                await _matchWidthCleanup.InvokeVoidAsync("dispose");
-                await _matchWidthCleanup.DisposeAsync();
+                await objMatchWidthCleanup.InvokeVoidAsync("dispose");
+                await objMatchWidthCleanup.DisposeAsync();
             }
             catch
             {
                 // Cleanup may already be disposed
             }
-            _matchWidthCleanup = null;
+            objMatchWidthCleanup = null;
         }
 
         // Dispose DotNetObjectReference to prevent stale callbacks
-        if (_dotNetRef != null)
+        if (objDotNetRef != null)
         {
-            _dotNetRef.Dispose();
-            _dotNetRef = null;
+            objDotNetRef.Dispose();
+            objDotNetRef = null;
         }
     }
 
     public async ValueTask DisposeAsync()
     {
         // Set disposed flag first to prevent JSInvokable callbacks during cleanup
-        _disposed = true;
+        objDisposed = true;
 
         await CleanupAsync();
 
-        if (_clickOutsideModule != null)
+        if (objClickOutsideModule != null)
         {
-            await _clickOutsideModule.DisposeAsync();
+            await objClickOutsideModule.DisposeAsync();
         }
 
-        if (_keyboardNavModule != null)
+        if (objKeyboardNavModule != null)
         {
-            await _keyboardNavModule.DisposeAsync();
+            await objKeyboardNavModule.DisposeAsync();
         }
 
-        if (_matchWidthModule != null)
+        if (objMatchWidthModule != null)
         {
-            await _matchWidthModule.DisposeAsync();
+            await objMatchWidthModule.DisposeAsync();
         }
 
-        _dotNetRef?.Dispose();
+        objDotNetRef?.Dispose();
 
         if (Context != null)
         {
@@ -416,16 +416,16 @@
     // Menu item registration for keyboard navigation (to be used in subtask 27.4)
     internal void RegisterMenuItem(IDropdownMenuItem item)
     {
-        if (!_menuItems.Contains(item))
+        if (!objMenuItems.Contains(item))
         {
-            _menuItems.Add(item);
+            objMenuItems.Add(item);
         }
     }
 
     internal void UnregisterMenuItem(IDropdownMenuItem item)
     {
-        _menuItems.Remove(item);
+        objMenuItems.Remove(item);
     }
 
-    internal List<IDropdownMenuItem> GetMenuItems() => _menuItems;
+    internal List<IDropdownMenuItem> GetMenuItems() => objMenuItems;
 }

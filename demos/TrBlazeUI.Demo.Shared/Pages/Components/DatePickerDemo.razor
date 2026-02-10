@@ -22,9 +22,9 @@
                 Click the button to open the calendar popover and select a date.
             </p>
         </div>
-        <DatePicker @bind-Value="_basicDate" />
+        <DatePicker @bind-Value="objBasicDate" />
         <p class="text-sm text-muted-foreground">
-            Selected: @(_basicDate?.ToString("MMMM d, yyyy") ?? "None")
+            Selected: @(objBasicDate?.ToString("MMMM d, yyyy") ?? "None")
         </p>
     </div>
 
@@ -36,7 +36,7 @@
                 Date picker with an initial value.
             </p>
         </div>
-        <DatePicker @bind-Value="_preselectedDate" />
+        <DatePicker @bind-Value="objPreselectedDate" />
     </div>
 
     <!-- Custom Placeholder -->
@@ -47,7 +47,7 @@
                 Customize the placeholder text when no date is selected.
             </p>
         </div>
-        <DatePicker @bind-Value="_customPlaceholder" Placeholder="Select birth date" />
+        <DatePicker @bind-Value="objCustomPlaceholder" Placeholder="Select birth date" />
     </div>
 
     <!-- Custom Date Format -->
@@ -61,15 +61,15 @@
         <div class="space-y-4">
             <div>
                 <p class="text-sm mb-2">Long format (default):</p>
-                <DatePicker @bind-Value="_formatDate1" DateFormat="MMMM d, yyyy" />
+                <DatePicker @bind-Value="objFormatDate1" DateFormat="MMMM d, yyyy" />
             </div>
             <div>
                 <p class="text-sm mb-2">Short format:</p>
-                <DatePicker @bind-Value="_formatDate2" DateFormat="MM/dd/yyyy" />
+                <DatePicker @bind-Value="objFormatDate2" DateFormat="MM/dd/yyyy" />
             </div>
             <div>
                 <p class="text-sm mb-2">ISO format:</p>
-                <DatePicker @bind-Value="_formatDate3" DateFormat="yyyy-MM-dd" />
+                <DatePicker @bind-Value="objFormatDate3" DateFormat="yyyy-MM-dd" />
             </div>
         </div>
     </div>
@@ -85,15 +85,15 @@
         <div class="space-y-4">
             <div>
                 <p class="text-sm mb-2">Future dates only (from today):</p>
-                <DatePicker @bind-Value="_futureDate" MinDate="@DateTime.Today" />
+                <DatePicker @bind-Value="objFutureDate" MinDate="@DateTime.Today" />
             </div>
             <div>
                 <p class="text-sm mb-2">Past dates only (until today):</p>
-                <DatePicker @bind-Value="_pastDate" MaxDate="@DateTime.Today" />
+                <DatePicker @bind-Value="objPastDate" MaxDate="@DateTime.Today" />
             </div>
             <div>
                 <p class="text-sm mb-2">Next 30 days only:</p>
-                <DatePicker @bind-Value="_rangeDate" MinDate="@DateTime.Today" MaxDate="@DateTime.Today.AddDays(30)" />
+                <DatePicker @bind-Value="objRangeDate" MinDate="@DateTime.Today" MaxDate="@DateTime.Today.AddDays(30)" />
             </div>
         </div>
     </div>
@@ -108,7 +108,7 @@
         </div>
         <div>
             <p class="text-sm mb-2">No weekends:</p>
-            <DatePicker @bind-Value="_noWeekendsDate" DisabledDates="@IsWeekend" />
+            <DatePicker @bind-Value="objNoWeekendsDate" DisabledDates="@IsWeekend" />
         </div>
     </div>
 
@@ -123,11 +123,11 @@
         <div class="flex gap-8">
             <div>
                 <p class="text-sm mb-2">Sunday (default):</p>
-                <DatePicker @bind-Value="_sundayStart" FirstDayOfWeek="DayOfWeek.Sunday" />
+                <DatePicker @bind-Value="objSundayStart" FirstDayOfWeek="DayOfWeek.Sunday" />
             </div>
             <div>
                 <p class="text-sm mb-2">Monday:</p>
-                <DatePicker @bind-Value="_mondayStart" FirstDayOfWeek="DayOfWeek.Monday" />
+                <DatePicker @bind-Value="objMondayStart" FirstDayOfWeek="DayOfWeek.Monday" />
             </div>
         </div>
     </div>
@@ -202,18 +202,18 @@
 </div>
 
 @code {
-    private DateTime? _basicDate;
-    private DateTime? _preselectedDate = DateTime.Today;
-    private DateTime? _customPlaceholder;
-    private DateTime? _formatDate1;
-    private DateTime? _formatDate2;
-    private DateTime? _formatDate3;
-    private DateTime? _futureDate;
-    private DateTime? _pastDate;
-    private DateTime? _rangeDate;
-    private DateTime? _noWeekendsDate;
-    private DateTime? _sundayStart;
-    private DateTime? _mondayStart;
+    private DateTime? objBasicDate;
+    private DateTime? objPreselectedDate = DateTime.Today;
+    private DateTime? objCustomPlaceholder;
+    private DateTime? objFormatDate1;
+    private DateTime? objFormatDate2;
+    private DateTime? objFormatDate3;
+    private DateTime? objFutureDate;
+    private DateTime? objPastDate;
+    private DateTime? objRangeDate;
+    private DateTime? objNoWeekendsDate;
+    private DateTime? objSundayStart;
+    private DateTime? objMondayStart;
 
     private bool IsWeekend(DateTime date)
     {
