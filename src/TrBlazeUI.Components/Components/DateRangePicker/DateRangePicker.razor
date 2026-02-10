@@ -5,7 +5,7 @@
 @using TrBlazeUI.Icons.Lucide.Components
 @using TrBlazeUI.Primitives.Services
 
-<Popover @bind-Open="_isOpen">
+<Popover @bind-Open="objIsOpen">
     <PopoverTrigger AsChild="true">
         <Button Variant="ButtonVariant.Outline"
                 Class="@ButtonCssClass"
@@ -49,7 +49,7 @@
                                             @onclick="PreviousMonth">
                                         <LucideIcon Name="chevron-left" Class="h-4 w-4" />
                                     </button>
-                                    <span class="text-sm font-medium">@GetMonthName(_displayMonth1.Month) @_displayMonth1.Year</span>
+                                    <span class="text-sm font-medium">@GetMonthName(objDisplayMonth1.Month) @objDisplayMonth1.Year</span>
                                     @if (!ShowTwoMonths)
                                     {
                                         <button type="button"
@@ -63,7 +63,7 @@
                                         <div class="w-7"></div>
                                     }
                                 </div>
-                                @RenderMonthGridInline(_displayMonth1)
+                                @RenderMonthGridInline(objDisplayMonth1)
                             </div>
 
                             @if (ShowTwoMonths)
@@ -72,14 +72,14 @@
                                 <div class="p-3 border-l">
                                     <div class="flex items-center justify-between mb-3">
                                         <div class="w-7"></div>
-                                        <span class="text-sm font-medium">@GetMonthName(_displayMonth2.Month) @_displayMonth2.Year</span>
+                                        <span class="text-sm font-medium">@GetMonthName(objDisplayMonth2.Month) @objDisplayMonth2.Year</span>
                                         <button type="button"
                                                 class="inline-flex items-center justify-center h-7 w-7 rounded-md border border-input bg-transparent hover:bg-accent hover:text-accent-foreground opacity-50 hover:opacity-100"
                                                 @onclick="NextMonth">
                                             <LucideIcon Name="chevron-right" Class="h-4 w-4" />
                                         </button>
                                     </div>
-                                    @RenderMonthGridInline(_displayMonth2)
+                                    @RenderMonthGridInline(objDisplayMonth2)
                                 </div>
                             }
                         </div>
@@ -98,7 +98,7 @@
                                     @onclick="PreviousMonth">
                                 <LucideIcon Name="chevron-left" Class="h-4 w-4" />
                             </button>
-                            <span class="text-sm font-medium">@GetMonthName(_displayMonth1.Month) @_displayMonth1.Year</span>
+                            <span class="text-sm font-medium">@GetMonthName(objDisplayMonth1.Month) @objDisplayMonth1.Year</span>
                             @if (!ShowTwoMonths)
                             {
                                 <button type="button"
@@ -112,7 +112,7 @@
                                 <div class="w-7"></div>
                             }
                         </div>
-                        @RenderMonthGridInline(_displayMonth1)
+                        @RenderMonthGridInline(objDisplayMonth1)
                     </div>
 
                     @if (ShowTwoMonths)
@@ -121,14 +121,14 @@
                         <div class="p-3 border-l">
                             <div class="flex items-center justify-between mb-3">
                                 <div class="w-7"></div>
-                                <span class="text-sm font-medium">@GetMonthName(_displayMonth2.Month) @_displayMonth2.Year</span>
+                                <span class="text-sm font-medium">@GetMonthName(objDisplayMonth2.Month) @objDisplayMonth2.Year</span>
                                 <button type="button"
                                         class="inline-flex items-center justify-center h-7 w-7 rounded-md border border-input bg-transparent hover:bg-accent hover:text-accent-foreground opacity-50 hover:opacity-100"
                                         @onclick="NextMonth">
                                     <LucideIcon Name="chevron-right" Class="h-4 w-4" />
                                 </button>
                             </div>
-                            @RenderMonthGridInline(_displayMonth2)
+                            @RenderMonthGridInline(objDisplayMonth2)
                         </div>
                     }
                 </div>
@@ -136,27 +136,27 @@
 
             <div class="flex items-center justify-between p-3 border-t">
                 <div class="text-sm text-muted-foreground">
-                    @if (_selectionStart.HasValue && !_selectionEnd.HasValue)
+                    @if (objSelectionStart.HasValue && !objSelectionEnd.HasValue)
                     {
                         <span>Select end date</span>
                     }
-                    else if (_selectionStart.HasValue && _selectionEnd.HasValue)
+                    else if (objSelectionStart.HasValue && objSelectionEnd.HasValue)
                     {
-                        var days = Math.Abs((_selectionEnd.Value - _selectionStart.Value).Days) + 1;
+                        var days = Math.Abs((objSelectionEnd.Value - objSelectionStart.Value).Days) + 1;
                         <span>@days day(s) selected</span>
                     }
                 </div>
                 <div class="flex gap-2">
                     <button type="button"
                             class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3"
-                            disabled="@(Value == null && !_selectionStart.HasValue)"
-                            @onclick="Clear">
+                            disabled="@(Value == null && !objSelectionStart.HasValue)"
+                            @onclick="ClearAsync">
                         Clear
                     </button>
                     <button type="button"
                             class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3"
                             disabled="@(!CanApply)"
-                            @onclick="Apply">
+                            @onclick="ApplyAsync">
                         Apply
                     </button>
                 </div>

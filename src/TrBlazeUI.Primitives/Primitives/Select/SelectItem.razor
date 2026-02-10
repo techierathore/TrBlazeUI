@@ -3,7 +3,7 @@
 @implements IDisposable
 
 @* SelectItem primitive - headless selectable option *@
-@if (_context != null)
+@if (objContext != null)
 {
     <div id="@ItemId"
          role="option"
@@ -21,9 +21,9 @@
 
 @code {
     [CascadingParameter]
-    private SelectContext<TValue>? _context { get; set; }
+    private SelectContext<TValue>? objContext { get; set; }
 
-    private int _itemIndex = -1;
+    private int objItemIndex = -1;
 
     /// <summary>
     /// The value this item represents.
@@ -55,35 +55,35 @@
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
-    private string ItemId => _context != null ? $"{_context.ContentId}-item-{_itemIndex}" : "";
+    private string ItemId => objContext != null ? $"{objContext.ContentId}-item-{objItemIndex}" : "";
 
     private bool IsSelected
     {
         get
         {
-            if (_context == null) return false;
+            if (objContext == null) return false;
 
-            if (_context.Value == null && Value == null)
+            if (objContext.Value == null && Value == null)
                 return true;
 
-            return EqualityComparer<TValue?>.Default.Equals(_context.Value, Value);
+            return EqualityComparer<TValue?>.Default.Equals(objContext.Value, Value);
         }
     }
 
-    private bool IsFocused => _context != null && _context.FocusedIndex == _itemIndex;
+    private bool IsFocused => objContext != null && objContext.FocusedIndex == objItemIndex;
 
     protected override void OnInitialized()
     {
-        if (_context == null) return;
+        if (objContext == null) return;
 
         // Get display text - either from TextValue parameter or fallback to Value string
         var displayText = TextValue ?? Value?.ToString();
 
         // Register this item with the context for keyboard navigation
-        _itemIndex = _context.RegisterItem(Value, Disabled, displayText);
+        objItemIndex = objContext.RegisterItem(Value, Disabled, displayText);
 
         // Subscribe to state changes to update focus
-        _context.OnStateChanged += HandleStateChanged;
+        objContext.OnStateChanged += HandleStateChanged;
     }
 
     private void HandleStateChanged()
@@ -93,30 +93,30 @@
 
     private void HandleClick()
     {
-        if (_context == null || Disabled || _context.Disabled) return;
+        if (objContext == null || Disabled || objContext.Disabled) return;
 
         // Get display text - either from TextValue parameter or render ChildContent to string
         var displayText = TextValue ?? Value?.ToString();
 
-        _context.SelectValue(Value, displayText);
+        objContext.SelectValue(Value, displayText);
     }
 
     private void HandleMouseEnter()
     {
-        if (_context == null) return;
+        if (objContext == null) return;
 
         // Update focused index on mouse hover for better UX
-        if (!Disabled && !_context.Disabled)
+        if (!Disabled && !objContext.Disabled)
         {
-            _context.SetFocusedIndex(_itemIndex);
+            objContext.SetFocusedIndex(objItemIndex);
         }
     }
 
     public void Dispose()
     {
-        if (_context != null)
+        if (objContext != null)
         {
-            _context.OnStateChanged -= HandleStateChanged;
+            objContext.OnStateChanged -= HandleStateChanged;
         }
         // Note: We don't unregister the item here as it could mess up indices
         // The context will be recreated when the select is reopened

@@ -7,9 +7,9 @@ namespace TrBlazeUI.Demo.Services;
 /// </summary>
 public class MockDataService
 {
-    private static readonly Random _random = new();
+    private static readonly Random objRandom = new();
 
-    private static readonly string[] _firstNames = {
+    private static readonly string[] objFirstNames = {
         "James", "Mary", "John", "Patricia", "Robert", "Jennifer", "Michael", "Linda",
         "William", "Barbara", "David", "Elizabeth", "Richard", "Susan", "Joseph", "Jessica",
         "Thomas", "Sarah", "Charles", "Karen", "Christopher", "Nancy", "Daniel", "Lisa",
@@ -23,7 +23,7 @@ public class MockDataService
         "Benjamin", "Samantha", "Samuel", "Katherine", "Raymond", "Christine", "Gregory", "Debra"
     };
 
-    private static readonly string[] _lastNames = {
+    private static readonly string[] objLastNames = {
         "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
         "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas",
         "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson", "White",
@@ -37,15 +37,15 @@ public class MockDataService
         "Watson", "Brooks", "Chavez", "Wood", "James", "Bennett", "Gray", "Mendoza"
     };
 
-    private static readonly string[] _roles = {
+    private static readonly string[] objRoles = {
         "Admin", "User", "Guest", "Moderator", "Manager", "Developer", "Designer", "Analyst"
     };
 
-    private static readonly string[] _statuses = {
+    private static readonly string[] objStatuses = {
         "Active", "Inactive", "Pending", "Suspended"
     };
 
-    private static readonly string[] _departments = {
+    private static readonly string[] objDepartments = {
         "Engineering", "Sales", "Marketing", "Support", "HR", "Finance", "Operations", "Product"
     };
 
@@ -64,14 +64,14 @@ public class MockDataService
                 Id = i + 1,
                 Name = GenerateFullName(),
                 Email = GenerateEmail(),
-                Age = _random.Next(18, 70),
-                Role = _roles[_random.Next(_roles.Length)],
-                Status = _statuses[_random.Next(_statuses.Length)],
-                Department = _departments[_random.Next(_departments.Length)],
+                Age = objRandom.Next(18, 70),
+                Role = objRoles[objRandom.Next(objRoles.Length)],
+                Status = objStatuses[objRandom.Next(objStatuses.Length)],
+                Department = objDepartments[objRandom.Next(objDepartments.Length)],
                 LastPromotionDate = GeneratePromotionDate(),
-                Salary = _random.Next(40000, 150000),
-                JoinDate = DateTime.Now.AddDays(-_random.Next(1, 3650)), // Random date within last 10 years
-                IsActive = _random.Next(100) > 20 // 80% chance of being active
+                Salary = objRandom.Next(40000, 150000),
+                JoinDate = DateTime.Now.AddDays(-objRandom.Next(1, 3650)), // Random date within last 10 years
+                IsActive = objRandom.Next(100) > 20 // 80% chance of being active
             });
         }
         return persons;
@@ -79,16 +79,16 @@ public class MockDataService
 
     private static string GenerateFullName()
     {
-        var firstName = _firstNames[_random.Next(_firstNames.Length)];
-        var lastName = _lastNames[_random.Next(_lastNames.Length)];
+        var firstName = objFirstNames[objRandom.Next(objFirstNames.Length)];
+        var lastName = objLastNames[objRandom.Next(objLastNames.Length)];
         return $"{firstName} {lastName}";
     }
 
     private static string GenerateEmail()
     {
-        var firstName = _firstNames[_random.Next(_firstNames.Length)].ToLower(CultureInfo.InvariantCulture);
-        var lastName = _lastNames[_random.Next(_lastNames.Length)].ToLower(CultureInfo.InvariantCulture);
-        var domain = _random.Next(5) switch
+        var firstName = objFirstNames[objRandom.Next(objFirstNames.Length)].ToLower(CultureInfo.InvariantCulture);
+        var lastName = objLastNames[objRandom.Next(objLastNames.Length)].ToLower(CultureInfo.InvariantCulture);
+        var domain = objRandom.Next(5) switch
         {
             0 => "example.com",
             1 => "company.com",
@@ -96,12 +96,12 @@ public class MockDataService
             3 => "enterprise.net",
             _ => "organization.com"
         };
-        var suffix = _random.Next(100) > 70 ? _random.Next(1, 999).ToString(CultureInfo.InvariantCulture) : "";
+        var suffix = objRandom.Next(100) > 70 ? objRandom.Next(1, 999).ToString(CultureInfo.InvariantCulture) : "";
         return $"{firstName}.{lastName}{suffix}@{domain}";
     }
 
     private static DateTimeOffset? GeneratePromotionDate() =>
-        DateTimeOffset.UtcNow - TimeSpan.FromDays(_random.Next(365, 730));
+        DateTimeOffset.UtcNow - TimeSpan.FromDays(objRandom.Next(365, 730));
 }
 
 /// <summary>

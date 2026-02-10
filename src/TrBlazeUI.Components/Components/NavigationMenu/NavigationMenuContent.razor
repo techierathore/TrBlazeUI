@@ -9,7 +9,7 @@
 
 @if (MenuItem?.IsOpen == true)
 {
-    <div @ref="_contentRef"
+    <div @ref="objContentRef"
          class="@CssClass"
          role="menu"
          tabindex="@(IsKeyboardNavigationEnabled ? -1 : null)"
@@ -22,12 +22,12 @@
 }
 
 @code {
-    private ElementReference _contentRef;
-    private IJSObjectReference? _navModule;
-    private IJSObjectReference? _keyboardCleanup;
-    private DotNetObjectReference<NavigationMenuContent>? _dotNetRef;
-    private bool _moduleLoaded = false;
-    private bool _wasOpen = false;
+    private ElementReference objContentRef;
+    private IJSObjectReference? objNavModule;
+    private IJSObjectReference? objKeyboardCleanup;
+    private DotNetObjectReference<NavigationMenuContent>? objDotNetRef;
+    private bool objModuleLoaded = false;
+    private bool objWasOpen = false;
 
     /// <summary>
     /// Reference to the parent menu item.
@@ -65,13 +65,13 @@
         if (IsKeyboardNavigationEnabled)
         {
             // Load module if not loaded
-            if (isOpen && !_moduleLoaded)
+            if (isOpen && !objModuleLoaded)
             {
                 try
                 {
-                    _navModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    objNavModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                         "import", "./_content/TrBlazeUI.Components/js/navigation-menu.js");
-                    _moduleLoaded = true;
+                    objModuleLoaded = true;
                 }
                 catch
                 {
@@ -80,16 +80,16 @@
             }
 
             // Set up keyboard navigation when menu opens
-            if (isOpen && !_wasOpen && _navModule != null)
+            if (isOpen && !objWasOpen && objNavModule != null)
             {
                 try
                 {
-                    _dotNetRef = DotNetObjectReference.Create(this);
-                    _keyboardCleanup = await _navModule.InvokeAsync<IJSObjectReference>(
-                        "setupKeyboardNavigation", _contentRef, _dotNetRef);
+                    objDotNetRef = DotNetObjectReference.Create(this);
+                    objKeyboardCleanup = await objNavModule.InvokeAsync<IJSObjectReference>(
+                        "setupKeyboardNavigation", objContentRef, objDotNetRef);
 
                     // Focus the first item in the content
-                    await _navModule.InvokeVoidAsync("navigateFirst", _contentRef);
+                    await objNavModule.InvokeVoidAsync("navigateFirst", objContentRef);
                 }
                 catch
                 {
@@ -98,15 +98,15 @@
             }
 
             // Clean up keyboard navigation when menu closes
-            if (!isOpen && _wasOpen && _keyboardCleanup != null)
+            if (!isOpen && objWasOpen && objKeyboardCleanup != null)
             {
                 try
                 {
-                    await _keyboardCleanup.InvokeVoidAsync("dispose");
-                    await _keyboardCleanup.DisposeAsync();
-                    _keyboardCleanup = null;
-                    _dotNetRef?.Dispose();
-                    _dotNetRef = null;
+                    await objKeyboardCleanup.InvokeVoidAsync("dispose");
+                    await objKeyboardCleanup.DisposeAsync();
+                    objKeyboardCleanup = null;
+                    objDotNetRef?.Dispose();
+                    objDotNetRef = null;
                 }
                 catch
                 {
@@ -115,7 +115,7 @@
             }
         }
 
-        _wasOpen = isOpen;
+        objWasOpen = isOpen;
     }
 
     /// <summary>
@@ -124,13 +124,13 @@
     internal async Task FocusFirstItemAsync()
     {
         // Ensure module is loaded
-        if (!_moduleLoaded)
+        if (!objModuleLoaded)
         {
             try
             {
-                _navModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                objNavModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "import", "./_content/TrBlazeUI.Components/js/navigation-menu.js");
-                _moduleLoaded = true;
+                objModuleLoaded = true;
             }
             catch
             {
@@ -138,9 +138,9 @@
             }
         }
 
-        if (_navModule != null)
+        if (objNavModule != null)
         {
-            await _navModule.InvokeVoidAsync("navigateFirst", _contentRef);
+            await objNavModule.InvokeVoidAsync("navigateFirst", objContentRef);
         }
     }
 
@@ -196,21 +196,21 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (_keyboardCleanup != null)
+        if (objKeyboardCleanup != null)
         {
             try
             {
-                await _keyboardCleanup.InvokeVoidAsync("dispose");
-                await _keyboardCleanup.DisposeAsync();
+                await objKeyboardCleanup.InvokeVoidAsync("dispose");
+                await objKeyboardCleanup.DisposeAsync();
             }
             catch { }
         }
 
-        _dotNetRef?.Dispose();
+        objDotNetRef?.Dispose();
 
-        if (_navModule != null)
+        if (objNavModule != null)
         {
-            await _navModule.DisposeAsync();
+            await objNavModule.DisposeAsync();
         }
     }
 }

@@ -21,10 +21,10 @@
                 Select a color using the visual picker or enter a hex value.
             </p>
         </div>
-        <ColorPicker @bind-Value="_basicColor" />
-        <p class="text-sm text-muted-foreground">Selected: @_basicColor</p>
+        <ColorPicker @bind-Value="objBasicColor" />
+        <p class="text-sm text-muted-foreground">Selected: @objBasicColor</p>
         <div class="h-16 w-32 rounded-md border border-input"
-             style="background-color: @_basicColor;">
+             style="background-color: @objBasicColor;">
         </div>
     </div>
 
@@ -36,10 +36,10 @@
                 Enable transparency selection with the alpha slider.
             </p>
         </div>
-        <ColorPicker @bind-Value="_alphaColor" ShowAlpha="true" />
-        <p class="text-sm text-muted-foreground">Selected: @_alphaColor</p>
+        <ColorPicker @bind-Value="objAlphaColor" ShowAlpha="true" />
+        <p class="text-sm text-muted-foreground">Selected: @objAlphaColor</p>
         <div class="h-16 w-32 rounded-md border border-input"
-             style="background: linear-gradient(@_alphaColor, @_alphaColor), url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 fill-opacity=%22.1%22><rect x=%220%22 y=%220%22 width=%228%22 height=%228%22 fill=%22%23000%22/><rect x=%228%22 y=%228%22 width=%228%22 height=%228%22 fill=%22%23000%22/></svg>');">
+             style="background: linear-gradient(@objAlphaColor, @objAlphaColor), url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 fill-opacity=%22.1%22><rect x=%220%22 y=%220%22 width=%228%22 height=%228%22 fill=%22%23000%22/><rect x=%228%22 y=%228%22 width=%228%22 height=%228%22 fill=%22%23000%22/></svg>');">
         </div>
     </div>
 
@@ -51,8 +51,8 @@
                 Preset color swatches are hidden.
             </p>
         </div>
-        <ColorPicker @bind-Value="_noPresetsColor" ShowPresets="false" />
-        <p class="text-sm text-muted-foreground">Selected: @_noPresetsColor</p>
+        <ColorPicker @bind-Value="objNoPresetsColor" ShowPresets="false" />
+        <p class="text-sm text-muted-foreground">Selected: @objNoPresetsColor</p>
     </div>
 
     <!-- Custom Presets -->
@@ -63,9 +63,9 @@
                 Brand colors as presets.
             </p>
         </div>
-        <ColorPicker @bind-Value="_customPresetsColor"
-                     PresetColors="@_brandColors" />
-        <p class="text-sm text-muted-foreground">Selected: @_customPresetsColor</p>
+        <ColorPicker @bind-Value="objCustomPresetsColor"
+                     PresetColors="@objBrandColors" />
+        <p class="text-sm text-muted-foreground">Selected: @objCustomPresetsColor</p>
     </div>
 
     <!-- Without Inputs -->
@@ -76,8 +76,8 @@
                 Visual picker only, no hex/RGB inputs.
             </p>
         </div>
-        <ColorPicker @bind-Value="_noInputsColor" ShowInputs="false" />
-        <p class="text-sm text-muted-foreground">Selected: @_noInputsColor</p>
+        <ColorPicker @bind-Value="objNoInputsColor" ShowInputs="false" />
+        <p class="text-sm text-muted-foreground">Selected: @objNoInputsColor</p>
     </div>
 
     <!-- Pre-selected Color -->
@@ -88,8 +88,8 @@
                 Initialized with a specific color.
             </p>
         </div>
-        <ColorPicker @bind-Value="_preselectedColor" />
-        <p class="text-sm text-muted-foreground">Selected: @_preselectedColor</p>
+        <ColorPicker @bind-Value="objPreselectedColor" />
+        <p class="text-sm text-muted-foreground">Selected: @objPreselectedColor</p>
     </div>
 
     <!-- Multiple Pickers -->
@@ -103,15 +103,15 @@
         <div class="flex items-center gap-4">
             <div>
                 <label class="text-sm font-medium mb-1 block">Foreground</label>
-                <ColorPicker @bind-Value="_fgColor" />
+                <ColorPicker @bind-Value="objFgColor" />
             </div>
             <div>
                 <label class="text-sm font-medium mb-1 block">Background</label>
-                <ColorPicker @bind-Value="_bgColor" />
+                <ColorPicker @bind-Value="objBgColor" />
             </div>
         </div>
         <div class="p-4 rounded-md border border-input"
-             style="background-color: @_bgColor; color: @_fgColor;">
+             style="background-color: @objBgColor; color: @objFgColor;">
             <p class="text-lg font-medium">Sample Text</p>
             <p class="text-sm">This text uses the selected colors.</p>
         </div>
@@ -160,16 +160,16 @@
 </div>
 
 @code {
-    private string _basicColor = "#3B82F6";
-    private string _alphaColor = "#3B82F680";
-    private string _noPresetsColor = "#10B981";
-    private string _customPresetsColor = "#6366F1";
-    private string _noInputsColor = "#F59E0B";
-    private string _preselectedColor = "#EC4899";
-    private string _fgColor = "#FFFFFF";
-    private string _bgColor = "#1E293B";
+    private string objBasicColor = "#3B82F6";
+    private string objAlphaColor = "#3B82F680";
+    private string objNoPresetsColor = "#10B981";
+    private string objCustomPresetsColor = "#6366F1";
+    private string objNoInputsColor = "#F59E0B";
+    private string objPreselectedColor = "#EC4899";
+    private string objFgColor = "#FFFFFF";
+    private string objBgColor = "#1E293B";
 
-    private string[] _brandColors = {
+    private string[] objBrandColors = {
         "#6366F1", "#8B5CF6", "#A855F7", "#D946EF",
         "#EC4899", "#F43F5E", "#EF4444", "#F97316",
         "#F59E0B", "#EAB308", "#84CC16", "#22C55E"

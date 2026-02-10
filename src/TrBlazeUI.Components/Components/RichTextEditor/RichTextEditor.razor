@@ -19,7 +19,7 @@
                 @if (Toolbar >= ToolbarPreset.Standard)
                 {
                     <NativeSelect TValue="string"
-                                 Value="@_headerLevel"
+                                 Value="@objHeaderLevel"
                                  ValueChanged="@HandleHeaderChangeAsync"
                                  Disabled="@Disabled"
                                  Size="NativeSelectSize.Small"
@@ -32,7 +32,7 @@
                     <Separator Orientation="SeparatorOrientation.Vertical" Class="h-6 mx-1" />
                 }
 
-                <Toggle Pressed="@_isBold"
+                <Toggle Pressed="@objIsBold"
                         PressedChanged="@(async _ => await ToggleFormatAsync("bold"))"
                         Size="ToggleSize.Small"
                         Disabled="@Disabled"
@@ -40,7 +40,7 @@
                         title="Bold (Ctrl+B)">
                     <LucideIcon Name="bold" Size="16" />
                 </Toggle>
-                <Toggle Pressed="@_isItalic"
+                <Toggle Pressed="@objIsItalic"
                         PressedChanged="@(async _ => await ToggleFormatAsync("italic"))"
                         Size="ToggleSize.Small"
                         Disabled="@Disabled"
@@ -48,7 +48,7 @@
                         title="Italic (Ctrl+I)">
                     <LucideIcon Name="italic" Size="16" />
                 </Toggle>
-                <Toggle Pressed="@_isUnderline"
+                <Toggle Pressed="@objIsUnderline"
                         PressedChanged="@(async _ => await ToggleFormatAsync("underline"))"
                         Size="ToggleSize.Small"
                         Disabled="@Disabled"
@@ -59,7 +59,7 @@
 
                 @if (Toolbar >= ToolbarPreset.Standard)
                 {
-                    <Toggle Pressed="@_isStrike"
+                    <Toggle Pressed="@objIsStrike"
                             PressedChanged="@(async _ => await ToggleFormatAsync("strike"))"
                             Size="ToggleSize.Small"
                             Disabled="@Disabled"
@@ -71,7 +71,7 @@
 
                 <Separator Orientation="SeparatorOrientation.Vertical" Class="h-6 mx-1" />
 
-                <Toggle Pressed="@_isBulletList"
+                <Toggle Pressed="@objIsBulletList"
                         PressedChanged="@(async _ => await ToggleFormatAsync("list", "bullet"))"
                         Size="ToggleSize.Small"
                         Disabled="@Disabled"
@@ -79,7 +79,7 @@
                         title="Bullet List">
                     <LucideIcon Name="list" Size="16" />
                 </Toggle>
-                <Toggle Pressed="@_isOrderedList"
+                <Toggle Pressed="@objIsOrderedList"
                         PressedChanged="@(async _ => await ToggleFormatAsync("list", "ordered"))"
                         Size="ToggleSize.Small"
                         Disabled="@Disabled"
@@ -105,7 +105,7 @@
                 @if (Toolbar == ToolbarPreset.Full)
                 {
                     <Separator Orientation="SeparatorOrientation.Vertical" Class="h-6 mx-1" />
-                    <Toggle Pressed="@_isBlockquote"
+                    <Toggle Pressed="@objIsBlockquote"
                             PressedChanged="@(async _ => await ToggleFormatAsync("blockquote"))"
                             Size="ToggleSize.Small"
                             Disabled="@Disabled"
@@ -113,7 +113,7 @@
                             title="Blockquote">
                         <LucideIcon Name="quote" Size="16" />
                     </Toggle>
-                    <Toggle Pressed="@_isCodeBlock"
+                    <Toggle Pressed="@objIsCodeBlock"
                             PressedChanged="@(async _ => await ToggleFormatAsync("code-block"))"
                             Size="ToggleSize.Small"
                             Disabled="@Disabled"
@@ -133,7 +133,7 @@
         </div>
     }
 
-    <div @ref="_editorRef"
+    <div @ref="objEditorRef"
          class="@EditorCssClass"
          style="@EditorStyle"
          aria-label="@AriaLabel"
@@ -143,12 +143,12 @@
     </div>
 
     @* Link Dialog *@
-    <Dialog @bind-Open="_linkDialogOpen">
+    <Dialog @bind-Open="objLinkDialogOpen">
         <DialogContent Class="sm:max-w-md">
             <DialogHeader>
-                <DialogTitle>@(_hasExistingLink ? "Edit Link" : "Insert Link")</DialogTitle>
+                <DialogTitle>@(objHasExistingLink ? "Edit Link" : "Insert Link")</DialogTitle>
                 <DialogDescription>
-                    @(_hasExistingLink ? "Update the URL or remove the link." : "Enter the URL for the selected text.")
+                    @(objHasExistingLink ? "Update the URL or remove the link." : "Enter the URL for the selected text.")
                 </DialogDescription>
             </DialogHeader>
             <div class="grid gap-4 py-4">
@@ -157,16 +157,16 @@
                     <Input Id="link-url"
                            Type="InputType.Url"
                            Placeholder="https://example.com"
-                           @bind-Value="_linkUrl"
+                           @bind-Value="objLinkUrl"
                            @bind-Value:after="ValidateLinkUrl" />
-                    @if (!string.IsNullOrEmpty(_linkUrlError))
+                    @if (!string.IsNullOrEmpty(objLinkUrlError))
                     {
-                        <p class="text-sm text-destructive">@_linkUrlError</p>
+                        <p class="text-sm text-destructive">@objLinkUrlError</p>
                     }
                 </div>
             </div>
             <DialogFooter Class="flex-col sm:flex-row gap-2">
-                @if (_hasExistingLink)
+                @if (objHasExistingLink)
                 {
                     <Button Variant="ButtonVariant.Destructive"
                             OnClick="RemoveLinkAsync"
@@ -177,8 +177,8 @@
                 <Button Variant="ButtonVariant.Outline" OnClick="CloseLinkDialog">
                     Cancel
                 </Button>
-                <Button OnClick="ApplyLinkAsync" Disabled="@(!IsValidUrl(_linkUrl))">
-                    @(_hasExistingLink ? "Update" : "Insert")
+                <Button OnClick="ApplyLinkAsync" Disabled="@(!IsValidUrl(objLinkUrl))">
+                    @(objHasExistingLink ? "Update" : "Insert")
                 </Button>
             </DialogFooter>
         </DialogContent>

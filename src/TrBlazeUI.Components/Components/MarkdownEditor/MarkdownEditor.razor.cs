@@ -13,11 +13,11 @@ namespace TrBlazeUI.Components.MarkdownEditor;
 /// </summary>
 public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
 {
-    private IJSObjectReference? _module;
-    private DotNetObjectReference<MarkdownEditor>? _dotNetRef;
-    private ElementReference _textareaRef;
-    private string _activeTab = "write";
-    private bool _shouldPreventKeydown;
+    private IJSObjectReference? objModule;
+    private DotNetObjectReference<MarkdownEditor>? objDotNetRef;
+    private ElementReference objTextareaRef;
+    private string objActiveTab = "write";
+    private bool objShouldPreventKeydown;
 
     [Inject]
     private IJSRuntime JSRuntime { get; set; } = default!;
@@ -137,12 +137,12 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
         {
             try
             {
-                _dotNetRef = DotNetObjectReference.Create(this);
-                _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                objDotNetRef = DotNetObjectReference.Create(this);
+                objModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "import", "./_content/TrBlazeUI.Components/js/markdown-editor.js");
 
                 // Initialize list continuation behavior and undo/redo
-                await _module.InvokeVoidAsync("initializeListContinuation", _textareaRef, _dotNetRef);
+                await objModule.InvokeVoidAsync("initializeListContinuation", objTextareaRef, objDotNetRef);
             }
             catch (JSException)
             {
@@ -184,7 +184,7 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
     /// </summary>
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
-        _shouldPreventKeydown = false;
+        objShouldPreventKeydown = false;
 
         // Handle Ctrl/Cmd shortcuts
         if (e.CtrlKey || e.MetaKey)
@@ -192,16 +192,16 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
             switch (e.Key.ToLowerInvariant())
             {
                 case "b":
-                    _shouldPreventKeydown = true;
-                    await ApplyBold();
+                    objShouldPreventKeydown = true;
+                    await ApplyBoldAsync();
                     break;
                 case "i":
-                    _shouldPreventKeydown = true;
-                    await ApplyItalic();
+                    objShouldPreventKeydown = true;
+                    await ApplyItalicAsync();
                     break;
                 case "u":
-                    _shouldPreventKeydown = true;
-                    await ApplyUnderline();
+                    objShouldPreventKeydown = true;
+                    await ApplyUnderlineAsync();
                     break;
             }
         }
@@ -212,18 +212,18 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
     /// <summary>
     /// Applies bold formatting to selected text.
     /// </summary>
-    private async Task ApplyBold()
+    private async Task ApplyBoldAsync()
     {
-        if (_module == null || Disabled)
+        if (objModule == null || Disabled)
         {
             return;
         }
 
         try
         {
-            var newValue = await _module.InvokeAsync<string>(
-                "insertFormatting", _textareaRef, "**", "**", "bold text");
-            await UpdateValue(newValue);
+            var newValue = await objModule.InvokeAsync<string>(
+                "insertFormatting", objTextareaRef, "**", "**", "bold text");
+            await UpdateValueAsync(newValue);
         }
         catch (JSException)
         {
@@ -234,18 +234,18 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
     /// <summary>
     /// Applies italic formatting to selected text.
     /// </summary>
-    private async Task ApplyItalic()
+    private async Task ApplyItalicAsync()
     {
-        if (_module == null || Disabled)
+        if (objModule == null || Disabled)
         {
             return;
         }
 
         try
         {
-            var newValue = await _module.InvokeAsync<string>(
-                "insertFormatting", _textareaRef, "*", "*", "italic text");
-            await UpdateValue(newValue);
+            var newValue = await objModule.InvokeAsync<string>(
+                "insertFormatting", objTextareaRef, "*", "*", "italic text");
+            await UpdateValueAsync(newValue);
         }
         catch (JSException)
         {
@@ -256,18 +256,18 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
     /// <summary>
     /// Applies underline formatting to selected text.
     /// </summary>
-    private async Task ApplyUnderline()
+    private async Task ApplyUnderlineAsync()
     {
-        if (_module == null || Disabled)
+        if (objModule == null || Disabled)
         {
             return;
         }
 
         try
         {
-            var newValue = await _module.InvokeAsync<string>(
-                "insertFormatting", _textareaRef, "<u>", "</u>", "underlined text");
-            await UpdateValue(newValue);
+            var newValue = await objModule.InvokeAsync<string>(
+                "insertFormatting", objTextareaRef, "<u>", "</u>", "underlined text");
+            await UpdateValueAsync(newValue);
         }
         catch (JSException)
         {
@@ -278,9 +278,9 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
     /// <summary>
     /// Applies heading formatting to current line.
     /// </summary>
-    private async Task ApplyHeading(int level)
+    private async Task ApplyHeadingAsync(int level)
     {
-        if (_module == null || Disabled)
+        if (objModule == null || Disabled)
         {
             return;
         }
@@ -298,15 +298,15 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
             if (string.IsNullOrEmpty(prefix))
             {
                 // Remove heading (normal paragraph)
-                var newValue = await _module.InvokeAsync<string>(
-                    "removeLinePrefix", _textareaRef);
-                await UpdateValue(newValue);
+                var newValue = await objModule.InvokeAsync<string>(
+                    "removeLinePrefix", objTextareaRef);
+                await UpdateValueAsync(newValue);
             }
             else
             {
-                var newValue = await _module.InvokeAsync<string>(
-                    "insertLinePrefix", _textareaRef, prefix);
-                await UpdateValue(newValue);
+                var newValue = await objModule.InvokeAsync<string>(
+                    "insertLinePrefix", objTextareaRef, prefix);
+                await UpdateValueAsync(newValue);
             }
         }
         catch (JSException)
@@ -318,18 +318,18 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
     /// <summary>
     /// Applies bullet list formatting to current line.
     /// </summary>
-    private async Task ApplyBulletList()
+    private async Task ApplyBulletListAsync()
     {
-        if (_module == null || Disabled)
+        if (objModule == null || Disabled)
         {
             return;
         }
 
         try
         {
-            var newValue = await _module.InvokeAsync<string>(
-                "insertLinePrefix", _textareaRef, "- ");
-            await UpdateValue(newValue);
+            var newValue = await objModule.InvokeAsync<string>(
+                "insertLinePrefix", objTextareaRef, "- ");
+            await UpdateValueAsync(newValue);
         }
         catch (JSException)
         {
@@ -340,18 +340,18 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
     /// <summary>
     /// Applies numbered list formatting to current line.
     /// </summary>
-    private async Task ApplyNumberedList()
+    private async Task ApplyNumberedListAsync()
     {
-        if (_module == null || Disabled)
+        if (objModule == null || Disabled)
         {
             return;
         }
 
         try
         {
-            var newValue = await _module.InvokeAsync<string>(
-                "insertLinePrefix", _textareaRef, "1. ");
-            await UpdateValue(newValue);
+            var newValue = await objModule.InvokeAsync<string>(
+                "insertLinePrefix", objTextareaRef, "1. ");
+            await UpdateValueAsync(newValue);
         }
         catch (JSException)
         {
@@ -362,7 +362,7 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
     /// <summary>
     /// Updates the value and notifies the parent component.
     /// </summary>
-    private async Task UpdateValue(string newValue)
+    private async Task UpdateValueAsync(string newValue)
     {
         Value = newValue;
 
@@ -381,7 +381,7 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
     {
         if (tab != null)
         {
-            _activeTab = tab;
+            objActiveTab = tab;
         }
     }
 
@@ -390,7 +390,7 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
     /// </summary>
     private string GetTabClass(string tabValue)
     {
-        var isActive = _activeTab == tabValue;
+        var isActive = objActiveTab == tabValue;
         return ClassNames.cn(
             // Reset default TabsTrigger styles
             "!shadow-none !ring-0 !ring-offset-0",
@@ -405,13 +405,13 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        if (_module != null)
+        if (objModule != null)
         {
             try
             {
                 // Clean up the list continuation listener and editor data
-                await _module.InvokeVoidAsync("disposeListContinuation", _textareaRef);
-                await _module.DisposeAsync();
+                await objModule.InvokeVoidAsync("disposeListContinuation", objTextareaRef);
+                await objModule.DisposeAsync();
             }
             catch (JSDisconnectedException)
             {
@@ -423,7 +423,7 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
             }
         }
 
-        _dotNetRef?.Dispose();
+        objDotNetRef?.Dispose();
         GC.SuppressFinalize(this);
     }
 }

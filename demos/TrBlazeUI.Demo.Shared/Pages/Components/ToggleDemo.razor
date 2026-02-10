@@ -23,10 +23,10 @@
                 A simple toggle button.
             </p>
         </div>
-        <Toggle @bind-Pressed="_isPressed">
+        <Toggle @bind-Pressed="objIsPressed">
             <LucideIcon Name="bold" Class="h-4 w-4" />
         </Toggle>
-        <p class="text-sm text-muted-foreground">Pressed: @_isPressed</p>
+        <p class="text-sm text-muted-foreground">Pressed: @objIsPressed</p>
     </div>
 
     <!-- Variants -->
@@ -91,14 +91,14 @@
             </p>
         </div>
         <div class="flex gap-4 items-center">
-            <Toggle @bind-Pressed="_isBookmarked" Variant="ToggleVariant.Outline">
+            <Toggle @bind-Pressed="objIsBookmarked" Variant="ToggleVariant.Outline">
                 <LucideIcon Name="bookmark"
                             Class="h-4 w-4 mr-2"
-                            Color="@(_isBookmarked ? "#3b82f6" : "currentColor")"
-                            Fill="@(_isBookmarked ? "#3b82f6" : "none")" />
+                            Color="@(objIsBookmarked ? "#3b82f6" : "currentColor")"
+                            Fill="@(objIsBookmarked ? "#3b82f6" : "none")" />
                 Bookmark
             </Toggle>
-            <span class="text-sm text-muted-foreground">@(_isBookmarked ? "Bookmarked" : "Not bookmarked")</span>
+            <span class="text-sm text-muted-foreground">@(objIsBookmarked ? "Bookmarked" : "Not bookmarked")</span>
         </div>
     </div>
 
@@ -126,7 +126,7 @@
         <div class="space-y-4">
             <div>
                 <p class="text-sm mb-2">Single selection:</p>
-                <ToggleGroup TValue="string" @bind-Value="_alignment" Variant="ToggleVariant.Outline">
+                <ToggleGroup TValue="string" @bind-Value="objAlignment" Variant="ToggleVariant.Outline">
                     <ToggleGroupItem TValue="string" Value="@("left")">
                         <LucideIcon Name="align-left" Class="h-4 w-4" />
                     </ToggleGroupItem>
@@ -137,7 +137,7 @@
                         <LucideIcon Name="align-right" Class="h-4 w-4" />
                     </ToggleGroupItem>
                 </ToggleGroup>
-                <p class="text-sm text-muted-foreground mt-2">Selected: @(_alignment ?? "none")</p>
+                <p class="text-sm text-muted-foreground mt-2">Selected: @(objAlignment ?? "none")</p>
             </div>
         </div>
     </div>
@@ -171,7 +171,7 @@
 </div>
 
 @code {
-    private bool _isPressed;
-    private bool _isBookmarked;
-    private string? _alignment = "center";
+    private bool objIsPressed;
+    private bool objIsBookmarked;
+    private string? objAlignment = "center";
 }

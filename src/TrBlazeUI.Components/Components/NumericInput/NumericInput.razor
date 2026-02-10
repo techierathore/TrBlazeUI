@@ -3,7 +3,7 @@
 
 <div class="@ContainerClass">
     <input
-        @ref="_inputRef"
+        @ref="objInputRef"
         id="@Id"
         type="text"
         inputmode="@InputMode"
@@ -31,7 +31,7 @@
                 tabindex="-1"
                 class="@ButtonClass"
                 disabled="@(Disabled || IsAtMax)"
-                @onclick="Increment"
+                @onclick="IncrementAsync"
                 aria-label="Increase value">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3 w-3">
                     <path d="m18 15-6-6-6 6"/>
@@ -42,7 +42,7 @@
                 tabindex="-1"
                 class="@ButtonClass"
                 disabled="@(Disabled || IsAtMin)"
-                @onclick="Decrement"
+                @onclick="DecrementAsync"
                 aria-label="Decrease value">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3 w-3">
                     <path d="m6 9 6 6 6-6"/>

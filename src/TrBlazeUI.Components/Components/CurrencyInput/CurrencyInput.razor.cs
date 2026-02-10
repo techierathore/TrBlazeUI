@@ -10,11 +10,11 @@ namespace TrBlazeUI.Components.CurrencyInput;
 /// </summary>
 public partial class CurrencyInput : ComponentBase
 {
-    private ElementReference _inputRef;
-    private string _editingValue = string.Empty;
-    private bool _isEditing;
-    private CurrencyDefinition? _currency;
-    private CultureInfo? _cultureInfo;
+    private ElementReference objInputRef;
+    private string objEditingValue = string.Empty;
+    private bool objIsEditing;
+    private CurrencyDefinition? objCurrency;
+    private CultureInfo? objCultureInfo;
 
     /// <summary>
     /// Gets or sets the current value.
@@ -112,34 +112,34 @@ public partial class CurrencyInput : ComponentBase
     [Parameter]
     public bool UseThousandSeparator { get; set; } = true;
 
-    private CurrencyDefinition Currency => _currency ??= CurrencyCatalog.GetCurrency(CurrencyCode);
+    private CurrencyDefinition Currency => objCurrency ??= CurrencyCatalog.GetCurrency(CurrencyCode);
 
     private CultureInfo CultureInfo
     {
         get
         {
-            if (_cultureInfo == null || _cultureInfo.Name != Currency.CultureName)
+            if (objCultureInfo == null || objCultureInfo.Name != Currency.CultureName)
             {
                 try
                 {
-                    _cultureInfo = new CultureInfo(Currency.CultureName);
+                    objCultureInfo = new CultureInfo(Currency.CultureName);
                 }
                 catch
                 {
-                    _cultureInfo = CultureInfo.InvariantCulture;
+                    objCultureInfo = CultureInfo.InvariantCulture;
                 }
             }
-            return _cultureInfo;
+            return objCultureInfo;
         }
     }
 
     protected override void OnParametersSet()
     {
         // Reset currency cache if currency code changed
-        if (_currency != null && !string.Equals(_currency.Code, CurrencyCode, StringComparison.OrdinalIgnoreCase))
+        if (objCurrency != null && !string.Equals(objCurrency.Code, CurrencyCode, StringComparison.OrdinalIgnoreCase))
         {
-            _currency = null;
-            _cultureInfo = null;
+            objCurrency = null;
+            objCultureInfo = null;
         }
     }
 
@@ -147,9 +147,9 @@ public partial class CurrencyInput : ComponentBase
     {
         get
         {
-            if (_isEditing)
+            if (objIsEditing)
             {
-                return _editingValue;
+                return objEditingValue;
             }
 
             return FormatCurrency(Value);
@@ -191,8 +191,8 @@ public partial class CurrencyInput : ComponentBase
     private void HandleInput(ChangeEventArgs args)
     {
         var inputValue = args.Value?.ToString() ?? string.Empty;
-        _editingValue = inputValue;
-        _isEditing = true;
+        objEditingValue = inputValue;
+        objIsEditing = true;
 
         // Try to parse and update value in real-time
         if (TryParseValue(inputValue, out var parsedValue))
@@ -208,10 +208,10 @@ public partial class CurrencyInput : ComponentBase
 
     private void HandleBlur(FocusEventArgs args)
     {
-        _isEditing = false;
+        objIsEditing = false;
 
         // On blur, ensure we have a valid value
-        if (TryParseValue(_editingValue, out var parsedValue))
+        if (TryParseValue(objEditingValue, out var parsedValue))
         {
             var clampedValue = ClampValue(parsedValue);
             if (clampedValue != Value)
@@ -227,8 +227,8 @@ public partial class CurrencyInput : ComponentBase
     private void HandleFocus(FocusEventArgs args)
     {
         // Show raw number without formatting for easier editing
-        _editingValue = Value.ToString($"F{Currency.DecimalPlaces}", CultureInfo.InvariantCulture);
-        _isEditing = true;
+        objEditingValue = Value.ToString($"F{Currency.DecimalPlaces}", CultureInfo.InvariantCulture);
+        objIsEditing = true;
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
@@ -243,22 +243,22 @@ public partial class CurrencyInput : ComponentBase
         switch (e.Key)
         {
             case "ArrowUp":
-                await SetValue(Value + step);
+                await SetValueAsync(Value + step);
                 break;
             case "ArrowDown":
-                await SetValue(Value - step);
+                await SetValueAsync(Value - step);
                 break;
         }
     }
 
-    private async Task SetValue(decimal value)
+    private async Task SetValueAsync(decimal value)
     {
         var clampedValue = ClampValue(value);
 
         if (clampedValue != Value)
         {
             Value = clampedValue;
-            _editingValue = clampedValue.ToString($"F{Currency.DecimalPlaces}", CultureInfo.InvariantCulture);
+            objEditingValue = clampedValue.ToString($"F{Currency.DecimalPlaces}", CultureInfo.InvariantCulture);
             await ValueChanged.InvokeAsync(clampedValue);
         }
     }

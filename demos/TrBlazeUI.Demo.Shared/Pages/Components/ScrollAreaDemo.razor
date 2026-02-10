@@ -25,7 +25,7 @@
         <ScrollArea Height="200px" Class="w-[350px] rounded-md border p-4">
             <div class="space-y-4">
                 <h4 class="text-sm font-medium leading-none">Tags</h4>
-                @foreach (var tag in _tags)
+                @foreach (var tag in objTags)
                 {
                     <div class="text-sm">@tag</div>
                     <Separator />
@@ -99,7 +99,7 @@
 </div>
 
 @code {
-    private readonly string[] _tags = new[]
+    private readonly string[] objTags = new[]
     {
         "React", "Vue", "Angular", "Svelte", "Blazor",
         "Next.js", "Nuxt", "Gatsby", "Remix", "Astro",

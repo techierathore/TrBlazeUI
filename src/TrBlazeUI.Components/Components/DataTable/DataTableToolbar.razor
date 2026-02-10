@@ -9,7 +9,7 @@
 
 <div class="flex items-center justify-between gap-2 py-4">
     <div class="flex flex-1 items-center gap-2">
-        <Input @bind-Value="@_searchValue"
+        <Input @bind-Value="@objSearchValue"
                @bind-Value:after="@HandleSearchChanged"
                Placeholder="Search..."
                Class="h-8 w-[150px] lg:w-[250px]" />
@@ -71,7 +71,7 @@
 </div>
 
 @code {
-    private string _searchValue = string.Empty;
+    private string objSearchValue = string.Empty;
 
     [Parameter]
     public string GlobalSearchValue { get; set; } = string.Empty;
@@ -90,14 +90,14 @@
 
     protected override void OnParametersSet()
     {
-        _searchValue = GlobalSearchValue;
+        objSearchValue = GlobalSearchValue;
     }
 
     private async Task HandleSearchChanged()
     {
         if (OnGlobalSearchChanged.HasDelegate)
         {
-            await OnGlobalSearchChanged.InvokeAsync(_searchValue);
+            await OnGlobalSearchChanged.InvokeAsync(objSearchValue);
         }
     }
 }

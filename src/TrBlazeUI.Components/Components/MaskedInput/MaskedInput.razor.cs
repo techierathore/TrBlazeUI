@@ -10,11 +10,11 @@ namespace TrBlazeUI.Components.MaskedInput;
 /// </summary>
 public partial class MaskedInput : ComponentBase, IAsyncDisposable
 {
-    private ElementReference _inputRef;
-    private MaskProcessor? _processor;
-    private string _displayValue = string.Empty;
-    private IJSObjectReference? _jsModule;
-    private bool _jsModuleLoaded;
+    private ElementReference objInputRef;
+    private MaskProcessor? objProcessor;
+    private string objDisplayValue = string.Empty;
+    private IJSObjectReference? objJsModule;
+    private bool objJsModuleLoaded;
 
     /// <summary>
     /// Gets or sets the unmasked value (raw input without formatting).
@@ -104,23 +104,23 @@ public partial class MaskedInput : ComponentBase, IAsyncDisposable
     /// <summary>
     /// Gets the masked (formatted) value.
     /// </summary>
-    public string MaskedValue => _displayValue;
+    public string MaskedValue => objDisplayValue;
 
     /// <summary>
     /// Gets the unmasked value.
     /// </summary>
-    public string UnmaskedValue => Processor.GetUnmaskedValue(_displayValue);
+    public string UnmaskedValue => Processor.GetUnmaskedValue(objDisplayValue);
 
     private MaskProcessor Processor
     {
         get
         {
             var effectiveMask = GetEffectiveMask();
-            if (_processor == null || _processor.Mask != effectiveMask || _processor.PlaceholderChar != PlaceholderChar)
+            if (objProcessor == null || objProcessor.Mask != effectiveMask || objProcessor.PlaceholderChar != PlaceholderChar)
             {
-                _processor = new MaskProcessor(effectiveMask, PlaceholderChar);
+                objProcessor = new MaskProcessor(effectiveMask, PlaceholderChar);
             }
-            return _processor;
+            return objProcessor;
         }
     }
 
@@ -168,9 +168,9 @@ public partial class MaskedInput : ComponentBase, IAsyncDisposable
         {
             try
             {
-                _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                objJsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "import", "./_content/TrBlazeUI.Components/js/masked-input.js");
-                _jsModuleLoaded = true;
+                objJsModuleLoaded = true;
             }
             catch (JSDisconnectedException)
             {
@@ -184,7 +184,7 @@ public partial class MaskedInput : ComponentBase, IAsyncDisposable
     }
 
     private void UpdateDisplayValue() =>
-        _displayValue = Processor.ApplyMask(Value);
+        objDisplayValue = Processor.ApplyMask(Value);
 
     private void HandleInput(ChangeEventArgs args)
     {
@@ -273,10 +273,10 @@ public partial class MaskedInput : ComponentBase, IAsyncDisposable
         var cursorPosition = CalculateCursorPosition(validatedStr.Length);
 
         // Update state
-        _displayValue = newDisplayValue;
+        objDisplayValue = newDisplayValue;
 
         // Update the bound Value
-        var unmasked = Processor.GetUnmaskedValue(_displayValue);
+        var unmasked = Processor.GetUnmaskedValue(objDisplayValue);
         if (unmasked != Value)
         {
             Value = unmasked;
@@ -289,11 +289,11 @@ public partial class MaskedInput : ComponentBase, IAsyncDisposable
 
     private async Task SetInputValueAsync(string value, int cursorPosition)
     {
-        if (_jsModuleLoaded && _jsModule != null)
+        if (objJsModuleLoaded && objJsModule != null)
         {
             try
             {
-                await _jsModule.InvokeVoidAsync("setInputValue", _inputRef, value, cursorPosition);
+                await objJsModule.InvokeVoidAsync("setInputValue", objInputRef, value, cursorPosition);
             }
             catch (JSDisconnectedException)
             {
@@ -334,10 +334,10 @@ public partial class MaskedInput : ComponentBase, IAsyncDisposable
         // Show the mask if empty
         if (string.IsNullOrEmpty(Value) && ShowMask)
         {
-            _displayValue = Processor.GetEmptyMask();
+            objDisplayValue = Processor.GetEmptyMask();
 
             // Use JS to set the value and position cursor at start
-            if (_jsModuleLoaded && _jsModule != null)
+            if (objJsModuleLoaded && objJsModule != null)
             {
                 try
                 {
@@ -348,7 +348,7 @@ public partial class MaskedInput : ComponentBase, IAsyncDisposable
                         firstEditablePos = 0;
                     }
 
-                    await _jsModule.InvokeVoidAsync("setInputValue", _inputRef, _displayValue, firstEditablePos);
+                    await objJsModule.InvokeVoidAsync("setInputValue", objInputRef, objDisplayValue, firstEditablePos);
                 }
                 catch (JSDisconnectedException)
                 {
@@ -367,7 +367,7 @@ public partial class MaskedInput : ComponentBase, IAsyncDisposable
         // Clear display if value is empty and not showing mask
         if (string.IsNullOrEmpty(Value) && !ShowMask)
         {
-            _displayValue = string.Empty;
+            objDisplayValue = string.Empty;
             StateHasChanged();
         }
     }
@@ -375,11 +375,11 @@ public partial class MaskedInput : ComponentBase, IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);
-        if (_jsModule != null)
+        if (objJsModule != null)
         {
             try
             {
-                await _jsModule.DisposeAsync();
+                await objJsModule.DisposeAsync();
             }
             catch (JSDisconnectedException)
             {

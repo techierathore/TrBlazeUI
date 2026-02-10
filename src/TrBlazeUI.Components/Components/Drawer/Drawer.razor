@@ -22,10 +22,10 @@
     public DrawerDirection Direction { get; set; } = DrawerDirection.Bottom;
 
     internal bool IsControlled => Open.HasValue;
-    internal bool IsOpen => Open ?? _internalOpen;
-    private bool _internalOpen;
+    internal bool IsOpen => Open ?? objInternalOpen;
+    private bool objInternalOpen;
 
-    internal async Task SetOpen(bool open)
+    internal async Task SetOpenAsync(bool open)
     {
         if (IsControlled)
         {
@@ -33,13 +33,13 @@
         }
         else
         {
-            _internalOpen = open;
+            objInternalOpen = open;
             StateHasChanged();
         }
     }
 
     protected override void OnInitialized()
     {
-        _internalOpen = DefaultOpen;
+        objInternalOpen = DefaultOpen;
     }
 }

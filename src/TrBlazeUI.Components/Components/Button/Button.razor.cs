@@ -175,7 +175,7 @@ public partial class Button : ComponentBase
     /// <summary>
     /// Reference to the button element for positioning support when used with AsChild.
     /// </summary>
-    private ElementReference _buttonRef;
+    private ElementReference objButtonRef;
 
     /// <summary>
     /// Gets whether the component should render as an anchor element.
@@ -328,7 +328,7 @@ public partial class Button : ComponentBase
     {
         if (firstRender && TriggerContext?.SetTriggerElement != null)
         {
-            TriggerContext.SetTriggerElement.Invoke(_buttonRef);
+            TriggerContext.SetTriggerElement.Invoke(objButtonRef);
         }
     }
 }

@@ -7,36 +7,36 @@ namespace TrBlazeUI.Components.MaskedInput;
 /// </summary>
 public class MaskProcessor
 {
-    private readonly string _mask;
-    private readonly char _placeholderChar;
+    private readonly string objMask;
+    private readonly char objPlaceholderChar;
 
     public MaskProcessor(string mask, char placeholderChar = '_')
     {
-        _mask = mask;
-        _placeholderChar = placeholderChar;
+        objMask = mask;
+        objPlaceholderChar = placeholderChar;
     }
 
     /// <summary>
     /// Gets the mask pattern.
     /// </summary>
-    public string Mask => _mask;
+    public string Mask => objMask;
 
     /// <summary>
     /// Gets the placeholder character.
     /// </summary>
-    public char PlaceholderChar => _placeholderChar;
+    public char PlaceholderChar => objPlaceholderChar;
 
     /// <summary>
     /// Checks if a character at a mask position is a literal (non-editable).
     /// </summary>
     public bool IsLiteral(int position)
     {
-        if (position < 0 || position >= _mask.Length)
+        if (position < 0 || position >= objMask.Length)
         {
             return false;
         }
 
-        var maskChar = _mask[position];
+        var maskChar = objMask[position];
         return !IsMaskChar(maskChar);
     }
 
@@ -50,12 +50,12 @@ public class MaskProcessor
     /// </summary>
     public bool IsValidChar(char input, int position)
     {
-        if (position < 0 || position >= _mask.Length)
+        if (position < 0 || position >= objMask.Length)
         {
             return false;
         }
 
-        var maskChar = _mask[position];
+        var maskChar = objMask[position];
 
         return maskChar switch
         {
@@ -71,9 +71,9 @@ public class MaskProcessor
     /// </summary>
     public int GetNextEditablePosition(int position)
     {
-        for (var i = position; i < _mask.Length; i++)
+        for (var i = position; i < objMask.Length; i++)
         {
-            if (IsMaskChar(_mask[i]))
+            if (IsMaskChar(objMask[i]))
             {
                 return i;
             }
@@ -88,7 +88,7 @@ public class MaskProcessor
     {
         for (var i = position - 1; i >= 0; i--)
         {
-            if (IsMaskChar(_mask[i]))
+            if (IsMaskChar(objMask[i]))
             {
                 return i;
             }
@@ -106,12 +106,12 @@ public class MaskProcessor
             return GetEmptyMask();
         }
 
-        var result = new StringBuilder(_mask.Length);
+        var result = new StringBuilder(objMask.Length);
         var inputIndex = 0;
 
-        for (var maskIndex = 0; maskIndex < _mask.Length; maskIndex++)
+        for (var maskIndex = 0; maskIndex < objMask.Length; maskIndex++)
         {
-            var maskChar = _mask[maskIndex];
+            var maskChar = objMask[maskIndex];
 
             if (IsMaskChar(maskChar))
             {
@@ -131,7 +131,7 @@ public class MaskProcessor
                 // If no more input, add placeholder
                 if (result.Length <= maskIndex)
                 {
-                    result.Append(_placeholderChar);
+                    result.Append(objPlaceholderChar);
                 }
             }
             else
@@ -162,13 +162,13 @@ public class MaskProcessor
 
         var result = new StringBuilder();
 
-        var length = Math.Min(maskedValue.Length, _mask.Length);
+        var length = Math.Min(maskedValue.Length, objMask.Length);
         for (var i = 0; i < length; i++)
         {
-            var maskChar = _mask[i];
+            var maskChar = objMask[i];
             var valueChar = maskedValue[i];
 
-            if (IsMaskChar(maskChar) && valueChar != _placeholderChar)
+            if (IsMaskChar(maskChar) && valueChar != objPlaceholderChar)
             {
                 result.Append(valueChar);
             }
@@ -182,11 +182,11 @@ public class MaskProcessor
     /// </summary>
     public string GetEmptyMask()
     {
-        var result = new StringBuilder(_mask.Length);
+        var result = new StringBuilder(objMask.Length);
 
-        foreach (var c in _mask)
+        foreach (var c in objMask)
         {
-            result.Append(IsMaskChar(c) ? _placeholderChar : c);
+            result.Append(IsMaskChar(c) ? objPlaceholderChar : c);
         }
 
         return result.ToString();
@@ -229,7 +229,7 @@ public class MaskProcessor
 
         for (var i = 0; i < masked.Length && inputCount < rawChars.Length; i++)
         {
-            if (IsMaskChar(_mask[i]) && masked[i] != _placeholderChar)
+            if (IsMaskChar(objMask[i]) && masked[i] != objPlaceholderChar)
             {
                 inputCount++;
                 newCursorPos = i + 1;
@@ -237,7 +237,7 @@ public class MaskProcessor
         }
 
         // Skip to next editable position if on a literal
-        if (newCursorPos < _mask.Length && IsLiteral(newCursorPos))
+        if (newCursorPos < objMask.Length && IsLiteral(newCursorPos))
         {
             var nextEdit = GetNextEditablePosition(newCursorPos);
             if (nextEdit >= 0)

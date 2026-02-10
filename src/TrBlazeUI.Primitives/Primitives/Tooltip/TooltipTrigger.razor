@@ -11,7 +11,7 @@
 }
 else
 {
-    <span @ref="@_triggerRef"
+    <span @ref="@objTriggerRef"
           id="@Context.TriggerId"
           @onmouseenter="HandleMouseEnter"
           @onmouseleave="HandleMouseLeave"
@@ -28,7 +28,7 @@ else
     [CascadingParameter]
     private TooltipContext Context { get; set; } = null!;
 
-    private ElementReference _triggerRef;
+    private ElementReference objTriggerRef;
 
     /// <summary>
     /// The content to display inside the trigger.
@@ -72,7 +72,7 @@ else
     /// <summary>
     /// Stores the trigger element reference when using AsChild pattern.
     /// </summary>
-    private ElementReference? _asChildTriggerRef;
+    private ElementReference? objAsChildTriggerRef;
 
     /// <summary>
     /// Context passed to child components when AsChild is true.
@@ -81,19 +81,19 @@ else
     {
         TriggerId = Context.TriggerId,
         IsOpen = Context.IsOpen,
-        Open = () => Context.Open(_asChildTriggerRef),
+        Open = () => Context.Open(objAsChildTriggerRef),
         Close = () => Context.Close(),
-        OnMouseEnter = () => Context.Open(_asChildTriggerRef),
+        OnMouseEnter = () => Context.Open(objAsChildTriggerRef),
         OnMouseLeave = () => Context.Close(),
-        OnFocus = () => Context.Open(_asChildTriggerRef),
+        OnFocus = () => Context.Open(objAsChildTriggerRef),
         OnBlur = () => Context.Close(),
-        SetTriggerElement = (ElementReference el) => _asChildTriggerRef = el
+        SetTriggerElement = (ElementReference el) => objAsChildTriggerRef = el
     };
 
     private async Task HandleMouseEnter(MouseEventArgs args)
     {
         // Open tooltip and store trigger element for positioning
-        Context.Open(_triggerRef);
+        Context.Open(objTriggerRef);
 
         // Invoke custom handler if provided
         if (OnMouseEnter.HasDelegate)
@@ -117,7 +117,7 @@ else
     private void HandleFocus(FocusEventArgs args)
     {
         // Open tooltip on focus for keyboard users
-        Context.Open(_triggerRef);
+        Context.Open(objTriggerRef);
     }
 
     private void HandleBlur(FocusEventArgs args)
@@ -142,14 +142,14 @@ else
         // even when the tooltip is opened programmatically (via @bind-Open)
         if (!AsChild)
         {
-            Context.SetTriggerElement(_triggerRef);
+            Context.SetTriggerElement(objTriggerRef);
         }
-        else if (_asChildTriggerRef.HasValue)
+        else if (objAsChildTriggerRef.HasValue)
         {
             // When using AsChild pattern, the child component (e.g., Button) sets
-            // _asChildTriggerRef via TriggerContext.SetTriggerElement. We need to
+            // objAsChildTriggerRef via TriggerContext.SetTriggerElement. We need to
             // propagate this to the context so Content can position relative to it.
-            Context.SetTriggerElement(_asChildTriggerRef.Value);
+            Context.SetTriggerElement(objAsChildTriggerRef.Value);
         }
     }
 }

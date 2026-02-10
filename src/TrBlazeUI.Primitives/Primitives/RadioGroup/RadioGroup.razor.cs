@@ -40,8 +40,8 @@ namespace TrBlazeUI.Primitives.RadioGroup;
 public partial class RadioGroup<TValue> : ComponentBase
 {
     private RadioGroupContext<TValue> context = new();
-    private List<RadioGroupItem<TValue>>? _cachedEnabledItems;
-    private int _lastItemsVersion;
+    private List<RadioGroupItem<TValue>>? objCachedEnabledItems;
+    private int objLastItemsVersion;
 
     /// <summary>
     /// Gets or sets the currently selected value.
@@ -160,12 +160,12 @@ public partial class RadioGroup<TValue> : ComponentBase
         {
             case "ArrowDown":
             case "ArrowRight":
-                await NavigateNext(enabledItems);
+                await NavigateNextAsync(enabledItems);
                 break;
 
             case "ArrowUp":
             case "ArrowLeft":
-                await NavigatePrevious(enabledItems);
+                await NavigatePreviousAsync(enabledItems);
                 break;
         }
     }
@@ -178,18 +178,18 @@ public partial class RadioGroup<TValue> : ComponentBase
     {
         // Use items count as a simple version check - if count changed, items changed
         var currentVersion = context.Items.Count;
-        if (_cachedEnabledItems == null || _lastItemsVersion != currentVersion)
+        if (objCachedEnabledItems == null || objLastItemsVersion != currentVersion)
         {
-            _cachedEnabledItems = context.Items.Where(i => !i.Disabled).ToList();
-            _lastItemsVersion = currentVersion;
+            objCachedEnabledItems = context.Items.Where(i => !i.Disabled).ToList();
+            objLastItemsVersion = currentVersion;
         }
-        return _cachedEnabledItems;
+        return objCachedEnabledItems;
     }
 
     /// <summary>
     /// Navigates to the next radio item.
     /// </summary>
-    private async Task NavigateNext(List<RadioGroupItem<TValue>> enabledItems)
+    private async Task NavigateNextAsync(List<RadioGroupItem<TValue>> enabledItems)
     {
         if (enabledItems.Count == 0)
         {
@@ -210,7 +210,7 @@ public partial class RadioGroup<TValue> : ComponentBase
     /// <summary>
     /// Navigates to the previous radio item.
     /// </summary>
-    private async Task NavigatePrevious(List<RadioGroupItem<TValue>> enabledItems)
+    private async Task NavigatePreviousAsync(List<RadioGroupItem<TValue>> enabledItems)
     {
         if (enabledItems.Count == 0)
         {

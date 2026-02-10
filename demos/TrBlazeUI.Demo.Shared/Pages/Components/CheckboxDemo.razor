@@ -278,13 +278,13 @@
     private bool option3 = true;
 
     // Interactive
-    private bool _interactiveChecked = false;
+    private bool objInteractiveChecked = false;
     private bool interactiveChecked
     {
-        get => _interactiveChecked;
+        get => objInteractiveChecked;
         set
         {
-            _interactiveChecked = value;
+            objInteractiveChecked = value;
             if (value)
             {
                 lastToggleTime = DateTime.Now.ToString("HH:mm:ss");

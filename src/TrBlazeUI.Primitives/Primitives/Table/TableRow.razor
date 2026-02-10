@@ -3,7 +3,7 @@
 @inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
-<tr @ref="_elementRef"
+<tr @ref="objElementRef"
     role="row"
     aria-selected="@(IsSelected ? "true" : "false")"
     tabindex="@(IsKeyboardNavigable ? 0 : -1)"
@@ -15,10 +15,10 @@
 </tr>
 
 @code {
-    private ElementReference _elementRef;
-    private bool _spaceKeyHandlerAttached = false;
-    private IJSObjectReference? _tableRowNavModule;
-    private IJSObjectReference? _spaceKeyCleanup;
+    private ElementReference objElementRef;
+    private bool objSpaceKeyHandlerAttached = false;
+    private IJSObjectReference? objTableRowNavModule;
+    private IJSObjectReference? objSpaceKeyCleanup;
 
     [CascadingParameter]
     private TableContext<TData> Context { get; set; } = default!;
@@ -68,19 +68,19 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && IsKeyboardNavigable && !_spaceKeyHandlerAttached)
+        if (firstRender && IsKeyboardNavigable && !objSpaceKeyHandlerAttached)
         {
             try
             {
                 // Lazy-load the table row navigation module
-                _tableRowNavModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+                objTableRowNavModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "import", "./_content/TrBlazeUI.Primitives/js/primitives/table-row-nav.js");
 
                 // Attach event listener in capture phase to prevent Space from scrolling
                 // This runs before Blazor's event handler, allowing us to preventDefault
-                _spaceKeyCleanup = await _tableRowNavModule.InvokeAsync<IJSObjectReference>(
-                    "preventSpaceKeyScroll", _elementRef);
-                _spaceKeyHandlerAttached = true;
+                objSpaceKeyCleanup = await objTableRowNavModule.InvokeAsync<IJSObjectReference>(
+                    "preventSpaceKeyScroll", objElementRef);
+                objSpaceKeyHandlerAttached = true;
             }
             catch
             {
@@ -131,9 +131,9 @@
     {
         try
         {
-            _tableRowNavModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+            objTableRowNavModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/TrBlazeUI.Primitives/js/primitives/table-row-nav.js");
-            await _tableRowNavModule.InvokeVoidAsync("moveFocusToPreviousRow", _elementRef);
+            await objTableRowNavModule.InvokeVoidAsync("moveFocusToPreviousRow", objElementRef);
         }
         catch
         {
@@ -145,9 +145,9 @@
     {
         try
         {
-            _tableRowNavModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+            objTableRowNavModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/TrBlazeUI.Primitives/js/primitives/table-row-nav.js");
-            await _tableRowNavModule.InvokeVoidAsync("moveFocusToNextRow", _elementRef);
+            await objTableRowNavModule.InvokeVoidAsync("moveFocusToNextRow", objElementRef);
         }
         catch
         {
@@ -157,12 +157,12 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (_spaceKeyCleanup != null)
+        if (objSpaceKeyCleanup != null)
         {
             try
             {
-                await _spaceKeyCleanup.InvokeVoidAsync("dispose");
-                await _spaceKeyCleanup.DisposeAsync();
+                await objSpaceKeyCleanup.InvokeVoidAsync("dispose");
+                await objSpaceKeyCleanup.DisposeAsync();
             }
             catch
             {
@@ -170,11 +170,11 @@
             }
         }
 
-        if (_tableRowNavModule != null)
+        if (objTableRowNavModule != null)
         {
             try
             {
-                await _tableRowNavModule.DisposeAsync();
+                await objTableRowNavModule.DisposeAsync();
             }
             catch
             {

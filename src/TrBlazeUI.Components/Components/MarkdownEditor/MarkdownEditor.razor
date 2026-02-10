@@ -26,7 +26,7 @@
             </div>
 
             @* Toolbar - only visible in Write mode *@
-            @if (_activeTab == "write")
+            @if (objActiveTab == "write")
             {
                 <div class="flex items-center gap-1 ml-auto">
                     @* Heading dropdown *@
@@ -43,19 +43,19 @@
                         <DropdownMenuContent Align="PopoverAlign.Start" Class="w-40">
                             <DropdownMenuLabel>Text Style</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem OnClick="@(() => ApplyHeading(0))">
+                            <DropdownMenuItem OnClick="@(() => ApplyHeadingAsync(0))">
                                 <LucideIcon Name="pilcrow" Size="14" Class="mr-2" />
                                 Normal
                             </DropdownMenuItem>
-                            <DropdownMenuItem OnClick="@(() => ApplyHeading(1))">
+                            <DropdownMenuItem OnClick="@(() => ApplyHeadingAsync(1))">
                                 <LucideIcon Name="heading-1" Size="14" Class="mr-2" />
                                 Heading 1
                             </DropdownMenuItem>
-                            <DropdownMenuItem OnClick="@(() => ApplyHeading(2))">
+                            <DropdownMenuItem OnClick="@(() => ApplyHeadingAsync(2))">
                                 <LucideIcon Name="heading-2" Size="14" Class="mr-2" />
                                 Heading 2
                             </DropdownMenuItem>
-                            <DropdownMenuItem OnClick="@(() => ApplyHeading(3))">
+                            <DropdownMenuItem OnClick="@(() => ApplyHeadingAsync(3))">
                                 <LucideIcon Name="heading-3" Size="14" Class="mr-2" />
                                 Heading 3
                             </DropdownMenuItem>
@@ -67,7 +67,7 @@
                         <Button Variant="ButtonVariant.Ghost"
                                 Size="ButtonSize.IconSmall"
                                 AriaLabel="Bold (Ctrl+B)"
-                                OnClick="ApplyBold"
+                                OnClick="ApplyBoldAsync"
                                 Disabled="@Disabled"
                                 Class="h-7 w-7">
                             <LucideIcon Name="bold" Size="14" />
@@ -75,7 +75,7 @@
                         <Button Variant="ButtonVariant.Ghost"
                                 Size="ButtonSize.IconSmall"
                                 AriaLabel="Italic (Ctrl+I)"
-                                OnClick="ApplyItalic"
+                                OnClick="ApplyItalicAsync"
                                 Disabled="@Disabled"
                                 Class="h-7 w-7">
                             <LucideIcon Name="italic" Size="14" />
@@ -83,7 +83,7 @@
                         <Button Variant="ButtonVariant.Ghost"
                                 Size="ButtonSize.IconSmall"
                                 AriaLabel="Underline (Ctrl+U)"
-                                OnClick="ApplyUnderline"
+                                OnClick="ApplyUnderlineAsync"
                                 Disabled="@Disabled"
                                 Class="h-7 w-7">
                             <LucideIcon Name="underline" Size="14" />
@@ -97,7 +97,7 @@
                         <Button Variant="ButtonVariant.Ghost"
                                 Size="ButtonSize.IconSmall"
                                 AriaLabel="Bullet list"
-                                OnClick="ApplyBulletList"
+                                OnClick="ApplyBulletListAsync"
                                 Disabled="@Disabled"
                                 Class="h-7 w-7">
                             <LucideIcon Name="list" Size="14" />
@@ -105,7 +105,7 @@
                         <Button Variant="ButtonVariant.Ghost"
                                 Size="ButtonSize.IconSmall"
                                 AriaLabel="Numbered list"
-                                OnClick="ApplyNumberedList"
+                                OnClick="ApplyNumberedListAsync"
                                 Disabled="@Disabled"
                                 Class="h-7 w-7">
                             <LucideIcon Name="list-ordered" Size="14" />
@@ -117,7 +117,7 @@
 
         @* Content area *@
         <TabsContent Value="write" Class="mt-0">
-            <textarea @ref="_textareaRef"
+            <textarea @ref="objTextareaRef"
                       id="@Id"
                       class="@TextareaCssClass"
                       value="@Value"
@@ -128,7 +128,7 @@
                       aria-invalid="@(AriaInvalid?.ToString().ToLower())"
                       @oninput="HandleInput"
                       @onkeydown="HandleKeyDown"
-                      @onkeydown:preventDefault="_shouldPreventKeydown"></textarea>
+                      @onkeydown:preventDefault="objShouldPreventKeydown"></textarea>
         </TabsContent>
 
         <TabsContent Value="preview" Class="mt-0">

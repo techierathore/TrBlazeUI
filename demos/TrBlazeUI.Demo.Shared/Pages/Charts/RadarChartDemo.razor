@@ -25,11 +25,11 @@
         <div class="max-w-lg mx-auto">
             <ChartContainer>
                 <RadarChart TItem="SkillScore"
-                            Items="@_skillData"
+                            Items="@objSkillData"
                             Variant="RadarChartVariant.Default"
                             Height="350px">
                     <ApexPointSeries TItem="SkillScore"
-                                     Items="@_skillData"
+                                     Items="@objSkillData"
                                      Name="Score"
                                      SeriesType="SeriesType.Radar"
                                      XValue="@(item => item.Skill)"
@@ -50,11 +50,11 @@
         <div class="max-w-lg mx-auto">
             <ChartContainer>
                 <RadarChart TItem="SkillScore"
-                            Items="@_skillData"
+                            Items="@objSkillData"
                             Variant="RadarChartVariant.PolygonFill"
                             Height="350px">
                     <ApexPointSeries TItem="SkillScore"
-                                     Items="@_skillData"
+                                     Items="@objSkillData"
                                      Name="Score"
                                      SeriesType="SeriesType.Radar"
                                      XValue="@(item => item.Skill)"
@@ -75,17 +75,17 @@
         <div class="max-w-lg mx-auto">
             <ChartContainer>
                 <RadarChart TItem="SkillScore"
-                            Items="@_skillData"
+                            Items="@objSkillData"
                             Variant="RadarChartVariant.MultiSeries"
                             Height="350px">
                     <ApexPointSeries TItem="SkillScore"
-                                     Items="@_skillData"
+                                     Items="@objSkillData"
                                      Name="Developer A"
                                      SeriesType="SeriesType.Radar"
                                      XValue="@(item => item.Skill)"
                                      YValue="@(item => (decimal)item.Score)" />
                     <ApexPointSeries TItem="SkillScore"
-                                     Items="@_skillDataB"
+                                     Items="@objSkillDataB"
                                      Name="Developer B"
                                      SeriesType="SeriesType.Radar"
                                      XValue="@(item => item.Skill)"
@@ -106,12 +106,12 @@
         <div class="max-w-lg mx-auto">
             <ChartContainer>
                 <RadarChart TItem="SkillScore"
-                            Items="@_skillData"
+                            Items="@objSkillData"
                             Variant="RadarChartVariant.PolygonFill"
                             ShowMarkers="false"
                             Height="350px">
                     <ApexPointSeries TItem="SkillScore"
-                                     Items="@_skillData"
+                                     Items="@objSkillData"
                                      Name="Score"
                                      SeriesType="SeriesType.Radar"
                                      XValue="@(item => item.Skill)"
@@ -177,7 +177,7 @@
         public int Score { get; set; }
     }
 
-    private List<SkillScore> _skillData =
+    private List<SkillScore> objSkillData =
     [
         new() { Skill = "HTML", Score = 90 },
         new() { Skill = "CSS", Score = 85 },
@@ -187,7 +187,7 @@
         new() { Skill = "Node.js", Score = 65 }
     ];
 
-    private List<SkillScore> _skillDataB =
+    private List<SkillScore> objSkillDataB =
     [
         new() { Skill = "HTML", Score = 75 },
         new() { Skill = "CSS", Score = 90 },

@@ -83,7 +83,7 @@ public partial class LineChart<TItem> : ChartBase<TItem> where TItem : class
     [Parameter]
     public int MarkerSize { get; set; } = 4;
 
-    private ApexChartOptions<TItem> _options = new();
+    private ApexChartOptions<TItem> objOptions = new();
 
     /// <summary>
     /// Gets the computed CSS classes for the chart container.
@@ -101,10 +101,10 @@ public partial class LineChart<TItem> : ChartBase<TItem> where TItem : class
 
     private void ConfigureOptions()
     {
-        _options = CreateBaseOptions();
+        objOptions = CreateBaseOptions();
 
         // Configure stroke based on variant
-        _options.Stroke = new Stroke
+        objOptions.Stroke = new Stroke
         {
             Curve = GetCurveType(),
             Width = StrokeWidth,
@@ -112,7 +112,7 @@ public partial class LineChart<TItem> : ChartBase<TItem> where TItem : class
         };
 
         // Configure markers
-        _options.Markers = new Markers
+        objOptions.Markers = new Markers
         {
             Size = ShowMarkers ? MarkerSize : 0,
             StrokeWidth = 0,
@@ -123,12 +123,12 @@ public partial class LineChart<TItem> : ChartBase<TItem> where TItem : class
         };
 
         // Set colors from config or defaults
-        _options.Colors = ChartColor.DefaultColors.ToList();
+        objOptions.Colors = ChartColor.DefaultColors.ToList();
 
         // Configure fill for gradient variant
         if (Variant == LineChartVariant.Gradient)
         {
-            _options.Fill = new Fill
+            objOptions.Fill = new Fill
             {
                 Type = FillType.Gradient,
                 Gradient = new FillGradient
@@ -142,14 +142,14 @@ public partial class LineChart<TItem> : ChartBase<TItem> where TItem : class
         }
 
         // Grid styling
-        _options.Grid = new Grid
+        objOptions.Grid = new Grid
         {
             BorderColor = "var(--border)",
             StrokeDashArray = 4
         };
 
         // X-Axis styling
-        _options.Xaxis = new XAxis
+        objOptions.Xaxis = new XAxis
         {
             Labels = new XAxisLabels
             {
@@ -173,7 +173,7 @@ public partial class LineChart<TItem> : ChartBase<TItem> where TItem : class
         };
 
         // Y-Axis styling
-        _options.Yaxis =
+        objOptions.Yaxis =
         [
             new YAxis
             {

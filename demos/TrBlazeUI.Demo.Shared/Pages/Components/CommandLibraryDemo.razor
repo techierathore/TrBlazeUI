@@ -65,7 +65,7 @@
     </section>
 </div>
 
-@if (_isOpen)
+@if (objIsOpen)
 {
     <div class="fixed inset-0 z-50 flex items-start justify-center pt-[10vh]" @onkeydown="HandleKeyDown">
         <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @onclick="CloseModal"></div>
@@ -160,8 +160,8 @@
 }
 
 @code {
-    private bool _isOpen;
-    private DotNetObjectReference<CommandLibraryDemo>? _dotNetRef;
+    private bool objIsOpen;
+    private DotNetObjectReference<CommandLibraryDemo>? objDotNetRef;
 
     // Primitives list (must be defined before TotalItemCount)
     private static readonly LibraryItem[] Primitives = new[]
@@ -267,7 +267,7 @@
     {
         if (firstRender)
         {
-            _dotNetRef = DotNetObjectReference.Create(this);
+            objDotNetRef = DotNetObjectReference.Create(this);
 
             await JS.InvokeVoidAsync("eval", @"
                 if (window.commandLibraryKeyHandler) {
@@ -287,32 +287,32 @@
                 };
             ");
 
-            await JS.InvokeVoidAsync("registerCommandLibraryRef", _dotNetRef);
+            await JS.InvokeVoidAsync("registerCommandLibraryRef", objDotNetRef);
         }
     }
 
     [JSInvokable]
     public void OpenCommandLibrary()
     {
-        _isOpen = true;
+        objIsOpen = true;
         StateHasChanged();
     }
 
     private void OpenModal()
     {
-        _isOpen = true;
+        objIsOpen = true;
     }
 
     private void CloseModal()
     {
-        _isOpen = false;
+        objIsOpen = false;
     }
 
     private void HandleKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Escape")
         {
-            _isOpen = false;
+            objIsOpen = false;
         }
     }
 
@@ -320,7 +320,7 @@
     {
         if (!string.IsNullOrEmpty(value))
         {
-            _isOpen = false;
+            objIsOpen = false;
             NavigationManager.NavigateTo(value);
         }
     }
@@ -338,7 +338,7 @@
             await JS.InvokeVoidAsync("eval", "document.removeEventListener('keydown', window.commandLibraryKeyHandler);");
         }
         catch { }
-        _dotNetRef?.Dispose();
+        objDotNetRef?.Dispose();
     }
 
     private record LibraryItem(string Name, string Url, string Icon);

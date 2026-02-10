@@ -36,7 +36,7 @@ namespace TrBlazeUI.Components.Chart;
 /// </example>
 public class ChartConfig : IEnumerable<KeyValuePair<string, ChartSeriesConfig>>
 {
-    private readonly Dictionary<string, ChartSeriesConfig> _configs = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, ChartSeriesConfig> objConfigs = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Gets the series configuration for the specified key.
@@ -45,16 +45,16 @@ public class ChartConfig : IEnumerable<KeyValuePair<string, ChartSeriesConfig>>
     /// <returns>The configuration for the series, or null if not found.</returns>
     public ChartSeriesConfig? this[string key]
     {
-        get => _configs.TryGetValue(key, out var config) ? config : null;
+        get => objConfigs.TryGetValue(key, out var config) ? config : null;
         set
         {
             if (value != null)
             {
-                _configs[key] = value;
+                objConfigs[key] = value;
             }
             else
             {
-                _configs.Remove(key);
+                objConfigs.Remove(key);
             }
         }
     }
@@ -65,7 +65,7 @@ public class ChartConfig : IEnumerable<KeyValuePair<string, ChartSeriesConfig>>
     /// <param name="key">The series key that matches data property names.</param>
     /// <param name="config">The configuration for the series.</param>
     public void Add(string key, ChartSeriesConfig config) =>
-        _configs[key] = config;
+        objConfigs[key] = config;
 
     /// <summary>
     /// Gets the label for a series key, returning the key itself if not configured.
@@ -74,7 +74,7 @@ public class ChartConfig : IEnumerable<KeyValuePair<string, ChartSeriesConfig>>
     /// <returns>The configured label or the key as a fallback.</returns>
     public string GetLabel(string key)
     {
-        return _configs.TryGetValue(key, out var config) && !string.IsNullOrEmpty(config.Label)
+        return objConfigs.TryGetValue(key, out var config) && !string.IsNullOrEmpty(config.Label)
             ? config.Label
             : key;
     }
@@ -87,7 +87,7 @@ public class ChartConfig : IEnumerable<KeyValuePair<string, ChartSeriesConfig>>
     /// <returns>The configured color or a default chart color.</returns>
     public string GetColor(string key, int index = 0)
     {
-        if (_configs.TryGetValue(key, out var config) && !string.IsNullOrEmpty(config.Color))
+        if (objConfigs.TryGetValue(key, out var config) && !string.IsNullOrEmpty(config.Color))
         {
             return config.Color;
         }
@@ -98,19 +98,19 @@ public class ChartConfig : IEnumerable<KeyValuePair<string, ChartSeriesConfig>>
     /// <summary>
     /// Gets all configured series keys.
     /// </summary>
-    public IEnumerable<string> Keys => _configs.Keys;
+    public IEnumerable<string> Keys => objConfigs.Keys;
 
     /// <summary>
     /// Gets the number of configured series.
     /// </summary>
-    public int Count => _configs.Count;
+    public int Count => objConfigs.Count;
 
     /// <summary>
     /// Checks if a series key is configured.
     /// </summary>
     /// <param name="key">The series key to check.</param>
     /// <returns>True if the key is configured, false otherwise.</returns>
-    public bool ContainsKey(string key) => _configs.ContainsKey(key);
+    public bool ContainsKey(string key) => objConfigs.ContainsKey(key);
 
     /// <summary>
     /// Creates a ChartConfig from a collection of key-value pairs.
@@ -157,7 +157,7 @@ public class ChartConfig : IEnumerable<KeyValuePair<string, ChartSeriesConfig>>
     }
 
     public IEnumerator<KeyValuePair<string, ChartSeriesConfig>> GetEnumerator() =>
-        _configs.GetEnumerator();
+        objConfigs.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() =>
         GetEnumerator();

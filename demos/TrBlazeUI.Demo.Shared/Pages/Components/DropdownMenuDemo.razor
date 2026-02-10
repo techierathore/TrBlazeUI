@@ -176,13 +176,13 @@
 @@implements IAsyncDisposable
 
 @@code {
-    private IDisposable? _shortcutNew;
+    private IDisposable? objShortcutNew;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _shortcutNew = await KeyboardShortcuts.RegisterAsync(
+            objShortcutNew = await KeyboardShortcuts.RegisterAsync(
                 "Ctrl+Shift+N", HandleNewFile);
         }
     }
@@ -195,7 +195,7 @@
 
     public ValueTask DisposeAsync()
     {
-        _shortcutNew?.Dispose();
+        objShortcutNew?.Dispose();
         return ValueTask.CompletedTask;
     }
 }</code></pre>
@@ -492,21 +492,21 @@
     private bool fullScreen = false;
 
     // Keyboard shortcut registrations
-    private IDisposable? _shortcutNew;
-    private IDisposable? _shortcutOpen;
-    private IDisposable? _shortcutSave;
-    private IDisposable? _shortcutSaveAs;
-    private CancellationTokenSource? _clearCts;
+    private IDisposable? objShortcutNew;
+    private IDisposable? objShortcutOpen;
+    private IDisposable? objShortcutSave;
+    private IDisposable? objShortcutSaveAs;
+    private CancellationTokenSource? objClearCts;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             // Register keyboard shortcuts
-            _shortcutNew = await KeyboardShortcuts.RegisterAsync("Ctrl+Shift+N", () => HandleShortcutAsync("New File"));
-            _shortcutOpen = await KeyboardShortcuts.RegisterAsync("Ctrl+O", () => HandleShortcutAsync("Open"));
-            _shortcutSave = await KeyboardShortcuts.RegisterAsync("Ctrl+S", () => HandleShortcutAsync("Save"));
-            _shortcutSaveAs = await KeyboardShortcuts.RegisterAsync("Ctrl+Shift+S", () => HandleShortcutAsync("Save As"));
+            objShortcutNew = await KeyboardShortcuts.RegisterAsync("Ctrl+Shift+N", () => HandleShortcutAsync("New File"));
+            objShortcutOpen = await KeyboardShortcuts.RegisterAsync("Ctrl+O", () => HandleShortcutAsync("Open"));
+            objShortcutSave = await KeyboardShortcuts.RegisterAsync("Ctrl+S", () => HandleShortcutAsync("Save"));
+            objShortcutSaveAs = await KeyboardShortcuts.RegisterAsync("Ctrl+Shift+S", () => HandleShortcutAsync("Save As"));
         }
     }
 
@@ -516,13 +516,13 @@
         await InvokeAsync(StateHasChanged);
 
         // Cancel any previous clear timer
-        _clearCts?.Cancel();
-        _clearCts = new CancellationTokenSource();
+        objClearCts?.Cancel();
+        objClearCts = new CancellationTokenSource();
 
         // Clear after 2 seconds
         try
         {
-            await Task.Delay(2000, _clearCts.Token);
+            await Task.Delay(2000, objClearCts.Token);
             shortcutsAction = null;
             await InvokeAsync(StateHasChanged);
         }
@@ -553,12 +553,12 @@
 
     public ValueTask DisposeAsync()
     {
-        _clearCts?.Cancel();
-        _clearCts?.Dispose();
-        _shortcutNew?.Dispose();
-        _shortcutOpen?.Dispose();
-        _shortcutSave?.Dispose();
-        _shortcutSaveAs?.Dispose();
+        objClearCts?.Cancel();
+        objClearCts?.Dispose();
+        objShortcutNew?.Dispose();
+        objShortcutOpen?.Dispose();
+        objShortcutSave?.Dispose();
+        objShortcutSaveAs?.Dispose();
         return ValueTask.CompletedTask;
     }
 }

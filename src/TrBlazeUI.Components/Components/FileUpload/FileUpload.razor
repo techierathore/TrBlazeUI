@@ -9,20 +9,20 @@
 
 <div class="@ContainerClass">
     @* Dropzone *@
-    <div @ref="_dropzoneRef"
+    <div @ref="objDropzoneRef"
          class="@DropzoneClass"
          @ondragenter="HandleDragEnter"
          @ondragleave="HandleDragLeave"
          @ondragover="HandleDragOver"
          @ondragover:preventDefault="true">
 
-        <InputFile @ref="_inputFile"
+        <InputFile @ref="objInputFile"
                    OnChange="HandleFileSelected"
                    accept="@Accept"
                    multiple="@Multiple"
                    disabled="@Disabled"
                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                   id="@_inputId" />
+                   id="@objInputId" />
 
         @if (DropzoneContent != null)
         {
@@ -36,7 +36,7 @@
                 </div>
                 <div class="text-center">
                     <p class="text-sm font-medium">
-                        @if (_isDragging)
+                        @if (objIsDragging)
                         {
                             <span>Drop files here</span>
                         }
@@ -67,10 +67,10 @@
     </div>
 
     @* File List *@
-    @if (_files.Count > 0)
+    @if (objFiles.Count > 0)
     {
         <div class="mt-4 space-y-2">
-            @foreach (var file in _files)
+            @foreach (var file in objFiles)
             {
                 <div class="@FileItemClass">
                     @* Preview or Icon *@
@@ -110,10 +110,10 @@
     }
 
     @* Validation Errors *@
-    @if (_errors.Count > 0)
+    @if (objErrors.Count > 0)
     {
         <div class="mt-2 space-y-1">
-            @foreach (var error in _errors)
+            @foreach (var error in objErrors)
             {
                 <p class="text-sm text-destructive flex items-center gap-1">
                     <LucideIcon Name="alert-circle" Class="h-4 w-4" />
@@ -125,15 +125,15 @@
 </div>
 
 @code {
-    private InputFile? _inputFile;
-    private ElementReference _dropzoneRef;
-    private string _inputId = $"file-upload-{Guid.NewGuid():N}";
-    private bool _isDragging;
-    private bool _jsInitialized;
-    private List<FileUploadItem> _files = new();
-    private List<FileValidationError> _errors = new();
-    private IJSObjectReference? _jsModule;
-    private IJSObjectReference? _jsCleanup;
+    private InputFile? objInputFile;
+    private ElementReference objDropzoneRef;
+    private string objInputId = $"file-upload-{Guid.NewGuid():N}";
+    private bool objIsDragging;
+    private bool objJsInitialized;
+    private List<FileUploadItem> objFiles = new();
+    private List<FileValidationError> objErrors = new();
+    private IJSObjectReference? objJsModule;
+    private IJSObjectReference? objJsCleanup;
 
     /// <summary>
     /// Gets or sets the selected files.
@@ -203,26 +203,26 @@
 
     protected override void OnParametersSet()
     {
-        if (Files != null && !ReferenceEquals(Files, _files))
+        if (Files != null && !ReferenceEquals(Files, objFiles))
         {
-            _files = Files.ToList();
+            objFiles = Files.ToList();
         }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && !_jsInitialized && _inputFile != null)
+        if (firstRender && !objJsInitialized && objInputFile != null)
         {
             try
             {
-                _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                objJsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "import", "./_content/TrBlazeUI.Components/js/file-upload.js");
 
                 // Get the underlying input element from InputFile
-                _jsCleanup = await _jsModule.InvokeAsync<IJSObjectReference>(
-                    "initializeDropZone", _dropzoneRef, _inputFile.Element);
+                objJsCleanup = await objJsModule.InvokeAsync<IJSObjectReference>(
+                    "initializeDropZone", objDropzoneRef, objInputFile.Element);
 
-                _jsInitialized = true;
+                objJsInitialized = true;
             }
             catch (JSDisconnectedException)
             {
@@ -237,21 +237,21 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (_jsCleanup != null)
+        if (objJsCleanup != null)
         {
             try
             {
-                await _jsCleanup.InvokeVoidAsync("dispose");
-                await _jsCleanup.DisposeAsync();
+                await objJsCleanup.InvokeVoidAsync("dispose");
+                await objJsCleanup.DisposeAsync();
             }
             catch (JSDisconnectedException) { }
         }
 
-        if (_jsModule != null)
+        if (objJsModule != null)
         {
             try
             {
-                await _jsModule.DisposeAsync();
+                await objJsModule.DisposeAsync();
             }
             catch (JSDisconnectedException) { }
         }
@@ -259,20 +259,20 @@
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
-        _errors.Clear();
+        objErrors.Clear();
         var filesToAdd = new List<FileUploadItem>();
 
-        foreach (var file in e.GetMultipleFiles(MaxFileCount + _files.Count))
+        foreach (var file in e.GetMultipleFiles(MaxFileCount + objFiles.Count))
         {
             var validationError = ValidateFile(file);
             if (validationError != null)
             {
-                _errors.Add(validationError);
+                objErrors.Add(validationError);
                 await OnValidationError.InvokeAsync(validationError);
                 continue;
             }
 
-            if (_files.Count + filesToAdd.Count >= MaxFileCount)
+            if (objFiles.Count + filesToAdd.Count >= MaxFileCount)
             {
                 var error = new FileValidationError
                 {
@@ -280,7 +280,7 @@
                     ErrorType = FileValidationErrorType.TooManyFiles,
                     Message = $"Maximum {MaxFileCount} files allowed"
                 };
-                _errors.Add(error);
+                objErrors.Add(error);
                 await OnValidationError.InvokeAsync(error);
                 break;
             }
@@ -313,10 +313,10 @@
         {
             if (!Multiple)
             {
-                _files.Clear();
+                objFiles.Clear();
             }
-            _files.AddRange(filesToAdd);
-            await FilesChanged.InvokeAsync(_files);
+            objFiles.AddRange(filesToAdd);
+            await FilesChanged.InvokeAsync(objFiles);
         }
     }
 
@@ -362,8 +362,8 @@
 
     private async Task RemoveFile(FileUploadItem file)
     {
-        _files.Remove(file);
-        await FilesChanged.InvokeAsync(_files);
+        objFiles.Remove(file);
+        await FilesChanged.InvokeAsync(objFiles);
     }
 
     private void TriggerFileInput()
@@ -384,12 +384,12 @@
     private void HandleDragEnter(DragEventArgs e)
     {
         if (Disabled) return;
-        _isDragging = true;
+        objIsDragging = true;
     }
 
     private void HandleDragLeave(DragEventArgs e)
     {
-        _isDragging = false;
+        objIsDragging = false;
     }
 
     private void HandleDragOver(DragEventArgs e)
@@ -399,7 +399,7 @@
 
     private void HandleDrop(DragEventArgs e)
     {
-        _isDragging = false;
+        objIsDragging = false;
         // The InputFile component handles the actual file drop
     }
 
@@ -437,7 +437,7 @@
         "w-full min-h-[150px] p-6",
         "border-2 border-dashed rounded-lg",
         "transition-colors cursor-pointer",
-        _isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-muted-foreground/50",
+        objIsDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-muted-foreground/50",
         Disabled ? "opacity-50 cursor-not-allowed" : null
     );
 

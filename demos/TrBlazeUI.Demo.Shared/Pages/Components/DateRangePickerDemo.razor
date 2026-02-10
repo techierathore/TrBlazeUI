@@ -21,11 +21,11 @@
                 Two-month view with preset date ranges.
             </p>
         </div>
-        <DateRangePicker @bind-Value="_basicRange" />
+        <DateRangePicker @bind-Value="objBasicRange" />
         <p class="text-sm text-muted-foreground">
-            @if (_basicRange != null)
+            @if (objBasicRange != null)
             {
-                @($"Selected: {_basicRange.Start:MMM d, yyyy} - {_basicRange.End:MMM d, yyyy} ({_basicRange.Days} days)")
+                @($"Selected: {objBasicRange.Start:MMM d, yyyy} - {objBasicRange.End:MMM d, yyyy} ({objBasicRange.Days} days)")
             }
             else
             {
@@ -42,11 +42,11 @@
                 Compact single calendar view.
             </p>
         </div>
-        <DateRangePicker @bind-Value="_singleMonth" ShowTwoMonths="false" />
+        <DateRangePicker @bind-Value="objSingleMonth" ShowTwoMonths="false" />
         <p class="text-sm text-muted-foreground">
-            @if (_singleMonth != null)
+            @if (objSingleMonth != null)
             {
-                @($"Selected: {_singleMonth.Days} days")
+                @($"Selected: {objSingleMonth.Days} days")
             }
         </p>
     </div>
@@ -59,7 +59,7 @@
                 Calendar only, no quick select presets.
             </p>
         </div>
-        <DateRangePicker @bind-Value="_noPresets" ShowPresets="false" />
+        <DateRangePicker @bind-Value="objNoPresets" ShowPresets="false" />
     </div>
 
     <!-- With Date Constraints -->
@@ -70,7 +70,7 @@
                 Only dates within the last 30 days are selectable.
             </p>
         </div>
-        <DateRangePicker @bind-Value="_constrained"
+        <DateRangePicker @bind-Value="objConstrained"
                          MinDate="@DateTime.Today.AddDays(-30)"
                          MaxDate="@DateTime.Today" />
     </div>
@@ -83,11 +83,11 @@
                 Range must be between 3 and 14 days.
             </p>
         </div>
-        <DateRangePicker @bind-Value="_minMaxDays" MinDays="3" MaxDays="14" />
+        <DateRangePicker @bind-Value="objMinMaxDays" MinDays="3" MaxDays="14" />
         <p class="text-sm text-muted-foreground">
-            @if (_minMaxDays != null)
+            @if (objMinMaxDays != null)
             {
-                @($"Selected: {_minMaxDays.Days} days (min: 3, max: 14)")
+                @($"Selected: {objMinMaxDays.Days} days (min: 3, max: 14)")
             }
         </p>
     </div>
@@ -100,7 +100,7 @@
                 Saturdays and Sundays are disabled.
             </p>
         </div>
-        <DateRangePicker @bind-Value="_noWeekends"
+        <DateRangePicker @bind-Value="objNoWeekends"
                          DisabledDates="@(date => date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)" />
     </div>
 
@@ -112,11 +112,11 @@
                 Initialized with last 7 days.
             </p>
         </div>
-        <DateRangePicker @bind-Value="_preselected" />
+        <DateRangePicker @bind-Value="objPreselected" />
         <p class="text-sm text-muted-foreground">
-            @if (_preselected != null)
+            @if (objPreselected != null)
             {
-                @($"Selected: {_preselected.Start:MMM d} - {_preselected.End:MMM d}")
+                @($"Selected: {objPreselected.Start:MMM d} - {objPreselected.End:MMM d}")
             }
         </p>
     </div>
@@ -129,7 +129,7 @@
                 Using ISO date format.
             </p>
         </div>
-        <DateRangePicker @bind-Value="_customFormat" DateFormat="yyyy-MM-dd" />
+        <DateRangePicker @bind-Value="objCustomFormat" DateFormat="yyyy-MM-dd" />
     </div>
 
     <!-- Custom Placeholder -->
@@ -137,7 +137,7 @@
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">Custom Placeholder</h2>
         </div>
-        <DateRangePicker @bind-Value="_placeholder" Placeholder="Choose booking dates" />
+        <DateRangePicker @bind-Value="objPlaceholder" Placeholder="Choose booking dates" />
     </div>
 
     <!-- Monday First -->
@@ -148,7 +148,7 @@
                 Week starts on Monday.
             </p>
         </div>
-        <DateRangePicker @bind-Value="_mondayFirst" FirstDayOfWeek="DayOfWeek.Monday" />
+        <DateRangePicker @bind-Value="objMondayFirst" FirstDayOfWeek="DayOfWeek.Monday" />
     </div>
 
     <!-- Disabled -->
@@ -201,14 +201,14 @@
 </div>
 
 @code {
-    private DateRange? _basicRange;
-    private DateRange? _singleMonth;
-    private DateRange? _noPresets;
-    private DateRange? _constrained;
-    private DateRange? _minMaxDays;
-    private DateRange? _noWeekends;
-    private DateRange? _preselected = new DateRange(DateTime.Today.AddDays(-6), DateTime.Today);
-    private DateRange? _customFormat;
-    private DateRange? _placeholder;
-    private DateRange? _mondayFirst;
+    private DateRange? objBasicRange;
+    private DateRange? objSingleMonth;
+    private DateRange? objNoPresets;
+    private DateRange? objConstrained;
+    private DateRange? objMinMaxDays;
+    private DateRange? objNoWeekends;
+    private DateRange? objPreselected = new DateRange(DateTime.Today.AddDays(-6), DateTime.Today);
+    private DateRange? objCustomFormat;
+    private DateRange? objPlaceholder;
+    private DateRange? objMondayFirst;
 }

@@ -10,7 +10,7 @@
     Date Picker component - combines a button trigger with a calendar popover.
 *@
 
-<Popover @bind-Open="_isOpen">
+<Popover @bind-Open="objIsOpen">
     <PopoverTrigger AsChild="true">
         <Button Variant="ButtonVariant.Outline"
                 Class="@ButtonCssClass">
@@ -36,7 +36,7 @@
 </Popover>
 
 @code {
-    private bool _isOpen;
+    private bool objIsOpen;
 
     /// <summary>
     /// The selected date value.
@@ -109,7 +109,7 @@
     {
         Value = date;
         await ValueChanged.InvokeAsync(date);
-        _isOpen = false;
+        objIsOpen = false;
     }
 
     /// <summary>

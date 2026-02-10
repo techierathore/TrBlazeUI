@@ -8,9 +8,9 @@ namespace TrBlazeUI.Demo.Services;
 /// </summary>
 public class ThemeService
 {
-    private readonly IJSRuntime _jsRuntime;
-    private bool _isDarkMode;
-    private bool _isInitialized;
+    private readonly IJSRuntime objJsRuntime;
+    private bool objIsDarkMode;
+    private bool objIsInitialized;
 
     /// <summary>
     /// Event raised when the theme changes.
@@ -20,11 +20,11 @@ public class ThemeService
     /// <summary>
     /// Gets whether dark mode is currently enabled.
     /// </summary>
-    public bool IsDarkMode => _isDarkMode;
+    public bool IsDarkMode => objIsDarkMode;
 
     public ThemeService(IJSRuntime jsRuntime)
     {
-        _jsRuntime = jsRuntime;
+        objJsRuntime = jsRuntime;
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ public class ThemeService
     /// </summary>
     public async Task InitializeAsync()
     {
-        if (_isInitialized)
+        if (objIsInitialized)
         {
             return;
         }
@@ -41,18 +41,18 @@ public class ThemeService
         try
         {
             // Try to load saved preference from localStorage
-            var savedTheme = await _jsRuntime.InvokeAsync<string?>("localStorage.getItem", "theme");
+            var savedTheme = await objJsRuntime.InvokeAsync<string?>("localStorage.getItem", "theme");
 
-            _isDarkMode = savedTheme == "dark";
-            await ApplyThemeAsync(_isDarkMode);
+            objIsDarkMode = savedTheme == "dark";
+            await ApplyThemeAsync(objIsDarkMode);
 
-            _isInitialized = true;
+            objIsInitialized = true;
         }
         catch
         {
             // If localStorage is not available (SSR), default to light mode
-            _isDarkMode = false;
-            _isInitialized = true;
+            objIsDarkMode = false;
+            objIsInitialized = true;
         }
     }
 
@@ -61,9 +61,9 @@ public class ThemeService
     /// </summary>
     public async Task ToggleThemeAsync()
     {
-        _isDarkMode = !_isDarkMode;
-        await ApplyThemeAsync(_isDarkMode);
-        await SaveThemeAsync(_isDarkMode);
+        objIsDarkMode = !objIsDarkMode;
+        await ApplyThemeAsync(objIsDarkMode);
+        await SaveThemeAsync(objIsDarkMode);
 
         OnThemeChanged?.Invoke();
     }
@@ -74,14 +74,14 @@ public class ThemeService
     /// <param name="isDark">True for dark mode, false for light mode.</param>
     public async Task SetThemeAsync(bool isDark)
     {
-        if (_isDarkMode == isDark)
+        if (objIsDarkMode == isDark)
         {
             return;
         }
 
-        _isDarkMode = isDark;
-        await ApplyThemeAsync(_isDarkMode);
-        await SaveThemeAsync(_isDarkMode);
+        objIsDarkMode = isDark;
+        await ApplyThemeAsync(objIsDarkMode);
+        await SaveThemeAsync(objIsDarkMode);
 
         OnThemeChanged?.Invoke();
     }
@@ -95,12 +95,12 @@ public class ThemeService
         {
             if (isDark)
             {
-                await _jsRuntime.InvokeVoidAsync("eval",
+                await objJsRuntime.InvokeVoidAsync("eval",
                     "document.documentElement.classList.add('dark')");
             }
             else
             {
-                await _jsRuntime.InvokeVoidAsync("eval",
+                await objJsRuntime.InvokeVoidAsync("eval",
                     "document.documentElement.classList.remove('dark')");
             }
         }
@@ -118,7 +118,7 @@ public class ThemeService
         try
         {
             var theme = isDark ? "dark" : "light";
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "theme", theme);
+            await objJsRuntime.InvokeVoidAsync("localStorage.setItem", "theme", theme);
         }
         catch
         {

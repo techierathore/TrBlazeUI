@@ -6,7 +6,7 @@ namespace TrBlazeUI.Components.Toast;
 /// </summary>
 public class ToastService
 {
-    private readonly List<ToastData> _toasts = new();
+    private readonly List<ToastData> objToasts = new();
 
     /// <summary>
     /// Event fired when the toast collection changes.
@@ -16,7 +16,7 @@ public class ToastService
     /// <summary>
     /// Gets the current list of toasts.
     /// </summary>
-    public IReadOnlyList<ToastData> Toasts => _toasts.AsReadOnly();
+    public IReadOnlyList<ToastData> Toasts => objToasts.AsReadOnly();
 
     /// <summary>
     /// Shows a toast notification.
@@ -24,7 +24,7 @@ public class ToastService
     /// <param name="toast">The toast data to display.</param>
     public void Show(ToastData toast)
     {
-        _toasts.Add(toast);
+        objToasts.Add(toast);
         OnChange?.Invoke();
     }
 
@@ -68,10 +68,10 @@ public class ToastService
     /// <param name="id">The toast ID to dismiss.</param>
     public void Dismiss(string id)
     {
-        var toast = _toasts.FirstOrDefault(t => t.Id == id);
+        var toast = objToasts.FirstOrDefault(t => t.Id == id);
         if (toast != null)
         {
-            _toasts.Remove(toast);
+            objToasts.Remove(toast);
             OnChange?.Invoke();
         }
     }
@@ -81,7 +81,7 @@ public class ToastService
     /// </summary>
     public void DismissAll()
     {
-        _toasts.Clear();
+        objToasts.Clear();
         OnChange?.Invoke();
     }
 }

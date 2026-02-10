@@ -22,22 +22,22 @@ public class ResponsiveNavState
 /// </summary>
 public class ResponsiveNavContext
 {
-    private ResponsiveNavState _state = new();
+    private ResponsiveNavState objState = new();
 
     /// <summary>
     /// Gets the current navigation state.
     /// </summary>
-    public ResponsiveNavState State => _state;
+    public ResponsiveNavState State => objState;
 
     /// <summary>
     /// Gets whether the mobile menu is currently open.
     /// </summary>
-    public bool OpenMobile => _state.OpenMobile;
+    public bool OpenMobile => objState.OpenMobile;
 
     /// <summary>
     /// Gets whether the current viewport is mobile.
     /// </summary>
-    public bool IsMobile => _state.IsMobile;
+    public bool IsMobile => objState.IsMobile;
 
     /// <summary>
     /// Event raised when the navigation state changes.
@@ -48,16 +48,16 @@ public class ResponsiveNavContext
     /// Toggles the mobile menu open/closed state.
     /// </summary>
     public void Toggle() =>
-        SetOpenMobile(!_state.OpenMobile);
+        SetOpenMobile(!objState.OpenMobile);
 
     /// <summary>
     /// Sets the mobile menu open state.
     /// </summary>
     public void SetOpenMobile(bool open)
     {
-        if (_state.OpenMobile != open)
+        if (objState.OpenMobile != open)
         {
-            _state.OpenMobile = open;
+            objState.OpenMobile = open;
             OnStateChanged();
         }
     }
@@ -68,13 +68,13 @@ public class ResponsiveNavContext
     /// </summary>
     public void SetIsMobile(bool isMobile)
     {
-        if (_state.IsMobile != isMobile)
+        if (objState.IsMobile != isMobile)
         {
-            _state.IsMobile = isMobile;
+            objState.IsMobile = isMobile;
             // Close mobile menu when switching to desktop
-            if (!isMobile && _state.OpenMobile)
+            if (!isMobile && objState.OpenMobile)
             {
-                _state.OpenMobile = false;
+                objState.OpenMobile = false;
             }
             OnStateChanged();
         }

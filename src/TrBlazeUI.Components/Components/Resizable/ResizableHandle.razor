@@ -27,7 +27,7 @@
     [Parameter]
     public string? Class { get; set; }
 
-    private int _handleIndex = -1;
+    private int objHandleIndex = -1;
 
     private bool IsHorizontal => Group?.GetDirection() == ResizableDirection.Horizontal;
 
@@ -35,15 +35,15 @@
     {
         if (Group != null)
         {
-            _handleIndex = Group.RegisterHandle();
+            objHandleIndex = Group.RegisterHandle();
         }
     }
 
     private async Task HandlePointerDown(PointerEventArgs e)
     {
-        if (Group != null && _handleIndex >= 0)
+        if (Group != null && objHandleIndex >= 0)
         {
-            await Group.StartResize(_handleIndex, e.ClientX, e.ClientY, e.PointerId);
+            await Group.StartResizeAsync(objHandleIndex, e.ClientX, e.ClientY, e.PointerId);
         }
     }
 

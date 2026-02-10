@@ -14,7 +14,7 @@
     </div>
 
     @* Drawer Content *@
-    <div @ref="_contentRef"
+    <div @ref="objContentRef"
          class="@CssClass"
          data-state="open"
          role="dialog"
@@ -51,24 +51,24 @@
     [Parameter]
     public bool CloseOnEscape { get; set; } = true;
 
-    private ElementReference _contentRef;
-    private IAsyncDisposable? _focusTrap;
-    private IJSObjectReference? _portalModule;
-    private IJSObjectReference? _scrollLockCleanup;
-    private bool _isInitialized;
+    private ElementReference objContentRef;
+    private IAsyncDisposable? objFocusTrap;
+    private IJSObjectReference? objPortalModule;
+    private IJSObjectReference? objScrollLockCleanup;
+    private bool objIsInitialized;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (Context?.IsOpen == true && !_isInitialized)
+        if (Context?.IsOpen == true && !objIsInitialized)
         {
-            _isInitialized = true;
+            objIsInitialized = true;
 
             // Set up focus trap
             if (TrapFocus)
             {
                 try
                 {
-                    _focusTrap = await FocusManager.TrapFocus(_contentRef);
+                    objFocusTrap = await FocusManager.TrapFocusAsync(objContentRef);
                 }
                 catch (Exception ex)
                 {
@@ -81,9 +81,9 @@
             {
                 try
                 {
-                    _portalModule = await JS.InvokeAsync<IJSObjectReference>(
+                    objPortalModule = await JS.InvokeAsync<IJSObjectReference>(
                         "import", "./_content/TrBlazeUI.Primitives/js/primitives/portal.js");
-                    _scrollLockCleanup = await _portalModule.InvokeAsync<IJSObjectReference>("lockBodyScroll");
+                    objScrollLockCleanup = await objPortalModule.InvokeAsync<IJSObjectReference>("lockBodyScroll");
                 }
                 catch (Exception ex)
                 {
@@ -91,7 +91,7 @@
                 }
             }
         }
-        else if (Context?.IsOpen != true && _isInitialized)
+        else if (Context?.IsOpen != true && objIsInitialized)
         {
             await CleanupAsync();
         }
@@ -101,7 +101,7 @@
     {
         if (Context != null)
         {
-            await Context.SetOpen(false);
+            await Context.SetOpenAsync(false);
         }
     }
 
@@ -109,52 +109,52 @@
     {
         if (e.Key == "Escape" && CloseOnEscape && Context != null)
         {
-            await Context.SetOpen(false);
+            await Context.SetOpenAsync(false);
         }
     }
 
     private async Task CleanupAsync()
     {
         // Dispose focus trap
-        if (_focusTrap != null)
+        if (objFocusTrap != null)
         {
             try
             {
-                await _focusTrap.DisposeAsync();
+                await objFocusTrap.DisposeAsync();
             }
             catch
             {
                 // Ignore disposal errors
             }
-            _focusTrap = null;
+            objFocusTrap = null;
         }
 
         // Unlock body scroll
-        if (_scrollLockCleanup != null)
+        if (objScrollLockCleanup != null)
         {
             try
             {
-                await _scrollLockCleanup.InvokeVoidAsync("apply");
+                await objScrollLockCleanup.InvokeVoidAsync("apply");
             }
             catch
             {
                 // Cleanup may already be disposed
             }
-            _scrollLockCleanup = null;
+            objScrollLockCleanup = null;
         }
 
-        _isInitialized = false;
+        objIsInitialized = false;
     }
 
     public async ValueTask DisposeAsync()
     {
         await CleanupAsync();
 
-        if (_portalModule != null)
+        if (objPortalModule != null)
         {
             try
             {
-                await _portalModule.DisposeAsync();
+                await objPortalModule.DisposeAsync();
             }
             catch
             {

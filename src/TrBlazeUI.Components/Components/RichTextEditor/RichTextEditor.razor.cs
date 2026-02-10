@@ -12,38 +12,38 @@ namespace TrBlazeUI.Components.RichTextEditor;
 public partial class RichTextEditor : ComponentBase, IAsyncDisposable
 {
     // === Private Fields ===
-    private ElementReference _editorRef;
-    private IJSObjectReference? _jsModule;
-    private DotNetObjectReference<RichTextEditor>? _dotNetRef;
-    private string _editorId = Guid.NewGuid().ToString("N");
-    private bool _jsInitialized;
-    private string? _lastKnownValue;
-    private bool _pendingValueUpdate;
+    private ElementReference objEditorRef;
+    private IJSObjectReference? objJsModule;
+    private DotNetObjectReference<RichTextEditor>? objDotNetRef;
+    private string objEditorId = Guid.NewGuid().ToString("N");
+    private bool objJsInitialized;
+    private string? objLastKnownValue;
+    private bool objPendingValueUpdate;
 
     // === Format State Tracking ===
-    private bool _isBold;
-    private bool _isItalic;
-    private bool _isUnderline;
-    private bool _isStrike;
-    private bool _isBulletList;
-    private bool _isOrderedList;
-    private bool _isBlockquote;
-    private bool _isCodeBlock;
-    private string _headerLevel = "";
+    private bool objIsBold;
+    private bool objIsItalic;
+    private bool objIsUnderline;
+    private bool objIsStrike;
+    private bool objIsBulletList;
+    private bool objIsOrderedList;
+    private bool objIsBlockquote;
+    private bool objIsCodeBlock;
+    private string objHeaderLevel = "";
 
     // === Link Dialog State ===
-    private bool _linkDialogOpen;
-    private string _linkUrl = "";
-    private string? _linkUrlError;
-    private bool _hasExistingLink;
-    private EditorRange? _savedSelection;
+    private bool objLinkDialogOpen;
+    private string objLinkUrl = "";
+    private string? objLinkUrlError;
+    private bool objHasExistingLink;
+    private EditorRange? objSavedSelection;
 
     // === ShouldRender Tracking ===
-    private string? _lastValue;
-    private bool _lastDisabled;
-    private bool _lastReadOnly;
-    private bool _lastLinkDialogOpen;
-    private bool _formatStateChanged;
+    private string? objLastValue;
+    private bool objLastDisabled;
+    private bool objLastReadOnly;
+    private bool objLastLinkDialogOpen;
+    private bool objFormatStateChanged;
 
     /// <summary>
     /// HTML sanitizer for XSS prevention. Thread-safe for static usage.
@@ -201,51 +201,51 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     protected override async Task OnParametersSetAsync()
     {
         // If Value changed externally, update the editor
-        if (_jsInitialized && Value != _lastKnownValue && !_pendingValueUpdate)
+        if (objJsInitialized && Value != objLastKnownValue && !objPendingValueUpdate)
         {
-            _pendingValueUpdate = true;
+            objPendingValueUpdate = true;
             try
             {
                 await SetHtmlAsync(Value);
-                _lastKnownValue = Value;
+                objLastKnownValue = Value;
             }
             finally
             {
-                _pendingValueUpdate = false;
+                objPendingValueUpdate = false;
             }
         }
     }
 
     private async Task InitializeJsAsync()
     {
-        if (_jsInitialized)
+        if (objJsInitialized)
         {
             return;
         }
 
         try
         {
-            _jsModule = await JS.InvokeAsync<IJSObjectReference>("import",
+            objJsModule = await JS.InvokeAsync<IJSObjectReference>("import",
                 "./_content/TrBlazeUI.Components/js/quill-interop.js");
-            _dotNetRef = DotNetObjectReference.Create(this);
+            objDotNetRef = DotNetObjectReference.Create(this);
 
             var options = BuildEditorOptions();
-            await _jsModule.InvokeVoidAsync("initializeEditor",
-                _editorRef, _dotNetRef, _editorId, options);
-            _jsInitialized = true;
+            await objJsModule.InvokeVoidAsync("initializeEditor",
+                objEditorRef, objDotNetRef, objEditorId, options);
+            objJsInitialized = true;
 
             // Set initial content (sanitized to prevent XSS)
             if (!string.IsNullOrEmpty(Value))
             {
                 var sanitized = Sanitizer.Sanitize(Value);
-                await _jsModule.InvokeVoidAsync("setHtml", _editorId, sanitized);
-                _lastKnownValue = Value;
+                await objJsModule.InvokeVoidAsync("setHtml", objEditorId, sanitized);
+                objLastKnownValue = Value;
             }
 
             // Apply disabled state
             if (Disabled)
             {
-                await _jsModule.InvokeVoidAsync("disable", _editorId);
+                await objJsModule.InvokeVoidAsync("disable", objEditorId);
             }
         }
         catch (Exception ex)
@@ -259,7 +259,7 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     [JSInvokable]
     public async Task OnTextChangeCallback(TextChangeEventArgs args)
     {
-        _lastKnownValue = args.Html;
+        objLastKnownValue = args.Html;
         Value = args.Html;
         await ValueChanged.InvokeAsync(args.Html);
 
@@ -342,7 +342,7 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
 
     private async Task ToggleFormatAsync(string format, object? value = null)
     {
-        if (_jsModule == null || !_jsInitialized || Disabled)
+        if (objJsModule == null || !objJsInitialized || Disabled)
         {
             return;
         }
@@ -350,26 +350,26 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
         // Toggle: if already active, remove; otherwise apply
         var isActive = format switch
         {
-            "bold" => _isBold,
-            "italic" => _isItalic,
-            "underline" => _isUnderline,
-            "strike" => _isStrike,
-            "blockquote" => _isBlockquote,
-            "code-block" => _isCodeBlock,
-            "list" when value?.ToString() == "bullet" => _isBulletList,
-            "list" when value?.ToString() == "ordered" => _isOrderedList,
+            "bold" => objIsBold,
+            "italic" => objIsItalic,
+            "underline" => objIsUnderline,
+            "strike" => objIsStrike,
+            "blockquote" => objIsBlockquote,
+            "code-block" => objIsCodeBlock,
+            "list" when value?.ToString() == "bullet" => objIsBulletList,
+            "list" when value?.ToString() == "ordered" => objIsOrderedList,
             _ => false
         };
 
         var newValue = isActive ? false : (value ?? true);
 
         // Use formatAndGetState for all formats to ensure immediate state sync
-        var formatState = await _jsModule.InvokeAsync<Dictionary<string, object?>>(
-            "formatAndGetState", _editorId, format, newValue);
+        var formatState = await objJsModule.InvokeAsync<Dictionary<string, object?>>(
+            "formatAndGetState", objEditorId, format, newValue);
         UpdateFormatState(formatState);
 
         // Refocus the editor after toolbar button click
-        await _jsModule.InvokeVoidAsync("focus", _editorId);
+        await objJsModule.InvokeVoidAsync("focus", objEditorId);
     }
 
     private void UpdateFormatState(Dictionary<string, object?> format)
@@ -379,21 +379,21 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
             return;
         }
 
-        _isBold = GetFormatBool(format, "bold");
-        _isItalic = GetFormatBool(format, "italic");
-        _isUnderline = GetFormatBool(format, "underline");
-        _isStrike = GetFormatBool(format, "strike");
-        _isBlockquote = GetFormatBool(format, "blockquote");
-        _isCodeBlock = GetFormatBool(format, "code-block");
+        objIsBold = GetFormatBool(format, "bold");
+        objIsItalic = GetFormatBool(format, "italic");
+        objIsUnderline = GetFormatBool(format, "underline");
+        objIsStrike = GetFormatBool(format, "strike");
+        objIsBlockquote = GetFormatBool(format, "blockquote");
+        objIsCodeBlock = GetFormatBool(format, "code-block");
 
         var listValue = GetFormatString(format, "list");
-        _isBulletList = listValue == "bullet";
-        _isOrderedList = listValue == "ordered";
+        objIsBulletList = listValue == "bullet";
+        objIsOrderedList = listValue == "ordered";
 
-        _headerLevel = GetFormatString(format, "header");
+        objHeaderLevel = GetFormatString(format, "header");
 
         // Mark format state as changed for ShouldRender optimization
-        _formatStateChanged = true;
+        objFormatStateChanged = true;
         StateHasChanged();
     }
 
@@ -403,18 +403,18 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     /// </summary>
     protected override bool ShouldRender()
     {
-        var valueChanged = _lastValue != Value;
-        var disabledChanged = _lastDisabled != Disabled;
-        var readOnlyChanged = _lastReadOnly != ReadOnly;
-        var dialogChanged = _lastLinkDialogOpen != _linkDialogOpen;
+        var valueChanged = objLastValue != Value;
+        var disabledChanged = objLastDisabled != Disabled;
+        var readOnlyChanged = objLastReadOnly != ReadOnly;
+        var dialogChanged = objLastLinkDialogOpen != objLinkDialogOpen;
 
-        if (valueChanged || disabledChanged || readOnlyChanged || dialogChanged || _formatStateChanged)
+        if (valueChanged || disabledChanged || readOnlyChanged || dialogChanged || objFormatStateChanged)
         {
-            _lastValue = Value;
-            _lastDisabled = Disabled;
-            _lastReadOnly = ReadOnly;
-            _lastLinkDialogOpen = _linkDialogOpen;
-            _formatStateChanged = false;
+            objLastValue = Value;
+            objLastDisabled = Disabled;
+            objLastReadOnly = ReadOnly;
+            objLastLinkDialogOpen = objLinkDialogOpen;
+            objFormatStateChanged = false;
             return true;
         }
 
@@ -423,86 +423,86 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
 
     private async Task HandleHeaderChangeAsync(string? value)
     {
-        if (_jsModule == null || !_jsInitialized || Disabled)
+        if (objJsModule == null || !objJsInitialized || Disabled)
         {
             return;
         }
 
-        _headerLevel = value ?? "";
+        objHeaderLevel = value ?? "";
 
         if (string.IsNullOrEmpty(value))
         {
-            await _jsModule.InvokeVoidAsync("format", _editorId, "header", false);
+            await objJsModule.InvokeVoidAsync("format", objEditorId, "header", false);
         }
         else
         {
-            await _jsModule.InvokeVoidAsync("format", _editorId, "header", int.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
+            await objJsModule.InvokeVoidAsync("format", objEditorId, "header", int.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
         }
 
         // Refocus the editor after dropdown change
-        await _jsModule.InvokeVoidAsync("focus", _editorId);
+        await objJsModule.InvokeVoidAsync("focus", objEditorId);
     }
 
     private async Task InsertLinkAsync()
     {
-        if (_jsModule == null || !_jsInitialized || Disabled)
+        if (objJsModule == null || !objJsInitialized || Disabled)
         {
             return;
         }
 
         // Save the current selection before opening dialog
-        _savedSelection = await GetSelectionAsync();
+        objSavedSelection = await GetSelectionAsync();
 
         // Check if there's already a link at the selection
-        var format = await _jsModule.InvokeAsync<Dictionary<string, object?>>("getFormat", _editorId);
+        var format = await objJsModule.InvokeAsync<Dictionary<string, object?>>("getFormat", objEditorId);
         object? linkValue = null;
-        _hasExistingLink = format != null && format.TryGetValue("link", out linkValue) && linkValue != null;
+        objHasExistingLink = format != null && format.TryGetValue("link", out linkValue) && linkValue != null;
 
-        if (_hasExistingLink)
+        if (objHasExistingLink)
         {
             if (linkValue is string existingUrl)
             {
-                _linkUrl = existingUrl;
+                objLinkUrl = existingUrl;
             }
             else if (linkValue is System.Text.Json.JsonElement je && je.ValueKind == System.Text.Json.JsonValueKind.String)
             {
-                _linkUrl = je.GetString() ?? "https://";
+                objLinkUrl = je.GetString() ?? "https://";
             }
             else
             {
-                _linkUrl = "https://";
+                objLinkUrl = "https://";
             }
         }
         else
         {
-            _linkUrl = "https://";
+            objLinkUrl = "https://";
         }
 
-        _linkUrlError = null;
-        _linkDialogOpen = true;
+        objLinkUrlError = null;
+        objLinkDialogOpen = true;
     }
 
     private void CloseLinkDialog()
     {
-        _linkDialogOpen = false;
-        _linkUrl = "";
-        _linkUrlError = null;
-        _savedSelection = null;
+        objLinkDialogOpen = false;
+        objLinkUrl = "";
+        objLinkUrlError = null;
+        objSavedSelection = null;
     }
 
     private void ValidateLinkUrl()
     {
-        if (string.IsNullOrWhiteSpace(_linkUrl) || _linkUrl == "https://")
+        if (string.IsNullOrWhiteSpace(objLinkUrl) || objLinkUrl == "https://")
         {
-            _linkUrlError = null;
+            objLinkUrlError = null;
         }
-        else if (!IsValidUrl(_linkUrl))
+        else if (!IsValidUrl(objLinkUrl))
         {
-            _linkUrlError = "Please enter a valid URL";
+            objLinkUrlError = "Please enter a valid URL";
         }
         else
         {
-            _linkUrlError = null;
+            objLinkUrlError = null;
         }
     }
 
@@ -519,40 +519,40 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
 
     private async Task ApplyLinkAsync()
     {
-        if (_jsModule == null || !_jsInitialized || !IsValidUrl(_linkUrl))
+        if (objJsModule == null || !objJsInitialized || !IsValidUrl(objLinkUrl))
         {
             return;
         }
 
         // Restore selection before applying link
-        if (_savedSelection != null)
+        if (objSavedSelection != null)
         {
-            await SetSelectionAsync(_savedSelection.Index, _savedSelection.Length);
+            await SetSelectionAsync(objSavedSelection.Index, objSavedSelection.Length);
         }
 
-        await _jsModule.InvokeVoidAsync("format", _editorId, "link", _linkUrl);
+        await objJsModule.InvokeVoidAsync("format", objEditorId, "link", objLinkUrl);
 
         CloseLinkDialog();
-        await _jsModule.InvokeVoidAsync("focus", _editorId);
+        await objJsModule.InvokeVoidAsync("focus", objEditorId);
     }
 
     private async Task RemoveLinkAsync()
     {
-        if (_jsModule == null || !_jsInitialized)
+        if (objJsModule == null || !objJsInitialized)
         {
             return;
         }
 
         // Restore selection before removing link
-        if (_savedSelection != null)
+        if (objSavedSelection != null)
         {
-            await SetSelectionAsync(_savedSelection.Index, _savedSelection.Length);
+            await SetSelectionAsync(objSavedSelection.Index, objSavedSelection.Length);
         }
 
-        await _jsModule.InvokeVoidAsync("format", _editorId, "link", false);
+        await objJsModule.InvokeVoidAsync("format", objEditorId, "link", false);
 
         CloseLinkDialog();
-        await _jsModule.InvokeVoidAsync("focus", _editorId);
+        await objJsModule.InvokeVoidAsync("focus", objEditorId);
     }
 
     // === Public API Methods ===
@@ -562,9 +562,9 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     /// </summary>
     public async Task FocusAsync()
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
-            await _jsModule.InvokeVoidAsync("focus", _editorId);
+            await objJsModule.InvokeVoidAsync("focus", objEditorId);
         }
     }
 
@@ -573,9 +573,9 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     /// </summary>
     public async Task BlurAsync()
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
-            await _jsModule.InvokeVoidAsync("blur", _editorId);
+            await objJsModule.InvokeVoidAsync("blur", objEditorId);
         }
     }
 
@@ -584,9 +584,9 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     /// </summary>
     public async Task<EditorRange?> GetSelectionAsync()
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
-            return await _jsModule.InvokeAsync<EditorRange?>("getSelection", _editorId);
+            return await objJsModule.InvokeAsync<EditorRange?>("getSelection", objEditorId);
         }
         return null;
     }
@@ -596,9 +596,9 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     /// </summary>
     public async Task SetSelectionAsync(int index, int length = 0)
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
-            await _jsModule.InvokeVoidAsync("setSelection", _editorId, index, length);
+            await objJsModule.InvokeVoidAsync("setSelection", objEditorId, index, length);
         }
     }
 
@@ -607,9 +607,9 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     /// </summary>
     public async Task FormatAsync(string formatName, object? value = null)
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
-            await _jsModule.InvokeVoidAsync("format", _editorId, formatName, value ?? true);
+            await objJsModule.InvokeVoidAsync("format", objEditorId, formatName, value ?? true);
         }
     }
 
@@ -618,9 +618,9 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     /// </summary>
     public async Task<string> GetTextAsync()
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
-            return await _jsModule.InvokeAsync<string>("getText", _editorId) ?? "";
+            return await objJsModule.InvokeAsync<string>("getText", objEditorId) ?? "";
         }
         return "";
     }
@@ -630,9 +630,9 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     /// </summary>
     public async Task<int> GetLengthAsync()
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
-            return await _jsModule.InvokeAsync<int>("getLength", _editorId);
+            return await objJsModule.InvokeAsync<int>("getLength", objEditorId);
         }
         return 0;
     }
@@ -642,9 +642,9 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     /// </summary>
     public async Task<string> GetHtmlAsync()
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
-            return await _jsModule.InvokeAsync<string>("getHtml", _editorId) ?? "";
+            return await objJsModule.InvokeAsync<string>("getHtml", objEditorId) ?? "";
         }
         return "";
     }
@@ -655,10 +655,10 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     /// </summary>
     public async Task SetHtmlAsync(string? html)
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
             var sanitized = string.IsNullOrEmpty(html) ? "" : Sanitizer.Sanitize(html);
-            await _jsModule.InvokeVoidAsync("setHtml", _editorId, sanitized);
+            await objJsModule.InvokeVoidAsync("setHtml", objEditorId, sanitized);
         }
     }
 
@@ -668,9 +668,9 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     /// </summary>
     public async Task<string> GetDeltaAsync()
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
-            return await _jsModule.InvokeAsync<string>("getContents", _editorId) ?? "{}";
+            return await objJsModule.InvokeAsync<string>("getContents", objEditorId) ?? "{}";
         }
         return "{}";
     }
@@ -681,15 +681,15 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     /// </summary>
     public async Task SetDeltaAsync(string? deltaJson)
     {
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
             if (string.IsNullOrEmpty(deltaJson))
             {
-                await _jsModule.InvokeVoidAsync("setContents", _editorId, "{\"ops\":[{\"insert\":\"\\n\"}]}");
+                await objJsModule.InvokeVoidAsync("setContents", objEditorId, "{\"ops\":[{\"insert\":\"\\n\"}]}");
             }
             else
             {
-                await _jsModule.InvokeVoidAsync("setContents", _editorId, deltaJson);
+                await objJsModule.InvokeVoidAsync("setContents", objEditorId, deltaJson);
             }
         }
     }
@@ -751,12 +751,12 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);
-        if (_jsModule != null && _jsInitialized)
+        if (objJsModule != null && objJsInitialized)
         {
             try
             {
-                await _jsModule.InvokeVoidAsync("disposeEditor", _editorId);
-                await _jsModule.DisposeAsync();
+                await objJsModule.InvokeVoidAsync("disposeEditor", objEditorId);
+                await objJsModule.DisposeAsync();
             }
             catch (JSDisconnectedException)
             {
@@ -771,6 +771,6 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
                 // JS interop not available (prerendering) - safe to ignore
             }
         }
-        _dotNetRef?.Dispose();
+        objDotNetRef?.Dispose();
     }
 }

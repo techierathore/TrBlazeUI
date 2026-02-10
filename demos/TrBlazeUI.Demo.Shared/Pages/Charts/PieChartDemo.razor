@@ -25,11 +25,11 @@
         <div class="max-w-md mx-auto">
             <ChartContainer>
                 <PieChart TItem="BrowserShare"
-                          Items="@_browserData"
+                          Items="@objBrowserData"
                           Variant="PieChartVariant.Pie"
                           Height="350px">
                     <ApexPointSeries TItem="BrowserShare"
-                                     Items="@_browserData"
+                                     Items="@objBrowserData"
                                      Name="Share"
                                      SeriesType="SeriesType.Pie"
                                      XValue="@(item => item.Browser)"
@@ -50,13 +50,13 @@
         <div class="max-w-md mx-auto">
             <ChartContainer>
                 <PieChart TItem="BrowserShare"
-                          Items="@_browserData"
+                          Items="@objBrowserData"
                           Variant="PieChartVariant.Donut"
                           CenterLabel="Browsers"
                           CenterValue="5"
                           Height="350px">
                     <ApexPointSeries TItem="BrowserShare"
-                                     Items="@_browserData"
+                                     Items="@objBrowserData"
                                      Name="Share"
                                      SeriesType="SeriesType.Donut"
                                      XValue="@(item => item.Browser)"
@@ -77,11 +77,11 @@
         <div class="max-w-md mx-auto">
             <ChartContainer>
                 <PieChart TItem="BrowserShare"
-                          Items="@_browserData"
+                          Items="@objBrowserData"
                           Variant="PieChartVariant.GradientDonut"
                           Height="350px">
                     <ApexPointSeries TItem="BrowserShare"
-                                     Items="@_browserData"
+                                     Items="@objBrowserData"
                                      Name="Share"
                                      SeriesType="SeriesType.Donut"
                                      XValue="@(item => item.Browser)"
@@ -102,14 +102,14 @@
         <div class="max-w-md mx-auto">
             <ChartContainer>
                 <PieChart TItem="BrowserShare"
-                          Items="@_browserData"
+                          Items="@objBrowserData"
                           Variant="PieChartVariant.Donut"
                           DonutSize="75"
                           CenterLabel="Total"
                           CenterValue="100%"
                           Height="350px">
                     <ApexPointSeries TItem="BrowserShare"
-                                     Items="@_browserData"
+                                     Items="@objBrowserData"
                                      Name="Share"
                                      SeriesType="SeriesType.Donut"
                                      XValue="@(item => item.Browser)"
@@ -175,7 +175,7 @@
         public double Percentage { get; set; }
     }
 
-    private List<BrowserShare> _browserData =
+    private List<BrowserShare> objBrowserData =
     [
         new() { Browser = "Chrome", Percentage = 63 },
         new() { Browser = "Safari", Percentage = 19 },

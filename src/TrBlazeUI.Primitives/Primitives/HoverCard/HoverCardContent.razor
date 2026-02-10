@@ -14,7 +14,7 @@
 {
     <FloatingPortal IsOpen="true"
                     AnchorElement="@Context.State.TriggerElement"
-                    PortalId="@_portalId"
+                    PortalId="@objPortalId"
                     Side="@Side"
                     Align="@Align"
                     Offset="@Offset"
@@ -62,8 +62,8 @@
     [Parameter]
     public int Offset { get; set; } = 4;
 
-    private System.Timers.Timer? _closeTimer;
-    private string _portalId = "";
+    private System.Timers.Timer? objCloseTimer;
+    private string objPortalId = "";
 
     protected override void OnInitialized()
     {
@@ -72,7 +72,7 @@
             throw new InvalidOperationException("HoverCardContent must be used within a HoverCard component.");
         }
 
-        _portalId = $"hovercard-portal-{Context.ContentId}";
+        objPortalId = $"hovercard-portal-{Context.ContentId}";
     }
 
     private RenderFragment RenderHoverCardContent() => __builder =>
@@ -107,9 +107,9 @@
     private void HandleMouseLeave()
     {
         // Close with delay when leaving content
-        _closeTimer?.Dispose();
-        _closeTimer = new System.Timers.Timer(Context.CloseDelay);
-        _closeTimer.Elapsed += (sender, e) =>
+        objCloseTimer?.Dispose();
+        objCloseTimer = new System.Timers.Timer(Context.CloseDelay);
+        objCloseTimer.Elapsed += (sender, e) =>
         {
             InvokeAsync(() =>
             {
@@ -117,17 +117,17 @@
                 StateHasChanged();
             });
         };
-        _closeTimer.AutoReset = false;
-        _closeTimer.Start();
+        objCloseTimer.AutoReset = false;
+        objCloseTimer.Start();
     }
 
     private void CancelCloseTimer()
     {
-        if (_closeTimer != null)
+        if (objCloseTimer != null)
         {
-            _closeTimer.Stop();
-            _closeTimer.Dispose();
-            _closeTimer = null;
+            objCloseTimer.Stop();
+            objCloseTimer.Dispose();
+            objCloseTimer = null;
         }
     }
 

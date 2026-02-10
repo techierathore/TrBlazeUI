@@ -4,12 +4,12 @@
 @implements IAsyncDisposable
 
 <input
-    @ref="_inputRef"
+    @ref="objInputRef"
     id="@Id"
     type="text"
     inputmode="@InputMode"
     class="@CssClass"
-    value="@_displayValue"
+    value="@objDisplayValue"
     @oninput="HandleInput"
     placeholder="@EffectivePlaceholder"
     disabled="@Disabled"

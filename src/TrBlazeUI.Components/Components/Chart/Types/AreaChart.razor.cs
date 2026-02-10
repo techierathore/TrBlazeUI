@@ -73,7 +73,7 @@ public partial class AreaChart<TItem> : ChartBase<TItem> where TItem : class
     [Parameter]
     public double FillOpacity { get; set; } = 0.4;
 
-    private ApexChartOptions<TItem> _options = new();
+    private ApexChartOptions<TItem> objOptions = new();
 
     /// <summary>
     /// Gets the computed CSS classes for the chart container.
@@ -91,17 +91,17 @@ public partial class AreaChart<TItem> : ChartBase<TItem> where TItem : class
 
     private void ConfigureOptions()
     {
-        _options = CreateBaseOptions();
+        objOptions = CreateBaseOptions();
 
         // Configure stroke based on variant
-        _options.Stroke = new Stroke
+        objOptions.Stroke = new Stroke
         {
             Curve = GetCurveType(),
             Width = StrokeWidth
         };
 
         // Configure fill with gradient
-        _options.Fill = new Fill
+        objOptions.Fill = new Fill
         {
             Type = FillType.Gradient,
             Gradient = new FillGradient
@@ -116,22 +116,22 @@ public partial class AreaChart<TItem> : ChartBase<TItem> where TItem : class
         // Configure stacking for stacked variant
         if (Variant == AreaChartVariant.Stacked)
         {
-            _options.Chart!.Stacked = true;
-            _options.Chart.StackType = StackType.Normal;
+            objOptions.Chart!.Stacked = true;
+            objOptions.Chart.StackType = StackType.Normal;
         }
 
         // Set colors from config or defaults
-        _options.Colors = ChartColor.DefaultColors.ToList();
+        objOptions.Colors = ChartColor.DefaultColors.ToList();
 
         // Grid styling
-        _options.Grid = new Grid
+        objOptions.Grid = new Grid
         {
             BorderColor = "var(--border)",
             StrokeDashArray = 4
         };
 
         // X-Axis styling
-        _options.Xaxis = new XAxis
+        objOptions.Xaxis = new XAxis
         {
             Labels = new XAxisLabels
             {
@@ -151,7 +151,7 @@ public partial class AreaChart<TItem> : ChartBase<TItem> where TItem : class
         };
 
         // Y-Axis styling
-        _options.Yaxis =
+        objOptions.Yaxis =
         [
             new YAxis
             {

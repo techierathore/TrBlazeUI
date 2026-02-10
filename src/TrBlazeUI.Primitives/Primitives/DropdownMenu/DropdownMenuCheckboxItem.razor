@@ -3,7 +3,7 @@
 @implements IDisposable
 
 @* Dropdown menu checkbox item - represents a toggleable menu item *@
-<div @ref="_itemRef"
+<div @ref="objItemRef"
      role="menuitemcheckbox"
      tabindex="@(Disabled ? -1 : -1)"
      aria-checked="@Checked.ToString().ToLower()"
@@ -24,7 +24,7 @@
     [CascadingParameter(Name = "DropdownMenuContentContext")]
     private DropdownMenuContent? ContentContext { get; set; }
 
-    private ElementReference _itemRef;
+    private ElementReference objItemRef;
 
     /// <summary>
     /// The content to display inside the menu item.
@@ -108,7 +108,7 @@
     {
         try
         {
-            await _itemRef.FocusAsync();
+            await objItemRef.FocusAsync();
         }
         catch
         {

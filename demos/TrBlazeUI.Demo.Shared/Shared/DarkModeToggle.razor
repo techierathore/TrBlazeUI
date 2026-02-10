@@ -5,7 +5,7 @@
 
 <div class="flex items-center gap-2">
     <LucideIcon Name="sun" Class="h-4 w-4 text-muted-foreground" />
-    <Switch Checked="@_isDarkMode"
+    <Switch Checked="@objIsDarkMode"
             CheckedChanged="@OnCheckedChanged"
             Size="SwitchSize.Small"
             AriaLabel="Toggle dark mode" />
@@ -13,13 +13,13 @@
 </div>
 
 @code {
-    private bool _isDarkMode;
+    private bool objIsDarkMode;
 
     protected override async Task OnInitializedAsync()
     {
         // Initialize theme service
         await ThemeService.InitializeAsync();
-        _isDarkMode = ThemeService.IsDarkMode;
+        objIsDarkMode = ThemeService.IsDarkMode;
 
         // Subscribe to theme changes
         ThemeService.OnThemeChanged += HandleThemeChanged;
@@ -27,13 +27,13 @@
 
     private async Task OnCheckedChanged(bool value)
     {
-        _isDarkMode = value;
+        objIsDarkMode = value;
         await ThemeService.SetThemeAsync(value);
     }
 
     private void HandleThemeChanged()
     {
-        _isDarkMode = ThemeService.IsDarkMode;
+        objIsDarkMode = ThemeService.IsDarkMode;
         InvokeAsync(StateHasChanged);
     }
 

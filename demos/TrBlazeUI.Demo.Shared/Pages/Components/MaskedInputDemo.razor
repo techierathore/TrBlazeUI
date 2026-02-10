@@ -22,10 +22,10 @@
             </p>
         </div>
         <div class="w-64">
-            <MaskedInput @ref="_phoneRef" @bind-Value="_phone" Preset="MaskPreset.Phone" />
+            <MaskedInput @ref="objPhoneRef" @bind-Value="objPhone" Preset="MaskPreset.Phone" />
         </div>
         <p class="text-sm text-muted-foreground">
-            Unmasked: @_phone | Masked: @(_phoneRef?.MaskedValue ?? "")
+            Unmasked: @objPhone | Masked: @(objPhoneRef?.MaskedValue ?? "")
         </p>
     </div>
 
@@ -38,9 +38,9 @@
             </p>
         </div>
         <div class="w-48">
-            <MaskedInput @bind-Value="_ssn" Preset="MaskPreset.SSN" />
+            <MaskedInput @bind-Value="objSsn" Preset="MaskPreset.SSN" />
         </div>
-        <p class="text-sm text-muted-foreground">Unmasked: @_ssn</p>
+        <p class="text-sm text-muted-foreground">Unmasked: @objSsn</p>
     </div>
 
     <!-- Credit Card -->
@@ -52,9 +52,9 @@
             </p>
         </div>
         <div class="w-72">
-            <MaskedInput @bind-Value="_creditCard" Preset="MaskPreset.CreditCard" />
+            <MaskedInput @bind-Value="objCreditCard" Preset="MaskPreset.CreditCard" />
         </div>
-        <p class="text-sm text-muted-foreground">Unmasked: @_creditCard</p>
+        <p class="text-sm text-muted-foreground">Unmasked: @objCreditCard</p>
     </div>
 
     <!-- Date -->
@@ -66,9 +66,9 @@
             </p>
         </div>
         <div class="w-40">
-            <MaskedInput @bind-Value="_date" Preset="MaskPreset.Date" />
+            <MaskedInput @bind-Value="objDate" Preset="MaskPreset.Date" />
         </div>
-        <p class="text-sm text-muted-foreground">Unmasked: @_date</p>
+        <p class="text-sm text-muted-foreground">Unmasked: @objDate</p>
     </div>
 
     <!-- Time -->
@@ -80,9 +80,9 @@
             </p>
         </div>
         <div class="w-32">
-            <MaskedInput @bind-Value="_time" Preset="MaskPreset.Time" />
+            <MaskedInput @bind-Value="objTime" Preset="MaskPreset.Time" />
         </div>
-        <p class="text-sm text-muted-foreground">Unmasked: @_time</p>
+        <p class="text-sm text-muted-foreground">Unmasked: @objTime</p>
     </div>
 
     <!-- Time with Seconds -->
@@ -94,9 +94,9 @@
             </p>
         </div>
         <div class="w-36">
-            <MaskedInput @bind-Value="_time24" Preset="MaskPreset.Time24" />
+            <MaskedInput @bind-Value="objTime24" Preset="MaskPreset.Time24" />
         </div>
-        <p class="text-sm text-muted-foreground">Unmasked: @_time24</p>
+        <p class="text-sm text-muted-foreground">Unmasked: @objTime24</p>
     </div>
 
     <!-- ZIP Code -->
@@ -108,9 +108,9 @@
             </p>
         </div>
         <div class="w-40">
-            <MaskedInput @bind-Value="_zipCode" Preset="MaskPreset.ZipCode" />
+            <MaskedInput @bind-Value="objZipCode" Preset="MaskPreset.ZipCode" />
         </div>
-        <p class="text-sm text-muted-foreground">Unmasked: @_zipCode</p>
+        <p class="text-sm text-muted-foreground">Unmasked: @objZipCode</p>
     </div>
 
     <!-- EIN -->
@@ -122,9 +122,9 @@
             </p>
         </div>
         <div class="w-40">
-            <MaskedInput @bind-Value="_ein" Preset="MaskPreset.EIN" />
+            <MaskedInput @bind-Value="objEin" Preset="MaskPreset.EIN" />
         </div>
-        <p class="text-sm text-muted-foreground">Unmasked: @_ein</p>
+        <p class="text-sm text-muted-foreground">Unmasked: @objEin</p>
     </div>
 
     <!-- Custom Mask -->
@@ -136,9 +136,9 @@
             </p>
         </div>
         <div class="w-40">
-            <MaskedInput @bind-Value="_custom" Preset="MaskPreset.Custom" Mask="AAA-9999" />
+            <MaskedInput @bind-Value="objCustom" Preset="MaskPreset.Custom" Mask="AAA-9999" />
         </div>
-        <p class="text-sm text-muted-foreground">Unmasked: @_custom</p>
+        <p class="text-sm text-muted-foreground">Unmasked: @objCustom</p>
     </div>
 
     <!-- License Plate -->
@@ -150,9 +150,9 @@
             </p>
         </div>
         <div class="w-40">
-            <MaskedInput @bind-Value="_plate" Preset="MaskPreset.Custom" Mask="***-****" />
+            <MaskedInput @bind-Value="objPlate" Preset="MaskPreset.Custom" Mask="***-****" />
         </div>
-        <p class="text-sm text-muted-foreground">Unmasked: @_plate</p>
+        <p class="text-sm text-muted-foreground">Unmasked: @objPlate</p>
     </div>
 
     <!-- Without Mask Display -->
@@ -164,9 +164,9 @@
             </p>
         </div>
         <div class="w-64">
-            <MaskedInput @bind-Value="_hiddenMask" Preset="MaskPreset.Phone" ShowMask="false" Placeholder="Enter phone number" />
+            <MaskedInput @bind-Value="objHiddenMask" Preset="MaskPreset.Phone" ShowMask="false" Placeholder="Enter phone number" />
         </div>
-        <p class="text-sm text-muted-foreground">Unmasked: @_hiddenMask</p>
+        <p class="text-sm text-muted-foreground">Unmasked: @objHiddenMask</p>
     </div>
 
     <!-- Custom Placeholder Char -->
@@ -178,9 +178,9 @@
             </p>
         </div>
         <div class="w-64">
-            <MaskedInput @bind-Value="_customPlaceholder" Preset="MaskPreset.Phone" PlaceholderChar="@('#')" />
+            <MaskedInput @bind-Value="objCustomPlaceholder" Preset="MaskPreset.Phone" PlaceholderChar="@('#')" />
         </div>
-        <p class="text-sm text-muted-foreground">Unmasked: @_customPlaceholder</p>
+        <p class="text-sm text-muted-foreground">Unmasked: @objCustomPlaceholder</p>
     </div>
 
     <!-- Pre-filled Value -->
@@ -192,9 +192,9 @@
             </p>
         </div>
         <div class="w-64">
-            <MaskedInput @bind-Value="_prefilled" Preset="MaskPreset.Phone" />
+            <MaskedInput @bind-Value="objPrefilled" Preset="MaskPreset.Phone" />
         </div>
-        <p class="text-sm text-muted-foreground">Unmasked: @_prefilled</p>
+        <p class="text-sm text-muted-foreground">Unmasked: @objPrefilled</p>
     </div>
 
     <!-- Disabled -->
@@ -245,19 +245,19 @@
 </div>
 
 @code {
-    private string _phone = "";
-    private string _ssn = "";
-    private string _creditCard = "";
-    private string _date = "";
-    private string _time = "";
-    private string _time24 = "";
-    private string _zipCode = "";
-    private string _ein = "";
-    private string _custom = "";
-    private string _plate = "";
-    private string _hiddenMask = "";
-    private string _customPlaceholder = "";
-    private string _prefilled = "5551234567";
+    private string objPhone = "";
+    private string objSsn = "";
+    private string objCreditCard = "";
+    private string objDate = "";
+    private string objTime = "";
+    private string objTime24 = "";
+    private string objZipCode = "";
+    private string objEin = "";
+    private string objCustom = "";
+    private string objPlate = "";
+    private string objHiddenMask = "";
+    private string objCustomPlaceholder = "";
+    private string objPrefilled = "5551234567";
 
-    private MaskedInput? _phoneRef;
+    private MaskedInput? objPhoneRef;
 }

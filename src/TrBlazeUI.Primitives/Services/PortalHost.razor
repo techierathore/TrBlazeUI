@@ -7,19 +7,19 @@
 @* Renders all registered portals at the document body level *@
 @{
     // Track which portals are being rendered in this cycle
-    _renderedThisCycle.Clear();
+    objRenderedThisCycle.Clear();
 }
 @foreach (var portal in PortalService.GetPortals())
 {
-    _renderedThisCycle.Add(portal.Key);
+    objRenderedThisCycle.Add(portal.Key);
     <div @key="portal.Key" data-portal-id="@portal.Key" class="trblazeui-portal" style="display: contents;">
         @portal.Value
     </div>
 }
 
 @code {
-    private HashSet<string> _renderedThisCycle = new();
-    private IJSObjectReference? _portalModule;
+    private HashSet<string> objRenderedThisCycle = new();
+    private IJSObjectReference? objPortalModule;
 
     protected override void OnInitialized()
     {
@@ -46,7 +46,7 @@
             // This ensures elements with data-autofocus are automatically focused when rendered
             try
             {
-                _portalModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                objPortalModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "import", "./_content/TrBlazeUI.Primitives/js/primitives/portal.js");
             }
             catch (JSDisconnectedException)
@@ -61,7 +61,7 @@
 
         // Notify all portals that were rendered this cycle
         // This signals to content components that their ElementRef is now valid
-        foreach (var portalId in _renderedThisCycle)
+        foreach (var portalId in objRenderedThisCycle)
         {
             PortalService.NotifyPortalRendered(portalId);
         }
@@ -71,11 +71,11 @@
     {
         PortalService.OnPortalsChanged -= HandlePortalsChanged;
 
-        if (_portalModule != null)
+        if (objPortalModule != null)
         {
             try
             {
-                await _portalModule.DisposeAsync();
+                await objPortalModule.DisposeAsync();
             }
             catch (JSDisconnectedException)
             {

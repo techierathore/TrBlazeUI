@@ -23,7 +23,7 @@
                 Only one item can be selected at a time.
             </p>
         </div>
-        <ToggleGroup TValue="string" @bind-Value="_alignment" Variant="ToggleVariant.Outline">
+        <ToggleGroup TValue="string" @bind-Value="objAlignment" Variant="ToggleVariant.Outline">
             <ToggleGroupItem TValue="string" Value="@("left")">
                 <LucideIcon Name="align-left" Class="h-4 w-4" />
             </ToggleGroupItem>
@@ -34,7 +34,7 @@
                 <LucideIcon Name="align-right" Class="h-4 w-4" />
             </ToggleGroupItem>
         </ToggleGroup>
-        <p class="text-sm text-muted-foreground">Selected: @(_alignment ?? "none")</p>
+        <p class="text-sm text-muted-foreground">Selected: @(objAlignment ?? "none")</p>
     </div>
 
     <!-- Multiple Selection -->
@@ -45,7 +45,7 @@
                 Multiple items can be selected at once.
             </p>
         </div>
-        <ToggleGroup TValue="string" @bind-Values="_formatting" Type="ToggleGroupType.Multiple" Variant="ToggleVariant.Outline">
+        <ToggleGroup TValue="string" @bind-Values="objFormatting" Type="ToggleGroupType.Multiple" Variant="ToggleVariant.Outline">
             <ToggleGroupItem TValue="string" Value="@("bold")">
                 <LucideIcon Name="bold" Class="h-4 w-4" />
             </ToggleGroupItem>
@@ -56,7 +56,7 @@
                 <LucideIcon Name="underline" Class="h-4 w-4" />
             </ToggleGroupItem>
         </ToggleGroup>
-        <p class="text-sm text-muted-foreground">Selected: @(string.Join(", ", _formatting ?? new List<string>()))</p>
+        <p class="text-sm text-muted-foreground">Selected: @(string.Join(", ", objFormatting ?? new List<string>()))</p>
     </div>
 
     <!-- Variants -->
@@ -223,6 +223,6 @@
 </div>
 
 @code {
-    private string? _alignment = "center";
-    private List<string>? _formatting = new() { "bold" };
+    private string? objAlignment = "center";
+    private List<string>? objFormatting = new() { "bold" };
 }

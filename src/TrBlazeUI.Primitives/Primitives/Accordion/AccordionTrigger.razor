@@ -5,7 +5,7 @@
     <button id="@Item.TriggerId"
             type="button"
             class="@Class"
-            aria-expanded="@_ariaExpanded"
+            aria-expanded="@objAriaExpanded"
             aria-controls="@Item.ContentId"
             data-state="@(Item.IsOpen ? "open" : "closed")"
             disabled="@Item.Disabled"
@@ -17,7 +17,7 @@
 </h3>
 
 @code {
-    private string _ariaExpanded => Item.IsOpen ? "true" : "false";
+    private string objAriaExpanded => Item.IsOpen ? "true" : "false";
 
     /// <summary>
     /// Cascading parameter to receive the parent accordion item.

@@ -8,14 +8,14 @@ namespace TrBlazeUI.Primitives.Services;
 /// </summary>
 public class KeyboardShortcutService : IKeyboardShortcutService
 {
-    private readonly IJSRuntime _jsRuntime;
-    private readonly Dictionary<string, ShortcutRegistration> _shortcuts = new();
-    private readonly SemaphoreSlim _moduleLock = new(1, 1);
-    private IJSObjectReference? _module;
-    private DotNetObjectReference<KeyboardShortcutService>? _dotNetRef;
-    private bool _suspended;
-    private bool _disposed;
-    private int _registrationCounter;
+    private readonly IJSRuntime objJsRuntime;
+    private readonly Dictionary<string, ShortcutRegistration> objShortcuts = new();
+    private readonly SemaphoreSlim objModuleLock = new(1, 1);
+    private IJSObjectReference? objModule;
+    private DotNetObjectReference<KeyboardShortcutService>? objDotNetRef;
+    private bool objSuspended;
+    private bool objDisposed;
+    private int objRegistrationCounter;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="KeyboardShortcutService"/> class.
@@ -23,37 +23,37 @@ public class KeyboardShortcutService : IKeyboardShortcutService
     /// <param name="jsRuntime">The JavaScript runtime for invoking keyboard handling functions.</param>
     public KeyboardShortcutService(IJSRuntime jsRuntime)
     {
-        _jsRuntime = jsRuntime;
+        objJsRuntime = jsRuntime;
     }
 
     /// <inheritdoc />
-    public bool IsSuspended => _suspended;
+    public bool IsSuspended => objSuspended;
 
     /// <inheritdoc />
     public async Task<IDisposable> RegisterAsync(string shortcut, Func<Task> callback)
     {
-        var id = $"shortcut_{Interlocked.Increment(ref _registrationCounter)}";
-        return await RegisterAsync(shortcut, callback, id);
+        var id = $"shortcut_{Interlocked.Increment(ref objRegistrationCounter)}";
+        return await RegisterAsync(shortcut, callback, id).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<IDisposable> RegisterAsync(string shortcut, Func<Task> callback, string id)
     {
-        ObjectDisposedException.ThrowIf(_disposed, nameof(KeyboardShortcutService));
+        ObjectDisposedException.ThrowIf(objDisposed, nameof(KeyboardShortcutService));
 
         var parsed = KeyboardShortcut.Parse(shortcut);
         var normalizedKey = parsed.GetNormalizedKey();
 
-        await EnsureInitializedAsync();
+        await EnsureInitializedAsync().ConfigureAwait(false);
 
         // Register with the service
         var registration = new ShortcutRegistration(id, parsed, callback);
-        _shortcuts[normalizedKey] = registration;
+        objShortcuts[normalizedKey] = registration;
 
         // Register with JavaScript
-        if (_module != null)
+        if (objModule != null)
         {
-            await _module.InvokeVoidAsync("registerShortcut", normalizedKey);
+            await objModule.InvokeVoidAsync("registerShortcut", normalizedKey).ConfigureAwait(false);
         }
 
         return new ShortcutHandle(this, normalizedKey, id);
@@ -62,7 +62,7 @@ public class KeyboardShortcutService : IKeyboardShortcutService
     /// <inheritdoc />
     public void Unregister(string id)
     {
-        var toRemove = _shortcuts.FirstOrDefault(kvp => kvp.Value.Id == id);
+        var toRemove = objShortcuts.FirstOrDefault(kvp => kvp.Value.Id == id);
         if (toRemove.Key != null)
         {
             UnregisterInternal(toRemove.Key);
@@ -70,10 +70,10 @@ public class KeyboardShortcutService : IKeyboardShortcutService
     }
 
     /// <inheritdoc />
-    public void Suspend() => _suspended = true;
+    public void Suspend() => objSuspended = true;
 
     /// <inheritdoc />
-    public void Resume() => _suspended = false;
+    public void Resume() => objSuspended = false;
 
     /// <summary>
     /// Called from JavaScript when a registered shortcut key is pressed.
@@ -82,7 +82,7 @@ public class KeyboardShortcutService : IKeyboardShortcutService
     [JSInvokable]
     public async Task HandleShortcutAsync(string normalizedKey)
     {
-        if (_suspended || _disposed)
+        if (objSuspended || objDisposed)
         {
             return;
         }
@@ -93,11 +93,11 @@ public class KeyboardShortcutService : IKeyboardShortcutService
             return;
         }
 
-        if (_shortcuts.TryGetValue(normalizedKey, out var registration))
+        if (objShortcuts.TryGetValue(normalizedKey, out var registration))
         {
             try
             {
-                await registration.Callback();
+                await registration.Callback().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -110,21 +110,21 @@ public class KeyboardShortcutService : IKeyboardShortcutService
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
-        if (_disposed)
+        if (objDisposed)
         {
             return;
         }
 
         GC.SuppressFinalize(this);
-        _disposed = true;
-        _shortcuts.Clear();
+        objDisposed = true;
+        objShortcuts.Clear();
 
-        if (_module != null)
+        if (objModule != null)
         {
             try
             {
-                await _module.InvokeVoidAsync("dispose");
-                await _module.DisposeAsync();
+                await objModule.InvokeVoidAsync("dispose").ConfigureAwait(false);
+                await objModule.DisposeAsync().ConfigureAwait(false);
             }
             catch
             {
@@ -132,40 +132,40 @@ public class KeyboardShortcutService : IKeyboardShortcutService
             }
         }
 
-        _dotNetRef?.Dispose();
-        _moduleLock.Dispose();
+        objDotNetRef?.Dispose();
+        objModuleLock.Dispose();
     }
 
     private async Task EnsureInitializedAsync()
     {
-        if (_module != null)
+        if (objModule != null)
         {
             return;
         }
 
-        await _moduleLock.WaitAsync();
+        await objModuleLock.WaitAsync().ConfigureAwait(false);
         try
         {
-            if (_module == null)
+            if (objModule == null)
             {
-                _dotNetRef = DotNetObjectReference.Create(this);
-                _module = await _jsRuntime.InvokeAsync<IJSObjectReference>(
-                    "import", "./_content/TrBlazeUI.Primitives/js/primitives/keyboard-shortcuts.js");
-                await _module.InvokeVoidAsync("initialize", _dotNetRef);
+                objDotNetRef = DotNetObjectReference.Create(this);
+                objModule = await objJsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/TrBlazeUI.Primitives/js/primitives/keyboard-shortcuts.js").ConfigureAwait(false);
+                await objModule.InvokeVoidAsync("initialize", objDotNetRef).ConfigureAwait(false);
             }
         }
         finally
         {
-            _moduleLock.Release();
+            objModuleLock.Release();
         }
     }
 
     private void UnregisterInternal(string normalizedKey)
     {
-        if (_shortcuts.Remove(normalizedKey) && _module != null)
+        if (objShortcuts.Remove(normalizedKey) && objModule != null)
         {
             // Fire-and-forget unregister from JS
-            _ = _module.InvokeVoidAsync("unregisterShortcut", normalizedKey).AsTask();
+            _ = objModule.InvokeVoidAsync("unregisterShortcut", normalizedKey).AsTask();
         }
     }
 
@@ -185,30 +185,30 @@ public class KeyboardShortcutService : IKeyboardShortcutService
 
     private sealed class ShortcutHandle : IDisposable
     {
-        private readonly KeyboardShortcutService _service;
-        private readonly string _normalizedKey;
-        private readonly string _id;
-        private bool _disposed;
+        private readonly KeyboardShortcutService objService;
+        private readonly string objNormalizedKey;
+        private readonly string objId;
+        private bool objDisposed;
 
         public ShortcutHandle(KeyboardShortcutService service, string normalizedKey, string id)
         {
-            _service = service;
-            _normalizedKey = normalizedKey;
-            _id = id;
+            objService = service;
+            objNormalizedKey = normalizedKey;
+            objId = id;
         }
 
         public void Dispose()
         {
-            if (_disposed)
+            if (objDisposed)
             {
                 return;
             }
 
-            _disposed = true;
+            objDisposed = true;
 
-            if (!_service._disposed)
+            if (!objService.objDisposed)
             {
-                _service.UnregisterInternal(_normalizedKey);
+                objService.UnregisterInternal(objNormalizedKey);
             }
         }
     }

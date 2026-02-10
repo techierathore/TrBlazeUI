@@ -15,22 +15,22 @@
 
     internal string? ActiveMenu { get; private set; }
 
-    private List<MenubarMenu> _menus = new();
+    private List<MenubarMenu> objMenus = new();
 
     internal void RegisterMenu(MenubarMenu menu)
     {
-        if (!_menus.Contains(menu))
+        if (!objMenus.Contains(menu))
         {
-            _menus.Add(menu);
+            objMenus.Add(menu);
         }
     }
 
     internal void UnregisterMenu(MenubarMenu menu)
     {
-        _menus.Remove(menu);
+        objMenus.Remove(menu);
     }
 
-    internal List<MenubarMenu> GetMenus() => _menus;
+    internal List<MenubarMenu> GetMenus() => objMenus;
 
     internal void SetActiveMenu(string? menuId)
     {
@@ -40,24 +40,24 @@
 
     internal void NavigateToNextMenu()
     {
-        if (_menus.Count == 0 || ActiveMenu == null) return;
+        if (objMenus.Count == 0 || ActiveMenu == null) return;
 
-        var currentIndex = _menus.FindIndex(m => m.MenuId == ActiveMenu);
+        var currentIndex = objMenus.FindIndex(m => m.MenuId == ActiveMenu);
         if (currentIndex == -1) return;
 
-        var nextIndex = (currentIndex + 1) % _menus.Count;
-        _menus[nextIndex].Open();
+        var nextIndex = (currentIndex + 1) % objMenus.Count;
+        objMenus[nextIndex].Open();
     }
 
     internal void NavigateToPreviousMenu()
     {
-        if (_menus.Count == 0 || ActiveMenu == null) return;
+        if (objMenus.Count == 0 || ActiveMenu == null) return;
 
-        var currentIndex = _menus.FindIndex(m => m.MenuId == ActiveMenu);
+        var currentIndex = objMenus.FindIndex(m => m.MenuId == ActiveMenu);
         if (currentIndex == -1) return;
 
-        var prevIndex = currentIndex == 0 ? _menus.Count - 1 : currentIndex - 1;
-        _menus[prevIndex].Open();
+        var prevIndex = currentIndex == 0 ? objMenus.Count - 1 : currentIndex - 1;
+        objMenus[prevIndex].Open();
     }
 
     private void HandleKeyDown(KeyboardEventArgs e)

@@ -22,9 +22,9 @@
                 A 6-digit OTP input with separators.
             </p>
         </div>
-        <InputOTP @bind-Value="_otpValue" OnComplete="HandleComplete" />
-        <p class="text-sm text-muted-foreground">Value: @(_otpValue ?? "empty")</p>
-        @if (_isComplete)
+        <InputOTP @bind-Value="objOtpValue" OnComplete="HandleComplete" />
+        <p class="text-sm text-muted-foreground">Value: @(objOtpValue ?? "empty")</p>
+        @if (objIsComplete)
         {
             <p class="text-sm text-green-600">OTP Complete!</p>
         }
@@ -131,9 +131,9 @@
                 </p>
             </div>
             <div class="flex justify-center">
-                <InputOTP @bind-Value="_verifyOtp" Length="6" />
+                <InputOTP @bind-Value="objVerifyOtp" Length="6" />
             </div>
-            <Button Class="w-full" Disabled="@(_verifyOtp?.Length != 6)">
+            <Button Class="w-full" Disabled="@(objVerifyOtp?.Length != 6)">
                 Verify
             </Button>
             <p class="text-center text-sm text-muted-foreground">
@@ -144,12 +144,12 @@
 </div>
 
 @code {
-    private string? _otpValue;
-    private string? _verifyOtp;
-    private bool _isComplete;
+    private string? objOtpValue;
+    private string? objVerifyOtp;
+    private bool objIsComplete;
 
     private void HandleComplete(string value)
     {
-        _isComplete = true;
+        objIsComplete = true;
     }
 }

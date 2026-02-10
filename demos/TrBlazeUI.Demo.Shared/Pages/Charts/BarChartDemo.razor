@@ -24,17 +24,17 @@
         </div>
         <ChartContainer>
             <BarChart TItem="SalesData"
-                      Items="@_salesData"
+                      Items="@objSalesData"
                       Variant="BarChartVariant.Vertical"
                       Height="300px">
                 <ApexPointSeries TItem="SalesData"
-                                 Items="@_salesData"
+                                 Items="@objSalesData"
                                  Name="Desktop"
                                  SeriesType="SeriesType.Bar"
                                  XValue="@(item => item.Month)"
                                  YValue="@(item => (decimal)item.Desktop)" />
                 <ApexPointSeries TItem="SalesData"
-                                 Items="@_salesData"
+                                 Items="@objSalesData"
                                  Name="Mobile"
                                  SeriesType="SeriesType.Bar"
                                  XValue="@(item => item.Month)"
@@ -53,11 +53,11 @@
         </div>
         <ChartContainer>
             <BarChart TItem="SalesData"
-                      Items="@_salesData"
+                      Items="@objSalesData"
                       Variant="BarChartVariant.Horizontal"
                       Height="300px">
                 <ApexPointSeries TItem="SalesData"
-                                 Items="@_salesData"
+                                 Items="@objSalesData"
                                  Name="Desktop"
                                  SeriesType="SeriesType.Bar"
                                  XValue="@(item => item.Month)"
@@ -76,17 +76,17 @@
         </div>
         <ChartContainer>
             <BarChart TItem="SalesData"
-                      Items="@_salesData"
+                      Items="@objSalesData"
                       Variant="BarChartVariant.Stacked"
                       Height="300px">
                 <ApexPointSeries TItem="SalesData"
-                                 Items="@_salesData"
+                                 Items="@objSalesData"
                                  Name="Desktop"
                                  SeriesType="SeriesType.Bar"
                                  XValue="@(item => item.Month)"
                                  YValue="@(item => (decimal)item.Desktop)" />
                 <ApexPointSeries TItem="SalesData"
-                                 Items="@_salesData"
+                                 Items="@objSalesData"
                                  Name="Mobile"
                                  SeriesType="SeriesType.Bar"
                                  XValue="@(item => item.Month)"
@@ -105,17 +105,17 @@
         </div>
         <ChartContainer>
             <BarChart TItem="SalesData"
-                      Items="@_salesData"
+                      Items="@objSalesData"
                       Variant="BarChartVariant.FullStacked"
                       Height="300px">
                 <ApexPointSeries TItem="SalesData"
-                                 Items="@_salesData"
+                                 Items="@objSalesData"
                                  Name="Desktop"
                                  SeriesType="SeriesType.Bar"
                                  XValue="@(item => item.Month)"
                                  YValue="@(item => (decimal)item.Desktop)" />
                 <ApexPointSeries TItem="SalesData"
-                                 Items="@_salesData"
+                                 Items="@objSalesData"
                                  Name="Mobile"
                                  SeriesType="SeriesType.Bar"
                                  XValue="@(item => item.Month)"
@@ -134,17 +134,17 @@
         </div>
         <ChartContainer>
             <BarChart TItem="SalesData"
-                      Items="@_salesData"
+                      Items="@objSalesData"
                       Variant="BarChartVariant.StackedHorizontal"
                       Height="300px">
                 <ApexPointSeries TItem="SalesData"
-                                 Items="@_salesData"
+                                 Items="@objSalesData"
                                  Name="Desktop"
                                  SeriesType="SeriesType.Bar"
                                  XValue="@(item => item.Month)"
                                  YValue="@(item => (decimal)item.Desktop)" />
                 <ApexPointSeries TItem="SalesData"
-                                 Items="@_salesData"
+                                 Items="@objSalesData"
                                  Name="Mobile"
                                  SeriesType="SeriesType.Bar"
                                  XValue="@(item => item.Month)"
@@ -200,7 +200,7 @@
         public int Mobile { get; set; }
     }
 
-    private List<SalesData> _salesData =
+    private List<SalesData> objSalesData =
     [
         new() { Month = "Jan", Desktop = 186, Mobile = 80 },
         new() { Month = "Feb", Desktop = 305, Mobile = 200 },

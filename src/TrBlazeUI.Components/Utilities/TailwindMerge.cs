@@ -140,7 +140,7 @@ public static class TailwindMerge
     private static readonly Regex GridRowsRegex = new(@"^grid-rows-(\d+|none)$", RegexOptions.Compiled);
 
     // Cache for utility group lookups to avoid repeated regex evaluation
-    private static readonly ConcurrentDictionary<string, string?> _utilityGroupCache = new();
+    private static readonly ConcurrentDictionary<string, string?> objUtilityGroupCache = new();
 
     // Regex to validate CSS class names - allows alphanumeric, hyphens, underscores, colons, slashes, brackets, dots, percentages, and CSS combinator characters
     // This covers Tailwind classes like "w-1/2", "hover:bg-blue-500", "data-[state=open]:block", "text-[14px]", "[&>svg]:absolute"
@@ -229,7 +229,7 @@ public static class TailwindMerge
     /// Results are cached for performance.
     /// </summary>
     private static string? GetUtilityGroup(string className) =>
-        _utilityGroupCache.GetOrAdd(className, ComputeUtilityGroup);
+        objUtilityGroupCache.GetOrAdd(className, ComputeUtilityGroup);
 
     /// <summary>
     /// Computes the utility group for a class name.

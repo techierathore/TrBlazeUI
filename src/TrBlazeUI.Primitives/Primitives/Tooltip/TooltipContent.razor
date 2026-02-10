@@ -13,7 +13,7 @@
 {
     <FloatingPortal IsOpen="true"
                     AnchorElement="@Context.State.TriggerElement"
-                    PortalId="@_portalId"
+                    PortalId="@objPortalId"
                     Side="@EffectiveSide"
                     Align="@EffectiveAlign"
                     Offset="@Offset"
@@ -63,7 +63,7 @@
     [Parameter]
     public int Offset { get; set; } = 8;
 
-    private string _portalId = "";
+    private string objPortalId = "";
 
     /// <summary>
     /// Gets the effective side for positioning.
@@ -135,7 +135,7 @@
                 "Ensure TooltipContent is a child of a Tooltip component.");
         }
 
-        _portalId = $"tooltip-portal-{Context.TooltipId}";
+        objPortalId = $"tooltip-portal-{Context.TooltipId}";
 
         // Subscribe to context changes
         Context.OnStateChanged += HandleContextStateChanged;

@@ -8,9 +8,9 @@
 @using TrBlazeUI.Icons.Lucide.Components
 
 <div class="@ContainerClass">
-    <Popover Open="_isOpen" OpenChanged="HandleOpenChanged">
+    <Popover Open="objIsOpen" OpenChanged="HandleOpenChanged">
         <PopoverTrigger role="combobox"
-                        aria-expanded="@_isOpen.ToString().ToLower()"
+                        aria-expanded="@objIsOpen.ToString().ToLower()"
                         aria-controls="@($"{Id}-listbox")"
                         aria-haspopup="listbox"
                         aria-multiselectable="true"
@@ -48,7 +48,7 @@
                     <button type="button"
                             class="rounded-sm opacity-70 hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-ring"
                             aria-label="Clear all"
-                            @onclick="ClearAll"
+                            @onclick="ClearAllAsync"
                             @onclick:stopPropagation="true">
                         <LucideIcon Name="x" Size="14" Class="h-3.5 w-3.5" />
                     </button>
@@ -80,11 +80,11 @@
                     <circle cx="11" cy="11" r="8"></circle>
                     <path d="m21 21-4.35-4.35"></path>
                 </svg>
-                <input @ref="_searchInputRef"
+                <input @ref="objSearchInputRef"
                        id="@($"{Id}-search")"
                        type="text"
                        placeholder="@SearchPlaceholder"
-                       value="@_searchQuery"
+                       value="@objSearchQuery"
                        @oninput="HandleSearchInput"
                        @onkeydown="HandleSearchKeyDown"
                        class="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 ml-2" />
@@ -156,7 +156,7 @@
             <div class="flex items-center justify-between border-t p-2">
                 <button type="button"
                         class="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                        @onclick="ClearAll"
+                        @onclick="ClearAllAsync"
                         @onclick:stopPropagation="true">
                     @ClearLabel
                 </button>

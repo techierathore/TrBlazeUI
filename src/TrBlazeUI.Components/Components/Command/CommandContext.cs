@@ -72,16 +72,16 @@ public interface IVirtualizedGroupHandler
 /// </summary>
 public class CommandContext
 {
-    private readonly List<CommandItemMetadata> _items = new();
-    private readonly List<IVirtualizedGroupHandler> _virtualizedGroups = new();
-    private string _searchQuery = string.Empty;
-    private int _focusedIndex = -1;
-    private int _focusedVirtualizedGroupIndex = -1; // Which virtualized group has focus (-1 = regular items)
-    private Func<CommandItemMetadata, string, bool>? _filterFunction;
-    private bool _closeOnSelect = true;
-    private bool _disabled;
-    private bool _hasRegisteredItems;
-    private bool _isKeyboardNavigating; // Flag to suppress hover during keyboard nav
+    private readonly List<CommandItemMetadata> objItems = new();
+    private readonly List<IVirtualizedGroupHandler> objVirtualizedGroups = new();
+    private string objSearchQuery = string.Empty;
+    private int objFocusedIndex = -1;
+    private int objFocusedVirtualizedGroupIndex = -1; // Which virtualized group has focus (-1 = regular items)
+    private Func<CommandItemMetadata, string, bool>? objFilterFunction;
+    private bool objCloseOnSelect = true;
+    private bool objDisabled;
+    private bool objHasRegisteredItems;
+    private bool objIsKeyboardNavigating; // Flag to suppress hover during keyboard nav
 
     /// <summary>
     /// Event that is raised when the state changes.
@@ -126,15 +126,15 @@ public class CommandContext
     /// <summary>
     /// Gets the current search query.
     /// </summary>
-    public string SearchQuery => _searchQuery;
+    public string SearchQuery => objSearchQuery;
 
     /// <summary>
     /// Gets or sets the custom filter function.
     /// </summary>
     public Func<CommandItemMetadata, string, bool>? FilterFunction
     {
-        get => _filterFunction;
-        set => _filterFunction = value;
+        get => objFilterFunction;
+        set => objFilterFunction = value;
     }
 
     /// <summary>
@@ -142,8 +142,8 @@ public class CommandContext
     /// </summary>
     public bool CloseOnSelect
     {
-        get => _closeOnSelect;
-        set => _closeOnSelect = value;
+        get => objCloseOnSelect;
+        set => objCloseOnSelect = value;
     }
 
     /// <summary>
@@ -151,33 +151,33 @@ public class CommandContext
     /// </summary>
     public bool Disabled
     {
-        get => _disabled;
-        set => _disabled = value;
+        get => objDisabled;
+        set => objDisabled = value;
     }
 
     /// <summary>
     /// Gets the currently focused item index within filtered items.
     /// </summary>
-    public int FocusedIndex => _focusedIndex;
+    public int FocusedIndex => objFocusedIndex;
 
     /// <summary>
     /// Gets the currently focused virtualized group index (-1 if focus is on regular items).
     /// </summary>
-    public int FocusedVirtualizedGroupIndex => _focusedVirtualizedGroupIndex;
+    public int FocusedVirtualizedGroupIndex => objFocusedVirtualizedGroupIndex;
 
     /// <summary>
     /// Gets whether keyboard navigation is currently active (suppresses mouse hover).
     /// </summary>
-    public bool IsKeyboardNavigating => _isKeyboardNavigating;
+    public bool IsKeyboardNavigating => objIsKeyboardNavigating;
 
     /// <summary>
     /// Called when the mouse actually moves to re-enable hover focus.
     /// </summary>
     public void OnMouseMove()
     {
-        if (_isKeyboardNavigating)
+        if (objIsKeyboardNavigating)
         {
-            _isKeyboardNavigating = false;
+            objIsKeyboardNavigating = false;
             OnKeyboardNavigationChanged?.Invoke(false);
         }
     }
@@ -187,9 +187,9 @@ public class CommandContext
     /// </summary>
     public void RegisterVirtualizedGroup(IVirtualizedGroupHandler handler)
     {
-        if (!_virtualizedGroups.Contains(handler))
+        if (!objVirtualizedGroups.Contains(handler))
         {
-            _virtualizedGroups.Add(handler);
+            objVirtualizedGroups.Add(handler);
         }
     }
 
@@ -197,13 +197,13 @@ public class CommandContext
     /// Unregisters a virtualized group handler.
     /// </summary>
     public void UnregisterVirtualizedGroup(IVirtualizedGroupHandler handler) =>
-        _virtualizedGroups.Remove(handler);
+        objVirtualizedGroups.Remove(handler);
 
     /// <summary>
     /// Gets the list of registered virtualized groups.
     /// </summary>
     public IReadOnlyList<IVirtualizedGroupHandler> GetVirtualizedGroups() =>
-        _virtualizedGroups.AsReadOnly();
+        objVirtualizedGroups.AsReadOnly();
 
     /// <summary>
     /// Sets focus on a specific virtualized group and clears focus from all other groups and regular items.
@@ -212,22 +212,22 @@ public class CommandContext
     public void SetVirtualizedGroupFocus(IVirtualizedGroupHandler group, int indexInGroup)
     {
         // Clear focus from regular items
-        if (_focusedIndex >= 0)
+        if (objFocusedIndex >= 0)
         {
-            var previousIndex = _focusedIndex;
-            _focusedIndex = -1;
+            var previousIndex = objFocusedIndex;
+            objFocusedIndex = -1;
             OnFocusChanged?.Invoke(previousIndex, -1);
         }
 
         // Find the group index and set it
-        var groupIndex = _virtualizedGroups.IndexOf(group);
+        var groupIndex = objVirtualizedGroups.IndexOf(group);
         if (groupIndex >= 0)
         {
-            _focusedVirtualizedGroupIndex = groupIndex;
+            objFocusedVirtualizedGroupIndex = groupIndex;
         }
 
         // Clear focus from all other virtualized groups
-        foreach (var otherGroup in _virtualizedGroups)
+        foreach (var otherGroup in objVirtualizedGroups)
         {
             if (otherGroup != group && otherGroup.FocusedIndex >= 0)
             {
@@ -243,14 +243,14 @@ public class CommandContext
     /// <param name="query">The new search query.</param>
     public void SetSearchQuery(string query)
     {
-        if (_searchQuery != query)
+        if (objSearchQuery != query)
         {
-            _searchQuery = query;
-            _focusedIndex = -1; // Reset focus when search changes
-            _focusedVirtualizedGroupIndex = -1; // Reset virtualized group focus
+            objSearchQuery = query;
+            objFocusedIndex = -1; // Reset focus when search changes
+            objFocusedVirtualizedGroupIndex = -1; // Reset virtualized group focus
 
             // Reset focus in all virtualized groups
-            foreach (var group in _virtualizedGroups)
+            foreach (var group in objVirtualizedGroups)
             {
                 group.FocusedIndex = -1;
             }
@@ -274,10 +274,10 @@ public class CommandContext
             OnSelect = onSelect,
             GroupId = groupId
         };
-        _items.Add(metadata);
-        _hasRegisteredItems = true;
+        objItems.Add(metadata);
+        objHasRegisteredItems = true;
         NotifyStateChanged(); // Notify so CommandEmpty can update
-        return _items.Count - 1;
+        return objItems.Count - 1;
     }
 
     /// <summary>
@@ -285,13 +285,13 @@ public class CommandContext
     /// </summary>
     public void UpdateItem(int index, string? value, string? searchText, bool disabled, EventCallback onSelect, string? groupId = null)
     {
-        if (index >= 0 && index < _items.Count)
+        if (index >= 0 && index < objItems.Count)
         {
-            _items[index].Value = value;
-            _items[index].SearchText = searchText ?? value;
-            _items[index].Disabled = disabled;
-            _items[index].OnSelect = onSelect;
-            _items[index].GroupId = groupId;
+            objItems[index].Value = value;
+            objItems[index].SearchText = searchText ?? value;
+            objItems[index].Disabled = disabled;
+            objItems[index].OnSelect = onSelect;
+            objItems[index].GroupId = groupId;
         }
     }
 
@@ -300,9 +300,9 @@ public class CommandContext
     /// </summary>
     public void UnregisterItem(int index)
     {
-        if (index >= 0 && index < _items.Count)
+        if (index >= 0 && index < objItems.Count)
         {
-            _items[index] = null!; // Mark as null, don't remove to preserve indices
+            objItems[index] = null!; // Mark as null, don't remove to preserve indices
         }
     }
 
@@ -311,18 +311,18 @@ public class CommandContext
     /// </summary>
     public List<CommandItemMetadata> GetFilteredItems()
     {
-        if (string.IsNullOrWhiteSpace(_searchQuery))
+        if (string.IsNullOrWhiteSpace(objSearchQuery))
         {
-            return _items.Where(i => i != null).ToList();
+            return objItems.Where(i => i != null).ToList();
         }
 
-        if (_filterFunction != null)
+        if (objFilterFunction != null)
         {
-            return _items.Where(i => i != null && _filterFunction(i, _searchQuery)).ToList();
+            return objItems.Where(i => i != null && objFilterFunction(i, objSearchQuery)).ToList();
         }
 
-        return _items
-            .Where(i => i != null && (i.SearchText?.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ?? false))
+        return objItems
+            .Where(i => i != null && (i.SearchText?.Contains(objSearchQuery, StringComparison.OrdinalIgnoreCase) ?? false))
             .ToList();
     }
 
@@ -331,9 +331,9 @@ public class CommandContext
     /// </summary>
     public CommandItemMetadata? GetItemByIndex(int index)
     {
-        if (index >= 0 && index < _items.Count)
+        if (index >= 0 && index < objItems.Count)
         {
-            return _items[index];
+            return objItems[index];
         }
         return null;
     }
@@ -350,7 +350,7 @@ public class CommandContext
     public bool HasVisibleItems()
     {
         // Don't show "No results" until items have had a chance to register
-        if (!_hasRegisteredItems)
+        if (!objHasRegisteredItems)
         {
             return true;
         }
@@ -374,16 +374,16 @@ public class CommandContext
     /// </summary>
     public void SetFocusedIndex(int index)
     {
-        if (_focusedIndex != index)
+        if (objFocusedIndex != index)
         {
-            var previousIndex = _focusedIndex;
-            _focusedIndex = index;
+            var previousIndex = objFocusedIndex;
+            objFocusedIndex = index;
 
             // Clear focus from all virtualized groups when focusing a regular item
             if (index >= 0)
             {
-                _focusedVirtualizedGroupIndex = -1;
-                foreach (var group in _virtualizedGroups)
+                objFocusedVirtualizedGroupIndex = -1;
+                foreach (var group in objVirtualizedGroups)
                 {
                     if (group.FocusedIndex >= 0)
                     {
@@ -405,9 +405,9 @@ public class CommandContext
     public async Task MoveFocusAsync(int direction)
     {
         // Suppress mouse hover while keyboard navigating
-        if (!_isKeyboardNavigating)
+        if (!objIsKeyboardNavigating)
         {
-            _isKeyboardNavigating = true;
+            objIsKeyboardNavigating = true;
             OnKeyboardNavigationChanged?.Invoke(true);
         }
 
@@ -415,7 +415,7 @@ public class CommandContext
         var enabledFilteredItems = allFiltered.Where(i => !i.Disabled).ToList();
 
         // Get virtualized groups that have visible items
-        var activeVirtualizedGroups = _virtualizedGroups.Where(g => g.VisibleItemCount > 0).ToList();
+        var activeVirtualizedGroups = objVirtualizedGroups.Where(g => g.VisibleItemCount > 0).ToList();
 
         // Calculate total navigable items
         var totalRegularItems = allFiltered.Count;
@@ -427,17 +427,17 @@ public class CommandContext
         }
 
         // Currently in a virtualized group?
-        if (_focusedVirtualizedGroupIndex >= 0)
+        if (objFocusedVirtualizedGroupIndex >= 0)
         {
             // Validate the index is still valid (groups may have changed due to filtering)
-            if (_focusedVirtualizedGroupIndex >= activeVirtualizedGroups.Count)
+            if (objFocusedVirtualizedGroupIndex >= activeVirtualizedGroups.Count)
             {
-                _focusedVirtualizedGroupIndex = -1;
+                objFocusedVirtualizedGroupIndex = -1;
                 // Fall through to regular items handling
             }
             else
             {
-                var currentGroup = activeVirtualizedGroups[_focusedVirtualizedGroupIndex];
+                var currentGroup = activeVirtualizedGroups[objFocusedVirtualizedGroupIndex];
                 var currentIndexInGroup = currentGroup.FocusedIndex;
                 var newIndexInGroup = currentIndexInGroup + direction;
 
@@ -454,18 +454,18 @@ public class CommandContext
                     currentGroup.FocusedIndex = -1;
                     currentGroup.NotifyStateChanged();
 
-                    if (_focusedVirtualizedGroupIndex + 1 < activeVirtualizedGroups.Count)
+                    if (objFocusedVirtualizedGroupIndex + 1 < activeVirtualizedGroups.Count)
                     {
                         // Move to next virtualized group
-                        _focusedVirtualizedGroupIndex++;
-                        var nextGroup = activeVirtualizedGroups[_focusedVirtualizedGroupIndex];
+                        objFocusedVirtualizedGroupIndex++;
+                        var nextGroup = activeVirtualizedGroups[objFocusedVirtualizedGroupIndex];
                         // Use ScrollToIndexAsync for consistency
-                        await nextGroup.ScrollToIndexAsync(0);
+                        await nextGroup.ScrollToIndexAsync(0).ConfigureAwait(false);
                     }
                     else
                     {
                         // Wrap to first regular item (or first virtualized group if no regular items)
-                        _focusedVirtualizedGroupIndex = -1;
+                        objFocusedVirtualizedGroupIndex = -1;
                         if (enabledFilteredItems.Count > 0)
                         {
                             FocusFirstRegularItem();
@@ -473,10 +473,10 @@ public class CommandContext
                         else if (activeVirtualizedGroups.Count > 0)
                         {
                             // No regular items, wrap to first virtualized group
-                            _focusedVirtualizedGroupIndex = 0;
+                            objFocusedVirtualizedGroupIndex = 0;
                             var firstGroup = activeVirtualizedGroups[0];
                             // Use ScrollToIndexAsync to ensure scroll position is updated
-                            await firstGroup.ScrollToIndexAsync(0);
+                            await firstGroup.ScrollToIndexAsync(0).ConfigureAwait(false);
                         }
                     }
                     return;
@@ -487,18 +487,18 @@ public class CommandContext
                     currentGroup.FocusedIndex = -1;
                     currentGroup.NotifyStateChanged();
 
-                    if (_focusedVirtualizedGroupIndex > 0)
+                    if (objFocusedVirtualizedGroupIndex > 0)
                     {
                         // Move to previous virtualized group (last item)
-                        _focusedVirtualizedGroupIndex--;
-                        var prevGroup = activeVirtualizedGroups[_focusedVirtualizedGroupIndex];
+                        objFocusedVirtualizedGroupIndex--;
+                        var prevGroup = activeVirtualizedGroups[objFocusedVirtualizedGroupIndex];
                         // Use ScrollToIndexAsync for potentially unloaded items
-                        await prevGroup.ScrollToIndexAsync(prevGroup.VisibleItemCount - 1);
+                        await prevGroup.ScrollToIndexAsync(prevGroup.VisibleItemCount - 1).ConfigureAwait(false);
                     }
                     else
                     {
                         // Move to last regular item (or last virtualized group if no regular items)
-                        _focusedVirtualizedGroupIndex = -1;
+                        objFocusedVirtualizedGroupIndex = -1;
                         if (enabledFilteredItems.Count > 0)
                         {
                             FocusLastRegularItem();
@@ -506,10 +506,10 @@ public class CommandContext
                         else if (activeVirtualizedGroups.Count > 0)
                         {
                             // No regular items, wrap to last virtualized group
-                            _focusedVirtualizedGroupIndex = activeVirtualizedGroups.Count - 1;
-                            var lastGroup = activeVirtualizedGroups[_focusedVirtualizedGroupIndex];
+                            objFocusedVirtualizedGroupIndex = activeVirtualizedGroups.Count - 1;
+                            var lastGroup = activeVirtualizedGroups[objFocusedVirtualizedGroupIndex];
                             // Use ScrollToIndexAsync for potentially unloaded items
-                            await lastGroup.ScrollToIndexAsync(lastGroup.VisibleItemCount - 1);
+                            await lastGroup.ScrollToIndexAsync(lastGroup.VisibleItemCount - 1).ConfigureAwait(false);
                         }
                     }
                     return;
@@ -518,7 +518,7 @@ public class CommandContext
         }
 
         // Currently in regular items
-        var currentIndex = _focusedIndex;
+        var currentIndex = objFocusedIndex;
         var newIndex = currentIndex + direction;
 
         if (direction > 0)
@@ -529,14 +529,14 @@ public class CommandContext
                 // Move to first virtualized group if available
                 if (activeVirtualizedGroups.Count > 0)
                 {
-                    var previousIndex = _focusedIndex;
-                    _focusedIndex = -1;
+                    var previousIndex = objFocusedIndex;
+                    objFocusedIndex = -1;
                     OnFocusChanged?.Invoke(previousIndex, -1);
 
-                    _focusedVirtualizedGroupIndex = 0;
+                    objFocusedVirtualizedGroupIndex = 0;
                     var firstGroup = activeVirtualizedGroups[0];
                     // Use ScrollToIndexAsync to ensure scroll position is updated
-                    await firstGroup.ScrollToIndexAsync(0);
+                    await firstGroup.ScrollToIndexAsync(0).ConfigureAwait(false);
                     return;
                 }
                 else
@@ -557,14 +557,14 @@ public class CommandContext
                 // All remaining items disabled, move to virtualized groups
                 if (activeVirtualizedGroups.Count > 0)
                 {
-                    var previousIndex = _focusedIndex;
-                    _focusedIndex = -1;
+                    var previousIndex = objFocusedIndex;
+                    objFocusedIndex = -1;
                     OnFocusChanged?.Invoke(previousIndex, -1);
 
-                    _focusedVirtualizedGroupIndex = 0;
+                    objFocusedVirtualizedGroupIndex = 0;
                     var firstGroup = activeVirtualizedGroups[0];
                     // Use ScrollToIndexAsync to ensure scroll position is updated
-                    await firstGroup.ScrollToIndexAsync(0);
+                    await firstGroup.ScrollToIndexAsync(0).ConfigureAwait(false);
                     return;
                 }
                 newIndex = 0;
@@ -582,14 +582,14 @@ public class CommandContext
                 // Move to last virtualized group if available
                 if (activeVirtualizedGroups.Count > 0)
                 {
-                    var previousIndex = _focusedIndex;
-                    _focusedIndex = -1;
+                    var previousIndex = objFocusedIndex;
+                    objFocusedIndex = -1;
                     OnFocusChanged?.Invoke(previousIndex, -1);
 
-                    _focusedVirtualizedGroupIndex = activeVirtualizedGroups.Count - 1;
-                    var lastGroup = activeVirtualizedGroups[_focusedVirtualizedGroupIndex];
+                    objFocusedVirtualizedGroupIndex = activeVirtualizedGroups.Count - 1;
+                    var lastGroup = activeVirtualizedGroups[objFocusedVirtualizedGroupIndex];
                     // Use ScrollToIndexAsync for potentially unloaded items
-                    await lastGroup.ScrollToIndexAsync(lastGroup.VisibleItemCount - 1);
+                    await lastGroup.ScrollToIndexAsync(lastGroup.VisibleItemCount - 1).ConfigureAwait(false);
                     return;
                 }
                 else
@@ -610,14 +610,14 @@ public class CommandContext
                 // All preceding items disabled, move to virtualized groups
                 if (activeVirtualizedGroups.Count > 0)
                 {
-                    var previousIndex = _focusedIndex;
-                    _focusedIndex = -1;
+                    var previousIndex = objFocusedIndex;
+                    objFocusedIndex = -1;
                     OnFocusChanged?.Invoke(previousIndex, -1);
 
-                    _focusedVirtualizedGroupIndex = activeVirtualizedGroups.Count - 1;
-                    var lastGroup = activeVirtualizedGroups[_focusedVirtualizedGroupIndex];
+                    objFocusedVirtualizedGroupIndex = activeVirtualizedGroups.Count - 1;
+                    var lastGroup = activeVirtualizedGroups[objFocusedVirtualizedGroupIndex];
                     // Use ScrollToIndexAsync for potentially unloaded items
-                    await lastGroup.ScrollToIndexAsync(lastGroup.VisibleItemCount - 1);
+                    await lastGroup.ScrollToIndexAsync(lastGroup.VisibleItemCount - 1).ConfigureAwait(false);
                     return;
                 }
                 newIndex = totalRegularItems - 1;
@@ -666,9 +666,9 @@ public class CommandContext
     public async Task FocusFirstAsync()
     {
         // Suppress mouse hover while keyboard navigating
-        if (!_isKeyboardNavigating)
+        if (!objIsKeyboardNavigating)
         {
-            _isKeyboardNavigating = true;
+            objIsKeyboardNavigating = true;
             OnKeyboardNavigationChanged?.Invoke(true);
         }
 
@@ -686,12 +686,12 @@ public class CommandContext
         }
 
         // Then try first virtualized group
-        var activeGroups = _virtualizedGroups.Where(g => g.VisibleItemCount > 0).ToList();
+        var activeGroups = objVirtualizedGroups.Where(g => g.VisibleItemCount > 0).ToList();
         if (activeGroups.Count > 0)
         {
             ClearVirtualizedGroupFocus();
-            _focusedVirtualizedGroupIndex = 0;
-            await activeGroups[0].ScrollToIndexAsync(0);
+            objFocusedVirtualizedGroupIndex = 0;
+            await activeGroups[0].ScrollToIndexAsync(0).ConfigureAwait(false);
         }
     }
 
@@ -701,20 +701,20 @@ public class CommandContext
     public async Task FocusLastAsync()
     {
         // Suppress mouse hover while keyboard navigating
-        if (!_isKeyboardNavigating)
+        if (!objIsKeyboardNavigating)
         {
-            _isKeyboardNavigating = true;
+            objIsKeyboardNavigating = true;
             OnKeyboardNavigationChanged?.Invoke(true);
         }
 
         // First try last virtualized group
-        var activeGroups = _virtualizedGroups.Where(g => g.VisibleItemCount > 0).ToList();
+        var activeGroups = objVirtualizedGroups.Where(g => g.VisibleItemCount > 0).ToList();
         if (activeGroups.Count > 0)
         {
             ClearVirtualizedGroupFocus();
-            _focusedVirtualizedGroupIndex = activeGroups.Count - 1;
-            var lastGroup = activeGroups[_focusedVirtualizedGroupIndex];
-            await lastGroup.ScrollToIndexAsync(lastGroup.VisibleItemCount - 1);
+            objFocusedVirtualizedGroupIndex = activeGroups.Count - 1;
+            var lastGroup = activeGroups[objFocusedVirtualizedGroupIndex];
+            await lastGroup.ScrollToIndexAsync(lastGroup.VisibleItemCount - 1).ConfigureAwait(false);
             return;
         }
 
@@ -735,7 +735,7 @@ public class CommandContext
     /// </summary>
     private void ClearVirtualizedGroupFocus()
     {
-        foreach (var group in _virtualizedGroups)
+        foreach (var group in objVirtualizedGroups)
         {
             if (group.FocusedIndex >= 0)
             {
@@ -751,24 +751,24 @@ public class CommandContext
     public async Task SelectFocusedItemAsync()
     {
         // Check if focus is in a virtualized group
-        if (_focusedVirtualizedGroupIndex >= 0)
+        if (objFocusedVirtualizedGroupIndex >= 0)
         {
-            var activeGroups = _virtualizedGroups.Where(g => g.VisibleItemCount > 0).ToList();
-            if (_focusedVirtualizedGroupIndex < activeGroups.Count)
+            var activeGroups = objVirtualizedGroups.Where(g => g.VisibleItemCount > 0).ToList();
+            if (objFocusedVirtualizedGroupIndex < activeGroups.Count)
             {
-                await activeGroups[_focusedVirtualizedGroupIndex].SelectFocusedItemAsync();
+                await activeGroups[objFocusedVirtualizedGroupIndex].SelectFocusedItemAsync().ConfigureAwait(false);
                 return;
             }
         }
 
         // Regular item selection
         var filteredItems = GetFilteredItems();
-        if (_focusedIndex >= 0 && _focusedIndex < filteredItems.Count)
+        if (objFocusedIndex >= 0 && objFocusedIndex < filteredItems.Count)
         {
-            var item = filteredItems[_focusedIndex];
+            var item = filteredItems[objFocusedIndex];
             if (!item.Disabled)
             {
-                await SelectItemAsync(item);
+                await SelectItemAsync(item).ConfigureAwait(false);
             }
         }
     }
@@ -778,10 +778,10 @@ public class CommandContext
     /// </summary>
     public async Task SelectItemByValueAsync(string value)
     {
-        var item = _items.FirstOrDefault(i => i != null && i.Value == value);
+        var item = objItems.FirstOrDefault(i => i != null && i.Value == value);
         if (item != null && !item.Disabled)
         {
-            await SelectItemAsync(item);
+            await SelectItemAsync(item).ConfigureAwait(false);
         }
     }
 
@@ -792,12 +792,12 @@ public class CommandContext
     {
         if (item.OnSelect.HasDelegate)
         {
-            await item.OnSelect.InvokeAsync();
+            await item.OnSelect.InvokeAsync().ConfigureAwait(false);
         }
 
         if (OnValueChange.HasDelegate)
         {
-            await OnValueChange.InvokeAsync(item.Value);
+            await OnValueChange.InvokeAsync(item.Value).ConfigureAwait(false);
         }
     }
 

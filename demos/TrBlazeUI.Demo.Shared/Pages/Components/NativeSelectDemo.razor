@@ -22,14 +22,14 @@
             </p>
         </div>
         <div class="w-[280px]">
-            <NativeSelect TValue="string" @bind-Value="_selectedFruit" Placeholder="Select a fruit">
+            <NativeSelect TValue="string" @bind-Value="objSelectedFruit" Placeholder="Select a fruit">
                 <option value="apple">Apple</option>
                 <option value="banana">Banana</option>
                 <option value="orange">Orange</option>
                 <option value="grape">Grape</option>
             </NativeSelect>
         </div>
-        <p class="text-sm text-muted-foreground">Selected: @(_selectedFruit ?? "none")</p>
+        <p class="text-sm text-muted-foreground">Selected: @(objSelectedFruit ?? "none")</p>
     </div>
 
     <!-- With Placeholder -->
@@ -41,7 +41,7 @@
             </p>
         </div>
         <div class="w-[280px]">
-            <NativeSelect TValue="string" @bind-Value="_selectedCountry" Placeholder="Choose your country">
+            <NativeSelect TValue="string" @bind-Value="objSelectedCountry" Placeholder="Choose your country">
                 <option value="us">United States</option>
                 <option value="uk">United Kingdom</option>
                 <option value="ca">Canada</option>
@@ -101,7 +101,7 @@
             </p>
         </div>
         <div class="w-[280px]">
-            <NativeSelect TValue="string" @bind-Value="_selectedCar" Placeholder="Select a car">
+            <NativeSelect TValue="string" @bind-Value="objSelectedCar" Placeholder="Select a car">
                 <optgroup label="Swedish Cars">
                     <option value="volvo">Volvo</option>
                     <option value="saab">Saab</option>
@@ -128,7 +128,7 @@
             </p>
         </div>
         <div class="w-[280px]">
-            <NativeSelect TValue="int" @bind-Value="_selectedNumber" Placeholder="Select a number">
+            <NativeSelect TValue="int" @bind-Value="objSelectedNumber" Placeholder="Select a number">
                 <option value="1">One</option>
                 <option value="2">Two</option>
                 <option value="3">Three</option>
@@ -136,13 +136,13 @@
                 <option value="5">Five</option>
             </NativeSelect>
         </div>
-        <p class="text-sm text-muted-foreground">Selected number: @_selectedNumber</p>
+        <p class="text-sm text-muted-foreground">Selected number: @objSelectedNumber</p>
     </div>
 </div>
 
 @code {
-    private string? _selectedFruit;
-    private string? _selectedCountry;
-    private string? _selectedCar;
-    private int _selectedNumber;
+    private string? objSelectedFruit;
+    private string? objSelectedCountry;
+    private string? objSelectedCar;
+    private int objSelectedNumber;
 }

@@ -5,7 +5,7 @@
     @for (int i = 0; i < Length; i++)
     {
         var index = i;
-        <input @ref="_inputRefs[index]"
+        <input @ref="objInputRefs[index]"
                type="text"
                inputmode="numeric"
                maxlength="1"
@@ -92,43 +92,43 @@
     [Parameter]
     public InputOTPSize Size { get; set; } = InputOTPSize.Default;
 
-    private ElementReference[] _inputRefs = Array.Empty<ElementReference>();
-    private string[] _values = Array.Empty<string>();
+    private ElementReference[] objInputRefs = Array.Empty<ElementReference>();
+    private string[] objValues = Array.Empty<string>();
 
     protected override void OnInitialized()
     {
-        _inputRefs = new ElementReference[Length];
-        _values = new string[Length];
+        objInputRefs = new ElementReference[Length];
+        objValues = new string[Length];
 
         if (!string.IsNullOrEmpty(Value))
         {
             for (int i = 0; i < Math.Min(Value.Length, Length); i++)
             {
-                _values[i] = Value[i].ToString();
+                objValues[i] = Value[i].ToString();
             }
         }
     }
 
     protected override void OnParametersSet()
     {
-        if (_values.Length != Length)
+        if (objValues.Length != Length)
         {
-            _inputRefs = new ElementReference[Length];
-            _values = new string[Length];
+            objInputRefs = new ElementReference[Length];
+            objValues = new string[Length];
         }
 
         if (!string.IsNullOrEmpty(Value))
         {
             for (int i = 0; i < Length; i++)
             {
-                _values[i] = i < Value.Length ? Value[i].ToString() : "";
+                objValues[i] = i < Value.Length ? Value[i].ToString() : "";
             }
         }
     }
 
     private string GetValueAt(int index)
     {
-        return index < _values.Length ? _values[index] ?? "" : "";
+        return index < objValues.Length ? objValues[index] ?? "" : "";
     }
 
     private async Task HandleInput(int index, ChangeEventArgs e)
@@ -141,13 +141,13 @@
             return;
         }
 
-        _values[index] = inputValue.Length > 0 ? inputValue[0].ToString() : "";
+        objValues[index] = inputValue.Length > 0 ? inputValue[0].ToString() : "";
 
-        var newValue = string.Join("", _values);
+        var newValue = string.Join("", objValues);
         await ValueChanged.InvokeAsync(newValue);
 
         // Move to next input if value entered
-        if (!string.IsNullOrEmpty(_values[index]) && index < Length - 1)
+        if (!string.IsNullOrEmpty(objValues[index]) && index < Length - 1)
         {
             await FocusInput(index + 1);
         }
@@ -155,7 +155,7 @@
         // Check if complete
         if (newValue.Length == Length && !newValue.Contains(""))
         {
-            var completeValue = string.Join("", _values.Where(v => !string.IsNullOrEmpty(v)));
+            var completeValue = string.Join("", objValues.Where(v => !string.IsNullOrEmpty(v)));
             if (completeValue.Length == Length)
             {
                 await OnComplete.InvokeAsync(completeValue);
@@ -165,7 +165,7 @@
 
     private async Task HandleKeyDown(int index, KeyboardEventArgs e)
     {
-        if (e.Key == "Backspace" && string.IsNullOrEmpty(_values[index]) && index > 0)
+        if (e.Key == "Backspace" && string.IsNullOrEmpty(objValues[index]) && index > 0)
         {
             // Move to previous input on backspace when current is empty
             await FocusInput(index - 1);
@@ -192,11 +192,11 @@
 
     private async Task FocusInput(int index)
     {
-        if (index >= 0 && index < _inputRefs.Length)
+        if (index >= 0 && index < objInputRefs.Length)
         {
             try
             {
-                await _inputRefs[index].FocusAsync();
+                await objInputRefs[index].FocusAsync();
             }
             catch
             {

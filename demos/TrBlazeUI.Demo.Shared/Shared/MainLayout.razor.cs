@@ -9,10 +9,10 @@ public partial class MainLayout : LayoutComponentBase
     private CollapsibleStateService StateService { get; set; } = null!;
 
     // State for each collapsible menu section
-    private bool _primitivesMenuOpen;
-    private bool _componentsMenuOpen;
-    private bool _chartsMenuOpen;
-    private bool _iconsMenuOpen;
+    private bool objPrimitivesMenuOpen;
+    private bool objComponentsMenuOpen;
+    private bool objChartsMenuOpen;
+    private bool objIconsMenuOpen;
 
     // State keys for localStorage
     private const string PrimitivesMenuKey = "sidebar-primitives-menu";
@@ -25,10 +25,10 @@ public partial class MainLayout : LayoutComponentBase
         if (firstRender)
         {
             // Load saved state from localStorage on first render
-            _primitivesMenuOpen = await StateService.GetStateAsync(PrimitivesMenuKey, defaultValue: false);
-            _componentsMenuOpen = await StateService.GetStateAsync(ComponentsMenuKey, defaultValue: false);
-            _chartsMenuOpen = await StateService.GetStateAsync(ChartsMenuKey, defaultValue: false);
-            _iconsMenuOpen = await StateService.GetStateAsync(IconsMenuKey, defaultValue: false);
+            objPrimitivesMenuOpen = await StateService.GetStateAsync(PrimitivesMenuKey, defaultValue: false);
+            objComponentsMenuOpen = await StateService.GetStateAsync(ComponentsMenuKey, defaultValue: false);
+            objChartsMenuOpen = await StateService.GetStateAsync(ChartsMenuKey, defaultValue: false);
+            objIconsMenuOpen = await StateService.GetStateAsync(IconsMenuKey, defaultValue: false);
 
             // Trigger re-render with loaded state
             StateHasChanged();
@@ -38,25 +38,25 @@ public partial class MainLayout : LayoutComponentBase
     // Event handlers for state changes
     private async Task OnPrimitivesMenuOpenChanged(bool isOpen)
     {
-        _primitivesMenuOpen = isOpen;
+        objPrimitivesMenuOpen = isOpen;
         await StateService.SetStateAsync(PrimitivesMenuKey, isOpen);
     }
 
     private async Task OnComponentsMenuOpenChanged(bool isOpen)
     {
-        _componentsMenuOpen = isOpen;
+        objComponentsMenuOpen = isOpen;
         await StateService.SetStateAsync(ComponentsMenuKey, isOpen);
     }
 
     private async Task OnChartsMenuOpenChanged(bool isOpen)
     {
-        _chartsMenuOpen = isOpen;
+        objChartsMenuOpen = isOpen;
         await StateService.SetStateAsync(ChartsMenuKey, isOpen);
     }
 
     private async Task OnIconsMenuOpenChanged(bool isOpen)
     {
-        _iconsMenuOpen = isOpen;
+        objIconsMenuOpen = isOpen;
         await StateService.SetStateAsync(IconsMenuKey, isOpen);
     }
 }

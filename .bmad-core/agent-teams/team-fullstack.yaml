@@ -10,6 +10,7 @@ agents:
   - ux-expert
   - architect
   - po
+  - trblazeui-designer
 workflows:
   - brownfield-fullstack.yaml
   - brownfield-service.yaml

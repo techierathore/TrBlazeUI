@@ -95,15 +95,15 @@
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
-    private IAsyncDisposable? _positioningCleanup;
-    private bool _isInitialized = false;
-    private bool _isPositioned = false;
-    private ElementReference _portalContentRef;
-    private TaskCompletionSource<bool>? _portalReadyTcs;
+    private IAsyncDisposable? objPositioningCleanup;
+    private bool objIsInitialized = false;
+    private bool objIsPositioned = false;
+    private ElementReference objPortalContentRef;
+    private TaskCompletionSource<bool>? objPortalReadyTcs;
 
     // Store computed position so it survives Blazor re-renders
-    private double _positionLeft = 0;
-    private double _positionTop = 0;
+    private double objPositionLeft = 0;
+    private double objPositionTop = 0;
 
     protected override void OnInitialized()
     {
@@ -122,7 +122,7 @@
     {
         if (portalId == PortalId)
         {
-            _portalReadyTcs?.TrySetResult(true);
+            objPortalReadyTcs?.TrySetResult(true);
         }
     }
 
@@ -133,7 +133,7 @@
         // Re-register portal with updated ChildContent to ensure content updates are reflected
         // Safe because GetInitialStyle() includes the stored position,
         // so re-renders won't lose the position styling
-        if (_isInitialized && IsOpen && !string.IsNullOrEmpty(PortalId))
+        if (objIsInitialized && IsOpen && !string.IsNullOrEmpty(PortalId))
         {
             PortalService.RegisterPortal(PortalId, RenderPortalContent());
         }
@@ -141,13 +141,13 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (IsOpen && !_isInitialized)
+        if (IsOpen && !objIsInitialized)
         {
-            _isInitialized = true;
-            _isPositioned = false;
+            objIsInitialized = true;
+            objIsPositioned = false;
 
             // Create completion source BEFORE registering portal
-            _portalReadyTcs = new TaskCompletionSource<bool>();
+            objPortalReadyTcs = new TaskCompletionSource<bool>();
 
             // Register content through portal - this triggers PortalHost to re-render
             PortalService.RegisterPortal(PortalId, RenderPortalContent());
@@ -155,14 +155,14 @@
             // Wait for PortalHost to signal it's done rendering our portal
             // Use timeout to prevent hanging if something goes wrong
             var timeoutTask = Task.Delay(500);
-            var completedTask = await Task.WhenAny(_portalReadyTcs.Task, timeoutTask);
+            var completedTask = await Task.WhenAny(objPortalReadyTcs.Task, timeoutTask);
 
             if (completedTask == timeoutTask)
             {
                 Console.WriteLine($"Warning: Portal {PortalId} render timeout");
             }
 
-            // Yield to ensure any pending re-renders complete and _portalContentRef is up-to-date
+            // Yield to ensure any pending re-renders complete and objPortalContentRef is up-to-date
             // This is critical when multiple portals are opening/closing simultaneously
             await Task.Yield();
 
@@ -172,10 +172,10 @@
                 return;
             }
 
-            // NOW _portalContentRef is guaranteed to be valid!
+            // NOW objPortalContentRef is guaranteed to be valid!
             await SetupAsync();
         }
-        else if (!IsOpen && _isInitialized)
+        else if (!IsOpen && objIsInitialized)
         {
             await CleanupAsync();
         }
@@ -192,7 +192,7 @@
             await SetupPositioningAsync();
 
             // Mark as positioned for any future Blazor re-renders
-            _isPositioned = true;
+            objIsPositioned = true;
 
             // Notify consumers that content is ready (for focus management, keyboard handlers, etc.)
             if (OnReady.HasDelegate)
@@ -204,7 +204,7 @@
         {
             Console.WriteLine($"FloatingPortal setup failed: {ex.Message}");
             // Mark as positioned and show via JS even if setup fails
-            _isPositioned = true;
+            objIsPositioned = true;
             try
             {
                 var elementUtilsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
@@ -218,7 +218,7 @@
 
     private RenderFragment RenderPortalContent() => __builder =>
     {
-        <div @ref="_portalContentRef"
+        <div @ref="objPortalContentRef"
              @attributes="GetAttributesWithoutStyle()"
              data-portal-content="true"
              style="@GetMergedStyle()">
@@ -252,20 +252,20 @@
             // Compute position using the portal content ref
             var position = await PositioningService.ComputePositionAsync(
                 AnchorElement.Value,
-                _portalContentRef,
+                objPortalContentRef,
                 options);
 
             // Store position in Blazor state so it survives re-renders
-            _positionLeft = position.X;
-            _positionTop = position.Y;
+            objPositionLeft = position.X;
+            objPositionTop = position.Y;
 
             // Apply position via JS for initial display
-            await PositioningService.ApplyPositionAsync(_portalContentRef, position, makeVisible: true);
+            await PositioningService.ApplyPositionAsync(objPortalContentRef, position, makeVisible: true);
 
             // Set up auto-update for dynamic positioning (scroll, resize)
-            _positioningCleanup = await PositioningService.AutoUpdateAsync(
+            objPositioningCleanup = await PositioningService.AutoUpdateAsync(
                 AnchorElement.Value,
-                _portalContentRef,
+                objPortalContentRef,
                 options);
         }
         catch (Exception ex)
@@ -279,7 +279,7 @@
     /// </summary>
     private string GetInitialStyle()
     {
-        if (!_isPositioned)
+        if (!objIsPositioned)
         {
             // Use position: fixed with off-screen coordinates to prevent:
             // 1. Flash at wrong position (fixed doesn't depend on parent context)
@@ -290,7 +290,7 @@
 
         // After positioning, include stored position so it survives Blazor re-renders
         // This prevents the content from "closing" when parent components re-render
-        return $"position: {Strategy}; z-index: {ZIndex}; left: {_positionLeft}px; top: {_positionTop}px; opacity: 1; visibility: visible;";
+        return $"position: {Strategy}; z-index: {ZIndex}; left: {objPositionLeft}px; top: {objPositionTop}px; opacity: 1; visibility: visible;";
     }
 
     private string GetMergedStyle()
@@ -318,10 +318,10 @@
     private async Task CleanupAsync()
     {
         // Dispose positioning auto-update
-        if (_positioningCleanup != null)
+        if (objPositioningCleanup != null)
         {
-            await _positioningCleanup.DisposeAsync();
-            _positioningCleanup = null;
+            await objPositioningCleanup.DisposeAsync();
+            objPositioningCleanup = null;
         }
 
         // Unregister portal when content closes
@@ -330,8 +330,8 @@
             PortalService.UnregisterPortal(PortalId);
         }
 
-        _isInitialized = false;
-        _isPositioned = false;
+        objIsInitialized = false;
+        objIsPositioned = false;
     }
 
     public async ValueTask DisposeAsync()

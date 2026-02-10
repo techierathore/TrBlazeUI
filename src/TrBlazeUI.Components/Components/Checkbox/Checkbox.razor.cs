@@ -36,8 +36,8 @@ namespace TrBlazeUI.Components.Checkbox;
 /// </example>
 public partial class Checkbox : ComponentBase
 {
-    private FieldIdentifier _fieldIdentifier;
-    private EditContext? _editContext;
+    private FieldIdentifier objFieldIdentifier;
+    private EditContext? objEditContext;
 
     /// <summary>
     /// Gets or sets the cascaded EditContext from a parent EditForm.
@@ -142,9 +142,9 @@ public partial class Checkbox : ComponentBase
     {
         get
         {
-            if (_editContext != null && CheckedExpression != null && _fieldIdentifier.FieldName != null)
+            if (objEditContext != null && CheckedExpression != null && objFieldIdentifier.FieldName != null)
             {
-                return _editContext.GetValidationMessages(_fieldIdentifier).Any();
+                return objEditContext.GetValidationMessages(objFieldIdentifier).Any();
             }
             return false;
         }
@@ -201,9 +201,9 @@ public partial class Checkbox : ComponentBase
         await CheckedChanged.InvokeAsync(value);
 
         // Notify EditContext of field change for validation
-        if (_editContext != null && CheckedExpression != null && _fieldIdentifier.FieldName != null)
+        if (objEditContext != null && CheckedExpression != null && objFieldIdentifier.FieldName != null)
         {
-            _editContext.NotifyFieldChanged(_fieldIdentifier);
+            objEditContext.NotifyFieldChanged(objFieldIdentifier);
         }
     }
 
@@ -215,8 +215,8 @@ public partial class Checkbox : ComponentBase
         // Initialize EditContext integration if available
         if (CascadedEditContext != null && CheckedExpression != null)
         {
-            _editContext = CascadedEditContext;
-            _fieldIdentifier = FieldIdentifier.Create(CheckedExpression);
+            objEditContext = CascadedEditContext;
+            objFieldIdentifier = FieldIdentifier.Create(CheckedExpression);
         }
     }
 }

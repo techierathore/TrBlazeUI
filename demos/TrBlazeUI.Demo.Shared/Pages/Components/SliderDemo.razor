@@ -23,9 +23,9 @@
             </p>
         </div>
         <div class="w-[60%]">
-            <Slider @bind-Value="_basicValue" />
+            <Slider @bind-Value="objBasicValue" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_basicValue</p>
+        <p class="text-sm text-muted-foreground">Value: @objBasicValue</p>
     </div>
 
     <!-- With Default Value -->
@@ -37,9 +37,9 @@
             </p>
         </div>
         <div class="w-[60%]">
-            <Slider @bind-Value="_presetValue" DefaultValue="50" />
+            <Slider @bind-Value="objPresetValue" DefaultValue="50" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_presetValue</p>
+        <p class="text-sm text-muted-foreground">Value: @objPresetValue</p>
     </div>
 
     <!-- Custom Range -->
@@ -51,9 +51,9 @@
             </p>
         </div>
         <div class="w-[60%]">
-            <Slider @bind-Value="_rangeValue" Min="0" Max="10" Step="1" />
+            <Slider @bind-Value="objRangeValue" Min="0" Max="10" Step="1" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_rangeValue (0-10)</p>
+        <p class="text-sm text-muted-foreground">Value: @objRangeValue (0-10)</p>
     </div>
 
     <!-- Step Size -->
@@ -65,9 +65,9 @@
             </p>
         </div>
         <div class="w-[60%]">
-            <Slider @bind-Value="_stepValue" Step="10" />
+            <Slider @bind-Value="objStepValue" Step="10" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_stepValue (step: 10)</p>
+        <p class="text-sm text-muted-foreground">Value: @objStepValue (step: 10)</p>
     </div>
 
     <!-- Disabled -->
@@ -104,8 +104,8 @@
 </div>
 
 @code {
-    private double _basicValue = 0;
-    private double _presetValue = 50;
-    private double _rangeValue = 5;
-    private double _stepValue = 50;
+    private double objBasicValue = 0;
+    private double objPresetValue = 50;
+    private double objRangeValue = 5;
+    private double objStepValue = 50;
 }

@@ -10,8 +10,8 @@ namespace TrBlazeUI.Primitives.Utilities;
 /// <typeparam name="T">The type of the state value.</typeparam>
 public class UseControllableState<T>
 {
-    private T? _uncontrolledValue;
-    private readonly T _defaultValue;
+    private T? objUncontrolledValue;
+    private readonly T objDefaultValue;
 
     /// <summary>
     /// Creates a new controllable state manager.
@@ -19,8 +19,8 @@ public class UseControllableState<T>
     /// <param name="defaultValue">The default value when uncontrolled.</param>
     public UseControllableState(T defaultValue)
     {
-        _defaultValue = defaultValue;
-        _uncontrolledValue = defaultValue;
+        objDefaultValue = defaultValue;
+        objUncontrolledValue = defaultValue;
     }
 
     /// <summary>
@@ -50,9 +50,9 @@ public class UseControllableState<T>
         {
             if (IsControlled)
             {
-                return ControlledValue ?? _defaultValue;
+                return ControlledValue ?? objDefaultValue;
             }
-            return _uncontrolledValue ?? _defaultValue;
+            return objUncontrolledValue ?? objDefaultValue;
         }
     }
 
@@ -65,13 +65,13 @@ public class UseControllableState<T>
     {
         if (!IsControlled)
         {
-            _uncontrolledValue = value;
+            objUncontrolledValue = value;
         }
 
         // Always notify parent of change (for both controlled and uncontrolled)
         if (OnValueChanged.HasDelegate)
         {
-            await OnValueChanged.InvokeAsync(value);
+            await OnValueChanged.InvokeAsync(value).ConfigureAwait(false);
         }
     }
 
@@ -83,7 +83,7 @@ public class UseControllableState<T>
     {
         if (!IsControlled)
         {
-            _uncontrolledValue = _defaultValue;
+            objUncontrolledValue = objDefaultValue;
         }
     }
 }

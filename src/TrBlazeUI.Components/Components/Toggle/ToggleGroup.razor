@@ -41,13 +41,13 @@
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-    private TValue? _internalValue;
-    private List<TValue> _internalValues = new();
+    private TValue? objInternalValue;
+    private List<TValue> objInternalValues = new();
     private bool IsControlled => ValueChanged.HasDelegate || ValuesChanged.HasDelegate;
 
     protected override void OnInitialized()
     {
-        _internalValue = DefaultValue;
+        objInternalValue = DefaultValue;
     }
 
     internal bool IsItemPressed(TValue? itemValue)
@@ -56,23 +56,23 @@
 
         if (Type == ToggleGroupType.Single)
         {
-            var currentValue = IsControlled ? Value : _internalValue;
+            var currentValue = IsControlled ? Value : objInternalValue;
             return EqualityComparer<TValue>.Default.Equals(currentValue, itemValue);
         }
         else
         {
-            var currentValues = IsControlled ? Values : _internalValues;
+            var currentValues = IsControlled ? Values : objInternalValues;
             return currentValues?.Contains(itemValue) == true;
         }
     }
 
-    internal async Task ToggleItem(TValue? itemValue)
+    internal async Task ToggleItemAsync(TValue? itemValue)
     {
         if (itemValue == null || Disabled) return;
 
         if (Type == ToggleGroupType.Single)
         {
-            var currentValue = IsControlled ? Value : _internalValue;
+            var currentValue = IsControlled ? Value : objInternalValue;
             var newValue = EqualityComparer<TValue>.Default.Equals(currentValue, itemValue) ? default : itemValue;
 
             if (IsControlled)
@@ -81,13 +81,13 @@
             }
             else
             {
-                _internalValue = newValue;
+                objInternalValue = newValue;
                 StateHasChanged();
             }
         }
         else
         {
-            var currentValues = (IsControlled ? Values : _internalValues) ?? new List<TValue>();
+            var currentValues = (IsControlled ? Values : objInternalValues) ?? new List<TValue>();
             var newValues = new List<TValue>(currentValues);
 
             if (newValues.Contains(itemValue))
@@ -105,7 +105,7 @@
             }
             else
             {
-                _internalValues = newValues;
+                objInternalValues = newValues;
                 StateHasChanged();
             }
         }

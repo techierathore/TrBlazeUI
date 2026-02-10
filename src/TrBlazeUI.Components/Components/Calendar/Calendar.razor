@@ -88,7 +88,7 @@
                             {
                                 var isSelected = day.HasValue && Selected.HasValue && day.Value.Date == Selected.Value.Date;
                                 var isDisabled = day.HasValue && (IsDisabled(day.Value) || day.Value.Month != DisplayDate.Month);
-                                var isFocused = day.HasValue && _focusedDate.HasValue && day.Value.Date == _focusedDate.Value.Date;
+                                var isFocused = day.HasValue && objFocusedDate.HasValue && day.Value.Date == objFocusedDate.Value.Date;
                                 <td class="@GetCellClasses(day, isSelected)"
                                     role="gridcell"
                                     aria-selected="@isSelected">
@@ -99,7 +99,7 @@
                                                 class="@GetDayClasses(day.Value, isSelected, isDisabled, isFocused)"
                                                 disabled="@isDisabled"
                                                 tabindex="@(isFocused ? 0 : -1)"
-                                                @onclick="@(() => SelectDate(day.Value))"
+                                                @onclick="@(() => SelectDateAsync(day.Value))"
                                                 @onclick:stopPropagation="true"
                                                 @onfocus="@(() => HandleDayFocus(day.Value))">
                                             @day.Value.Day
@@ -116,41 +116,41 @@
 </div>
 
 @code {
-    private DateTime _displayDate;
-    private DateTime? _previousSelected;
-    private IJSObjectReference? _elementUtilsModule;
+    private DateTime objDisplayDate;
+    private DateTime? objPreviousSelected;
+    private IJSObjectReference? objElementUtilsModule;
 
     // Keyboard navigation fields
-    private DateTime? _focusedDate;
-    private bool _isKeyboardNavigating;
-    private readonly string _calendarId = $"calendar-{Guid.NewGuid():N}";
+    private DateTime? objFocusedDate;
+    private bool objIsKeyboardNavigating;
+    private readonly string objCalendarId = $"calendar-{Guid.NewGuid():N}";
 
     // Caching fields
-    private DayOfWeek _cachedFirstDayOfWeek;
-    private bool _cachedShowOutsideDays;
-    private string[]? _cachedDayNames;
-    private List<List<DateTime?>>? _cachedWeeks;
+    private DayOfWeek objCachedFirstDayOfWeek;
+    private bool objCachedShowOutsideDays;
+    private string[]? objCachedDayNames;
+    private List<List<DateTime?>>? objCachedWeeks;
 
     // ShouldRender tracking fields
-    private DateTime? _lastSelected;
-    private DateTime _lastDisplayDate;
-    private DateTime? _lastMinDate;
-    private DateTime? _lastMaxDate;
-    private bool _lastShowMonthYearDropdowns;
-    private DateTime? _lastFocusedDate;
-    private bool _lastIsKeyboardNavigating;
+    private DateTime? objLastSelected;
+    private DateTime objLastDisplayDate;
+    private DateTime? objLastMinDate;
+    private DateTime? objLastMaxDate;
+    private bool objLastShowMonthYearDropdowns;
+    private DateTime? objLastFocusedDate;
+    private bool objLastIsKeyboardNavigating;
 
     /// <summary>
     /// The currently displayed month.
     /// </summary>
     private DateTime DisplayDate
     {
-        get => _displayDate;
+        get => objDisplayDate;
         set
         {
-            if (_displayDate.Year != value.Year || _displayDate.Month != value.Month)
-                _cachedWeeks = null;
-            _displayDate = value;
+            if (objDisplayDate.Year != value.Year || objDisplayDate.Month != value.Month)
+                objCachedWeeks = null;
+            objDisplayDate = value;
         }
     }
 
@@ -241,8 +241,8 @@
 
     protected override void OnInitialized()
     {
-        _displayDate = Selected ?? DateTime.Today;
-        _previousSelected = Selected;
+        objDisplayDate = Selected ?? DateTime.Today;
+        objPreviousSelected = Selected;
         InitializeFocusedDate();
     }
 
@@ -250,28 +250,28 @@
     {
         // Only sync display date when Selected actually changes from external source
         // This prevents overwriting user's month/year navigation
-        if (Selected != _previousSelected)
+        if (Selected != objPreviousSelected)
         {
-            _previousSelected = Selected;
+            objPreviousSelected = Selected;
             if (Selected.HasValue)
             {
-                _displayDate = Selected.Value;
-                _focusedDate = Selected.Value;
+                objDisplayDate = Selected.Value;
+                objFocusedDate = Selected.Value;
             }
         }
 
         // Invalidate caches when relevant parameters change
-        if (_cachedFirstDayOfWeek != FirstDayOfWeek)
+        if (objCachedFirstDayOfWeek != FirstDayOfWeek)
         {
-            _cachedFirstDayOfWeek = FirstDayOfWeek;
-            _cachedDayNames = null;
-            _cachedWeeks = null;
+            objCachedFirstDayOfWeek = FirstDayOfWeek;
+            objCachedDayNames = null;
+            objCachedWeeks = null;
         }
 
-        if (_cachedShowOutsideDays != ShowOutsideDays)
+        if (objCachedShowOutsideDays != ShowOutsideDays)
         {
-            _cachedShowOutsideDays = ShowOutsideDays;
-            _cachedWeeks = null;
+            objCachedShowOutsideDays = ShowOutsideDays;
+            objCachedWeeks = null;
         }
     }
 
@@ -281,16 +281,16 @@
         if (Selected.HasValue && Selected.Value.Month == DisplayDate.Month &&
             Selected.Value.Year == DisplayDate.Year)
         {
-            _focusedDate = Selected.Value.Date;
+            objFocusedDate = Selected.Value.Date;
         }
         else if (DateTime.Today.Month == DisplayDate.Month &&
                  DateTime.Today.Year == DisplayDate.Year)
         {
-            _focusedDate = DateTime.Today;
+            objFocusedDate = DateTime.Today;
         }
         else
         {
-            _focusedDate = GetFirstEnabledDayOfMonth();
+            objFocusedDate = GetFirstEnabledDayOfMonth();
         }
     }
 
@@ -318,7 +318,7 @@
 
     private static readonly string[] BaseDayNames = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
 
-    private string[] DayNames => _cachedDayNames ??= BuildDayNames();
+    private string[] DayNames => objCachedDayNames ??= BuildDayNames();
 
     private string[] BuildDayNames()
     {
@@ -364,7 +364,7 @@
     // Always prevent default for navigation keys to stop page scrolling
     private bool ShouldPreventKeyDefault => true;
 
-    private string GetDayId(DateTime date) => $"{_calendarId}-day-{date:yyyyMMdd}";
+    private string GetDayId(DateTime date) => $"{objCalendarId}-day-{date:yyyyMMdd}";
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
@@ -374,44 +374,44 @@
 
         if (!shouldHandle) return;
 
-        _isKeyboardNavigating = true;
+        objIsKeyboardNavigating = true;
 
         switch (e.Key)
         {
             case "ArrowLeft":
-                await NavigateDay(-1);
+                await NavigateDayAsync(-1);
                 break;
             case "ArrowRight":
-                await NavigateDay(1);
+                await NavigateDayAsync(1);
                 break;
             case "ArrowUp":
-                await NavigateDay(-7);
+                await NavigateDayAsync(-7);
                 break;
             case "ArrowDown":
-                await NavigateDay(7);
+                await NavigateDayAsync(7);
                 break;
             case "Home":
-                await NavigateToFirstOfMonth();
+                await NavigateToFirstOfMonthAsync();
                 break;
             case "End":
-                await NavigateToLastOfMonth();
+                await NavigateToLastOfMonthAsync();
                 break;
             case "PageUp":
-                await NavigateMonth(e.ShiftKey ? -12 : -1);
+                await NavigateMonthAsync(e.ShiftKey ? -12 : -1);
                 break;
             case "PageDown":
-                await NavigateMonth(e.ShiftKey ? 12 : 1);
+                await NavigateMonthAsync(e.ShiftKey ? 12 : 1);
                 break;
             case "Enter":
             case " ":
-                await SelectFocusedDate();
+                await SelectFocusedDateAsync();
                 break;
         }
     }
 
-    private async Task NavigateDay(int days)
+    private async Task NavigateDayAsync(int days)
     {
-        var currentFocus = _focusedDate ?? Selected ?? DateTime.Today;
+        var currentFocus = objFocusedDate ?? Selected ?? DateTime.Today;
         var newDate = currentFocus.AddDays(days);
 
         // Skip disabled dates in the navigation direction
@@ -435,25 +435,25 @@
             DisplayDate = new DateTime(newDate.Year, newDate.Month, 1);
         }
 
-        _focusedDate = newDate;
-        await FocusCurrentButton();
+        objFocusedDate = newDate;
+        await FocusCurrentButtonAsync();
     }
 
-    private async Task NavigateToFirstOfMonth()
+    private async Task NavigateToFirstOfMonthAsync()
     {
-        _focusedDate = GetFirstEnabledDayOfMonth();
-        await FocusCurrentButton();
+        objFocusedDate = GetFirstEnabledDayOfMonth();
+        await FocusCurrentButtonAsync();
     }
 
-    private async Task NavigateToLastOfMonth()
+    private async Task NavigateToLastOfMonthAsync()
     {
-        _focusedDate = GetLastEnabledDayOfMonth();
-        await FocusCurrentButton();
+        objFocusedDate = GetLastEnabledDayOfMonth();
+        await FocusCurrentButtonAsync();
     }
 
-    private async Task NavigateMonth(int months)
+    private async Task NavigateMonthAsync(int months)
     {
-        var currentFocus = _focusedDate ?? Selected ?? DateTime.Today;
+        var currentFocus = objFocusedDate ?? Selected ?? DateTime.Today;
         var targetMonth = DisplayDate.AddMonths(months);
         DisplayDate = new DateTime(targetMonth.Year, targetMonth.Month, 1);
 
@@ -464,37 +464,37 @@
         // Find nearest enabled date if the target is disabled
         if (IsDisabled(newDate))
         {
-            _focusedDate = GetFirstEnabledDayOfMonth();
+            objFocusedDate = GetFirstEnabledDayOfMonth();
         }
         else
         {
-            _focusedDate = newDate;
+            objFocusedDate = newDate;
         }
 
-        await FocusCurrentButton();
+        await FocusCurrentButtonAsync();
     }
 
-    private async Task SelectFocusedDate()
+    private async Task SelectFocusedDateAsync()
     {
-        if (_focusedDate.HasValue && !IsDisabled(_focusedDate.Value))
+        if (objFocusedDate.HasValue && !IsDisabled(objFocusedDate.Value))
         {
-            await SelectDate(_focusedDate.Value);
+            await SelectDateAsync(objFocusedDate.Value);
         }
     }
 
-    private async Task FocusCurrentButton()
+    private async Task FocusCurrentButtonAsync()
     {
-        if (!_focusedDate.HasValue) return;
+        if (!objFocusedDate.HasValue) return;
 
         StateHasChanged();
         await Task.Yield(); // Allow render to complete
 
         try
         {
-            var elementId = GetDayId(_focusedDate.Value);
-            _elementUtilsModule ??= await JS.InvokeAsync<IJSObjectReference>(
+            var elementId = GetDayId(objFocusedDate.Value);
+            objElementUtilsModule ??= await JS.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/TrBlazeUI.Primitives/js/primitives/element-utils.js");
-            await _elementUtilsModule.InvokeVoidAsync("focusElement", elementId);
+            await objElementUtilsModule.InvokeVoidAsync("focusElement", elementId);
         }
         catch
         {
@@ -504,11 +504,11 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (_elementUtilsModule != null)
+        if (objElementUtilsModule != null)
         {
             try
             {
-                await _elementUtilsModule.DisposeAsync();
+                await objElementUtilsModule.DisposeAsync();
             }
             catch
             {
@@ -520,8 +520,8 @@
     private void HandleDayFocus(DateTime date)
     {
         // Sync focused date when user clicks/tabs to a day
-        _focusedDate = date;
-        // Don't reset _isKeyboardNavigating here - let it persist until mouse click
+        objFocusedDate = date;
+        // Don't reset objIsKeyboardNavigating here - let it persist until mouse click
     }
 
     #endregion
@@ -565,13 +565,13 @@
 
     #region Date Selection
 
-    private async Task SelectDate(DateTime date)
+    private async Task SelectDateAsync(DateTime date)
     {
         if (IsDisabled(date)) return;
 
         // Reset keyboard navigation mode on click selection
-        _isKeyboardNavigating = false;
-        _focusedDate = date;
+        objIsKeyboardNavigating = false;
+        objFocusedDate = date;
 
         Selected = date;
         await SelectedChanged.InvokeAsync(date);
@@ -588,11 +588,11 @@
 
     private List<List<DateTime?>> GetWeeksInMonth()
     {
-        if (_cachedWeeks != null)
-            return _cachedWeeks;
+        if (objCachedWeeks != null)
+            return objCachedWeeks;
 
-        _cachedWeeks = BuildWeeksInMonth();
-        return _cachedWeeks;
+        objCachedWeeks = BuildWeeksInMonth();
+        return objCachedWeeks;
     }
 
     private List<List<DateTime?>> BuildWeeksInMonth()
@@ -663,7 +663,7 @@
             baseClass = DayBaseClasses;
 
         // Add keyboard focus ring (distinct from :focus-visible for programmatic focus)
-        if (isFocused && _isKeyboardNavigating && !isSelected)
+        if (isFocused && objIsKeyboardNavigating && !isSelected)
         {
             baseClass = ClassNames.cn(baseClass, "ring-2 ring-ring ring-offset-2");
         }
@@ -679,24 +679,24 @@
     /// </summary>
     protected override bool ShouldRender()
     {
-        var selectedChanged = _lastSelected != Selected;
-        var displayDateChanged = _lastDisplayDate != _displayDate;
-        var minDateChanged = _lastMinDate != MinDate;
-        var maxDateChanged = _lastMaxDate != MaxDate;
-        var dropdownsChanged = _lastShowMonthYearDropdowns != ShowMonthYearDropdowns;
-        var focusedDateChanged = _lastFocusedDate != _focusedDate;
-        var keyboardNavigatingChanged = _lastIsKeyboardNavigating != _isKeyboardNavigating;
+        var selectedChanged = objLastSelected != Selected;
+        var displayDateChanged = objLastDisplayDate != objDisplayDate;
+        var minDateChanged = objLastMinDate != MinDate;
+        var maxDateChanged = objLastMaxDate != MaxDate;
+        var dropdownsChanged = objLastShowMonthYearDropdowns != ShowMonthYearDropdowns;
+        var focusedDateChanged = objLastFocusedDate != objFocusedDate;
+        var keyboardNavigatingChanged = objLastIsKeyboardNavigating != objIsKeyboardNavigating;
 
         if (selectedChanged || displayDateChanged || minDateChanged || maxDateChanged ||
             dropdownsChanged || focusedDateChanged || keyboardNavigatingChanged)
         {
-            _lastSelected = Selected;
-            _lastDisplayDate = _displayDate;
-            _lastMinDate = MinDate;
-            _lastMaxDate = MaxDate;
-            _lastShowMonthYearDropdowns = ShowMonthYearDropdowns;
-            _lastFocusedDate = _focusedDate;
-            _lastIsKeyboardNavigating = _isKeyboardNavigating;
+            objLastSelected = Selected;
+            objLastDisplayDate = objDisplayDate;
+            objLastMinDate = MinDate;
+            objLastMaxDate = MaxDate;
+            objLastShowMonthYearDropdowns = ShowMonthYearDropdowns;
+            objLastFocusedDate = objFocusedDate;
+            objLastIsKeyboardNavigating = objIsKeyboardNavigating;
             return true;
         }
 

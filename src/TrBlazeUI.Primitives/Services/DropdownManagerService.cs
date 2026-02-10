@@ -39,9 +39,9 @@ public interface IDropdownManagerService
 /// </remarks>
 public class DropdownManagerService : IDropdownManagerService
 {
-    private readonly object _lock = new object();
-    private string? _currentDropdownId;
-    private Action? _currentCloseCallback;
+    private readonly object objLock = new object();
+    private string? objCurrentDropdownId;
+    private Action? objCurrentCloseCallback;
 
     /// <summary>
     /// Registers a dropdown as open. If another dropdown is already open, it will be closed first.
@@ -65,16 +65,16 @@ public class DropdownManagerService : IDropdownManagerService
             throw new ArgumentException("Dropdown ID contains invalid characters.", nameof(dropdownId));
         }
 
-        lock (_lock)
+        lock (objLock)
         {
             // Close the currently open dropdown if it's different from the one being registered
-            if (_currentDropdownId != null && _currentDropdownId != dropdownId)
+            if (objCurrentDropdownId != null && objCurrentDropdownId != dropdownId)
             {
-                _currentCloseCallback?.Invoke();
+                objCurrentCloseCallback?.Invoke();
             }
 
-            _currentDropdownId = dropdownId;
-            _currentCloseCallback = closeCallback;
+            objCurrentDropdownId = dropdownId;
+            objCurrentCloseCallback = closeCallback;
         }
     }
 
@@ -100,12 +100,12 @@ public class DropdownManagerService : IDropdownManagerService
     /// <param name="dropdownId">The dropdown ID to unregister</param>
     public void Unregister(string dropdownId)
     {
-        lock (_lock)
+        lock (objLock)
         {
-            if (_currentDropdownId == dropdownId)
+            if (objCurrentDropdownId == dropdownId)
             {
-                _currentDropdownId = null;
-                _currentCloseCallback = null;
+                objCurrentDropdownId = null;
+                objCurrentCloseCallback = null;
             }
         }
     }
@@ -117,9 +117,9 @@ public class DropdownManagerService : IDropdownManagerService
     /// <returns>True if the dropdown is currently registered as open</returns>
     public bool IsOpen(string dropdownId)
     {
-        lock (_lock)
+        lock (objLock)
         {
-            return _currentDropdownId == dropdownId;
+            return objCurrentDropdownId == dropdownId;
         }
     }
 }

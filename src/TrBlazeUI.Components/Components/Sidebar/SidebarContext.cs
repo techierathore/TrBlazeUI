@@ -74,42 +74,42 @@ public class SidebarState
 /// </summary>
 public class SidebarContext
 {
-    private SidebarState _state = new();
+    private SidebarState objState = new();
 
     /// <summary>
     /// Gets the current sidebar state.
     /// </summary>
-    public SidebarState State => _state;
+    public SidebarState State => objState;
 
     /// <summary>
     /// Gets whether the sidebar is currently open (desktop or mobile based on viewport).
     /// </summary>
-    public bool IsOpen => _state.IsMobile ? _state.OpenMobile : _state.Open;
+    public bool IsOpen => objState.IsMobile ? objState.OpenMobile : objState.Open;
 
     /// <summary>
     /// Gets whether the sidebar is open on desktop.
     /// </summary>
-    public bool Open => _state.Open;
+    public bool Open => objState.Open;
 
     /// <summary>
     /// Gets whether the sidebar is open on mobile.
     /// </summary>
-    public bool OpenMobile => _state.OpenMobile;
+    public bool OpenMobile => objState.OpenMobile;
 
     /// <summary>
     /// Gets whether the current viewport is mobile.
     /// </summary>
-    public bool IsMobile => _state.IsMobile;
+    public bool IsMobile => objState.IsMobile;
 
     /// <summary>
     /// Gets the sidebar variant.
     /// </summary>
-    public SidebarVariant Variant => _state.Variant;
+    public SidebarVariant Variant => objState.Variant;
 
     /// <summary>
     /// Gets which side the sidebar appears on.
     /// </summary>
-    public SidebarSide Side => _state.Side;
+    public SidebarSide Side => objState.Side;
 
     /// <summary>
     /// Event raised when the sidebar state changes.
@@ -122,13 +122,13 @@ public class SidebarContext
     /// </summary>
     public void ToggleSidebar()
     {
-        if (_state.IsMobile)
+        if (objState.IsMobile)
         {
-            SetOpenMobile(!_state.OpenMobile);
+            SetOpenMobile(!objState.OpenMobile);
         }
         else
         {
-            SetOpen(!_state.Open);
+            SetOpen(!objState.Open);
         }
     }
 
@@ -137,9 +137,9 @@ public class SidebarContext
     /// </summary>
     public void SetOpen(bool open)
     {
-        if (_state.Open != open)
+        if (objState.Open != open)
         {
-            _state.Open = open;
+            objState.Open = open;
             OnStateChanged();
         }
     }
@@ -149,9 +149,9 @@ public class SidebarContext
     /// </summary>
     public void SetOpenMobile(bool open)
     {
-        if (_state.OpenMobile != open)
+        if (objState.OpenMobile != open)
         {
-            _state.OpenMobile = open;
+            objState.OpenMobile = open;
             OnStateChanged();
         }
     }
@@ -162,9 +162,9 @@ public class SidebarContext
     /// </summary>
     public void SetIsMobile(bool isMobile)
     {
-        if (_state.IsMobile != isMobile)
+        if (objState.IsMobile != isMobile)
         {
-            _state.IsMobile = isMobile;
+            objState.IsMobile = isMobile;
             OnStateChanged();
         }
     }
@@ -174,9 +174,9 @@ public class SidebarContext
     /// </summary>
     public void SetVariant(SidebarVariant variant)
     {
-        if (_state.Variant != variant)
+        if (objState.Variant != variant)
         {
-            _state.Variant = variant;
+            objState.Variant = variant;
             OnStateChanged();
         }
     }
@@ -186,9 +186,9 @@ public class SidebarContext
     /// </summary>
     public void SetSide(SidebarSide side)
     {
-        if (_state.Side != side)
+        if (objState.Side != side)
         {
-            _state.Side = side;
+            objState.Side = side;
             OnStateChanged();
         }
     }
@@ -200,21 +200,21 @@ public class SidebarContext
     {
         var changed = false;
 
-        if (open.HasValue && _state.Open != open.Value)
+        if (open.HasValue && objState.Open != open.Value)
         {
-            _state.Open = open.Value;
+            objState.Open = open.Value;
             changed = true;
         }
 
-        if (variant.HasValue && _state.Variant != variant.Value)
+        if (variant.HasValue && objState.Variant != variant.Value)
         {
-            _state.Variant = variant.Value;
+            objState.Variant = variant.Value;
             changed = true;
         }
 
-        if (side.HasValue && _state.Side != side.Value)
+        if (side.HasValue && objState.Side != side.Value)
         {
-            _state.Side = side.Value;
+            objState.Side = side.Value;
             changed = true;
         }
 

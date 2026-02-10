@@ -111,7 +111,7 @@ public partial class RadialChart<TItem> : ChartBase<TItem> where TItem : class
     [Parameter]
     public string TrackBackground { get; set; } = "var(--muted)";
 
-    private ApexChartOptions<TItem> _options = new();
+    private ApexChartOptions<TItem> objOptions = new();
 
     /// <summary>
     /// Gets the computed CSS classes for the chart container.
@@ -129,16 +129,16 @@ public partial class RadialChart<TItem> : ChartBase<TItem> where TItem : class
 
     private void ConfigureOptions()
     {
-        _options = CreateBaseOptions();
+        objOptions = CreateBaseOptions();
 
         // Set colors from config or defaults
-        _options.Colors = ChartColor.DefaultColors.ToList();
+        objOptions.Colors = ChartColor.DefaultColors.ToList();
 
         // Get angles based on variant
         var (startAngle, endAngle) = GetAngles();
 
         // Configure radial bar specific options
-        _options.PlotOptions = new PlotOptions
+        objOptions.PlotOptions = new PlotOptions
         {
             RadialBar = new PlotOptionsRadialBar
             {
@@ -184,7 +184,7 @@ public partial class RadialChart<TItem> : ChartBase<TItem> where TItem : class
         // Configure fill based on variant
         if (Variant == RadialChartVariant.Gradient)
         {
-            _options.Fill = new Fill
+            objOptions.Fill = new Fill
             {
                 Type = FillType.Gradient,
                 Gradient = new FillGradient
@@ -201,7 +201,7 @@ public partial class RadialChart<TItem> : ChartBase<TItem> where TItem : class
         }
 
         // Stroke
-        _options.Stroke = new Stroke
+        objOptions.Stroke = new Stroke
         {
             LineCap = LineCap.Round
         };

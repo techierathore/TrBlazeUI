@@ -16,9 +16,9 @@
 </nav>
 
 @code {
-    private string? _activeItem;
-    private CancellationTokenSource? _closeTimerCts;
-    private List<ElementReference> _triggerRefs = new();
+    private string? objActiveItem;
+    private CancellationTokenSource? objCloseTimerCts;
+    private List<ElementReference> objTriggerRefs = new();
 
     protected override void OnInitialized()
     {
@@ -28,9 +28,9 @@
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
         // Close any open menu when navigation occurs
-        if (_activeItem != null)
+        if (objActiveItem != null)
         {
-            _activeItem = null;
+            objActiveItem = null;
             StateHasChanged();
         }
     }
@@ -38,7 +38,7 @@
     public void Dispose()
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
-        _closeTimerCts?.Dispose();
+        objCloseTimerCts?.Dispose();
     }
 
     /// <summary>
@@ -73,10 +73,10 @@
     /// </summary>
     internal string? ActiveItem
     {
-        get => _activeItem;
+        get => objActiveItem;
         set
         {
-            _activeItem = value;
+            objActiveItem = value;
             StateHasChanged();
         }
     }
@@ -86,8 +86,8 @@
     /// </summary>
     internal int RegisterTrigger(ElementReference triggerRef)
     {
-        _triggerRefs.Add(triggerRef);
-        return _triggerRefs.Count - 1;
+        objTriggerRefs.Add(triggerRef);
+        return objTriggerRefs.Count - 1;
     }
 
     /// <summary>
@@ -95,9 +95,9 @@
     /// </summary>
     internal ElementReference? GetTriggerAt(int index)
     {
-        if (index >= 0 && index < _triggerRefs.Count)
+        if (index >= 0 && index < objTriggerRefs.Count)
         {
-            return _triggerRefs[index];
+            return objTriggerRefs[index];
         }
         return null;
     }
@@ -105,7 +105,7 @@
     /// <summary>
     /// Gets the total number of registered triggers.
     /// </summary>
-    internal int TriggerCount => _triggerRefs.Count;
+    internal int TriggerCount => objTriggerRefs.Count;
 
     /// <summary>
     /// Starts a shared timer to close the menu after a short delay.
@@ -114,11 +114,11 @@
     internal async void StartCloseTimer()
     {
         CancelCloseTimer();
-        _closeTimerCts = new CancellationTokenSource();
+        objCloseTimerCts = new CancellationTokenSource();
 
         try
         {
-            await Task.Delay(150, _closeTimerCts.Token);
+            await Task.Delay(150, objCloseTimerCts.Token);
             ActiveItem = null;
         }
         catch (TaskCanceledException)
@@ -132,9 +132,9 @@
     /// </summary>
     internal void CancelCloseTimer()
     {
-        _closeTimerCts?.Cancel();
-        _closeTimerCts?.Dispose();
-        _closeTimerCts = null;
+        objCloseTimerCts?.Cancel();
+        objCloseTimerCts?.Dispose();
+        objCloseTimerCts = null;
     }
 
     /// <summary>
@@ -142,7 +142,7 @@
     /// </summary>
     private string CssClass => ClassNames.cn(
         "relative flex max-w-max flex-1 items-center justify-center",
-        _activeItem != null ? "z-50" : "z-10",
+        objActiveItem != null ? "z-50" : "z-10",
         Class
     );
 }

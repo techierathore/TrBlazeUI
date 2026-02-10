@@ -14,7 +14,7 @@
 {
     <FloatingPortal IsOpen="true"
                     AnchorElement="@Context.State.TriggerElement"
-                    PortalId="@_portalId"
+                    PortalId="@objPortalId"
                     Side="@Side"
                     Align="@Align"
                     Offset="@Offset"
@@ -118,11 +118,11 @@
     [Parameter]
     public EventCallback OnContentReady { get; set; }
 
-    private IJSObjectReference? _clickOutsideModule;
-    private IJSObjectReference? _clickOutsideCleanup;
-    private DotNetObjectReference<PopoverContent>? _dotNetRef;
-    private bool _disposed = false;
-    private string _portalId = "";
+    private IJSObjectReference? objClickOutsideModule;
+    private IJSObjectReference? objClickOutsideCleanup;
+    private DotNetObjectReference<PopoverContent>? objDotNetRef;
+    private bool objDisposed = false;
+    private string objPortalId = "";
 
     protected override void OnInitialized()
     {
@@ -133,7 +133,7 @@
                 "Ensure PopoverContent is a child of a Popover component.");
         }
 
-        _portalId = $"popover-portal-{Context.ContentId}";
+        objPortalId = $"popover-portal-{Context.ContentId}";
 
         // Subscribe to context changes
         Context.OnStateChanged += HandleContextStateChanged;
@@ -173,18 +173,18 @@
     {
         try
         {
-            _clickOutsideModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+            objClickOutsideModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/TrBlazeUI.Primitives/js/primitives/click-outside.js");
 
-            _dotNetRef = DotNetObjectReference.Create(this);
+            objDotNetRef = DotNetObjectReference.Create(this);
 
             // Use ID-based lookup instead of ElementReference
             // This ensures we always reference the current DOM element, not a stale one
             // that may have been replaced during Blazor re-renders
-            _clickOutsideCleanup = await _clickOutsideModule.InvokeAsync<IJSObjectReference>(
+            objClickOutsideCleanup = await objClickOutsideModule.InvokeAsync<IJSObjectReference>(
                 "onClickOutsideByIds",
                 Context.ContentId,      // Element ID (not ElementReference)
-                _dotNetRef,
+                objDotNetRef,
                 "HandleClickOutside",
                 Context.TriggerId);     // Trigger ID (not ElementReference)
         }
@@ -198,7 +198,7 @@
     public async Task HandleClickOutside()
     {
         // Guard against callbacks after disposal
-        if (_disposed || !Context.IsOpen) return;
+        if (objDisposed || !Context.IsOpen) return;
 
         // Invoke custom handler if provided
         if (OnClickOutside.HasDelegate)
@@ -251,41 +251,41 @@
     private async Task CleanupAsync()
     {
         // Remove click-outside listener by invoking dispose method
-        if (_clickOutsideCleanup != null)
+        if (objClickOutsideCleanup != null)
         {
             try
             {
-                await _clickOutsideCleanup.InvokeVoidAsync("dispose");
-                await _clickOutsideCleanup.DisposeAsync();
+                await objClickOutsideCleanup.InvokeVoidAsync("dispose");
+                await objClickOutsideCleanup.DisposeAsync();
             }
             catch
             {
                 // Cleanup may already be disposed
             }
-            _clickOutsideCleanup = null;
+            objClickOutsideCleanup = null;
         }
 
         // Dispose DotNetObjectReference to prevent stale callbacks
-        if (_dotNetRef != null)
+        if (objDotNetRef != null)
         {
-            _dotNetRef.Dispose();
-            _dotNetRef = null;
+            objDotNetRef.Dispose();
+            objDotNetRef = null;
         }
     }
 
     public async ValueTask DisposeAsync()
     {
         // Set disposed flag first to prevent JSInvokable callbacks during cleanup
-        _disposed = true;
+        objDisposed = true;
 
         await CleanupAsync();
 
-        if (_clickOutsideModule != null)
+        if (objClickOutsideModule != null)
         {
-            await _clickOutsideModule.DisposeAsync();
+            await objClickOutsideModule.DisposeAsync();
         }
 
-        _dotNetRef?.Dispose();
+        objDotNetRef?.Dispose();
 
         if (Context != null)
         {

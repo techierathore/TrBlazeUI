@@ -1,0 +1,52 @@
+name: Build and Publish NuGet Packages
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  NUGET_SOURCE: 'https://nuget.pkg.github.com/techierathore/index.json'
+
+jobs:
+  build-and-publish:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history needed for MinVer
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore TrBlazeUI.sln
+
+      - name: Build solution
+        run: dotnet build TrBlazeUI.sln -c Release --no-restore -p:CI=true
+
+      - name: Pack TrBlazeUI.Primitives
+        run: dotnet pack src/TrBlazeUI.Primitives/TrBlazeUI.Primitives.csproj -c Release --no-build -o ./nupkgs
+
+      - name: Pack TrBlazeUI.Components
+        run: dotnet pack src/TrBlazeUI.Components/TrBlazeUI.Components.csproj -c Release --no-build -o ./nupkgs
+
+      - name: Pack TrBlazeUI.Icons.Lucide
+        run: dotnet pack src/TrBlazeUI.Icons.Lucide/TrBlazeUI.Icons.Lucide.csproj -c Release --no-build -o ./nupkgs
+
+      - name: Pack TrBlazeUI.Icons.Heroicons
+        run: dotnet pack src/TrBlazeUI.Icons.Heroicons/TrBlazeUI.Icons.Heroicons.csproj -c Release --no-build -o ./nupkgs
+
+      - name: Pack TrBlazeUI.Icons.Feather
+        run: dotnet pack src/TrBlazeUI.Icons.Feather/TrBlazeUI.Icons.Feather.csproj -c Release --no-build -o ./nupkgs
+
+      - name: Publish to GitHub Packages
+        run: dotnet nuget push ./nupkgs/*.nupkg --source ${{ env.NUGET_SOURCE }} --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate

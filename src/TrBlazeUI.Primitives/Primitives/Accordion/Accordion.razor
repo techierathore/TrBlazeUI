@@ -3,14 +3,14 @@
 
 @* Accordion primitive root component - headless, unstyled behavior only *@
 <div @attributes="AdditionalAttributes">
-    <CascadingValue Value="@_context" IsFixed="false">
+    <CascadingValue Value="@objContext" IsFixed="false">
         @ChildContent
     </CascadingValue>
 </div>
 
 @code {
-    private AccordionContext _context = new();
-    private UseControllableState<HashSet<string>> _state = null!;
+    private AccordionContext objContext = new();
+    private UseControllableState<HashSet<string>> objState = null!;
 
     /// <summary>
     /// The child content to render within the accordion context.
@@ -69,7 +69,7 @@
     protected override void OnInitialized()
     {
         // Initialize controllable state
-        _state = new UseControllableState<HashSet<string>>(DefaultValue ?? new HashSet<string>())
+        objState = new UseControllableState<HashSet<string>>(DefaultValue ?? new HashSet<string>())
         {
             ControlledValue = Value ?? new HashSet<string>(),
             OnValueChanged = ValueChanged,
@@ -77,37 +77,37 @@
         };
 
         // Sync initial state to context
-        _context.State.OpenValues = new HashSet<string>(_state.Value);
-        _context.State.Type = Type;
-        _context.State.Collapsible = Collapsible;
+        objContext.State.OpenValues = new HashSet<string>(objState.Value);
+        objContext.State.Type = Type;
+        objContext.State.Collapsible = Collapsible;
 
         // Subscribe to context state changes
-        _context.OnStateChanged += HandleContextStateChanged;
+        objContext.OnStateChanged += HandleContextStateChanged;
     }
 
     protected override void OnParametersSet()
     {
         // Update controlled value if it changed
-        if (_state.IsControlled && Value != null && _state.ControlledValue != null && !Value.SetEquals(_state.ControlledValue))
+        if (objState.IsControlled && Value != null && objState.ControlledValue != null && !Value.SetEquals(objState.ControlledValue))
         {
-            _state.ControlledValue = Value;
-            _context.State.OpenValues = new HashSet<string>(Value);
+            objState.ControlledValue = Value;
+            objContext.State.OpenValues = new HashSet<string>(Value);
         }
 
         // Update type and collapsible settings
-        _context.State.Type = Type;
-        _context.State.Collapsible = Collapsible;
+        objContext.State.Type = Type;
+        objContext.State.Collapsible = Collapsible;
     }
 
     private void HandleContextStateChanged()
     {
         // When context state changes (e.g., from AccordionTrigger),
         // update the controllable state
-        var newOpenValues = _context.State.OpenValues;
+        var newOpenValues = objContext.State.OpenValues;
 
-        if (!_state.Value.SetEquals(newOpenValues))
+        if (!objState.Value.SetEquals(newOpenValues))
         {
-            _ = _state.SetValueAsync(new HashSet<string>(newOpenValues));
+            _ = objState.SetValueAsync(new HashSet<string>(newOpenValues));
 
             // Invoke additional callback if provided
             if (OnValueChange.HasDelegate)
@@ -121,6 +121,6 @@
 
     public void Dispose()
     {
-        _context.OnStateChanged -= HandleContextStateChanged;
+        objContext.OnStateChanged -= HandleContextStateChanged;
     }
 }

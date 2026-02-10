@@ -9,10 +9,10 @@ namespace TrBlazeUI.Primitives.Services;
 /// </summary>
 public class PositioningService : IPositioningService, IAsyncDisposable
 {
-    private readonly IJSRuntime _jsRuntime;
-    private readonly SemaphoreSlim _moduleLock = new(1, 1);
-    private IJSObjectReference? _module;
-    private bool _disposed;
+    private readonly IJSRuntime objJsRuntime;
+    private readonly SemaphoreSlim objModuleLock = new(1, 1);
+    private IJSObjectReference? objModule;
+    private bool objDisposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PositioningService"/> class.
@@ -20,26 +20,26 @@ public class PositioningService : IPositioningService, IAsyncDisposable
     /// <param name="jsRuntime">The JavaScript runtime for invoking positioning functions.</param>
     public PositioningService(IJSRuntime jsRuntime)
     {
-        _jsRuntime = jsRuntime;
+        objJsRuntime = jsRuntime;
     }
 
     private async Task<IJSObjectReference> GetModuleAsync()
     {
-        ObjectDisposedException.ThrowIf(_disposed, nameof(PositioningService));
+        ObjectDisposedException.ThrowIf(objDisposed, nameof(PositioningService));
 
-        await _moduleLock.WaitAsync();
+        await objModuleLock.WaitAsync().ConfigureAwait(false);
         try
         {
-            if (_module == null)
+            if (objModule == null)
             {
-                _module = await _jsRuntime.InvokeAsync<IJSObjectReference>(
-                    "import", "./_content/TrBlazeUI.Primitives/js/primitives/positioning.js");
+                objModule = await objJsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/TrBlazeUI.Primitives/js/primitives/positioning.js").ConfigureAwait(false);
             }
-            return _module;
+            return objModule;
         }
         finally
         {
-            _moduleLock.Release();
+            objModuleLock.Release();
         }
     }
 
@@ -49,7 +49,7 @@ public class PositioningService : IPositioningService, IAsyncDisposable
         ElementReference floating,
         PositioningOptions? options = null)
     {
-        var module = await GetModuleAsync();
+        var module = await GetModuleAsync().ConfigureAwait(false);
         options ??= new PositioningOptions();
 
         var jsOptions = new
@@ -64,7 +64,7 @@ public class PositioningService : IPositioningService, IAsyncDisposable
         };
 
         var result = await module.InvokeAsync<JsonElement>(
-            "computePosition", reference, floating, jsOptions);
+            "computePosition", reference, floating, jsOptions).ConfigureAwait(false);
 
         return new PositionResult
         {
@@ -83,8 +83,8 @@ public class PositioningService : IPositioningService, IAsyncDisposable
     /// <inheritdoc />
     public async Task ApplyPositionAsync(ElementReference floating, PositionResult position, bool makeVisible = false)
     {
-        var module = await GetModuleAsync();
-        await module.InvokeVoidAsync("applyPosition", floating, position, makeVisible);
+        var module = await GetModuleAsync().ConfigureAwait(false);
+        await module.InvokeVoidAsync("applyPosition", floating, position, makeVisible).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -93,7 +93,7 @@ public class PositioningService : IPositioningService, IAsyncDisposable
         ElementReference floating,
         PositioningOptions? options = null)
     {
-        var module = await GetModuleAsync();
+        var module = await GetModuleAsync().ConfigureAwait(false);
         options ??= new PositioningOptions();
 
         var jsOptions = new
@@ -108,7 +108,7 @@ public class PositioningService : IPositioningService, IAsyncDisposable
         };
 
         var cleanup = await module.InvokeAsync<IJSObjectReference>(
-            "autoUpdate", reference, floating, jsOptions);
+            "autoUpdate", reference, floating, jsOptions).ConfigureAwait(false);
 
         return new AutoUpdateHandle(cleanup);
     }
@@ -118,36 +118,36 @@ public class PositioningService : IPositioningService, IAsyncDisposable
     /// </summary>
     public async ValueTask DisposeAsync()
     {
-        if (_disposed)
+        if (objDisposed)
         {
             return;
         }
 
         GC.SuppressFinalize(this);
-        _disposed = true;
+        objDisposed = true;
 
-        if (_module != null)
+        if (objModule != null)
         {
-            await _module.DisposeAsync();
+            await objModule.DisposeAsync().ConfigureAwait(false);
         }
 
-        _moduleLock.Dispose();
+        objModuleLock.Dispose();
     }
 
     private sealed class AutoUpdateHandle : IAsyncDisposable
     {
-        private readonly IJSObjectReference _cleanup;
+        private readonly IJSObjectReference objCleanup;
 
         public AutoUpdateHandle(IJSObjectReference cleanup)
         {
-            _cleanup = cleanup;
+            objCleanup = cleanup;
         }
 
         public async ValueTask DisposeAsync()
         {
             try
             {
-                await _cleanup.InvokeVoidAsync("apply");
+                await objCleanup.InvokeVoidAsync("apply").ConfigureAwait(false);
             }
             catch
             {

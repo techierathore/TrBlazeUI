@@ -88,12 +88,12 @@
             </p>
         </div>
         <div class="flex items-center gap-4">
-            <Button OnClick="@(() => _isControlledOpen = true)">Open Dialog</Button>
+            <Button OnClick="@(() => objIsControlledOpen = true)">Open Dialog</Button>
             <span class="text-sm text-muted-foreground">
-                Dialog is: @(_isControlledOpen ? "Open" : "Closed")
+                Dialog is: @(objIsControlledOpen ? "Open" : "Closed")
             </span>
         </div>
-        <AlertDialog @bind-Open="_isControlledOpen">
+        <AlertDialog @bind-Open="objIsControlledOpen">
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Controlled Dialog</AlertDialogTitle>
@@ -181,5 +181,5 @@
 </div>
 
 @code {
-    private bool _isControlledOpen;
+    private bool objIsControlledOpen;
 }

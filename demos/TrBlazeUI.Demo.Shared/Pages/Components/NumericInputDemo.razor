@@ -22,9 +22,9 @@
             </p>
         </div>
         <div class="w-64">
-            <NumericInput TValue="int" @bind-Value="_intValue" Placeholder="Enter a number" />
+            <NumericInput TValue="int" @bind-Value="objIntValue" Placeholder="Enter a number" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_intValue</p>
+        <p class="text-sm text-muted-foreground">Value: @objIntValue</p>
     </div>
 
     <!-- Double with Decimal Places -->
@@ -36,9 +36,9 @@
             </p>
         </div>
         <div class="w-64">
-            <NumericInput TValue="double" @bind-Value="_doubleValue" DecimalPlaces="2" Placeholder="0.00" />
+            <NumericInput TValue="double" @bind-Value="objDoubleValue" DecimalPlaces="2" Placeholder="0.00" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_doubleValue.ToString("F2")</p>
+        <p class="text-sm text-muted-foreground">Value: @objDoubleValue.ToString("F2")</p>
     </div>
 
     <!-- With Min/Max Constraints -->
@@ -50,9 +50,9 @@
             </p>
         </div>
         <div class="w-64">
-            <NumericInput TValue="int" @bind-Value="_constrainedValue" Min="0" Max="100" Placeholder="0-100" />
+            <NumericInput TValue="int" @bind-Value="objConstrainedValue" Min="0" Max="100" Placeholder="0-100" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_constrainedValue (min: 0, max: 100)</p>
+        <p class="text-sm text-muted-foreground">Value: @objConstrainedValue (min: 0, max: 100)</p>
     </div>
 
     <!-- With Step -->
@@ -64,9 +64,9 @@
             </p>
         </div>
         <div class="w-64">
-            <NumericInput TValue="int" @bind-Value="_steppedValue" Step="5" Min="0" Max="100" Placeholder="Step: 5" />
+            <NumericInput TValue="int" @bind-Value="objSteppedValue" Step="5" Min="0" Max="100" Placeholder="Step: 5" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_steppedValue (step: 5, use arrow keys)</p>
+        <p class="text-sm text-muted-foreground">Value: @objSteppedValue (step: 5, use arrow keys)</p>
     </div>
 
     <!-- With Buttons -->
@@ -78,9 +78,9 @@
             </p>
         </div>
         <div class="w-64">
-            <NumericInput TValue="int" @bind-Value="_buttonValue" ShowButtons="true" Min="0" Max="99" />
+            <NumericInput TValue="int" @bind-Value="objButtonValue" ShowButtons="true" Min="0" Max="99" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_buttonValue</p>
+        <p class="text-sm text-muted-foreground">Value: @objButtonValue</p>
     </div>
 
     <!-- Decimal Type -->
@@ -92,9 +92,9 @@
             </p>
         </div>
         <div class="w-64">
-            <NumericInput TValue="decimal" @bind-Value="_decimalValue" DecimalPlaces="2" Step="0.01m" Min="0m" />
+            <NumericInput TValue="decimal" @bind-Value="objDecimalValue" DecimalPlaces="2" Step="0.01m" Min="0m" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: $@_decimalValue.ToString("F2")</p>
+        <p class="text-sm text-muted-foreground">Value: $@objDecimalValue.ToString("F2")</p>
     </div>
 
     <!-- Positive Only -->
@@ -106,9 +106,9 @@
             </p>
         </div>
         <div class="w-64">
-            <NumericInput TValue="int" @bind-Value="_positiveValue" AllowNegative="false" Placeholder="Positive only" />
+            <NumericInput TValue="int" @bind-Value="objPositiveValue" AllowNegative="false" Placeholder="Positive only" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_positiveValue</p>
+        <p class="text-sm text-muted-foreground">Value: @objPositiveValue</p>
     </div>
 
     <!-- Disabled -->
@@ -133,9 +133,9 @@
             </p>
         </div>
         <div class="w-64">
-            <NumericInput TValue="float" @bind-Value="_floatValue" Format="F3" Step="0.1f" />
+            <NumericInput TValue="float" @bind-Value="objFloatValue" Format="F3" Step="0.1f" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_floatValue.ToString("F3")</p>
+        <p class="text-sm text-muted-foreground">Value: @objFloatValue.ToString("F3")</p>
     </div>
 
     <!-- Long Type -->
@@ -147,9 +147,9 @@
             </p>
         </div>
         <div class="w-64">
-            <NumericInput TValue="long" @bind-Value="_longValue" Step="1000" Placeholder="Large number" />
+            <NumericInput TValue="long" @bind-Value="objLongValue" Step="1000" Placeholder="Large number" />
         </div>
-        <p class="text-sm text-muted-foreground">Value: @_longValue.ToString("N0")</p>
+        <p class="text-sm text-muted-foreground">Value: @objLongValue.ToString("N0")</p>
     </div>
 
     <!-- API Reference -->
@@ -187,13 +187,13 @@
 </div>
 
 @code {
-    private int _intValue = 0;
-    private double _doubleValue = 0.0;
-    private int _constrainedValue = 50;
-    private int _steppedValue = 0;
-    private int _buttonValue = 1;
-    private decimal _decimalValue = 99.99m;
-    private int _positiveValue = 0;
-    private float _floatValue = 3.14f;
-    private long _longValue = 0;
+    private int objIntValue = 0;
+    private double objDoubleValue = 0.0;
+    private int objConstrainedValue = 50;
+    private int objSteppedValue = 0;
+    private int objButtonValue = 1;
+    private decimal objDecimalValue = 99.99m;
+    private int objPositiveValue = 0;
+    private float objFloatValue = 3.14f;
+    private long objLongValue = 0;
 }

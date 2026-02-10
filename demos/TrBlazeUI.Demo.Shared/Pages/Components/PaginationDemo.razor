@@ -26,21 +26,21 @@
         <Pagination>
             <PaginationContent>
                 <PaginationItem>
-                    <PaginationPrevious OnClick="@(() => GoToPage(_currentPage - 1))" Disabled="@(_currentPage <= 1)" />
+                    <PaginationPrevious OnClick="@(() => GoToPage(objCurrentPage - 1))" Disabled="@(objCurrentPage <= 1)" />
                 </PaginationItem>
                 @for (int i = 1; i <= 5; i++)
                 {
                     var page = i;
                     <PaginationItem>
-                        <PaginationLink IsActive="@(_currentPage == page)" OnClick="@(() => GoToPage(page))">@(page)</PaginationLink>
+                        <PaginationLink IsActive="@(objCurrentPage == page)" OnClick="@(() => GoToPage(page))">@(page)</PaginationLink>
                     </PaginationItem>
                 }
                 <PaginationItem>
-                    <PaginationNext OnClick="@(() => GoToPage(_currentPage + 1))" Disabled="@(_currentPage >= 5)" />
+                    <PaginationNext OnClick="@(() => GoToPage(objCurrentPage + 1))" Disabled="@(objCurrentPage >= 5)" />
                 </PaginationItem>
             </PaginationContent>
         </Pagination>
-        <p class="text-sm text-muted-foreground text-center">Current page: @_currentPage</p>
+        <p class="text-sm text-muted-foreground text-center">Current page: @objCurrentPage</p>
     </div>
 
     <!-- With Ellipsis -->
@@ -87,7 +87,7 @@
                 Navigation buttons automatically enable/disable and update state.
             </p>
         </div>
-        <Pagination State="@_paginationState"
+        <Pagination State="@objPaginationState"
                     OnPageChanged="HandlePageChanged"
                     Class="flex items-center justify-between">
             <PaginationInfo />
@@ -119,7 +119,7 @@
                 Full-featured pagination with page size selector, ideal for data tables.
             </p>
         </div>
-        <Pagination State="@_tablePaginationState"
+        <Pagination State="@objTablePaginationState"
                     PageSizes="@(new[] { 5, 10, 20, 50 })"
                     OnPageChanged="HandleTablePageChanged"
                     OnPageSizeChanged="HandleTablePageSizeChanged"
@@ -148,7 +148,7 @@
                 Customize labels and formats for internationalization or different use cases.
             </p>
         </div>
-        <Pagination State="@_customPaginationState"
+        <Pagination State="@objCustomPaginationState"
                     Class="flex items-center justify-between px-2 py-4 border rounded-lg">
             <PaginationInfo Format="Items {0} to {1} (Total: {2})" EmptyText="No data available" />
             <PaginationContent Class="flex items-center gap-4">
@@ -214,10 +214,10 @@
 </div>
 
 @code {
-    private int _currentPage = 1;
+    private int objCurrentPage = 1;
 
     // State-managed pagination
-    private PaginationState _paginationState = new()
+    private PaginationState objPaginationState = new()
     {
         CurrentPage = 1,
         PageSize = 10,
@@ -225,7 +225,7 @@
     };
 
     // Table-style pagination
-    private PaginationState _tablePaginationState = new()
+    private PaginationState objTablePaginationState = new()
     {
         CurrentPage = 1,
         PageSize = 10,
@@ -233,7 +233,7 @@
     };
 
     // Custom labels pagination
-    private PaginationState _customPaginationState = new()
+    private PaginationState objCustomPaginationState = new()
     {
         CurrentPage = 1,
         PageSize = 20,
@@ -244,7 +244,7 @@
     {
         if (page >= 1 && page <= 5)
         {
-            _currentPage = page;
+            objCurrentPage = page;
         }
     }
 
