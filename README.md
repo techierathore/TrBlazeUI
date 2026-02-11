@@ -36,34 +36,82 @@ Blazor developers lack a modern, system-first UI library equivalent to shadcn/ui
 
 ### Installation
 
-Install TrBlazeUI packages from NuGet:
+TrBlazeUI packages are hosted on **GitHub Packages** under the `techierathore` organization.
+
+#### Step 1: Create a GitHub Personal Access Token (PAT)
+
+1. Go to [GitHub Settings > Developer settings > Personal access tokens > Tokens (classic)](https://github.com/settings/tokens)
+2. Click **Generate new token (classic)**
+3. Select the **`read:packages`** scope (minimum required to consume packages)
+4. Copy the generated token
+
+#### Step 2: Configure NuGet Source
+
+Add the TrBlazeUI GitHub Packages source to your project or global NuGet configuration.
+
+**Option A: Project-level `nuget.config`** (recommended for teams)
+
+Create a `nuget.config` file in your solution root:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+    <add key="TrBlazeUI" value="https://nuget.pkg.github.com/techierathore/index.json" />
+  </packageSources>
+  <packageSourceCredentials>
+    <TrBlazeUI>
+      <add key="Username" value="YOUR_GITHUB_USERNAME" />
+      <add key="ClearTextPassword" value="YOUR_GITHUB_PAT" />
+    </TrBlazeUI>
+  </packageSourceCredentials>
+</configuration>
+```
+
+> **Security Note:** Do not commit tokens to source control. Use environment variables or `dotnet user-secrets` for CI/CD and shared repos.
+
+**Option B: Global NuGet source** (for individual developers)
 
 ```bash
-# Headless primitives for custom styling
-dotnet add package TrBlazeUI.Primitives
+dotnet nuget add source https://nuget.pkg.github.com/techierathore/index.json \
+  --name TrBlazeUI \
+  --username YOUR_GITHUB_USERNAME \
+  --password YOUR_GITHUB_PAT \
+  --store-password-in-clear-text
+```
 
-# Styled components with shadcn/ui design
+#### Step 3: Install Packages
+
+```bash
+# Styled components with shadcn/ui design (includes Primitives as dependency)
 dotnet add package TrBlazeUI.Components
 
+# Or install individually:
+dotnet add package TrBlazeUI.Primitives          # Headless primitives for custom styling
+
 # Icon libraries (choose one or more)
-dotnet add package TrBlazeUI.Icons.Lucide      # 1,665 icons - stroke-based, consistent
-dotnet add package TrBlazeUI.Icons.Heroicons   # 1,288 icons - 4 variants (outline, solid, mini, micro)
-dotnet add package TrBlazeUI.Icons.Feather     # 286 icons - minimalist, stroke-based
+dotnet add package TrBlazeUI.Icons.Lucide        # 1,665 icons - stroke-based, consistent
+dotnet add package TrBlazeUI.Icons.Heroicons     # 1,288 icons - 4 variants (outline, solid, mini, micro)
+dotnet add package TrBlazeUI.Icons.Feather       # 286 icons - minimalist, stroke-based
 ```
 
-### Using the .NET Template
+#### CI/CD Setup (GitHub Actions)
 
-The fastest way to get started is with the official TrBlazeUI template:
+For GitHub Actions workflows that need to restore TrBlazeUI packages:
 
-```bash
-# Install the template
-dotnet new install TrBlazeUI.Templates
-
-# Create a new project
-dotnet new trblazeui -n MyApp
+```yaml
+- name: Add TrBlazeUI NuGet source
+  run: |
+    dotnet nuget add source https://nuget.pkg.github.com/techierathore/index.json \
+      --name TrBlazeUI \
+      --username ${{ github.actor }} \
+      --password ${{ secrets.GITHUB_TOKEN }} \
+      --store-password-in-clear-text
 ```
 
-This creates a fully configured Blazor project with TrBlazeUI components, theming, and best practices already set up.
+> **Note:** `GITHUB_TOKEN` is automatically available in GitHub Actions and has `read:packages` permission for packages in the same organization.
 
 ### Quick Start
 
@@ -144,6 +192,56 @@ This creates a fully configured Blazor project with TrBlazeUI components, themin
 
 - **Documentation & Demos**: Visit the documentation site for full documentation and interactive examples
 - **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines
+
+## AI Agent Skills (Claude Code & OpenCode)
+
+TrBlazeUI ships with AI agent skill files that help you integrate and use TrBlazeUI in your Blazor projects. These skills enable AI assistants to automatically set up NuGet sources, install packages, configure your project, and generate UI code using TrBlazeUI components.
+
+The skill files are located in [`docs/skills/`](docs/skills/):
+
+| File | AI Tool | Description |
+|------|---------|-------------|
+| `claude-code-trblazeui-designer.md` | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | Slash command skill for Claude Code CLI |
+| `opencode-trblazeui-designer.md` | [OpenCode](https://opencode.ai/) | Agent definition for OpenCode |
+
+### Setup for Claude Code
+
+Copy the skill file into your project's `.claude/commands/` directory:
+
+```bash
+# From your Blazor project root
+mkdir -p .claude/commands
+cp path/to/TrBlazeUI/docs/skills/claude-code-trblazeui-designer.md .claude/commands/trblazeui-designer.md
+```
+
+Then use it in Claude Code with the `/trblazeui-designer` slash command. The agent can:
+- **`*integrate`** - Add TrBlazeUI to your existing Blazor app (NuGet source, packages, CSS, services, imports, PortalHost)
+- **`*generate-page`** / **`*generate-form`** / **`*generate-dashboard`** - Generate UI code using TrBlazeUI components
+- **`*setup-theme`** - Generate a theme.css with OKLCH color variables
+- **`*list-components`** - Show all available components by category
+
+### Setup for OpenCode
+
+Copy the skill file into your project's `.opencode/agents/` directory:
+
+```bash
+# From your Blazor project root
+mkdir -p .opencode/agents
+cp path/to/TrBlazeUI/docs/skills/opencode-trblazeui-designer.md .opencode/agents/trblazeui-designer.md
+```
+
+The agent supports the same commands: integrate, generate pages/forms/dashboards, setup themes, and list components.
+
+### Optional: Copy the AI Reference Doc
+
+For the best results, also copy the component reference document into your project:
+
+```bash
+mkdir -p docs
+cp path/to/TrBlazeUI/docs/TrBlazeUI-AI-Reference.md docs/
+```
+
+This gives the AI agent detailed knowledge of every component's parameters, events, and usage patterns.
 
 ## Demo Applications
 
