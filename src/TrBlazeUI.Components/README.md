@@ -13,7 +13,7 @@ Pre-styled Blazor components with shadcn/ui design. Beautiful defaults with zero
 - **Accessible**: Built on TrBlazeUI.Primitives with WCAG 2.1 AA compliance
 - **Composable**: Flexible component composition patterns
 - **Type-Safe**: Full C# type safety with IntelliSense support
-- **.NET 8**: Built for the latest .NET platform
+- **.NET 10**: Built for the latest .NET platform
 
 ## Installation
 
