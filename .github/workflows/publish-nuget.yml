@@ -44,17 +44,39 @@ jobs:
         run: dotnet build TrBlazeUI.sln -c Release --no-restore -p:CI=true
 
       - name: Pack NuGet packages
+        shell: pwsh
         run: |
-          dotnet pack src/TrBlazeUI.Primitives/TrBlazeUI.Primitives.csproj -c Release --no-build -o ./nupkgs
-          dotnet pack src/TrBlazeUI.Components/TrBlazeUI.Components.csproj -c Release --no-build -o ./nupkgs
-          dotnet pack src/TrBlazeUI.Icons.Lucide/TrBlazeUI.Icons.Lucide.csproj -c Release --no-build -o ./nupkgs
-          dotnet pack src/TrBlazeUI.Icons.Heroicons/TrBlazeUI.Icons.Heroicons.csproj -c Release --no-build -o ./nupkgs
-          dotnet pack src/TrBlazeUI.Icons.Feather/TrBlazeUI.Icons.Feather.csproj -c Release --no-build -o ./nupkgs
+          $projects = @(
+            "src/TrBlazeUI.Primitives/TrBlazeUI.Primitives.csproj",
+            "src/TrBlazeUI.Components/TrBlazeUI.Components.csproj",
+            "src/TrBlazeUI.Icons.Lucide/TrBlazeUI.Icons.Lucide.csproj",
+            "src/TrBlazeUI.Icons.Heroicons/TrBlazeUI.Icons.Heroicons.csproj",
+            "src/TrBlazeUI.Icons.Feather/TrBlazeUI.Icons.Feather.csproj"
+          )
+          foreach ($project in $projects) {
+            Write-Host "Packing $project..."
+            dotnet pack $project -c Release --no-restore -o ./nupkgs -p:CI=true
+            if ($LASTEXITCODE -ne 0) { throw "dotnet pack failed for $project with exit code $LASTEXITCODE" }
+          }
 
       - name: List generated packages
+        shell: pwsh
         run: |
-          Write-Host "Generated packages:"
-          Get-ChildItem ./nupkgs -Recurse | ForEach-Object { Write-Host "  $($_.Name) ($($_.Length) bytes)" }
+          $packages = Get-ChildItem ./nupkgs -Filter *.nupkg -ErrorAction SilentlyContinue
+          if (-not $packages -or $packages.Count -eq 0) {
+            throw "No .nupkg files found in ./nupkgs - pack step likely failed"
+          }
+          Write-Host "Generated $($packages.Count) packages:"
+          foreach ($pkg in $packages) {
+            Write-Host "  $($pkg.Name) ($($pkg.Length) bytes)"
+          }
 
       - name: Publish to GitHub Packages
-        run: dotnet nuget push ./nupkgs/*.nupkg --source TrBlazeUI --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+        shell: pwsh
+        run: |
+          $packages = Get-ChildItem ./nupkgs -Filter *.nupkg
+          foreach ($pkg in $packages) {
+            Write-Host "Pushing $($pkg.Name)..."
+            dotnet nuget push $pkg.FullName --source TrBlazeUI --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+            if ($LASTEXITCODE -ne 0) { throw "Failed to push $($pkg.Name) with exit code $LASTEXITCODE" }
+          }
