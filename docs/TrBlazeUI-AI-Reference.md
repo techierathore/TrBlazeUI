@@ -1,7 +1,7 @@
 # TrBlazeUI AI Component Reference
 
 > Comprehensive reference for AI agents generating TrBlazeUI-based Blazor UIs.
-> TrBlazeUI is a .NET 8 Blazor component library with Tailwind CSS v4 and shadcn/ui design.
+> TrBlazeUI is a .NET 10 Blazor component library with Tailwind CSS v4 and shadcn/ui design.
 
 ---
 

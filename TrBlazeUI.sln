@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.2.11415.280 d18.0
+VisualStudioVersion = 18.2.11415.280
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
@@ -28,7 +28,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrBlazeUI.Demo.Auto.Client"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{C881631D-8A6A-479A-9F9E-5B4FCD3EAE9D}"
 	ProjectSection(SolutionItems) = preProject
+		docs\Coding-Standards.md = docs\Coding-Standards.md
+		docs\TrBlazeUI-AI-Reference.md = docs\TrBlazeUI-AI-Reference.md
 		docs\TrBlazeUI-Doc.md = docs\TrBlazeUI-Doc.md
+		docs\TrBlazeUI-Update-plan.md = docs\TrBlazeUI-Update-plan.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "skills", "skills", "{E11CC80A-B5FA-4B1A-BFD0-176FF038BD3A}"
+	ProjectSection(SolutionItems) = preProject
+		docs\skills\claude-code-trblazeui.md = docs\skills\claude-code-trblazeui.md
+		docs\skills\opencode-trblazeui.md = docs\skills\opencode-trblazeui.md
 	EndProjectSection
 EndProject
 Global
@@ -176,6 +185,7 @@ Global
 		{E2B3C4D5-F6A7-8901-BCDE-F12345678901} = {A39C23D2-F2C0-258D-165A-CF1E7FEE6E7B}
 		{F3C4D5E6-A7B8-9012-CDEF-123456789012} = {A39C23D2-F2C0-258D-165A-CF1E7FEE6E7B}
 		{A4D5E6F7-B8C9-0123-DEFA-234567890123} = {A39C23D2-F2C0-258D-165A-CF1E7FEE6E7B}
+		{E11CC80A-B5FA-4B1A-BFD0-176FF038BD3A} = {C881631D-8A6A-479A-9F9E-5B4FCD3EAE9D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5A765F7-4371-41CE-8864-03097E334989}
