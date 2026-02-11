@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+  release:
+    types: [published]
 
 env:
   DOTNET_VERSION: '10.0.x'
@@ -27,26 +29,27 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Add GitHub Packages source
+        run: |
+          dotnet nuget remove source TrBlazeUI 2>$null
+          dotnet nuget add source ${{ env.NUGET_SOURCE }} --name TrBlazeUI --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+
       - name: Restore dependencies
         run: dotnet restore TrBlazeUI.sln
 
       - name: Build solution
         run: dotnet build TrBlazeUI.sln -c Release --no-restore -p:CI=true
 
-      - name: Pack TrBlazeUI.Primitives
-        run: dotnet pack src/TrBlazeUI.Primitives/TrBlazeUI.Primitives.csproj -c Release --no-build -o ./nupkgs
+      - name: Pack NuGet packages
+        run: |
+          dotnet pack src/TrBlazeUI.Primitives/TrBlazeUI.Primitives.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack src/TrBlazeUI.Components/TrBlazeUI.Components.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack src/TrBlazeUI.Icons.Lucide/TrBlazeUI.Icons.Lucide.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack src/TrBlazeUI.Icons.Heroicons/TrBlazeUI.Icons.Heroicons.csproj -c Release --no-build -o ./nupkgs
+          dotnet pack src/TrBlazeUI.Icons.Feather/TrBlazeUI.Icons.Feather.csproj -c Release --no-build -o ./nupkgs
 
-      - name: Pack TrBlazeUI.Components
-        run: dotnet pack src/TrBlazeUI.Components/TrBlazeUI.Components.csproj -c Release --no-build -o ./nupkgs
-
-      - name: Pack TrBlazeUI.Icons.Lucide
-        run: dotnet pack src/TrBlazeUI.Icons.Lucide/TrBlazeUI.Icons.Lucide.csproj -c Release --no-build -o ./nupkgs
-
-      - name: Pack TrBlazeUI.Icons.Heroicons
-        run: dotnet pack src/TrBlazeUI.Icons.Heroicons/TrBlazeUI.Icons.Heroicons.csproj -c Release --no-build -o ./nupkgs
-
-      - name: Pack TrBlazeUI.Icons.Feather
-        run: dotnet pack src/TrBlazeUI.Icons.Feather/TrBlazeUI.Icons.Feather.csproj -c Release --no-build -o ./nupkgs
+      - name: List generated packages
+        run: dir ./nupkgs
 
       - name: Publish to GitHub Packages
-        run: dotnet nuget push ./nupkgs/*.nupkg --source ${{ env.NUGET_SOURCE }} --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+        run: dotnet nuget push ./nupkgs/*.nupkg --source TrBlazeUI --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate

@@ -1,0 +1,140 @@
+@using TrBlazeUI.Components.DropdownMenu
+@using TrBlazeUI.Components.Sidebar
+@using TrBlazeUI.Primitives.DropdownMenu
+@using TrBlazeUI.Primitives.Services
+@using TrBlazeUI.Components.Button
+@using TrBlazeUI.Icons.Lucide.Components
+@inject NavigationManager Navigation
+
+<nav class="flex items-center gap-1">
+    @* Direct links *@
+    <a href="" class="@NavLinkClass(string.Empty, true)">Home</a>
+    <a href="architecture" class="@NavLinkClass("architecture")">Architecture</a>
+    <a href="dynamic-theme" class="@NavLinkClass("dynamic-theme")">Theme</a>
+
+    @* Primitives dropdown *@
+    <TrBlazeUI.Components.DropdownMenu.DropdownMenu>
+        <TrBlazeUI.Components.DropdownMenu.DropdownMenuTrigger>
+            <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Small" Class="@DropdownTriggerClass("primitives/")">
+                Primitives
+                <LucideIcon Name="chevron-down" Size="14" Class="ml-1 opacity-60" />
+            </Button>
+        </TrBlazeUI.Components.DropdownMenu.DropdownMenuTrigger>
+        <TrBlazeUI.Components.DropdownMenu.DropdownMenuContent Side="PopoverSide.Bottom" Align="PopoverAlign.Start" Strategy="PositioningStrategy.Fixed" ZIndex="100" Class="max-h-[70vh] overflow-y-auto">
+            <div class="grid gap-0.5 p-1 w-[300px] md:grid-cols-2">
+                @foreach (var item in PrimitivesItems)
+                {
+                    var isActive = IsItemActive(item.Href);
+                    <TrBlazeUI.Components.DropdownMenu.DropdownMenuItem Class="@(isActive ? "bg-accent text-accent-foreground" : "")" OnClick="@(() => NavigateTo(item.Href))">
+                        @item.Label
+                    </TrBlazeUI.Components.DropdownMenu.DropdownMenuItem>
+                }
+            </div>
+        </TrBlazeUI.Components.DropdownMenu.DropdownMenuContent>
+    </TrBlazeUI.Components.DropdownMenu.DropdownMenu>
+
+    @* Components dropdown *@
+    <TrBlazeUI.Components.DropdownMenu.DropdownMenu>
+        <TrBlazeUI.Components.DropdownMenu.DropdownMenuTrigger>
+            <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Small" Class="@DropdownTriggerClass("components/")">
+                Components
+                <LucideIcon Name="chevron-down" Size="14" Class="ml-1 opacity-60" />
+            </Button>
+        </TrBlazeUI.Components.DropdownMenu.DropdownMenuTrigger>
+        <TrBlazeUI.Components.DropdownMenu.DropdownMenuContent Side="PopoverSide.Bottom" Align="PopoverAlign.Start" Strategy="PositioningStrategy.Fixed" ZIndex="100" Class="max-h-[70vh] overflow-y-auto">
+            <div class="grid gap-0.5 p-1 w-[480px] md:grid-cols-3">
+                @foreach (var item in ComponentsItems)
+                {
+                    var isActive = IsItemActive(item.Href);
+                    <TrBlazeUI.Components.DropdownMenu.DropdownMenuItem Class="@(isActive ? "bg-accent text-accent-foreground" : "")" OnClick="@(() => NavigateTo(item.Href))">
+                        @item.Label
+                    </TrBlazeUI.Components.DropdownMenu.DropdownMenuItem>
+                }
+            </div>
+        </TrBlazeUI.Components.DropdownMenu.DropdownMenuContent>
+    </TrBlazeUI.Components.DropdownMenu.DropdownMenu>
+
+    @* Charts dropdown *@
+    <TrBlazeUI.Components.DropdownMenu.DropdownMenu>
+        <TrBlazeUI.Components.DropdownMenu.DropdownMenuTrigger>
+            <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Small" Class="@DropdownTriggerClass("charts/")">
+                Charts
+                <LucideIcon Name="chevron-down" Size="14" Class="ml-1 opacity-60" />
+            </Button>
+        </TrBlazeUI.Components.DropdownMenu.DropdownMenuTrigger>
+        <TrBlazeUI.Components.DropdownMenu.DropdownMenuContent Side="PopoverSide.Bottom" Align="PopoverAlign.Start" Strategy="PositioningStrategy.Fixed" ZIndex="100">
+            <div class="grid gap-0.5 p-1 w-[180px]">
+                @foreach (var item in ChartsItems)
+                {
+                    var isActive = IsItemActive(item.Href);
+                    <TrBlazeUI.Components.DropdownMenu.DropdownMenuItem Class="@(isActive ? "bg-accent text-accent-foreground" : "")" OnClick="@(() => NavigateTo(item.Href))">
+                        @item.Label
+                    </TrBlazeUI.Components.DropdownMenu.DropdownMenuItem>
+                }
+            </div>
+        </TrBlazeUI.Components.DropdownMenu.DropdownMenuContent>
+    </TrBlazeUI.Components.DropdownMenu.DropdownMenu>
+
+    @* Icons dropdown *@
+    <TrBlazeUI.Components.DropdownMenu.DropdownMenu>
+        <TrBlazeUI.Components.DropdownMenu.DropdownMenuTrigger>
+            <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Small" Class="@DropdownTriggerClass("icons/")">
+                Icons
+                <LucideIcon Name="chevron-down" Size="14" Class="ml-1 opacity-60" />
+            </Button>
+        </TrBlazeUI.Components.DropdownMenu.DropdownMenuTrigger>
+        <TrBlazeUI.Components.DropdownMenu.DropdownMenuContent Side="PopoverSide.Bottom" Align="PopoverAlign.Start" Strategy="PositioningStrategy.Fixed" ZIndex="100">
+            <div class="grid gap-0.5 p-1 w-[180px]">
+                @foreach (var item in IconsItems)
+                {
+                    var isActive = IsItemActive(item.Href);
+                    <TrBlazeUI.Components.DropdownMenu.DropdownMenuItem Class="@(isActive ? "bg-accent text-accent-foreground" : "")" OnClick="@(() => NavigateTo(item.Href))">
+                        @item.Label
+                    </TrBlazeUI.Components.DropdownMenu.DropdownMenuItem>
+                }
+            </div>
+        </TrBlazeUI.Components.DropdownMenu.DropdownMenuContent>
+    </TrBlazeUI.Components.DropdownMenu.DropdownMenu>
+</nav>
+
+@code {
+    [Parameter]
+    public List<SidebarNavItem> PrimitivesItems { get; set; } = [];
+
+    [Parameter]
+    public List<SidebarNavItem> ComponentsItems { get; set; } = [];
+
+    [Parameter]
+    public List<SidebarNavItem> ChartsItems { get; set; } = [];
+
+    [Parameter]
+    public List<SidebarNavItem> IconsItems { get; set; } = [];
+
+    private void NavigateTo(string href)
+    {
+        Navigation.NavigateTo(href);
+    }
+
+    private bool IsItemActive(string href)
+    {
+        var currentUri = Navigation.ToBaseRelativePath(Navigation.Uri);
+        return string.Equals(currentUri, href, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool IsSectionActive(string prefix, bool exactMatch = false)
+    {
+        var currentUri = Navigation.ToBaseRelativePath(Navigation.Uri);
+        if (exactMatch)
+        {
+            return string.Equals(currentUri, prefix, StringComparison.OrdinalIgnoreCase)
+                || string.IsNullOrEmpty(currentUri) && string.IsNullOrEmpty(prefix);
+        }
+        return currentUri.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private string NavLinkClass(string href, bool exactMatch = false) =>
+        $"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors h-9 px-3 hover:bg-accent hover:text-accent-foreground{(IsSectionActive(href, exactMatch) ? " bg-accent/50 text-accent-foreground" : "")}";
+
+    private string DropdownTriggerClass(string prefix) =>
+        IsSectionActive(prefix) ? "bg-accent/50 text-accent-foreground" : "";
+}

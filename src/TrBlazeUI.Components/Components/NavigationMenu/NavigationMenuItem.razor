@@ -72,6 +72,11 @@
     }
 
     /// <summary>
+    /// Gets the trigger element reference for FloatingPortal positioning.
+    /// </summary>
+    internal ElementReference? TriggerElementRef => objTrigger?.ButtonRef;
+
+    /// <summary>
     /// Focuses the trigger element.
     /// </summary>
     internal async Task FocusTriggerAsync()

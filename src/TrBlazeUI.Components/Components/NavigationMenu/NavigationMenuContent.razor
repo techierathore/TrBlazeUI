@@ -1,24 +1,37 @@
 @namespace TrBlazeUI.Components.NavigationMenu
 @using TrBlazeUI.Components.Utilities
+@using TrBlazeUI.Primitives.Floating
+@using TrBlazeUI.Primitives.Services
 @inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
 @*
     Navigation Menu Content - the dropdown content panel.
+    Uses FloatingPortal for proper positioning that escapes overflow containers.
 *@
 
-@if (MenuItem?.IsOpen == true)
+@if (MenuItem?.IsOpen == true && MenuItem.TriggerElementRef.HasValue)
 {
-    <div @ref="objContentRef"
-         class="@CssClass"
-         role="menu"
-         tabindex="@(IsKeyboardNavigationEnabled ? -1 : null)"
-         data-state="@(MenuItem?.IsOpen == true ? "open" : "closed")"
-         @onmouseenter="HandleMouseEnter"
-         @onmouseleave="HandleMouseLeave"
-         @onclick="HandleClick">
-        @ChildContent
-    </div>
+    <FloatingPortal IsOpen="true"
+                    AnchorElement="@MenuItem.TriggerElementRef"
+                    PortalId="@objPortalId"
+                    Side="@Side"
+                    Align="@Align"
+                    Offset="@Offset"
+                    Strategy="@Strategy"
+                    ZIndex="@ZIndex"
+                    OnReady="@HandlePortalReady">
+        <div @ref="objContentRef"
+             class="@CssClass"
+             role="menu"
+             tabindex="@(IsKeyboardNavigationEnabled ? -1 : null)"
+             data-state="open"
+             @onmouseenter="HandleMouseEnter"
+             @onmouseleave="HandleMouseLeave"
+             @onclick="HandleClick">
+            @ChildContent
+        </div>
+    </FloatingPortal>
 }
 
 @code {
@@ -28,6 +41,7 @@
     private DotNetObjectReference<NavigationMenuContent>? objDotNetRef;
     private bool objModuleLoaded = false;
     private bool objWasOpen = false;
+    private readonly string objPortalId = $"nav-menu-portal-{Guid.NewGuid():N}";
 
     /// <summary>
     /// Reference to the parent menu item.
@@ -47,6 +61,42 @@
     [Parameter]
     public string? Class { get; set; }
 
+    /// <summary>
+    /// Preferred side for positioning the content relative to the trigger.
+    /// Default is Bottom.
+    /// </summary>
+    [Parameter]
+    public PopoverSide Side { get; set; } = PopoverSide.Bottom;
+
+    /// <summary>
+    /// Alignment relative to the trigger element.
+    /// Default is Start (left-aligned).
+    /// </summary>
+    [Parameter]
+    public PopoverAlign Align { get; set; } = PopoverAlign.Start;
+
+    /// <summary>
+    /// Offset distance from the trigger element in pixels.
+    /// Default is 6 (equivalent to mt-1.5).
+    /// </summary>
+    [Parameter]
+    public int Offset { get; set; } = 6;
+
+    /// <summary>
+    /// CSS positioning strategy: "absolute" or "fixed".
+    /// Use "fixed" for content that needs to escape stacking contexts or overflow containers.
+    /// Default is "fixed".
+    /// </summary>
+    [Parameter]
+    public string Strategy { get; set; } = "fixed";
+
+    /// <summary>
+    /// CSS z-index value for the floating content.
+    /// Default is 50.
+    /// </summary>
+    [Parameter]
+    public int ZIndex { get; set; } = 50;
+
     protected override void OnInitialized()
     {
         MenuItem?.RegisterContent(this);
@@ -61,69 +111,41 @@
     {
         var isOpen = MenuItem?.IsOpen == true;
 
-        // Only set up keyboard navigation if enabled
-        if (IsKeyboardNavigationEnabled)
+        // Clean up keyboard navigation when menu closes
+        if (!isOpen && objWasOpen)
         {
-            // Load module if not loaded
-            if (isOpen && !objModuleLoaded)
-            {
-                try
-                {
-                    objNavModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                        "import", "./_content/TrBlazeUI.Components/js/navigation-menu.js");
-                    objModuleLoaded = true;
-                }
-                catch
-                {
-                    // Module loading failed
-                }
-            }
-
-            // Set up keyboard navigation when menu opens
-            if (isOpen && !objWasOpen && objNavModule != null)
-            {
-                try
-                {
-                    objDotNetRef = DotNetObjectReference.Create(this);
-                    objKeyboardCleanup = await objNavModule.InvokeAsync<IJSObjectReference>(
-                        "setupKeyboardNavigation", objContentRef, objDotNetRef);
-
-                    // Focus the first item in the content
-                    await objNavModule.InvokeVoidAsync("navigateFirst", objContentRef);
-                }
-                catch
-                {
-                    // Keyboard navigation setup failed
-                }
-            }
-
-            // Clean up keyboard navigation when menu closes
-            if (!isOpen && objWasOpen && objKeyboardCleanup != null)
-            {
-                try
-                {
-                    await objKeyboardCleanup.InvokeVoidAsync("dispose");
-                    await objKeyboardCleanup.DisposeAsync();
-                    objKeyboardCleanup = null;
-                    objDotNetRef?.Dispose();
-                    objDotNetRef = null;
-                }
-                catch
-                {
-                    // Cleanup failed
-                }
-            }
+            await CleanupKeyboardAsync();
         }
 
         objWasOpen = isOpen;
     }
 
     /// <summary>
-    /// Focuses the first focusable item in the content.
+    /// Called when FloatingPortal has positioned content and it is visible.
     /// </summary>
-    internal async Task FocusFirstItemAsync()
+    private async Task HandlePortalReady()
     {
-        // Ensure module is loaded
+        if (!IsKeyboardNavigationEnabled) return;
+
+        try
+        {
+            await EnsureModuleLoadedAsync();
+            if (objNavModule != null)
+            {
+                objDotNetRef = DotNetObjectReference.Create(this);
+                objKeyboardCleanup = await objNavModule.InvokeAsync<IJSObjectReference>(
+                    "setupKeyboardNavigation", objContentRef, objDotNetRef);
+                await objNavModule.InvokeVoidAsync("navigateFirst", objContentRef);
+            }
+        }
+        catch
+        {
+            // Keyboard navigation setup failed
+        }
+    }
+
+    private async Task EnsureModuleLoadedAsync()
+    {
         if (!objModuleLoaded)
         {
             try
@@ -132,12 +154,16 @@
                     "import", "./_content/TrBlazeUI.Components/js/navigation-menu.js");
                 objModuleLoaded = true;
             }
-            catch
-            {
-                return;
-            }
+            catch { }
         }
+    }
 
+    /// <summary>
+    /// Focuses the first focusable item in the content.
+    /// </summary>
+    internal async Task FocusFirstItemAsync()
+    {
+        await EnsureModuleLoadedAsync();
         if (objNavModule != null)
         {
             await objNavModule.InvokeVoidAsync("navigateFirst", objContentRef);
@@ -181,11 +207,27 @@
         }
     }
 
+    private async Task CleanupKeyboardAsync()
+    {
+        if (objKeyboardCleanup != null)
+        {
+            try
+            {
+                await objKeyboardCleanup.InvokeVoidAsync("dispose");
+                await objKeyboardCleanup.DisposeAsync();
+                objKeyboardCleanup = null;
+                objDotNetRef?.Dispose();
+                objDotNetRef = null;
+            }
+            catch { }
+        }
+    }
+
     /// <summary>
     /// Gets the computed CSS classes for the content panel.
     /// </summary>
     private string CssClass => ClassNames.cn(
-        "absolute left-0 top-full mt-1.5 w-max z-50",
+        "w-max",
         "rounded-md border bg-popover text-popover-foreground shadow-lg",
         "outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus-within:bg-popover",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -196,17 +238,7 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (objKeyboardCleanup != null)
-        {
-            try
-            {
-                await objKeyboardCleanup.InvokeVoidAsync("dispose");
-                await objKeyboardCleanup.DisposeAsync();
-            }
-            catch { }
-        }
-
-        objDotNetRef?.Dispose();
+        await CleanupKeyboardAsync();
 
         if (objNavModule != null)
         {

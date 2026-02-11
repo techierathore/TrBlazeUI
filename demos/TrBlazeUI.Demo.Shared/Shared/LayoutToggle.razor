@@ -1,0 +1,41 @@
+@using TrBlazeUI.Demo.Services
+@using TrBlazeUI.Icons.Lucide.Components
+@inject LayoutService LayoutService
+@implements IDisposable
+
+<div class="flex items-center gap-2">
+    <LucideIcon Name="panel-left" Class="h-4 w-4 text-muted-foreground" />
+    <Switch Checked="@objIsHorizontal"
+            CheckedChanged="@OnCheckedChanged"
+            Size="SwitchSize.Small"
+            AriaLabel="Toggle layout mode" />
+    <LucideIcon Name="panel-top" Class="h-4 w-4 text-muted-foreground" />
+</div>
+
+@code {
+    private bool objIsHorizontal;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LayoutService.InitializeAsync();
+        objIsHorizontal = LayoutService.IsHorizontal;
+        LayoutService.OnLayoutChanged += HandleLayoutChanged;
+    }
+
+    private async Task OnCheckedChanged(bool value)
+    {
+        objIsHorizontal = value;
+        await LayoutService.SetLayoutAsync(value);
+    }
+
+    private void HandleLayoutChanged()
+    {
+        objIsHorizontal = LayoutService.IsHorizontal;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        LayoutService.OnLayoutChanged -= HandleLayoutChanged;
+    }
+}

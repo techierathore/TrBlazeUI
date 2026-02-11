@@ -1,0 +1,110 @@
+@namespace TrBlazeUI.Components.Sidebar
+@using TrBlazeUI.Components.Collapsible
+@using TrBlazeUI.Components.DropdownMenu
+@using TrBlazeUI.Primitives.DropdownMenu
+@using TrBlazeUI.Primitives.Services
+@inject NavigationManager Navigation
+
+@*
+    SidebarCollapsibleMenuItem - dual-mode sidebar menu item.
+    When sidebar is expanded: renders as a Collapsible with sub-menu items.
+    When sidebar is collapsed: renders as a DropdownMenu flyout to the right.
+*@
+
+@if (Context != null && !Context.Open)
+{
+    @* Collapsed mode: show as DropdownMenu flyout *@
+    <TrBlazeUI.Components.DropdownMenu.DropdownMenu>
+        <TrBlazeUI.Components.DropdownMenu.DropdownMenuTrigger>
+            <SidebarMenuButton Tooltip="@Label">
+                @Icon
+                <span>@Label</span>
+            </SidebarMenuButton>
+        </TrBlazeUI.Components.DropdownMenu.DropdownMenuTrigger>
+        <TrBlazeUI.Components.DropdownMenu.DropdownMenuContent Side="PopoverSide.Right" Align="PopoverAlign.Start" Strategy="PositioningStrategy.Fixed" ZIndex="100" Class="max-h-[70vh] overflow-y-auto">
+            <TrBlazeUI.Components.DropdownMenu.DropdownMenuLabel>@Label</TrBlazeUI.Components.DropdownMenu.DropdownMenuLabel>
+            <TrBlazeUI.Components.DropdownMenu.DropdownMenuSeparator />
+            @foreach (var item in Items)
+            {
+                var isActive = IsItemActive(item.Href);
+                <TrBlazeUI.Components.DropdownMenu.DropdownMenuItem Class="@(isActive ? "bg-accent text-accent-foreground" : "")" OnClick="@(() => NavigateTo(item.Href))">
+                    @item.Label
+                </TrBlazeUI.Components.DropdownMenu.DropdownMenuItem>
+            }
+        </TrBlazeUI.Components.DropdownMenu.DropdownMenuContent>
+    </TrBlazeUI.Components.DropdownMenu.DropdownMenu>
+}
+else
+{
+    @* Expanded mode: show as Collapsible with sub-menu *@
+    <Collapsible Open="@Open" OpenChanged="@OpenChanged">
+        <SidebarMenuButton Tooltip="@Label">
+            @Icon
+            <span>@Label</span>
+            <SidebarMenuChevron>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m9 18 6-6-6-6"/>
+                </svg>
+            </SidebarMenuChevron>
+        </SidebarMenuButton>
+        <CollapsibleContent>
+            <SidebarMenuSub>
+                @foreach (var item in Items)
+                {
+                    <SidebarMenuSubItem>
+                        <SidebarMenuSubButton AsChild="@SidebarMenuButtonElement.Anchor" Href="@item.Href">
+                            <span>@item.Label</span>
+                        </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                }
+            </SidebarMenuSub>
+        </CollapsibleContent>
+    </Collapsible>
+}
+
+@code {
+    [CascadingParameter]
+    private SidebarContext? Context { get; set; }
+
+    /// <summary>
+    /// The display label for the menu section.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    /// <summary>
+    /// The icon to display for the menu section.
+    /// Rendered in both collapsed (icon-only) and expanded modes.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public RenderFragment? Icon { get; set; }
+
+    /// <summary>
+    /// The list of navigation sub-items to display.
+    /// </summary>
+    [Parameter]
+    public List<SidebarNavItem> Items { get; set; } = [];
+
+    /// <summary>
+    /// Whether the collapsible section is expanded (expanded mode only).
+    /// </summary>
+    [Parameter]
+    public bool Open { get; set; }
+
+    /// <summary>
+    /// Callback when the collapsible section open state changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> OpenChanged { get; set; }
+
+    private void NavigateTo(string href)
+    {
+        Navigation.NavigateTo(href);
+    }
+
+    private bool IsItemActive(string href)
+    {
+        var currentUri = Navigation.ToBaseRelativePath(Navigation.Uri);
+        return string.Equals(currentUri, href, StringComparison.OrdinalIgnoreCase);
+    }
+}
