@@ -195,14 +195,14 @@ For GitHub Actions workflows that need to restore TrBlazeUI packages:
 
 ## AI Agent Skills (Claude Code & OpenCode)
 
-TrBlazeUI ships with AI agent skill files that help you integrate and use TrBlazeUI in your Blazor projects. These skills enable AI assistants to automatically set up NuGet sources, install packages, configure your project, and generate UI code using TrBlazeUI components.
+TrBlazeUI ships with AI agent skill files that turn your AI assistant into a full .NET/Blazor developer with deep knowledge of TrBlazeUI components. The agent can integrate TrBlazeUI into your existing Blazor application, generate UI pages and components, build forms and dashboards, and handle general .NET/Blazor development tasks.
 
 The skill files are located in [`docs/skills/`](docs/skills/):
 
 | File | AI Tool | Description |
 |------|---------|-------------|
-| `claude-code-trblazeui-designer.md` | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | Slash command skill for Claude Code CLI |
-| `opencode-trblazeui-designer.md` | [OpenCode](https://opencode.ai/) | Agent definition for OpenCode |
+| `claude-code-trblazeui.md` | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | Slash command for Claude Code CLI |
+| `opencode-trblazeui.md` | [OpenCode](https://opencode.ai/) | Agent definition for OpenCode |
 
 ### Setup for Claude Code
 
@@ -211,12 +211,13 @@ Copy the skill file into your project's `.claude/commands/` directory:
 ```bash
 # From your Blazor project root
 mkdir -p .claude/commands
-cp path/to/TrBlazeUI/docs/skills/claude-code-trblazeui-designer.md .claude/commands/trblazeui-designer.md
+cp path/to/TrBlazeUI/docs/skills/claude-code-trblazeui.md .claude/commands/trblazeui.md
 ```
 
-Then use it in Claude Code with the `/trblazeui-designer` slash command. The agent can:
+Then use it in Claude Code with the `/trblazeui` slash command. The agent can:
 - **`*integrate`** - Add TrBlazeUI to your existing Blazor app (NuGet source, packages, CSS, services, imports, PortalHost)
 - **`*generate-page`** / **`*generate-form`** / **`*generate-dashboard`** - Generate UI code using TrBlazeUI components
+- **`*generate-component`** / **`*generate-service`** - Generate Blazor components or .NET services
 - **`*setup-theme`** - Generate a theme.css with OKLCH color variables
 - **`*list-components`** - Show all available components by category
 
@@ -227,10 +228,10 @@ Copy the skill file into your project's `.opencode/agents/` directory:
 ```bash
 # From your Blazor project root
 mkdir -p .opencode/agents
-cp path/to/TrBlazeUI/docs/skills/opencode-trblazeui-designer.md .opencode/agents/trblazeui-designer.md
+cp path/to/TrBlazeUI/docs/skills/opencode-trblazeui.md .opencode/agents/trblazeui.md
 ```
 
-The agent supports the same commands: integrate, generate pages/forms/dashboards, setup themes, and list components.
+The agent supports the same commands: integrate, generate pages/components/forms/dashboards/services, setup themes, and list components.
 
 ### Optional: Copy the AI Reference Doc
 
