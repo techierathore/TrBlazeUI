@@ -18,6 +18,9 @@ public static class ServiceCollectionExtensions
         // Add collapsible state service for menu state persistence
         services.AddScoped<CollapsibleStateService>();
 
+        // Add layout service for vertical/horizontal layout toggle
+        services.AddScoped<LayoutService>();
+
         // Add mock data service for generating demo data
         services.AddSingleton<MockDataService>();
 
