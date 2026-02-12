@@ -182,7 +182,7 @@ public abstract class ChartBase<TItem> : ComponentBase where TItem : class
             {
                 Enabled = EnableAnimations
             },
-            Toolbar = new Toolbar
+            Toolbar = new ApexCharts.Toolbar
             {
                 Show = false
             },

@@ -1,4 +1,5 @@
 using TrBlazeUI.Components.Sidebar;
+using TrBlazeUI.Components.Toast;
 using TrBlazeUI.Demo.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -12,8 +13,16 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
     [Inject]
     private LayoutService LayoutService { get; set; } = null!;
 
+    [Inject]
+    private ToastService ToastService { get; set; } = null!;
+
     // Layout mode
     private bool objIsHorizontal;
+
+    // Toolbar toggle states
+    private bool objToolbarBold;
+    private bool objToolbarItalic;
+    private bool objToolbarUnderline;
 
     // State for each collapsible menu section
     private bool objPrimitivesMenuOpen;
@@ -114,6 +123,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         new("components/toast", "Toast"),
         new("components/toggle", "Toggle"),
         new("components/toggle-group", "Toggle Group"),
+        new("components/toolbar", "Toolbar"),
         new("components/tooltip", "Tooltip"),
         new("components/typography", "Typography"),
     ];
@@ -184,6 +194,15 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
     {
         objIconsMenuOpen = isOpen;
         await StateService.SetStateAsync(IconsMenuKey, isOpen);
+    }
+
+    private void OnToolbarAction(string action) =>
+        ToastService.Show($"\"{action}\" clicked", "Toolbar Action");
+
+    private void OnToolbarToggle(string name, bool isPressed, Action<bool> setter)
+    {
+        setter(isPressed);
+        ToastService.Show($"\"{name}\" toggled {(isPressed ? "ON" : "OFF")}", "Toolbar Toggle");
     }
 
     public void Dispose()

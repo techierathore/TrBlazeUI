@@ -195,7 +195,7 @@ When the user asks you to:
 
 ## Component Categories Quick Reference
 
-- **Layout**: Sidebar, Card, AspectRatio, Resizable, ScrollArea, Separator
+- **Layout**: Sidebar, Card, AspectRatio, Resizable, ScrollArea, Separator, Toolbar
 - **Navigation**: Breadcrumb, Menubar, NavigationMenu, Pagination, ResponsiveNav, Tabs
 - **Forms**: Button, Calendar, Checkbox, ColorPicker, Combobox, CurrencyInput, DatePicker, DateRangePicker, Field, FileUpload, Input, InputGroup, InputOTP, Label, MaskedInput, MultiSelect, NativeSelect, NumericInput, RadioGroup, RangeSlider, Rating, Select, Slider, Switch, Textarea, TimePicker, Toggle
 - **Data Display**: Avatar, Badge, DataTable, Empty, Item, Kbd, Progress, Skeleton, Spinner, Typography

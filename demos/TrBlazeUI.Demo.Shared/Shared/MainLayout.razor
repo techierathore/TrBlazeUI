@@ -3,6 +3,10 @@
 @using TrBlazeUI.Components.Collapsible
 @using TrBlazeUI.Components.Sidebar
 @using TrBlazeUI.Components.Toast
+@using TrBlazeUI.Components.Toolbar
+@using TrBlazeUI.Components.DropdownMenu
+@using TrBlazeUI.Components.Popover
+@using TrBlazeUI.Icons.Lucide.Components
 
 <PageTitle>TrBlazeUI Demo</PageTitle>
 
@@ -26,6 +30,117 @@
                 <DarkModeToggle />
             </div>
         </header>
+
+        <!-- Document Manager Toolbar (horizontal layout only) -->
+        <div class="shrink-0 border-b bg-muted/30 px-4 py-0">
+            <Toolbar Variant="ToolbarVariant.Dense" AriaLabel="Document manager toolbar" Class="border-0 shadow-none bg-transparent rounded-none">
+                <ToolbarGroup AriaLabel="File actions">
+                    <ToolbarButton AriaLabel="New document" OnClick="@(e => OnToolbarAction("New Document"))">
+                        <LucideIcon Name="file-plus" Size="16" />
+                    </ToolbarButton>
+                    <ToolbarButton AriaLabel="Open document" OnClick="@(e => OnToolbarAction("Open Document"))">
+                        <LucideIcon Name="folder-open" Size="16" />
+                    </ToolbarButton>
+                    <ToolbarButton AriaLabel="Save" OnClick="@(e => OnToolbarAction("Save"))">
+                        <LucideIcon Name="save" Size="16" />
+                    </ToolbarButton>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <ToolbarButton AriaLabel="Save options">
+                                <LucideIcon Name="chevron-down" Size="14" />
+                            </ToolbarButton>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem OnClick="@(() => OnToolbarAction("Save As..."))">
+                                <LucideIcon Name="save" Size="16" Class="mr-1" />
+                                Save As...
+                            </DropdownMenuItem>
+                            <DropdownMenuItem OnClick="@(() => OnToolbarAction("Save All"))">
+                                <LucideIcon Name="save-all" Size="16" Class="mr-1" />
+                                Save All
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem OnClick="@(() => OnToolbarAction("Export as PDF"))">
+                                <LucideIcon Name="file-down" Size="16" Class="mr-1" />
+                                Export as PDF
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <ToolbarButton AriaLabel="Print" OnClick="@(e => OnToolbarAction("Print"))">
+                        <LucideIcon Name="printer" Size="16" />
+                    </ToolbarButton>
+                </ToolbarGroup>
+                <ToolbarSeparator />
+                <ToolbarGroup AriaLabel="Edit actions">
+                    <ToolbarButton AriaLabel="Undo" OnClick="@(e => OnToolbarAction("Undo"))">
+                        <LucideIcon Name="undo-2" Size="16" />
+                    </ToolbarButton>
+                    <ToolbarButton AriaLabel="Redo" OnClick="@(e => OnToolbarAction("Redo"))">
+                        <LucideIcon Name="redo-2" Size="16" />
+                    </ToolbarButton>
+                </ToolbarGroup>
+                <ToolbarSeparator />
+                <ToolbarGroup AriaLabel="Clipboard">
+                    <ToolbarButton AriaLabel="Cut" OnClick="@(e => OnToolbarAction("Cut"))">
+                        <LucideIcon Name="scissors" Size="16" />
+                    </ToolbarButton>
+                    <ToolbarButton AriaLabel="Copy" OnClick="@(e => OnToolbarAction("Copy"))">
+                        <LucideIcon Name="copy" Size="16" />
+                    </ToolbarButton>
+                    <ToolbarButton AriaLabel="Paste" OnClick="@(e => OnToolbarAction("Paste"))">
+                        <LucideIcon Name="clipboard-paste" Size="16" />
+                    </ToolbarButton>
+                </ToolbarGroup>
+                <ToolbarSeparator />
+                <ToolbarGroup AriaLabel="Text formatting">
+                    <ToolbarToggleButton AriaLabel="Bold" IsPressed="objToolbarBold" IsPressedChanged="@(v => OnToolbarToggle("Bold", v, val => objToolbarBold = val))">
+                        <LucideIcon Name="bold" Size="16" />
+                    </ToolbarToggleButton>
+                    <ToolbarToggleButton AriaLabel="Italic" IsPressed="objToolbarItalic" IsPressedChanged="@(v => OnToolbarToggle("Italic", v, val => objToolbarItalic = val))">
+                        <LucideIcon Name="italic" Size="16" />
+                    </ToolbarToggleButton>
+                    <ToolbarToggleButton AriaLabel="Underline" IsPressed="objToolbarUnderline" IsPressedChanged="@(v => OnToolbarToggle("Underline", v, val => objToolbarUnderline = val))">
+                        <LucideIcon Name="underline" Size="16" />
+                    </ToolbarToggleButton>
+                </ToolbarGroup>
+                <ToolbarSeparator />
+                <ToolbarGroup AriaLabel="Alignment">
+                    <ToolbarButton AriaLabel="Align left" OnClick="@(e => OnToolbarAction("Align Left"))">
+                        <LucideIcon Name="align-left" Size="16" />
+                    </ToolbarButton>
+                    <ToolbarButton AriaLabel="Align center" OnClick="@(e => OnToolbarAction("Align Center"))">
+                        <LucideIcon Name="align-center" Size="16" />
+                    </ToolbarButton>
+                    <ToolbarButton AriaLabel="Align right" OnClick="@(e => OnToolbarAction("Align Right"))">
+                        <LucideIcon Name="align-right" Size="16" />
+                    </ToolbarButton>
+                </ToolbarGroup>
+                <ToolbarSeparator />
+                <ToolbarGroup AriaLabel="Insert">
+                    <ToolbarButton AriaLabel="Insert link" OnClick="@(e => OnToolbarAction("Insert Link"))">
+                        <LucideIcon Name="link" Size="16" />
+                    </ToolbarButton>
+                    <ToolbarButton AriaLabel="Insert image" OnClick="@(e => OnToolbarAction("Insert Image"))">
+                        <LucideIcon Name="image" Size="16" />
+                    </ToolbarButton>
+                    <ToolbarButton AriaLabel="Insert table" OnClick="@(e => OnToolbarAction("Insert Table"))">
+                        <LucideIcon Name="table" Size="16" />
+                    </ToolbarButton>
+                </ToolbarGroup>
+                <ToolbarSeparator />
+                <ToolbarGroup AriaLabel="View">
+                    <ToolbarButton AriaLabel="Zoom in" OnClick="@(e => OnToolbarAction("Zoom In"))">
+                        <LucideIcon Name="zoom-in" Size="16" />
+                    </ToolbarButton>
+                    <ToolbarButton AriaLabel="Zoom out" OnClick="@(e => OnToolbarAction("Zoom Out"))">
+                        <LucideIcon Name="zoom-out" Size="16" />
+                    </ToolbarButton>
+                    <ToolbarButton AriaLabel="Find" OnClick="@(e => OnToolbarAction("Find & Replace"))">
+                        <LucideIcon Name="search" Size="16" />
+                    </ToolbarButton>
+                </ToolbarGroup>
+            </Toolbar>
+        </div>
 
         <div class="flex-1 overflow-auto p-6 md:p-8">
             @Body

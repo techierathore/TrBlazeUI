@@ -1200,6 +1200,119 @@ Sub-components: `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitle`,
 }
 ```
 
+### Toolbar
+
+Action toolbar for desktop/hybrid applications with grouped buttons, separators, and controls.
+
+**Import:** `@using TrBlazeUI.Components.Toolbar`
+
+#### Basic Toolbar
+
+```razor
+<Toolbar AriaLabel="File actions">
+    <ToolbarGroup>
+        <ToolbarButton AriaLabel="New file" OnClick="HandleNew">
+            <LucideIcon Name="file-plus" Size="16" />
+        </ToolbarButton>
+        <ToolbarButton AriaLabel="Open file" OnClick="HandleOpen">
+            <LucideIcon Name="folder-open" Size="16" />
+        </ToolbarButton>
+        <ToolbarButton AriaLabel="Save" OnClick="HandleSave">
+            <LucideIcon Name="save" Size="16" />
+        </ToolbarButton>
+    </ToolbarGroup>
+    <ToolbarSeparator />
+    <ToolbarGroup>
+        <ToolbarButton AriaLabel="Undo" OnClick="HandleUndo">
+            <LucideIcon Name="undo-2" Size="16" />
+        </ToolbarButton>
+        <ToolbarButton AriaLabel="Redo" OnClick="HandleRedo">
+            <LucideIcon Name="redo-2" Size="16" />
+        </ToolbarButton>
+    </ToolbarGroup>
+</Toolbar>
+```
+
+#### Toolbar Variants
+
+```razor
+<Toolbar Variant="ToolbarVariant.Default" AriaLabel="Default toolbar">...</Toolbar>
+<Toolbar Variant="ToolbarVariant.Compact" AriaLabel="Compact toolbar">...</Toolbar>
+<Toolbar Variant="ToolbarVariant.Dense" AriaLabel="Dense toolbar">...</Toolbar>
+```
+
+#### Toggle Buttons (Formatting Toolbar)
+
+```razor
+<Toolbar AriaLabel="Text formatting">
+    <ToolbarGroup>
+        <ToolbarToggleButton AriaLabel="Bold" @bind-IsPressed="objIsBold">
+            <LucideIcon Name="bold" Size="16" />
+        </ToolbarToggleButton>
+        <ToolbarToggleButton AriaLabel="Italic" @bind-IsPressed="objIsItalic">
+            <LucideIcon Name="italic" Size="16" />
+        </ToolbarToggleButton>
+        <ToolbarToggleButton AriaLabel="Underline" @bind-IsPressed="objIsUnderline">
+            <LucideIcon Name="underline" Size="16" />
+        </ToolbarToggleButton>
+    </ToolbarGroup>
+</Toolbar>
+```
+
+#### With Dropdown Menus
+
+```razor
+<Toolbar AriaLabel="IDE toolbar">
+    <ToolbarGroup>
+        <DropdownMenu>
+            <DropdownMenuTrigger>
+                <ToolbarButton AriaLabel="Build configuration">
+                    Debug
+                    <LucideIcon Name="chevron-down" Size="14" />
+                </ToolbarButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                <DropdownMenuItem>Debug</DropdownMenuItem>
+                <DropdownMenuItem>Release</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    </ToolbarGroup>
+    <ToolbarSeparator />
+    <ToolbarGroup>
+        <ToolbarButton AriaLabel="Start debugging" Class="text-green-600">
+            <LucideIcon Name="play" Size="16" />
+        </ToolbarButton>
+    </ToolbarGroup>
+</Toolbar>
+```
+
+#### Vertical Toolbar
+
+```razor
+<Toolbar Vertical AriaLabel="Side tools">
+    <ToolbarButton AriaLabel="Select">
+        <LucideIcon Name="mouse-pointer" Size="16" />
+    </ToolbarButton>
+    <ToolbarButton AriaLabel="Move">
+        <LucideIcon Name="move" Size="16" />
+    </ToolbarButton>
+    <ToolbarSeparator Vertical="false" />
+    <ToolbarButton AriaLabel="Zoom in">
+        <LucideIcon Name="zoom-in" Size="16" />
+    </ToolbarButton>
+</Toolbar>
+```
+
+#### Toolbar API
+
+| Component | Key Parameters |
+|-----------|---------------|
+| `Toolbar` | `Variant` (Default/Compact/Dense), `Vertical` (bool), `AriaLabel`, `Class` |
+| `ToolbarGroup` | `AriaLabel`, `Class` |
+| `ToolbarButton` | `Variant` (Default/Ghost/Outline), `OnClick`, `Disabled`, `AriaLabel`, `Title`, `Class` |
+| `ToolbarToggleButton` | `@bind-IsPressed`, `Disabled`, `AriaLabel`, `Title`, `Class` |
+| `ToolbarSeparator` | `Vertical` (bool, default true), `Class` |
+
 ### Tooltip
 
 ```razor
@@ -1758,6 +1871,7 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
 | Slider | `@bind-Value="dbl"` | double |
 | Rating | `@bind-Value="int"` | int |
 | Toggle | `@bind-Pressed="bln"` | bool |
+| ToolbarToggleButton | `@bind-IsPressed="bln"` | bool |
 | DatePicker | `@bind-Value="dt"` | DateTime? |
 | TimePicker | `@bind-Value="ts"` | TimeSpan? |
 | Dialog | `@bind-Open="bln"` | bool |
