@@ -1,0 +1,11 @@
+@namespace TrBlazeUI.Components.Toolbar
+
+<div
+    data-slot="toolbar"
+    role="toolbar"
+    aria-label="@AriaLabel"
+    aria-orientation="@(Vertical ? "vertical" : "horizontal")"
+    class="@CssClass"
+    @attributes="AdditionalAttributes">
+    @ChildContent
+</div>

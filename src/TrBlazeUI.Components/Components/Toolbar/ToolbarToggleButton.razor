@@ -1,0 +1,14 @@
+@namespace TrBlazeUI.Components.Toolbar
+
+<button
+    data-slot="toolbar-toggle-button"
+    type="button"
+    class="@CssClass"
+    aria-label="@AriaLabel"
+    aria-pressed="@IsPressed.ToString().ToLowerInvariant()"
+    title="@EffectiveTitle"
+    disabled="@Disabled"
+    @onclick="HandleClick"
+    @attributes="AdditionalAttributes">
+    @ChildContent
+</button>

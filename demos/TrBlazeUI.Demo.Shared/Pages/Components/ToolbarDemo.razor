@@ -1,0 +1,569 @@
+@page "/components/toolbar"
+@using TrBlazeUI.Components.Toolbar
+@using TrBlazeUI.Components.Button
+@using TrBlazeUI.Components.DropdownMenu
+@using TrBlazeUI.Components.Separator
+@using TrBlazeUI.Components.Popover
+@using TrBlazeUI.Icons.Lucide.Components
+
+<PageTitle>Toolbar - TrBlazeUI</PageTitle>
+
+<div class="space-y-10 max-w-4xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Toolbar</h1>
+        <p class="text-xl text-muted-foreground">
+            Action bar with grouped buttons, separators, and controls for desktop and hybrid Blazor applications.
+        </p>
+    </div>
+
+    <!-- Basic Toolbar -->
+    <section class="space-y-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Toolbar</h2>
+            <p class="text-muted-foreground">
+                A simple toolbar with icon-only buttons grouped together.
+            </p>
+        </div>
+
+        <div class="space-y-4">
+            <Toolbar AriaLabel="File actions">
+                <ToolbarGroup AriaLabel="File operations">
+                    <ToolbarButton AriaLabel="New file" OnClick="@(e => HandleAction("New file"))">
+                        <LucideIcon Name="file-plus" Size="16" />
+                    </ToolbarButton>
+                    <ToolbarButton AriaLabel="Open file" OnClick="@(e => HandleAction("Open file"))">
+                        <LucideIcon Name="folder-open" Size="16" />
+                    </ToolbarButton>
+                    <ToolbarButton AriaLabel="Save" OnClick="@(e => HandleAction("Save"))">
+                        <LucideIcon Name="save" Size="16" />
+                    </ToolbarButton>
+                </ToolbarGroup>
+            </Toolbar>
+
+            @if (!string.IsNullOrEmpty(objLastAction))
+            {
+                <p class="text-sm text-muted-foreground">Last action: <strong>@objLastAction</strong></p>
+            }
+        </div>
+    </section>
+
+    <!-- Multiple Groups with Separators -->
+    <section class="space-y-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Multiple Groups with Separators</h2>
+            <p class="text-muted-foreground">
+                Use ToolbarSeparator between groups to create visual divisions.
+            </p>
+        </div>
+
+        <Toolbar AriaLabel="Document toolbar">
+            <ToolbarGroup AriaLabel="File actions">
+                <ToolbarButton AriaLabel="New file" OnClick="@(e => HandleAction("New"))">
+                    <LucideIcon Name="file-plus" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Open" OnClick="@(e => HandleAction("Open"))">
+                    <LucideIcon Name="folder-open" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Save" OnClick="@(e => HandleAction("Save"))">
+                    <LucideIcon Name="save" Size="16" />
+                </ToolbarButton>
+            </ToolbarGroup>
+            <ToolbarSeparator />
+            <ToolbarGroup AriaLabel="Edit actions">
+                <ToolbarButton AriaLabel="Undo" OnClick="@(e => HandleAction("Undo"))">
+                    <LucideIcon Name="undo-2" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Redo" OnClick="@(e => HandleAction("Redo"))">
+                    <LucideIcon Name="redo-2" Size="16" />
+                </ToolbarButton>
+            </ToolbarGroup>
+            <ToolbarSeparator />
+            <ToolbarGroup AriaLabel="View actions">
+                <ToolbarButton AriaLabel="Zoom in" OnClick="@(e => HandleAction("Zoom in"))">
+                    <LucideIcon Name="zoom-in" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Zoom out" OnClick="@(e => HandleAction("Zoom out"))">
+                    <LucideIcon Name="zoom-out" Size="16" />
+                </ToolbarButton>
+            </ToolbarGroup>
+        </Toolbar>
+    </section>
+
+    <!-- Toolbar Variants -->
+    <section class="space-y-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Toolbar Variants</h2>
+            <p class="text-muted-foreground">
+                Three density variants control padding and gap spacing.
+            </p>
+        </div>
+
+        <div class="space-y-4">
+            <div class="space-y-2">
+                <h3 class="text-sm font-medium">Default</h3>
+                <Toolbar Variant="ToolbarVariant.Default" AriaLabel="Default variant toolbar">
+                    <ToolbarGroup>
+                        <ToolbarButton AriaLabel="Cut"><LucideIcon Name="scissors" Size="16" /></ToolbarButton>
+                        <ToolbarButton AriaLabel="Copy"><LucideIcon Name="copy" Size="16" /></ToolbarButton>
+                        <ToolbarButton AriaLabel="Paste"><LucideIcon Name="clipboard-paste" Size="16" /></ToolbarButton>
+                    </ToolbarGroup>
+                </Toolbar>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-sm font-medium">Compact</h3>
+                <Toolbar Variant="ToolbarVariant.Compact" AriaLabel="Compact variant toolbar">
+                    <ToolbarGroup>
+                        <ToolbarButton AriaLabel="Cut"><LucideIcon Name="scissors" Size="16" /></ToolbarButton>
+                        <ToolbarButton AriaLabel="Copy"><LucideIcon Name="copy" Size="16" /></ToolbarButton>
+                        <ToolbarButton AriaLabel="Paste"><LucideIcon Name="clipboard-paste" Size="16" /></ToolbarButton>
+                    </ToolbarGroup>
+                </Toolbar>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-sm font-medium">Dense</h3>
+                <Toolbar Variant="ToolbarVariant.Dense" AriaLabel="Dense variant toolbar">
+                    <ToolbarGroup>
+                        <ToolbarButton AriaLabel="Cut"><LucideIcon Name="scissors" Size="16" /></ToolbarButton>
+                        <ToolbarButton AriaLabel="Copy"><LucideIcon Name="copy" Size="16" /></ToolbarButton>
+                        <ToolbarButton AriaLabel="Paste"><LucideIcon Name="clipboard-paste" Size="16" /></ToolbarButton>
+                    </ToolbarGroup>
+                </Toolbar>
+            </div>
+        </div>
+    </section>
+
+    <!-- Toolbar with Text Buttons -->
+    <section class="space-y-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Toolbar with Text Buttons</h2>
+            <p class="text-muted-foreground">
+                Buttons can display both icon and text for clearer labeling.
+            </p>
+        </div>
+
+        <Toolbar AriaLabel="Actions with labels">
+            <ToolbarGroup>
+                <ToolbarButton AriaLabel="New file" OnClick="@(e => HandleAction("New"))">
+                    <LucideIcon Name="file-plus" Size="16" />
+                    New
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Open" OnClick="@(e => HandleAction("Open"))">
+                    <LucideIcon Name="folder-open" Size="16" />
+                    Open
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Save" OnClick="@(e => HandleAction("Save"))">
+                    <LucideIcon Name="save" Size="16" />
+                    Save
+                </ToolbarButton>
+            </ToolbarGroup>
+            <ToolbarSeparator />
+            <ToolbarGroup>
+                <ToolbarButton AriaLabel="Print" OnClick="@(e => HandleAction("Print"))">
+                    <LucideIcon Name="printer" Size="16" />
+                    Print
+                </ToolbarButton>
+            </ToolbarGroup>
+        </Toolbar>
+    </section>
+
+    <!-- Toggle Buttons -->
+    <section class="space-y-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Toggle Buttons</h2>
+            <p class="text-muted-foreground">
+                Use ToolbarToggleButton for on/off states like text formatting. Supports two-way binding with @@bind-IsPressed.
+            </p>
+        </div>
+
+        <div class="space-y-4">
+            <Toolbar AriaLabel="Text formatting">
+                <ToolbarGroup AriaLabel="Formatting options">
+                    <ToolbarToggleButton AriaLabel="Bold" @bind-IsPressed="objIsBold">
+                        <LucideIcon Name="bold" Size="16" />
+                    </ToolbarToggleButton>
+                    <ToolbarToggleButton AriaLabel="Italic" @bind-IsPressed="objIsItalic">
+                        <LucideIcon Name="italic" Size="16" />
+                    </ToolbarToggleButton>
+                    <ToolbarToggleButton AriaLabel="Underline" @bind-IsPressed="objIsUnderline">
+                        <LucideIcon Name="underline" Size="16" />
+                    </ToolbarToggleButton>
+                    <ToolbarToggleButton AriaLabel="Strikethrough" @bind-IsPressed="objIsStrikethrough">
+                        <LucideIcon Name="strikethrough" Size="16" />
+                    </ToolbarToggleButton>
+                </ToolbarGroup>
+            </Toolbar>
+
+            <p class="text-sm text-muted-foreground">
+                Active: @(objIsBold ? "Bold " : "")@(objIsItalic ? "Italic " : "")@(objIsUnderline ? "Underline " : "")@(objIsStrikethrough ? "Strikethrough " : "")@(!(objIsBold || objIsItalic || objIsUnderline || objIsStrikethrough) ? "None" : "")
+            </p>
+        </div>
+    </section>
+
+    <!-- Toolbar with Dropdowns -->
+    <section class="space-y-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Toolbar with Dropdowns</h2>
+            <p class="text-muted-foreground">
+                Mix ToolbarButtons with DropdownMenu for complex toolbar interactions like IDE toolbars.
+            </p>
+        </div>
+
+        <Toolbar AriaLabel="IDE toolbar">
+            <ToolbarGroup>
+                <DropdownMenu>
+                    <DropdownMenuTrigger>
+                        <ToolbarButton AriaLabel="Build configuration">
+                            Debug
+                            <LucideIcon Name="chevron-down" Size="14" />
+                        </ToolbarButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem>Debug</DropdownMenuItem>
+                        <DropdownMenuItem>Release</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>Configuration Manager...</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </ToolbarGroup>
+            <ToolbarSeparator />
+            <ToolbarGroup>
+                <DropdownMenu>
+                    <DropdownMenuTrigger>
+                        <ToolbarButton AriaLabel="Platform target">
+                            Any CPU
+                            <LucideIcon Name="chevron-down" Size="14" />
+                        </ToolbarButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem>Any CPU</DropdownMenuItem>
+                        <DropdownMenuItem>x86</DropdownMenuItem>
+                        <DropdownMenuItem>x64</DropdownMenuItem>
+                        <DropdownMenuItem>ARM64</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </ToolbarGroup>
+            <ToolbarSeparator />
+            <ToolbarGroup>
+                <ToolbarButton AriaLabel="Start debugging" Class="text-green-600 dark:text-green-400">
+                    <LucideIcon Name="play" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Start without debugging">
+                    <LucideIcon Name="square" Size="16" />
+                </ToolbarButton>
+            </ToolbarGroup>
+        </Toolbar>
+    </section>
+
+    <!-- Vertical Toolbar -->
+    <section class="space-y-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Vertical Toolbar</h2>
+            <p class="text-muted-foreground">
+                Set Vertical to true for side-mounted toolbars.
+            </p>
+        </div>
+
+        <div class="flex gap-6">
+            <Toolbar Vertical AriaLabel="Side tools">
+                <ToolbarButton AriaLabel="Select">
+                    <LucideIcon Name="mouse-pointer" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Move">
+                    <LucideIcon Name="move" Size="16" />
+                </ToolbarButton>
+                <ToolbarSeparator Vertical="false" />
+                <ToolbarButton AriaLabel="Zoom in">
+                    <LucideIcon Name="zoom-in" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Zoom out">
+                    <LucideIcon Name="zoom-out" Size="16" />
+                </ToolbarButton>
+                <ToolbarSeparator Vertical="false" />
+                <ToolbarButton AriaLabel="Layers">
+                    <LucideIcon Name="layers" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Grid">
+                    <LucideIcon Name="grid-3x3" Size="16" />
+                </ToolbarButton>
+            </Toolbar>
+
+            <div class="flex-1 border rounded-lg p-6 bg-muted/30 flex items-center justify-center text-muted-foreground text-sm">
+                Canvas area
+            </div>
+        </div>
+    </section>
+
+    <!-- Toolbar Button Variants -->
+    <section class="space-y-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Toolbar Button Variants</h2>
+            <p class="text-muted-foreground">
+                Three button variants: Default, Ghost, and Outline.
+            </p>
+        </div>
+
+        <div class="space-y-4">
+            <div class="space-y-2">
+                <h3 class="text-sm font-medium">Default</h3>
+                <Toolbar AriaLabel="Default button variants">
+                    <ToolbarGroup>
+                        <ToolbarButton AriaLabel="Home" Variant="ToolbarButtonVariant.Default">
+                            <LucideIcon Name="house" Size="16" />
+                            Home
+                        </ToolbarButton>
+                        <ToolbarButton AriaLabel="Search" Variant="ToolbarButtonVariant.Default">
+                            <LucideIcon Name="search" Size="16" />
+                            Search
+                        </ToolbarButton>
+                    </ToolbarGroup>
+                </Toolbar>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-sm font-medium">Ghost</h3>
+                <Toolbar AriaLabel="Ghost button variants">
+                    <ToolbarGroup>
+                        <ToolbarButton AriaLabel="Home" Variant="ToolbarButtonVariant.Ghost">
+                            <LucideIcon Name="house" Size="16" />
+                            Home
+                        </ToolbarButton>
+                        <ToolbarButton AriaLabel="Search" Variant="ToolbarButtonVariant.Ghost">
+                            <LucideIcon Name="search" Size="16" />
+                            Search
+                        </ToolbarButton>
+                    </ToolbarGroup>
+                </Toolbar>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-sm font-medium">Outline</h3>
+                <Toolbar AriaLabel="Outline button variants">
+                    <ToolbarGroup>
+                        <ToolbarButton AriaLabel="Home" Variant="ToolbarButtonVariant.Outline">
+                            <LucideIcon Name="house" Size="16" />
+                            Home
+                        </ToolbarButton>
+                        <ToolbarButton AriaLabel="Search" Variant="ToolbarButtonVariant.Outline">
+                            <LucideIcon Name="search" Size="16" />
+                            Search
+                        </ToolbarButton>
+                    </ToolbarGroup>
+                </Toolbar>
+            </div>
+        </div>
+    </section>
+
+    <!-- Disabled State -->
+    <section class="space-y-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Disabled State</h2>
+            <p class="text-muted-foreground">
+                Individual buttons can be disabled while others remain active.
+            </p>
+        </div>
+
+        <Toolbar AriaLabel="Toolbar with disabled buttons">
+            <ToolbarGroup>
+                <ToolbarButton AriaLabel="Cut" OnClick="@(e => HandleAction("Cut"))">
+                    <LucideIcon Name="scissors" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Copy" OnClick="@(e => HandleAction("Copy"))">
+                    <LucideIcon Name="copy" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Paste" Disabled="true">
+                    <LucideIcon Name="clipboard-paste" Size="16" />
+                </ToolbarButton>
+            </ToolbarGroup>
+            <ToolbarSeparator />
+            <ToolbarGroup>
+                <ToolbarButton AriaLabel="Undo" Disabled="true">
+                    <LucideIcon Name="undo-2" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Redo" Disabled="true">
+                    <LucideIcon Name="redo-2" Size="16" />
+                </ToolbarButton>
+            </ToolbarGroup>
+        </Toolbar>
+    </section>
+
+    <!-- Real-World Example: Document Editor -->
+    <section class="space-y-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Real-World Example: Document Editor Toolbar</h2>
+            <p class="text-muted-foreground">
+                A full-featured toolbar combining groups, separators, toggle buttons, and dropdowns.
+            </p>
+        </div>
+
+        <Toolbar Variant="ToolbarVariant.Compact" AriaLabel="Document editor toolbar">
+            <ToolbarGroup AriaLabel="File actions">
+                <ToolbarButton AriaLabel="New" OnClick="@(e => HandleAction("New"))">
+                    <LucideIcon Name="file-plus" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Open" OnClick="@(e => HandleAction("Open"))">
+                    <LucideIcon Name="folder-open" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Save" OnClick="@(e => HandleAction("Save"))">
+                    <LucideIcon Name="save" Size="16" />
+                </ToolbarButton>
+            </ToolbarGroup>
+            <ToolbarSeparator />
+            <ToolbarGroup AriaLabel="Text formatting">
+                <ToolbarToggleButton AriaLabel="Bold" @bind-IsPressed="objIsBold">
+                    <LucideIcon Name="bold" Size="16" />
+                </ToolbarToggleButton>
+                <ToolbarToggleButton AriaLabel="Italic" @bind-IsPressed="objIsItalic">
+                    <LucideIcon Name="italic" Size="16" />
+                </ToolbarToggleButton>
+                <ToolbarToggleButton AriaLabel="Underline" @bind-IsPressed="objIsUnderline">
+                    <LucideIcon Name="underline" Size="16" />
+                </ToolbarToggleButton>
+            </ToolbarGroup>
+            <ToolbarSeparator />
+            <ToolbarGroup AriaLabel="Alignment">
+                <ToolbarButton AriaLabel="Align left" OnClick="@(e => HandleAction("Align left"))">
+                    <LucideIcon Name="align-left" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Align center" OnClick="@(e => HandleAction("Align center"))">
+                    <LucideIcon Name="align-center" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Align right" OnClick="@(e => HandleAction("Align right"))">
+                    <LucideIcon Name="align-right" Size="16" />
+                </ToolbarButton>
+            </ToolbarGroup>
+            <ToolbarSeparator />
+            <ToolbarGroup AriaLabel="Insert">
+                <ToolbarButton AriaLabel="Insert link" OnClick="@(e => HandleAction("Insert link"))">
+                    <LucideIcon Name="link" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Insert image" OnClick="@(e => HandleAction("Insert image"))">
+                    <LucideIcon Name="image" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Insert table" OnClick="@(e => HandleAction("Insert table"))">
+                    <LucideIcon Name="table" Size="16" />
+                </ToolbarButton>
+            </ToolbarGroup>
+        </Toolbar>
+    </section>
+
+    <!-- Real-World Example: IDE-Style Toolbar -->
+    <section class="space-y-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Real-World Example: IDE-Style Toolbar</h2>
+            <p class="text-muted-foreground">
+                A Visual Studio-style toolbar with run/debug controls, build configuration dropdowns, and navigation buttons.
+            </p>
+        </div>
+
+        <Toolbar Variant="ToolbarVariant.Dense" AriaLabel="IDE toolbar">
+            <ToolbarGroup AriaLabel="Navigation">
+                <ToolbarButton AriaLabel="Navigate back" OnClick="@(e => HandleAction("Navigate back"))">
+                    <LucideIcon Name="arrow-left" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Navigate forward" OnClick="@(e => HandleAction("Navigate forward"))">
+                    <LucideIcon Name="arrow-right" Size="16" />
+                </ToolbarButton>
+            </ToolbarGroup>
+            <ToolbarSeparator />
+            <ToolbarGroup AriaLabel="Build configuration">
+                <DropdownMenu>
+                    <DropdownMenuTrigger>
+                        <ToolbarButton AriaLabel="Build configuration">
+                            Debug
+                            <LucideIcon Name="chevron-down" Size="14" />
+                        </ToolbarButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem>Debug</DropdownMenuItem>
+                        <DropdownMenuItem>Release</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                    <DropdownMenuTrigger>
+                        <ToolbarButton AriaLabel="Target platform">
+                            Any CPU
+                            <LucideIcon Name="chevron-down" Size="14" />
+                        </ToolbarButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem>Any CPU</DropdownMenuItem>
+                        <DropdownMenuItem>x64</DropdownMenuItem>
+                        <DropdownMenuItem>x86</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </ToolbarGroup>
+            <ToolbarSeparator />
+            <ToolbarGroup AriaLabel="Run controls">
+                <ToolbarButton AriaLabel="Start debugging" Class="text-green-600 dark:text-green-400" OnClick="@(e => HandleAction("Start debugging"))">
+                    <LucideIcon Name="play" Size="16" />
+                    Start
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Stop" Class="text-red-600 dark:text-red-400" Disabled="true">
+                    <LucideIcon Name="square" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Restart" Disabled="true">
+                    <LucideIcon Name="rotate-ccw" Size="16" />
+                </ToolbarButton>
+            </ToolbarGroup>
+            <ToolbarSeparator />
+            <ToolbarGroup AriaLabel="Search">
+                <ToolbarButton AriaLabel="Find in files" OnClick="@(e => HandleAction("Find in files"))">
+                    <LucideIcon Name="search" Size="16" />
+                </ToolbarButton>
+                <ToolbarButton AriaLabel="Terminal" OnClick="@(e => HandleAction("Terminal"))">
+                    <LucideIcon Name="terminal" Size="16" />
+                </ToolbarButton>
+            </ToolbarGroup>
+        </Toolbar>
+    </section>
+
+    <!-- Usage Notes -->
+    <section class="space-y-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Usage Notes</h2>
+        </div>
+
+        <div class="rounded-lg border p-6 space-y-4">
+            <div class="space-y-3">
+                <h3 class="font-semibold">Key Features</h3>
+                <ul class="space-y-2 text-sm text-muted-foreground list-disc list-inside">
+                    <li>Horizontal and vertical orientations</li>
+                    <li>Three density variants (Default, Compact, Dense)</li>
+                    <li>ToolbarButton for actions, ToolbarToggleButton for on/off state</li>
+                    <li>ToolbarGroup for logical grouping, ToolbarSeparator for visual dividers</li>
+                    <li>Integrates with DropdownMenu for complex toolbar interactions</li>
+                    <li>Supports icon-only and icon+text button layouts</li>
+                    <li>Dark mode support via CSS variables</li>
+                </ul>
+            </div>
+
+            <div class="space-y-3">
+                <h3 class="font-semibold">Accessibility</h3>
+                <ul class="space-y-2 text-sm text-muted-foreground list-disc list-inside">
+                    <li>Uses role="toolbar" with aria-orientation on the container</li>
+                    <li>Uses role="group" on ToolbarGroup for screen readers</li>
+                    <li>Uses role="separator" with aria-orientation on separators</li>
+                    <li>ToolbarToggleButton uses aria-pressed for toggle state</li>
+                    <li>Icon-only buttons should have AriaLabel for screen reader support</li>
+                    <li>Keyboard navigation with Tab, Enter, and Space</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    private bool objIsBold;
+    private bool objIsItalic;
+    private bool objIsUnderline;
+    private bool objIsStrikethrough;
+
+    private string objLastAction = "";
+    private void HandleAction(string action)
+    {
+        objLastAction = action;
+        StateHasChanged();
+    }
+}

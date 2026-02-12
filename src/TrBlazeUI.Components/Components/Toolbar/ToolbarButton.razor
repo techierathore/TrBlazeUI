@@ -1,0 +1,13 @@
+@namespace TrBlazeUI.Components.Toolbar
+
+<button
+    data-slot="toolbar-button"
+    type="button"
+    class="@CssClass"
+    aria-label="@AriaLabel"
+    title="@EffectiveTitle"
+    disabled="@Disabled"
+    @onclick="HandleClick"
+    @attributes="AdditionalAttributes">
+    @ChildContent
+</button>
