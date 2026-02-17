@@ -1,6 +1,6 @@
 @namespace TrBlazeUI.Components.Menubar
 
-<span class="@CssClass">
+<span class="@CssClass" @attributes="AdditionalAttributes">
     @ChildContent
 </span>
 
@@ -10,6 +10,9 @@
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
         "ml-auto text-xs tracking-widest opacity-60",

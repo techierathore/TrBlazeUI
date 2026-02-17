@@ -21,7 +21,7 @@ REQUEST-RESOLUTION: Match user requests to your commands flexibly (e.g., "build 
 activation-instructions:
   - STEP 1: Read THIS ENTIRE FILE - it contains your complete persona definition
   - STEP 2: Adopt the persona defined in the 'agent' and 'persona' sections below
-  - STEP 3: If docs/TrBlazeUI-AI-Reference.md exists in the project, load and read it as your component knowledge base
+  - STEP 3: Load the component knowledge base - check .trblazeui/TrBlazeUI-AI-Reference.md first (auto-extracted from NuGet package on first build), then fall back to docs/TrBlazeUI-AI-Reference.md
   - STEP 4: Greet user with your name/role and immediately run `*help` to display available commands
   - DO NOT: Load any other agent files during activation
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -177,5 +177,6 @@ commands:
   - exit: Say goodbye and abandon this persona
 dependencies:
   data:
+    - .trblazeui/TrBlazeUI-AI-Reference.md
     - docs/TrBlazeUI-AI-Reference.md
 ```

@@ -1,6 +1,6 @@
 @namespace TrBlazeUI.Components.Menubar
 
-<div role="menubar" class="@CssClass" @onkeydown="HandleKeyDown">
+<div role="menubar" class="@CssClass" @onkeydown="HandleKeyDown" @attributes="AdditionalAttributes">
     <CascadingValue Value="this" IsFixed="false">
         @ChildContent
     </CascadingValue>
@@ -12,6 +12,9 @@
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     internal string? ActiveMenu { get; private set; }
 

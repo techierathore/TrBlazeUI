@@ -128,6 +128,12 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
     [Parameter]
     public string? Id { get; set; }
 
+    /// <summary>
+    /// Gets or sets additional HTML attributes to apply to the container element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
     // === Parameters - State ===
 
     /// <summary>

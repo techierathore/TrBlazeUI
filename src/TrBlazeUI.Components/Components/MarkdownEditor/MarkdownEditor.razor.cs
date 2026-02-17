@@ -59,6 +59,12 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
     public string? Id { get; set; }
 
     /// <summary>
+    /// Gets or sets additional HTML attributes to apply to the container element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
     /// Gets or sets the ARIA label for the textarea.
     /// </summary>
     [Parameter]

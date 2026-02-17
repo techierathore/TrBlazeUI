@@ -2,7 +2,7 @@
 @using TrBlazeUI.Primitives.Table
 
 <CascadingValue Value="@objContext" IsFixed="false">
-    <nav role="navigation" aria-label="pagination" class="@CssClass">
+    <nav role="navigation" aria-label="pagination" class="@CssClass" @attributes="AdditionalAttributes">
         @ChildContent
     </nav>
 </CascadingValue>
@@ -15,6 +15,9 @@
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     /// <summary>
     /// Optional pagination state for automatic state management.

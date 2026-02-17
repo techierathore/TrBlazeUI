@@ -1,6 +1,6 @@
 @namespace TrBlazeUI.Components.Resizable
 
-<div class="@CssClass" style="@Style">
+<div class="@CssClass" @attributes="AdditionalAttributes" style="@Style">
     @ChildContent
 </div>
 
@@ -43,6 +43,9 @@
     /// </summary>
     [Parameter]
     public string? Class { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private int objPanelIndex = -1;
 

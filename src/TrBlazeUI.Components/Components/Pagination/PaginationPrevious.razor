@@ -5,7 +5,8 @@
                 Size="@EffectiveSize"
                 Class="@CssClass"
                 Disabled="@IsDisabled"
-                OnClick="HandleClick">
+                OnClick="HandleClick"
+                @attributes="AdditionalAttributes">
     <LucideIcon Name="chevron-left" Class="h-4 w-4" />
     @if (ShowText)
     {
@@ -56,6 +57,9 @@
     /// </summary>
     [Parameter]
     public PaginationLinkSize Size { get; set; } = PaginationLinkSize.Default;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private bool IsDisabled => Disabled ?? (Context?.State != null && !Context.State.CanGoPrevious);
 

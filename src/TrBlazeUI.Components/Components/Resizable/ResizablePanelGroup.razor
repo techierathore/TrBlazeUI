@@ -3,7 +3,7 @@
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 
-<div @ref="objGroupRef" class="@CssClass" style="@Style">
+<div @ref="objGroupRef" class="@CssClass" @attributes="AdditionalAttributes" style="@Style">
     <CascadingValue Value="this" IsFixed="false">
         @ChildContent
     </CascadingValue>
@@ -27,6 +27,9 @@
     /// </summary>
     [Parameter]
     public string? Class { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private ElementReference objGroupRef;
     private IJSObjectReference? objJsModule;

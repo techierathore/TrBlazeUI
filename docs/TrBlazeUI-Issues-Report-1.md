@@ -5,13 +5,15 @@
 **Target Framework:** .NET 10.0
 **Host:** MAUI Blazor Hybrid (WebView2) on Windows
 **Date:** 2026-02-17
-**Last Updated:** 2026-02-17
+**Last Updated:** 2026-02-17 (fix statuses updated)
 
 ---
 
 ## Executive Summary
 
 When building the AppStudio IDE, we encountered **critical issues** with TrBlazeUI's `<Dialog>`, `<NativeSelect>`, and `<Input>` components that make them unusable in dialogs containing interactive content. We implemented custom workaround components to bypass these limitations.
+
+> **Update:** Issues #1, #3, #4, and #5 have been **fixed in TrBlazeUI**. Issue #2 is a WebView2/MAUI platform limitation — use `<Select>` instead of `<NativeSelect>` inside overlays. All workaround components can now be migrated back to standard TrBlazeUI components.
 
 ### Workaround Components Created
 
@@ -26,7 +28,7 @@ When building the AppStudio IDE, we encountered **critical issues** with TrBlaze
 ## Issue 1: Dialog PortalHost Does Not Re-render on Internal State Changes (CRITICAL)
 
 ### Severity: **Blocker**
-### Status: **Workaround Implemented** — Custom `AppDialog` component
+### Status: **Fixed in TrBlazeUI** — Reactive portal refresh mechanism added
 
 ### Description
 
@@ -95,12 +97,22 @@ Then in `DialogPortal`, call `PortalService.NotifyContentChanged()` on every ren
 
 Pass content as a `RenderFragment` through a cascading service instead of physically moving DOM elements via JavaScript. Content changes would propagate naturally through Blazor's rendering system.
 
+### TrBlazeUI Fix Applied
+
+**Fixed.** A reactive portal refresh mechanism was implemented (combination of Options A and B):
+
+- `PortalService` now has a `RefreshPortal(id)` method that triggers `OnPortalsChanged` event
+- `PortalHost` subscribes to `OnPortalsChanged` and calls `InvokeAsync(StateHasChanged)` to re-render
+- `DialogPortal` calls `PortalService.RefreshPortal()` when the dialog is already open, ensuring internal state changes propagate to the PortalHost
+
+**Consumer migration:** `AppDialog` workaround can be replaced with standard `<Dialog>` — internal state changes (sidebar navigation, form controls, checkboxes, dropdowns) now re-render correctly.
+
 ---
 
 ## Issue 2: NativeSelect Dropdown Does Not Open Inside Dialog/Overlay (CRITICAL)
 
 ### Severity: **Blocker** (in MAUI Blazor Hybrid context)
-### Status: **Workaround Implemented** — Custom `SettingsSelect` component
+### Status: **Platform Limitation** — Use `<Select>` instead of `<NativeSelect>` inside overlays
 
 ### Description
 
@@ -160,12 +172,20 @@ Either:
 2. Or a documented fallback mechanism for MAUI Blazor Hybrid users
 3. Or both: `<NativeSelect>` for normal contexts + `<Select>` for overlay contexts
 
+### TrBlazeUI Guidance
+
+**No code fix needed — this is a WebView2/MAUI platform limitation.** TrBlazeUI already provides both components:
+- `<NativeSelect>` — native HTML `<select>`, use in normal page contexts
+- `<Select>` — custom JavaScript-based dropdown, use inside dialogs/overlays
+
+**Consumer migration:** Replace `<SettingsSelect>` with `<Select TValue="string">` inside overlays. The `<Select>` component renders a custom dropdown that works in `position: fixed` containers.
+
 ---
 
 ## Issue 3: Input Component Text Truncation / Poor Contrast
 
 ### Severity: **Major**
-### Status: **Workaround Implemented** — Plain `<input>` with CSS class
+### Status: **Fixed in TrBlazeUI** — `CaptureUnmatchedValues` added to Input
 
 ### Description
 
@@ -207,23 +227,39 @@ CSS in `ide-layout.css`:
 2. Or provide a `Width` / `FullWidth` parameter
 3. Or set default CSS to `width: 100%` to fill container
 
+### TrBlazeUI Fix Applied
+
+**Fixed.** `Input` now has `CaptureUnmatchedValues` support (`Input.razor.cs`) with `@attributes="AdditionalAttributes"` on the rendered element. It accepts `style=`, `id=`, `data-*`, and all other HTML attributes.
+
+**Consumer migration:** Replace `<input class="settings-input">` with `<Input style="width: 160px" @bind-Value="val" />`.
+
 ---
 
 ## Issue 4: NativeSelect Does Not Accept HTML Attributes
 
 ### Severity: **Minor**
-### Status: **Bypassed** (we no longer use NativeSelect in dialogs)
+### Status: **Fixed in TrBlazeUI** — `CaptureUnmatchedValues` added to NativeSelect
 
-Like `<Input>`, `<NativeSelect>` does not accept `style=` or other arbitrary HTML attributes.
+Like `<Input>`, `<NativeSelect>` previously did not accept `style=` or other arbitrary HTML attributes.
+
+### TrBlazeUI Fix Applied
+
+**Fixed.** `NativeSelect` now has `CaptureUnmatchedValues` support with `@attributes="AdditionalAttributes"` on the rendered `<select>` element.
 
 ---
 
 ## Issue 5: Badge Does Not Accept `style=` Attribute
 
 ### Severity: **Minor**
-### Status: **Workaround: wrap in `<span style="...">`**
+### Status: **Fixed in TrBlazeUI** — `CaptureUnmatchedValues` added to Badge
 
-`<Badge>` does not forward `style=` to its rendered element.
+`<Badge>` previously did not forward `style=` to its rendered element.
+
+### TrBlazeUI Fix Applied
+
+**Fixed.** `Badge` now has `CaptureUnmatchedValues` support (`Badge.razor.cs`) with `@attributes="AdditionalAttributes"` on the rendered element.
+
+**Consumer migration:** Remove `<span>` wrappers and pass `style=` directly to `<Badge>`.
 
 ---
 
@@ -244,14 +280,16 @@ TrBlazeUI still provides:
   <Input>                  ← Still available, used in non-constrained contexts
 ```
 
-### When TrBlazeUI updates, our options are:
+### When migrating away from workarounds:
 
-| TrBlazeUI Fix | Migration Needed | Effort | Risk |
-|---|---|---|---|
-| **Dialog portal re-rendering (Issue 1)** | Replace `<AppDialog>` with `<Dialog>` + TrBlazeUI content components | Medium — API is similar but header/footer structure differs | Low — test each dialog individually |
-| **NativeSelect in overlays (Issue 2)** | Replace `<SettingsSelect>` with `<NativeSelect>` | Medium — change `Options` list back to `<option>` child content | Low — straightforward API change |
-| **Input accepts `style=` (Issue 3)** | Replace `<input class="settings-input">` with `<Input>` | Low — add `style="width: 160px"` to each Input | Very Low |
-| **Badge accepts `style=` (Issue 5)** | Remove `<span>` wrappers around Badge | Very Low | None |
+All fixes below are now available in TrBlazeUI. Migration is optional and incremental.
+
+| TrBlazeUI Fix | Migration Needed | Effort | Risk | Fix Available |
+|---|---|---|---|---|
+| **Dialog portal re-rendering (Issue 1)** | Replace `<AppDialog>` with `<Dialog>` + TrBlazeUI content components | Medium — API is similar but header/footer structure differs | Low — test each dialog individually | **Yes** |
+| **NativeSelect in overlays (Issue 2)** | Replace `<SettingsSelect>` with `<Select TValue="string">` (not `<NativeSelect>`) | Medium — change `Options` list to `<SelectItem>` child content | Low — straightforward API change | **Yes** (use `<Select>`) |
+| **Input accepts `style=` (Issue 3)** | Replace `<input class="settings-input">` with `<Input>` | Low — add `style="width: 160px"` to each Input | Very Low | **Yes** |
+| **Badge accepts `style=` (Issue 5)** | Remove `<span>` wrappers around Badge | Very Low | None | **Yes** |
 
 ### Key points:
 
@@ -264,13 +302,13 @@ TrBlazeUI still provides:
 
 ## Summary of All Issues and Current Status
 
-| # | Issue | Severity | Workaround | Status |
-|---|-------|----------|-----------|--------|
-| 1 | Dialog PortalHost does not re-render on internal state changes | **Blocker** | `AppDialog` component (position: fixed, in component tree) | Fully Resolved |
-| 2 | NativeSelect dropdown doesn't open inside Dialog/overlay | **Blocker** | `SettingsSelect` component (div-based dropdown) | Fully Resolved |
-| 3 | Input text truncation / poor contrast in constrained containers | **Major** | Plain `<input class="settings-input">` with CSS | Fully Resolved |
-| 4 | NativeSelect doesn't accept HTML attributes | **Minor** | Bypassed (no longer using NativeSelect in dialogs) | N/A |
-| 5 | Badge doesn't accept `style=` | **Minor** | Wrapper `<span>` | Workaround in place |
+| # | Issue | Severity | Workaround | TrBlazeUI Fix | Consumer Migration |
+|---|-------|----------|-----------|---------------|-------------------|
+| 1 | Dialog PortalHost does not re-render on internal state changes | **Blocker** | `AppDialog` component | **Fixed** — Reactive portal refresh | Replace `AppDialog` with `<Dialog>` |
+| 2 | NativeSelect dropdown doesn't open inside Dialog/overlay | **Blocker** | `SettingsSelect` component | **N/A** — Platform limitation | Use `<Select>` instead of `<NativeSelect>` in overlays |
+| 3 | Input text truncation / poor contrast in constrained containers | **Major** | Plain `<input class="settings-input">` | **Fixed** — CaptureUnmatchedValues | Replace with `<Input style="width: 160px">` |
+| 4 | NativeSelect doesn't accept HTML attributes | **Minor** | Bypassed | **Fixed** — CaptureUnmatchedValues | Can now pass `style=`, `id=`, etc. |
+| 5 | Badge doesn't accept `style=` | **Minor** | Wrapper `<span>` | **Fixed** — CaptureUnmatchedValues | Remove `<span>` wrappers |
 
 ---
 

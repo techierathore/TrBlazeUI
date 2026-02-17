@@ -4,7 +4,8 @@
 <PaginationLink Size="PaginationLinkSize.Icon"
                 Class="@CssClass"
                 Disabled="@IsDisabled"
-                OnClick="HandleClick">
+                OnClick="HandleClick"
+                @attributes="AdditionalAttributes">
     <LucideIcon Name="chevrons-left" Class="h-4 w-4" />
     <span class="sr-only">Go to first page</span>
 </PaginationLink>
@@ -27,6 +28,9 @@
     /// </summary>
     [Parameter]
     public EventCallback OnClick { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private bool IsDisabled => Disabled ?? !(Context?.State?.CanGoPrevious ?? true);
 

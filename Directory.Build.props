@@ -17,8 +17,8 @@
     <!-- Build Configuration -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <!-- Suppress missing XML comment warnings and RZ10012 dot-notation child content warnings -->
-    <NoWarn>$(NoWarn);CS1591;RZ10012</NoWarn>
+    <!-- Suppress missing XML comment warnings -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
 
     <!-- Code Style Enforcement -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

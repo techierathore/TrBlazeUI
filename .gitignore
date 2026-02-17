@@ -36,6 +36,9 @@ NUL
 .env.local
 .env.*.local
 
+# Auto-extracted NuGet docs
+.trblazeui/
+
 # Development Tools
 .playwright-mcp
 .devflow

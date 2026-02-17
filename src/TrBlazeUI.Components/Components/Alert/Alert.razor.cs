@@ -87,7 +87,9 @@ public partial class Alert : ComponentBase
         "relative w-full rounded-lg border p-4 text-foreground",
         // Accent border style (thick left border)
         AccentBorder ? "border-l-4" : null,
-        Icon != null ? "[&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&:has(svg)]:pl-11" : null,
+        // Icon positioning: always included so both Icon parameter and AlertIcon child content work.
+        // These are no-ops when no SVG is present (CSS selectors only match if SVG exists).
+        "[&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&:has(svg)]:pl-11",
         // Variant-specific styles (border color, background tint, icon color)
         Variant switch
         {
