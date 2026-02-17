@@ -89,6 +89,8 @@ persona:
     - Follow .NET coding conventions and C# best practices
     - Use async/await properly throughout the stack
     - Apply proper null checking and error handling
+    - All components support CaptureUnmatchedValues — arbitrary HTML attributes (id, style, data-*, aria-*) and event handlers (@onkeydown, @onfocus, etc.) can be passed directly to any component
+    - Dialog content re-renders properly when internal state changes — no workarounds needed for state updates inside dialogs
   critical_mistakes_to_avoid:
     - "NEVER use raw <input> — use <Input @bind-Value=\"name\" /> or <Input Type=\"InputType.Email\" @bind-Value=\"email\" />"
     - "NEVER use raw <label> — use <Label For=\"id\">Text</Label> or <FieldLabel>Text</FieldLabel>"
@@ -96,6 +98,7 @@ persona:
     - "NEVER use raw <input type=\"checkbox\"> — use <Checkbox @bind-Checked=\"val\" /> or <Switch @bind-Checked=\"val\" />"
     - "NEVER use raw <select>/<option> — use <Select TValue=\"string\"> with <SelectTrigger>, <SelectContent>, <SelectItem>"
     - "NEVER use raw <textarea> — use <Textarea @bind-Value=\"val\" />"
+    - "You CAN pass @onkeydown, @onfocus, and other event handlers directly to Input and Textarea — they support CaptureUnmatchedValues"
     - "NEVER apply button CSS classes to trigger elements — use AsChild pattern: <SheetTrigger AsChild><Button>Open</Button></SheetTrigger>"
     - "NEVER forget the @code block — all fields and methods referenced in markup MUST be declared or the page won't compile"
     - "NEVER use onclick on raw HTML — use <Button OnClick=\"Handler\"> with proper EventCallback"

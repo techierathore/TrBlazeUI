@@ -158,6 +158,12 @@ public partial class Collapsible : ComponentBase
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
+    /// <summary>
+    /// Gets or sets additional HTML attributes to apply to the element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
     /// <inheritdoc />
     protected override void OnInitialized() =>
         // Initialize with DefaultOpen if not controlled

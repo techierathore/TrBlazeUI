@@ -11,11 +11,14 @@
     <RepositoryUrl>https://github.com/techierathore/TrBlazeUI</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
 
+    <!-- Version -->
+    <Version>1.0.3</Version>
+
     <!-- Build Configuration -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <!-- Suppress missing XML comment warnings for internal enums and lifecycle methods -->
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!-- Suppress missing XML comment warnings and RZ10012 dot-notation child content warnings -->
+    <NoWarn>$(NoWarn);CS1591;RZ10012</NoWarn>
 
     <!-- Code Style Enforcement -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

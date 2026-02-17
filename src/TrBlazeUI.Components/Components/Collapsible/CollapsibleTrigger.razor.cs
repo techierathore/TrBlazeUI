@@ -81,6 +81,12 @@ public partial class CollapsibleTrigger : ComponentBase
     public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
+    /// Gets or sets additional HTML attributes to apply to the element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
     /// Gets the computed CSS class string for the trigger button element.
     /// </summary>
     /// <value>

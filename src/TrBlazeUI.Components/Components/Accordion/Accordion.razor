@@ -12,7 +12,8 @@
                                               OnValueChange="@OnValueChange"
                                               Type="@Type"
                                               Collapsible="@Collapsible"
-                                              class="@CssClass">
+                                              class="@CssClass"
+                                              @attributes="AdditionalAttributes">
     @ChildContent
 </TrBlazeUI.Primitives.Accordion.Accordion>
 
@@ -65,6 +66,12 @@
     /// </summary>
     [Parameter]
     public string? Class { get; set; }
+
+    /// <summary>
+    /// Additional HTML attributes to apply to the element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string CssClass => $"{Class}".Trim();
 }

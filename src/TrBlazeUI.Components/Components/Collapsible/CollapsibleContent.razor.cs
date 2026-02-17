@@ -88,6 +88,12 @@ public partial class CollapsibleContent : ComponentBase
     public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
+    /// Gets or sets additional HTML attributes to apply to the element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
     /// Gets the CSS classes for the grid container (for animation).
     /// </summary>
     /// <remarks>

@@ -12,4 +12,5 @@
     aria-describedby="@AriaDescribedBy"
     aria-invalid="@(AriaInvalid?.ToString().ToLower())"
     data-slot="textarea-control"
+    @attributes="AdditionalAttributes"
     @oninput="HandleInput"></textarea>
