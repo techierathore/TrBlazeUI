@@ -5,6 +5,82 @@
 
 ---
 
+## CRITICAL: Rules You MUST Follow
+
+These rules are non-negotiable. Violating them produces broken or inconsistent UI.
+
+### ALWAYS Do
+
+1. **ALWAYS use TrBlazeUI components instead of raw HTML** — Use `<Input>` not `<input>`, `<Label>` not `<label>`, `<Button>` not `<button>`, `<Checkbox>` not `<input type="checkbox">`, `<Switch>` not custom toggles
+2. **ALWAYS include a complete `@code { }` block** — Every generated page/component must have working C# code with all referenced fields, methods, and event handlers
+3. **ALWAYS use `@bind-Value` / `@bind-Checked`** for two-way data binding on form inputs
+4. **ALWAYS wrap form inputs with `<Field>` + `<FieldLabel>` + `<FieldContent>`** for consistent labeling, spacing, and validation
+5. **ALWAYS use `ToastService`** (injected via `@inject`) for user feedback — never use `alert()` or custom notification divs
+6. **ALWAYS use `<Dialog>` / `<Sheet>` / `<AlertDialog>`** for modal/overlay interactions
+7. **ALWAYS use Tailwind CSS utility classes** via the `Class` parameter — never inline `style=""` attributes
+8. **ALWAYS use `<LucideIcon Name="..." Size="16" />`** for icons — never raw SVG or `<i>` tags
+9. **ALWAYS add `@using` statements** at the top of each file for any TrBlazeUI namespaces used (unless they're in `_Imports.razor`)
+10. **ALWAYS use `AsChild` pattern** on triggers (`SheetTrigger`, `DialogTrigger`, etc.) to compose with `<Button>` instead of applying raw CSS to the trigger element
+
+### NEVER Do
+
+1. **NEVER use raw `<input>` elements** — Use `<Input Type="InputType.Email">`, `<Input Type="InputType.Password">`, etc.
+2. **NEVER use raw `<label>` elements** — Use `<Label For="id">` or `<FieldLabel>`
+3. **NEVER use raw `<button>` elements** — Use `<Button>` with appropriate `Variant` and `Size`
+4. **NEVER use raw `<input type="checkbox">` elements** — Use `<Checkbox @bind-Checked="...">` or `<Switch @bind-Checked="...">`
+5. **NEVER use raw `<select>` elements** — Use `<Select TValue="string">` with `<SelectTrigger>`, `<SelectContent>`, `<SelectItem>`
+6. **NEVER use raw `<textarea>` elements** — Use `<Textarea @bind-Value="...">`
+7. **NEVER apply button CSS classes directly to trigger elements** — Instead of `<DialogTrigger class="inline-flex items-center ...">`, use `<DialogTrigger AsChild><Button>...</Button></DialogTrigger>`
+8. **NEVER forget the `@code` block** — Every page must compile; all fields and methods referenced in markup must be declared
+9. **NEVER use `onclick` handlers on raw HTML** — Use `<Button OnClick="HandleClick">`
+10. **NEVER use JavaScript `alert()` or `console.log()`** for user feedback — Use `ToastService`
+
+### Common Anti-Patterns (DO NOT copy these)
+
+```razor
+@* BAD: Raw HTML input with manual CSS classes *@
+<input id="name" value="John"
+       class="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm..." />
+
+@* GOOD: TrBlazeUI Input component *@
+<Input Id="name" @bind-Value="name" Class="col-span-3" />
+```
+
+```razor
+@* BAD: Raw button with manual styling on trigger *@
+<DialogTrigger class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+    Open Dialog
+</DialogTrigger>
+
+@* GOOD: AsChild pattern with Button component *@
+<DialogTrigger AsChild>
+    <Button>Open Dialog</Button>
+</DialogTrigger>
+```
+
+```razor
+@* BAD: Raw checkbox *@
+<input type="checkbox" checked class="h-4 w-4" />
+
+@* GOOD: TrBlazeUI Checkbox or Switch *@
+<Checkbox @bind-Checked="isEnabled" Id="feature" />
+<Switch @bind-Checked="isEnabled" Id="feature" />
+```
+
+```razor
+@* BAD: Missing @code block — fields not declared *@
+<Input @bind-Value="name" />
+@* Where is 'name' declared? This won't compile! *@
+
+@* GOOD: Complete with @code block *@
+<Input @bind-Value="name" />
+@code {
+    private string? name;
+}
+```
+
+---
+
 ## 1. Quick Start Setup
 
 ### NuGet Packages
@@ -1534,12 +1610,18 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
 
 ---
 
-## 10. Common Page Patterns
+## 10. Complete Page Examples
 
-### Dashboard Layout
+> **IMPORTANT:** Every example below includes a complete `@code` block. When generating pages, you MUST always include the `@code` block with all fields, methods, and types referenced in the markup. A page without `@code` will not compile.
+
+### Dashboard Page (Complete)
 
 ```razor
 @page "/dashboard"
+@using TrBlazeUI.Components.Toast
+@inject ToastService ToastService
+
+<PageTitle>Dashboard - MyApp</PageTitle>
 
 <div class="space-y-6">
     <div>
@@ -1549,26 +1631,19 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
 
     <!-- Stats Cards -->
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-            <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle class="text-sm font-medium">Total Revenue</CardTitle>
-                <LucideIcon Name="dollar-sign" Size="16" Class="text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-                <div class="text-2xl font-bold">$45,231.89</div>
-                <p class="text-xs text-muted-foreground">+20.1% from last month</p>
-            </CardContent>
-        </Card>
-        <Card>
-            <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle class="text-sm font-medium">Users</CardTitle>
-                <LucideIcon Name="users" Size="16" Class="text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-                <div class="text-2xl font-bold">+2,350</div>
-                <p class="text-xs text-muted-foreground">+180 this week</p>
-            </CardContent>
-        </Card>
+        @foreach (var stat in stats)
+        {
+            <Card>
+                <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle class="text-sm font-medium">@stat.Title</CardTitle>
+                    <LucideIcon Name="@stat.Icon" Size="16" Class="text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div class="text-2xl font-bold">@stat.Value</div>
+                    <p class="text-xs text-muted-foreground">@stat.Change</p>
+                </CardContent>
+            </Card>
+        }
     </div>
 
     <!-- Main Content Area -->
@@ -1579,7 +1654,7 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
             </CardHeader>
             <CardContent>
                 <ChartContainer Class="h-[300px]">
-                    <BarChart TItem="MonthlyData" Items="@data"
+                    <BarChart TItem="MonthlyData" Items="@monthlyData"
                               XValue="@(d => d.Month)" YValue="@(d => d.Value)" />
                 </ChartContainer>
             </CardContent>
@@ -1601,6 +1676,7 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
                                 <p class="text-sm font-medium">@item.Name</p>
                                 <p class="text-xs text-muted-foreground">@item.Description</p>
                             </div>
+                            <Badge Variant="@item.BadgeVariant">@item.Status</Badge>
                         </div>
                     }
                 </div>
@@ -1608,12 +1684,43 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
         </Card>
     </div>
 </div>
+
+@code {
+    private record StatCard(string Title, string Value, string Change, string Icon);
+    private record MonthlyData(string Month, double Value);
+    private record ActivityItem(string Name, string Initials, string Description, string Status, BadgeVariant BadgeVariant);
+
+    private List<StatCard> stats = new()
+    {
+        new("Total Revenue", "$45,231.89", "+20.1% from last month", "dollar-sign"),
+        new("Users", "+2,350", "+180 this week", "users"),
+        new("Active Sessions", "573", "+12% from yesterday", "activity"),
+        new("Conversion Rate", "3.2%", "+0.4% from last month", "trending-up")
+    };
+
+    private List<MonthlyData> monthlyData = new()
+    {
+        new("Jan", 4500), new("Feb", 3800), new("Mar", 5200),
+        new("Apr", 4100), new("May", 6300), new("Jun", 5800)
+    };
+
+    private List<ActivityItem> recentItems = new()
+    {
+        new("Alice Johnson", "AJ", "Created new project", "New", BadgeVariant.Default),
+        new("Bob Smith", "BS", "Completed deployment", "Done", BadgeVariant.Secondary),
+        new("Carol Davis", "CD", "Submitted pull request", "Review", BadgeVariant.Outline)
+    };
+}
 ```
 
-### Form Page
+### Form Page with Validation (Complete)
 
 ```razor
 @page "/settings/profile"
+@using TrBlazeUI.Components.Toast
+@inject ToastService ToastService
+
+<PageTitle>Profile Settings - MyApp</PageTitle>
 
 <div class="space-y-6 max-w-2xl">
     <div>
@@ -1666,6 +1773,21 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
                     </FieldContent>
                 </Field>
 
+                <Field>
+                    <FieldLabel>Preferred Framework</FieldLabel>
+                    <FieldContent>
+                        <Combobox TItem="FrameworkOption"
+                                  Items="frameworks"
+                                  @bind-Value="selectedFramework"
+                                  ValueSelector="@(f => f.Value)"
+                                  DisplaySelector="@(f => f.Label)"
+                                  Placeholder="Select framework..."
+                                  SearchPlaceholder="Search..."
+                                  EmptyMessage="No framework found."
+                                  MatchTriggerWidth="true" />
+                    </FieldContent>
+                </Field>
+
                 <div class="flex items-center space-x-2">
                     <Switch @bind-Checked="notifications" Id="notifications" />
                     <Label For="notifications">Email notifications</Label>
@@ -1673,31 +1795,76 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
             </div>
         </CardContent>
         <CardFooter class="flex justify-between">
-            <Button Variant="ButtonVariant.Outline">Cancel</Button>
-            <Button OnClick="HandleSave">Save Changes</Button>
+            <Button Variant="ButtonVariant.Outline" OnClick="HandleCancel">Cancel</Button>
+            <Button OnClick="HandleSave" Disabled="@isSaving">
+                @if (isSaving)
+                {
+                    <Spinner Size="SpinnerSize.Small" Class="mr-2" />
+                    <span>Saving...</span>
+                }
+                else
+                {
+                    <span>Save Changes</span>
+                }
+            </Button>
         </CardFooter>
     </Card>
 </div>
 
 @code {
+    private record FrameworkOption(string Value, string Label);
+
     private string name = "";
     private string email = "";
     private string bio = "";
     private string? role;
+    private string? selectedFramework;
     private bool notifications = true;
+    private bool isSaving = false;
+
+    private List<FrameworkOption> frameworks = new()
+    {
+        new("blazor", "Blazor"),
+        new("react", "React"),
+        new("angular", "Angular"),
+        new("vue", "Vue.js")
+    };
 
     private async Task HandleSave()
     {
-        // Save logic here
-        ToastService.Success("Profile updated successfully.", "Saved");
+        isSaving = true;
+        StateHasChanged();
+
+        try
+        {
+            await Task.Delay(1000); // Simulate API call
+            ToastService.Success("Profile updated successfully.", "Saved");
+        }
+        catch (Exception ex)
+        {
+            ToastService.Error($"Failed to save: {ex.Message}", "Error");
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private void HandleCancel()
+    {
+        ToastService.Show("Changes discarded.");
     }
 }
 ```
 
-### List/Detail Page
+### CRUD Page with DataTable + Dialog (Complete)
 
 ```razor
 @page "/users"
+@using TrBlazeUI.Components.Toast
+@inject ToastService ToastService
+
+<PageTitle>User Management - MyApp</PageTitle>
 
 <div class="space-y-6">
     <div class="flex items-center justify-between">
@@ -1705,43 +1872,79 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
             <h1 class="text-3xl font-bold tracking-tight">Users</h1>
             <p class="text-muted-foreground">Manage user accounts.</p>
         </div>
-        <Dialog>
-            <DialogTrigger>
-                <Button><LucideIcon Name="plus" Size="16" Class="mr-2" />Add User</Button>
+        <Dialog @bind-Open="isAddDialogOpen">
+            <DialogTrigger AsChild>
+                <Button>
+                    <Button.Icon><LucideIcon Name="plus" Size="16" /></Button.Icon>
+                    Add User
+                </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Add New User</DialogTitle>
                     <DialogDescription>Create a new user account.</DialogDescription>
                 </DialogHeader>
-                <div class="grid gap-4 py-4">
+                <div class="space-y-4 py-4">
                     <Field>
                         <FieldLabel>Name</FieldLabel>
-                        <FieldContent><Input @bind-Value="newUserName" /></FieldContent>
+                        <FieldContent>
+                            <Input @bind-Value="newUserName" Placeholder="Full name" />
+                        </FieldContent>
                     </Field>
                     <Field>
                         <FieldLabel>Email</FieldLabel>
-                        <FieldContent><Input Type="InputType.Email" @bind-Value="newUserEmail" /></FieldContent>
+                        <FieldContent>
+                            <Input Type="InputType.Email" @bind-Value="newUserEmail" Placeholder="user@example.com" />
+                        </FieldContent>
+                    </Field>
+                    <Field>
+                        <FieldLabel>Role</FieldLabel>
+                        <FieldContent>
+                            <Select @bind-Value="newUserRole" TValue="string" Class="w-full">
+                                <SelectTrigger><SelectValue Placeholder="Select role" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem Value="@("Admin")" Text="Admin" TValue="string">Admin</SelectItem>
+                                    <SelectItem Value="@("Editor")" Text="Editor" TValue="string">Editor</SelectItem>
+                                    <SelectItem Value="@("Viewer")" Text="Viewer" TValue="string">Viewer</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </FieldContent>
                     </Field>
                 </div>
                 <DialogFooter>
-                    <DialogClose><Button Variant="ButtonVariant.Outline">Cancel</Button></DialogClose>
+                    <DialogClose AsChild>
+                        <Button Variant="ButtonVariant.Outline">Cancel</Button>
+                    </DialogClose>
                     <Button OnClick="HandleAddUser">Create</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
     </div>
 
-    <DataTable TData="User" Data="@users" SelectionMode="DataTableSelectionMode.Multiple"
-               @bind-SelectedItems="selectedUsers">
+    @if (selectedUsers.Any())
+    {
+        <Alert Variant="AlertVariant.Info">
+            <AlertTitle>@selectedUsers.Count user(s) selected</AlertTitle>
+            <AlertDescription>
+                <Button Variant="ButtonVariant.Destructive" Size="ButtonSize.Small"
+                        OnClick="HandleDeleteSelected" Class="mt-2">
+                    <Button.Icon><LucideIcon Name="trash" Size="14" /></Button.Icon>
+                    Delete Selected
+                </Button>
+            </AlertDescription>
+        </Alert>
+    }
+
+    <DataTable TData="UserRecord" Data="@users" SelectionMode="DataTableSelectionMode.Multiple"
+               @bind-SelectedItems="selectedUsers" InitialPageSize="10">
         <Columns>
-            <DataTableColumn TData="User" TValue="string"
+            <DataTableColumn TData="UserRecord" TValue="string"
                              Property="@(u => u.Name)" Header="Name" Sortable Filterable />
-            <DataTableColumn TData="User" TValue="string"
+            <DataTableColumn TData="UserRecord" TValue="string"
                              Property="@(u => u.Email)" Header="Email" Sortable Filterable />
-            <DataTableColumn TData="User" TValue="string"
+            <DataTableColumn TData="UserRecord" TValue="string"
                              Property="@(u => u.Role)" Header="Role" Sortable />
-            <DataTableColumn TData="User" TValue="string"
+            <DataTableColumn TData="UserRecord" TValue="string"
                              Property="@(u => u.Status)" Header="Status">
                 <CellTemplate Context="user">
                     <Badge Variant="@(user.Status == "Active" ? BadgeVariant.Default : BadgeVariant.Secondary)">
@@ -1752,12 +1955,60 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
         </Columns>
     </DataTable>
 </div>
+
+@code {
+    private record UserRecord(int Id, string Name, string Email, string Role, string Status);
+
+    private bool isAddDialogOpen;
+    private string newUserName = "";
+    private string newUserEmail = "";
+    private string? newUserRole;
+    private IReadOnlyCollection<UserRecord> selectedUsers = Array.Empty<UserRecord>();
+
+    private List<UserRecord> users = new()
+    {
+        new(1, "Alice Johnson", "alice@example.com", "Admin", "Active"),
+        new(2, "Bob Smith", "bob@example.com", "Editor", "Active"),
+        new(3, "Carol Davis", "carol@example.com", "Viewer", "Inactive")
+    };
+
+    private void HandleAddUser()
+    {
+        if (string.IsNullOrWhiteSpace(newUserName) || string.IsNullOrWhiteSpace(newUserEmail))
+        {
+            ToastService.Error("Please fill in all required fields.", "Validation Error");
+            return;
+        }
+
+        var newId = users.Max(u => u.Id) + 1;
+        users.Add(new UserRecord(newId, newUserName, newUserEmail, newUserRole ?? "Viewer", "Active"));
+
+        newUserName = "";
+        newUserEmail = "";
+        newUserRole = null;
+        isAddDialogOpen = false;
+
+        ToastService.Success($"User created successfully.", "Created");
+    }
+
+    private void HandleDeleteSelected()
+    {
+        var count = selectedUsers.Count;
+        users.RemoveAll(u => selectedUsers.Contains(u));
+        selectedUsers = Array.Empty<UserRecord>();
+        ToastService.Show($"{count} user(s) deleted.");
+    }
+}
 ```
 
-### Settings Page with Tabs
+### Settings Page with Tabs (Complete)
 
 ```razor
 @page "/settings"
+@using TrBlazeUI.Components.Toast
+@inject ToastService ToastService
+
+<PageTitle>Settings - MyApp</PageTitle>
 
 <div class="space-y-6 max-w-4xl">
     <div>
@@ -1793,12 +2044,13 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
                                 <SelectContent>
                                     <SelectItem Value="@("en")" Text="English" TValue="string">English</SelectItem>
                                     <SelectItem Value="@("es")" Text="Spanish" TValue="string">Spanish</SelectItem>
+                                    <SelectItem Value="@("fr")" Text="French" TValue="string">French</SelectItem>
                                 </SelectContent>
                             </Select>
                         </FieldContent>
                     </Field>
                 </CardContent>
-                <CardFooter><Button>Save</Button></CardFooter>
+                <CardFooter><Button OnClick="@(() => ToastService.Success("General settings saved."))">Save</Button></CardFooter>
             </Card>
         </TabsContent>
 
@@ -1824,6 +2076,14 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
                         </div>
                         <Switch @bind-Checked="pushNotifs" />
                     </div>
+                    <Separator />
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium">Marketing Emails</p>
+                            <p class="text-xs text-muted-foreground">Receive product updates and offers.</p>
+                        </div>
+                        <Switch @bind-Checked="marketingNotifs" />
+                    </div>
                 </CardContent>
             </Card>
         </TabsContent>
@@ -1843,16 +2103,154 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
                         <FieldLabel>New Password</FieldLabel>
                         <FieldContent><Input Type="InputType.Password" @bind-Value="newPwd" /></FieldContent>
                     </Field>
+                    <Field>
+                        <FieldLabel>Confirm Password</FieldLabel>
+                        <FieldContent><Input Type="InputType.Password" @bind-Value="confirmPwd" /></FieldContent>
+                    </Field>
+                    <Separator />
                     <div class="flex items-center space-x-2">
                         <Checkbox @bind-Checked="twoFactor" Id="2fa" />
                         <Label For="2fa">Enable two-factor authentication</Label>
                     </div>
                 </CardContent>
-                <CardFooter><Button>Update Security</Button></CardFooter>
+                <CardFooter><Button OnClick="HandleUpdateSecurity">Update Security</Button></CardFooter>
             </Card>
         </TabsContent>
     </Tabs>
 </div>
+
+@code {
+    private string appName = "My Application";
+    private string? language = "en";
+    private bool emailNotifs = true;
+    private bool pushNotifs = false;
+    private bool marketingNotifs = false;
+    private string currentPwd = "";
+    private string newPwd = "";
+    private string confirmPwd = "";
+    private bool twoFactor = false;
+
+    private void HandleUpdateSecurity()
+    {
+        if (newPwd != confirmPwd)
+        {
+            ToastService.Error("Passwords do not match.", "Validation Error");
+            return;
+        }
+        ToastService.Success("Security settings updated.", "Saved");
+        currentPwd = "";
+        newPwd = "";
+        confirmPwd = "";
+    }
+}
+```
+
+### Sheet with Form (Complete)
+
+```razor
+@* Example: Using Sheet for a side panel form *@
+
+<Sheet @bind-Open="isEditOpen">
+    <SheetTrigger AsChild>
+        <Button Variant="ButtonVariant.Outline">
+            <Button.Icon><LucideIcon Name="pencil" Size="16" /></Button.Icon>
+            Edit Details
+        </Button>
+    </SheetTrigger>
+    <SheetContent Class="w-[400px] sm:w-[540px]">
+        <SheetHeader>
+            <SheetTitle>Edit Profile</SheetTitle>
+            <SheetDescription>Make changes to your profile here.</SheetDescription>
+        </SheetHeader>
+        <div class="space-y-4 py-4">
+            <Field>
+                <FieldLabel>Name</FieldLabel>
+                <FieldContent>
+                    <Input @bind-Value="editName" Placeholder="Your name" />
+                </FieldContent>
+            </Field>
+            <Field>
+                <FieldLabel>Username</FieldLabel>
+                <FieldContent>
+                    <Input @bind-Value="editUsername" Placeholder="@username" />
+                    <FieldDescription>This is your public display name.</FieldDescription>
+                </FieldContent>
+            </Field>
+        </div>
+        <SheetFooter>
+            <SheetClose AsChild>
+                <Button Variant="ButtonVariant.Outline">Cancel</Button>
+            </SheetClose>
+            <Button OnClick="HandleSaveEdit">Save Changes</Button>
+        </SheetFooter>
+    </SheetContent>
+</Sheet>
+
+@code {
+    private bool isEditOpen;
+    private string editName = "Pedro Duarte";
+    private string editUsername = "peduarte";
+
+    private void HandleSaveEdit()
+    {
+        isEditOpen = false;
+        // ToastService.Success("Profile updated.");
+    }
+}
+```
+
+### Toast Notification Patterns (Complete)
+
+```razor
+@* Toast requires: @inject ToastService ToastService *@
+@* Layout requires: <ToastProvider Position="ToastPosition.BottomRight" /> *@
+@inject ToastService ToastService
+
+@* Simple notifications *@
+<Button OnClick="@(() => ToastService.Show("Your message has been sent."))">
+    Default Toast
+</Button>
+<Button OnClick="@(() => ToastService.Success("Changes saved.", "Success"))">
+    Success Toast
+</Button>
+<Button OnClick="@(() => ToastService.Error("Something went wrong.", "Error"))">
+    Error Toast
+</Button>
+
+@* Toast with action button *@
+<Button OnClick="ShowUndoToast">Toast with Action</Button>
+
+@* Custom duration (ms) — 0 means no auto-dismiss *@
+<Button OnClick="@(() => ToastService.Show("Quick!", duration: 2000))">2 Second Toast</Button>
+<Button OnClick="ShowPersistentToast">Persistent Toast</Button>
+
+@* Dismiss all *@
+<Button Variant="ButtonVariant.Outline" OnClick="@(() => ToastService.DismissAll())">
+    Dismiss All
+</Button>
+
+@code {
+    private void ShowUndoToast()
+    {
+        ToastService.Show(new ToastData
+        {
+            Title = "Post deleted",
+            Description = "Your post has been removed.",
+            ActionText = "Undo",
+            OnAction = () => ToastService.Success("Post restored!")
+        });
+    }
+
+    private void ShowPersistentToast()
+    {
+        ToastService.Show(new ToastData
+        {
+            Title = "Important",
+            Description = "This won't auto-dismiss. Click X to close.",
+            Duration = 0
+        });
+    }
+}
 ```
 
 ---

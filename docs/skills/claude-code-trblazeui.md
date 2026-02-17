@@ -70,12 +70,16 @@ persona:
       - "ASP.NET Core documentation: https://learn.microsoft.com/en-us/aspnet/core/"
       - "C# language reference: https://learn.microsoft.com/en-us/dotnet/csharp/"
   core_principles:
-    - Always use TrBlazeUI components instead of raw HTML when a TrBlazeUI component exists
-    - Always use @bind-Value or @bind-Checked for two-way binding
-    - Never use inline styles - use Tailwind CSS utility classes
-    - Always wrap forms with Field components for proper labeling and validation
-    - Use ToastService for user feedback (success, error, warning, info)
-    - Use Dialog/Sheet for modal interactions, not custom implementations
+    - ALWAYS use TrBlazeUI components instead of raw HTML — <Input> not <input>, <Label> not <label>, <Button> not <button>, <Checkbox> not <input type="checkbox">, <Switch> not custom toggles, <Textarea> not <textarea>, <Select> not <select>
+    - ALWAYS use @bind-Value or @bind-Checked for two-way binding
+    - NEVER use inline styles - use Tailwind CSS utility classes via the Class parameter
+    - ALWAYS wrap form inputs with <Field> + <FieldLabel> + <FieldContent> for proper labeling, spacing, and validation
+    - ALWAYS include a complete @code { } block — every page/component must have all referenced fields, methods, types, and event handlers declared
+    - ALWAYS use the AsChild pattern on triggers — write <DialogTrigger AsChild><Button>...</Button></DialogTrigger> instead of applying CSS classes directly on the trigger element
+    - ALWAYS inject ToastService before using it — add @inject ToastService ToastService at the top of the file
+    - ALWAYS specify generic type parameters — use TValue="string" on Select/SelectItem, TData on DataTable/DataTableColumn, TItem on Combobox
+    - Use ToastService for user feedback (success, error, warning, info) — never use JavaScript alert() or custom notification divs
+    - Use Dialog/Sheet/AlertDialog for modal interactions, not custom implementations
     - Follow shadcn/ui design patterns - minimal, clean, accessible
     - Use Typography component for text hierarchy (H1-H4, P, Lead, Muted)
     - Include proper @using statements or rely on _Imports.razor
@@ -85,6 +89,17 @@ persona:
     - Follow .NET coding conventions and C# best practices
     - Use async/await properly throughout the stack
     - Apply proper null checking and error handling
+  critical_mistakes_to_avoid:
+    - "NEVER use raw <input> — use <Input @bind-Value=\"name\" /> or <Input Type=\"InputType.Email\" @bind-Value=\"email\" />"
+    - "NEVER use raw <label> — use <Label For=\"id\">Text</Label> or <FieldLabel>Text</FieldLabel>"
+    - "NEVER use raw <button> — use <Button OnClick=\"Handler\">Text</Button>"
+    - "NEVER use raw <input type=\"checkbox\"> — use <Checkbox @bind-Checked=\"val\" /> or <Switch @bind-Checked=\"val\" />"
+    - "NEVER use raw <select>/<option> — use <Select TValue=\"string\"> with <SelectTrigger>, <SelectContent>, <SelectItem>"
+    - "NEVER use raw <textarea> — use <Textarea @bind-Value=\"val\" />"
+    - "NEVER apply button CSS classes to trigger elements — use AsChild pattern: <SheetTrigger AsChild><Button>Open</Button></SheetTrigger>"
+    - "NEVER forget the @code block — all fields and methods referenced in markup MUST be declared or the page won't compile"
+    - "NEVER use onclick on raw HTML — use <Button OnClick=\"Handler\"> with proper EventCallback"
+    - "NEVER forget TValue/TData generic params — Select needs TValue=\"string\", DataTable needs TData=\"MyType\""
   integration:
     description: >
       TrBlazeUI can be added to any existing Blazor application (Server, WebAssembly, or Auto/Hybrid).

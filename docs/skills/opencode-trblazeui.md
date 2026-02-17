@@ -66,19 +66,111 @@ You are deeply knowledgeable in:
 
 ## Rules - MUST Follow
 
-1. **ALWAYS** use TrBlazeUI components instead of raw HTML when a TrBlazeUI component exists
+1. **ALWAYS** use TrBlazeUI components instead of raw HTML — `<Input>` not `<input>`, `<Label>` not `<label>`, `<Button>` not `<button>`, `<Checkbox>` not `<input type="checkbox">`, `<Switch>` not custom toggles, `<Textarea>` not `<textarea>`, `<Select>` not `<select>`
 2. **ALWAYS** use `@bind-Value` or `@bind-Checked` for two-way binding
-3. **NEVER** use inline styles - use Tailwind CSS utility classes
-4. **ALWAYS** wrap forms with Field components for proper labeling and validation
-5. Use `ToastService` for user feedback (success, error, warning, info)
-6. Use `Dialog`/`Sheet` for modal interactions, not custom implementations
-7. Follow shadcn/ui design patterns - minimal, clean, accessible
-8. Use `Typography` component for text hierarchy (H1-H4, P, Lead, Muted)
-9. Include proper `@using` statements or rely on `_Imports.razor`
-10. Register services in `Program.cs`: `AddTrBlazeUIPrimitives()` and `AddScoped<ToastService>()`
-11. Follow .NET coding conventions and C# best practices
-12. Use async/await properly throughout the stack
-13. Apply proper null checking and error handling
+3. **NEVER** use inline styles - use Tailwind CSS utility classes via the `Class` parameter
+4. **ALWAYS** wrap form inputs with `<Field>` + `<FieldLabel>` + `<FieldContent>` for proper labeling, spacing, and validation
+5. **ALWAYS** include a complete `@code { }` block — every page/component must have all referenced fields, methods, types, and event handlers declared. A page without `@code` will NOT compile.
+6. **ALWAYS** use the `AsChild` pattern on triggers — write `<DialogTrigger AsChild><Button>...</Button></DialogTrigger>` instead of applying CSS classes directly on the trigger element
+7. **ALWAYS** inject `ToastService` before using it — add `@inject ToastService ToastService` at the top of the file
+8. **ALWAYS** specify generic type parameters — `TValue="string"` on Select/SelectItem, `TData` on DataTable/DataTableColumn, `TItem` on Combobox
+9. Use `ToastService` for user feedback (success, error, warning, info) — never JavaScript `alert()` or custom notification divs
+10. Use `Dialog`/`Sheet`/`AlertDialog` for modal interactions, not custom implementations
+11. Follow shadcn/ui design patterns - minimal, clean, accessible
+12. Use `Typography` component for text hierarchy (H1-H4, P, Lead, Muted)
+13. Include proper `@using` statements or rely on `_Imports.razor`
+14. Register services in `Program.cs`: `AddTrBlazeUIPrimitives()` and `AddScoped<ToastService>()`
+15. Follow .NET coding conventions and C# best practices
+16. Use async/await properly throughout the stack
+17. Apply proper null checking and error handling
+
+## Common Mistakes to Avoid
+
+These are the most frequent errors AI agents make when generating TrBlazeUI code. **Do NOT make these mistakes.**
+
+### 1. Using raw HTML instead of TrBlazeUI components
+
+```razor
+@* WRONG — raw HTML input with manual CSS *@
+<input id="name" value="John"
+       class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm..." />
+<label for="name" class="text-right text-sm font-medium">Name</label>
+<button class="inline-flex items-center justify-center rounded-md ...">Save</button>
+<input type="checkbox" class="h-4 w-4" />
+
+@* CORRECT — TrBlazeUI components *@
+<Input Id="name" @bind-Value="name" />
+<Label For="name">Name</Label>
+<Button OnClick="HandleSave">Save</Button>
+<Checkbox @bind-Checked="isEnabled" Id="feature" />
+```
+
+### 2. Applying button CSS directly to triggers
+
+```razor
+@* WRONG — manual button styling on trigger *@
+<DialogTrigger class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+    Open Dialog
+</DialogTrigger>
+
+@* CORRECT — AsChild pattern *@
+<DialogTrigger AsChild>
+    <Button>Open Dialog</Button>
+</DialogTrigger>
+```
+
+### 3. Missing @code block
+
+```razor
+@* WRONG — page won't compile, fields not declared *@
+<Input @bind-Value="name" />
+<Button OnClick="HandleSave">Save</Button>
+
+@* CORRECT — all fields and methods declared *@
+<Input @bind-Value="name" />
+<Button OnClick="HandleSave">Save</Button>
+
+@code {
+    private string? name;
+
+    private void HandleSave()
+    {
+        // save logic
+    }
+}
+```
+
+### 4. Forgetting ToastService injection
+
+```razor
+@* WRONG — using ToastService without injecting it *@
+<Button OnClick="@(() => ToastService.Success("Saved!"))">Save</Button>
+
+@* CORRECT — inject first *@
+@inject ToastService ToastService
+
+<Button OnClick="@(() => ToastService.Success("Saved!"))">Save</Button>
+```
+
+### 5. Missing generic type parameters
+
+```razor
+@* WRONG — missing TValue on Select/SelectItem *@
+<Select @bind-Value="role">
+    <SelectTrigger><SelectValue Placeholder="Select..." /></SelectTrigger>
+    <SelectContent>
+        <SelectItem Value="admin">Admin</SelectItem>
+    </SelectContent>
+</Select>
+
+@* CORRECT — TValue specified on Select and each SelectItem *@
+<Select @bind-Value="role" TValue="string">
+    <SelectTrigger><SelectValue Placeholder="Select..." /></SelectTrigger>
+    <SelectContent>
+        <SelectItem Value="@("admin")" Text="Admin" TValue="string">Admin</SelectItem>
+    </SelectContent>
+</Select>
+```
 
 ## Integrating TrBlazeUI into an Existing Blazor Application
 
