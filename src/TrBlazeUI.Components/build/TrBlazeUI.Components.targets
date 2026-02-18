@@ -1,7 +1,27 @@
 <Project>
+
+  <PropertyGroup>
+    <!--
+      Resolve solution/repo root for AI skill file deployment.
+      Fallback chain:
+        1. $(SolutionDir) - set when building from VS or 'dotnet build *.sln'
+        2. Walk up to find Directory.Build.props (standard .NET solution root marker)
+        3. Walk up to find .gitignore (common repo root marker)
+        4. Fall back to project directory
+    -->
+    <_TrBlazeUISolutionRoot Condition="'$(SolutionDir)' != '' AND '$(SolutionDir)' != '*Undefined*'">$(SolutionDir)</_TrBlazeUISolutionRoot>
+    <_TrBlazeUISolutionRoot Condition="'$(_TrBlazeUISolutionRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove('$(MSBuildProjectDirectory)', 'Directory.Build.props'))</_TrBlazeUISolutionRoot>
+    <_TrBlazeUISolutionRoot Condition="'$(_TrBlazeUISolutionRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove('$(MSBuildProjectDirectory)', '.gitignore'))</_TrBlazeUISolutionRoot>
+    <_TrBlazeUISolutionRoot Condition="'$(_TrBlazeUISolutionRoot)' == ''">$(MSBuildProjectDirectory)</_TrBlazeUISolutionRoot>
+  </PropertyGroup>
+
+  <!--
+    Target: Extract AI Reference Documentation
+    Deploys TrBlazeUI-AI-Reference.md to .trblazeui/ in the project directory.
+    Always copies (SkipUnchangedFiles ensures efficiency). Updates on package upgrade.
+  -->
   <Target Name="_ExtractTrBlazeUIAIDocs"
-          AfterTargets="ResolvePackageAssets"
-          Condition="!Exists('$(MSBuildProjectDirectory)\.trblazeui\TrBlazeUI-AI-Reference.md')">
+          AfterTargets="ResolvePackageAssets">
     <MakeDir Directories="$(MSBuildProjectDirectory)\.trblazeui" />
     <Copy SourceFiles="$(MSBuildThisFileDirectory)..\docs\TrBlazeUI-AI-Reference.md"
           DestinationFolder="$(MSBuildProjectDirectory)\.trblazeui"
@@ -11,4 +31,36 @@
                      Overwrite="true"
                      Condition="!Exists('$(MSBuildProjectDirectory)\.trblazeui\.gitignore')" />
   </Target>
+
+  <!--
+    Target: Deploy AI Skill Files to Solution Root
+    Copies Claude Code and OpenCode skill files to their respective command directories.
+    Always copies (SkipUnchangedFiles ensures efficiency). Updates on package upgrade.
+  -->
+  <Target Name="_DeployTrBlazeUISkillFiles"
+          AfterTargets="ResolvePackageAssets">
+
+    <!-- Claude Code: .claude/commands/trblazeui.md -->
+    <MakeDir Directories="$(_TrBlazeUISolutionRoot)\.claude\commands" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)..\skills\claude-code-trblazeui.md"
+          DestinationFiles="$(_TrBlazeUISolutionRoot)\.claude\commands\trblazeui.md"
+          SkipUnchangedFiles="true" />
+    <WriteLinesToFile File="$(_TrBlazeUISolutionRoot)\.claude\commands\.gitignore"
+                     Lines="trblazeui.md"
+                     Overwrite="true"
+                     Condition="!Exists('$(_TrBlazeUISolutionRoot)\.claude\commands\.gitignore')" />
+
+    <!-- OpenCode: .opencode/commands/trblazeui.md -->
+    <MakeDir Directories="$(_TrBlazeUISolutionRoot)\.opencode\commands" />
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)..\skills\opencode-trblazeui.md"
+          DestinationFiles="$(_TrBlazeUISolutionRoot)\.opencode\commands\trblazeui.md"
+          SkipUnchangedFiles="true" />
+    <WriteLinesToFile File="$(_TrBlazeUISolutionRoot)\.opencode\commands\.gitignore"
+                     Lines="trblazeui.md"
+                     Overwrite="true"
+                     Condition="!Exists('$(_TrBlazeUISolutionRoot)\.opencode\commands\.gitignore')" />
+
+    <Message Text="TrBlazeUI: AI skill files deployed to $(_TrBlazeUISolutionRoot)" Importance="normal" />
+  </Target>
+
 </Project>
