@@ -1,0 +1,23 @@
+@namespace TrBlazeUI.Components.Button
+
+@ChildContent
+
+@code {
+    /// <summary>
+    /// Gets or sets the icon content (e.g., a LucideIcon component).
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// ButtonIcon is an alternative to the <c>&lt;Button.Icon&gt;</c> child content syntax
+    /// that avoids the RZ10012 compiler warning. Place it inside a Button component:
+    /// </para>
+    /// <code>
+    /// &lt;Button&gt;
+    ///     &lt;ButtonIcon&gt;&lt;LucideIcon Name="mail" Size="16" /&gt;&lt;/ButtonIcon&gt;
+    ///     Send Email
+    /// &lt;/Button&gt;
+    /// </code>
+    /// </remarks>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

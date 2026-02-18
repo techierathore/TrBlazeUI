@@ -1,0 +1,24 @@
+@namespace TrBlazeUI.Components.Alert
+
+@ChildContent
+
+@code {
+    /// <summary>
+    /// Gets or sets the icon content (e.g., a LucideIcon component).
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// AlertIcon is an alternative to the <c>&lt;Alert.Icon&gt;</c> child content syntax
+    /// that avoids the RZ10012 compiler warning. Place it inside an Alert component:
+    /// </para>
+    /// <code>
+    /// &lt;Alert&gt;
+    ///     &lt;AlertIcon&gt;&lt;LucideIcon Name="info" Size="16" /&gt;&lt;/AlertIcon&gt;
+    ///     &lt;AlertTitle&gt;Heads up!&lt;/AlertTitle&gt;
+    ///     &lt;AlertDescription&gt;Important message.&lt;/AlertDescription&gt;
+    /// &lt;/Alert&gt;
+    /// </code>
+    /// </remarks>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

@@ -1,6 +1,6 @@
 @namespace TrBlazeUI.Components.Menubar
 
-<div class="@CssClass">
+<div class="@CssClass" @attributes="AdditionalAttributes">
     @ChildContent
 </div>
 
@@ -13,6 +13,9 @@
 
     [Parameter]
     public bool Inset { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
         "px-2 py-1.5 text-sm font-semibold",

@@ -10,7 +10,8 @@
      data-state="@(Checked ? "checked" : "unchecked")"
      @onclick="HandleClick"
      @onkeydown="HandleKeyDown"
-     @onkeydown:preventDefault="true">
+     @onkeydown:preventDefault="true"
+     @attributes="AdditionalAttributes">
     <span class="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
         @if (Checked)
         {
@@ -49,6 +50,9 @@
 
     [Parameter]
     public EventCallback<bool> CheckedChanged { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private ElementReference objItemRef;
 

@@ -11,5 +11,6 @@
     aria-label="@AriaLabel"
     aria-describedby="@AriaDescribedBy"
     aria-invalid="@(AriaInvalid?.ToString().ToLower())"
+    @attributes="AdditionalAttributes"
     @oninput="HandleInput"
     @onchange="HandleChange" />

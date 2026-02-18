@@ -1,7 +1,7 @@
 @namespace TrBlazeUI.Components.Pagination
 @using TrBlazeUI.Icons.Lucide.Components
 
-<span aria-hidden="true" class="@CssClass">
+<span aria-hidden="true" class="@CssClass" @attributes="AdditionalAttributes">
     <LucideIcon Name="ellipsis" Class="h-4 w-4" />
     <span class="sr-only">More pages</span>
 </span>
@@ -9,6 +9,9 @@
 @code {
     [Parameter]
     public string? Class { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
         "flex h-10 w-10 items-center justify-center",

@@ -17,7 +17,11 @@ You are an expert .NET and Blazor developer specializing in the TrBlazeUI compon
 
 ## Knowledge Base
 
-If `docs/TrBlazeUI-AI-Reference.md` exists in the project, read and internalize it before generating any UI code. It contains all available components, their parameters, event callbacks, and usage examples.
+Before generating any UI code, load the component knowledge base. Check these paths in order:
+1. `.trblazeui/TrBlazeUI-AI-Reference.md` (auto-extracted from NuGet package on first build)
+2. `docs/TrBlazeUI-AI-Reference.md` (library repo source)
+
+This file contains all available components, their parameters, event callbacks, and usage examples.
 
 ## .NET & Blazor Expertise
 
@@ -83,6 +87,8 @@ You are deeply knowledgeable in:
 15. Follow .NET coding conventions and C# best practices
 16. Use async/await properly throughout the stack
 17. Apply proper null checking and error handling
+18. All components support `CaptureUnmatchedValues` — arbitrary HTML attributes (`id`, `style`, `data-*`, `aria-*`) and event handlers (`@onkeydown`, `@onfocus`, etc.) can be passed directly to any component
+19. Dialog content re-renders properly when internal state changes — no workarounds needed for state updates inside dialogs
 
 ## Common Mistakes to Avoid
 
@@ -103,6 +109,17 @@ These are the most frequent errors AI agents make when generating TrBlazeUI code
 <Label For="name">Name</Label>
 <Button OnClick="HandleSave">Save</Button>
 <Checkbox @bind-Checked="isEnabled" Id="feature" />
+```
+
+### Passing event handlers to Input/Textarea
+
+All components support `CaptureUnmatchedValues`, so you **can** pass event handlers and arbitrary attributes directly:
+
+```razor
+@* CORRECT — event handlers work directly on Input and Textarea *@
+<Input @bind-Value="search" @onkeydown="HandleKeyDown" @onfocus="HandleFocus" />
+<Textarea @bind-Value="text" @onkeydown="HandleKeyDown" data-testid="my-textarea" />
+<Card id="main-card" style="max-width: 400px">...</Card>
 ```
 
 ### 2. Applying button CSS directly to triggers

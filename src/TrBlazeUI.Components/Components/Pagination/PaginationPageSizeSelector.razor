@@ -1,7 +1,7 @@
 @namespace TrBlazeUI.Components.Pagination
 @using TrBlazeUI.Components.Select
 
-<div class="@CssClass">
+<div class="@CssClass" @attributes="AdditionalAttributes">
     @if (ShowLabel)
     {
         <p class="text-sm font-medium">@Label</p>
@@ -60,6 +60,9 @@
     /// </summary>
     [Parameter]
     public EventCallback<int> OnPageSizeChanged { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private int[] EffectivePageSizes => PageSizes ?? Context?.PageSizes ?? [10, 20, 50, 100];
 

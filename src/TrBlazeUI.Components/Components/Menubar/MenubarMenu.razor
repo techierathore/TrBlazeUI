@@ -1,6 +1,6 @@
 @namespace TrBlazeUI.Components.Menubar
 
-<div class="relative">
+<div class="relative" @attributes="AdditionalAttributes">
     <CascadingValue Value="this" IsFixed="false">
         @ChildContent
     </CascadingValue>
@@ -12,6 +12,9 @@
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     internal string MenuId { get; } = Guid.NewGuid().ToString();
     internal bool IsOpen => Context?.ActiveMenu == MenuId;

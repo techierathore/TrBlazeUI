@@ -1,6 +1,6 @@
 @namespace TrBlazeUI.Components.Pagination
 
-<li class="@Class">
+<li class="@Class" @attributes="AdditionalAttributes">
     @ChildContent
 </li>
 
@@ -10,4 +10,7 @@
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

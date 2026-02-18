@@ -8,7 +8,8 @@
 
 <TrBlazeUI.Primitives.Accordion.AccordionItem Value="@Value"
                                                    Disabled="@Disabled"
-                                                   class="@CssClass">
+                                                   class="@CssClass"
+                                                   @attributes="AdditionalAttributes">
     @ChildContent
 </TrBlazeUI.Primitives.Accordion.AccordionItem>
 
@@ -36,6 +37,12 @@
     /// </summary>
     [Parameter]
     public string? Class { get; set; }
+
+    /// <summary>
+    /// Additional HTML attributes to apply to the element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string CssClass =>
         $"border-b {Class}".Trim();
