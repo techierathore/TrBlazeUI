@@ -46,7 +46,10 @@
     <None Include="README.md" Pack="true" PackagePath="\" />
     <!-- Pack AI reference doc for consuming projects -->
     <None Include="..\..\docs\TrBlazeUI-AI-Reference.md" Pack="true" PackagePath="docs\" />
-    <!-- Pack buildTransitive targets to auto-extract docs -->
+    <!-- Pack AI skill files for consuming projects -->
+    <None Include="..\..\docs\skills\claude-code-trblazeui.md" Pack="true" PackagePath="skills\" />
+    <None Include="..\..\docs\skills\opencode-trblazeui.md" Pack="true" PackagePath="skills\" />
+    <!-- Pack buildTransitive targets to auto-extract docs and deploy skills -->
     <None Include="build\TrBlazeUI.Components.targets" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
 
