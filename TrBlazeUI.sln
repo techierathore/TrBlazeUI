@@ -28,7 +28,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrBlazeUI.Demo.Auto.Client"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{C881631D-8A6A-479A-9F9E-5B4FCD3EAE9D}"
 	ProjectSection(SolutionItems) = preProject
+		docs\agent-auto-deploy-steps.md = docs\agent-auto-deploy-steps.md
 		docs\Coding-Standards.md = docs\Coding-Standards.md
+		docs\toolbarplan.md = docs\toolbarplan.md
 		docs\TrBlazeUI-AI-Reference.md = docs\TrBlazeUI-AI-Reference.md
 		docs\TrBlazeUI-Doc.md = docs\TrBlazeUI-Doc.md
 		docs\TrBlazeUI-Update-plan.md = docs\TrBlazeUI-Update-plan.md

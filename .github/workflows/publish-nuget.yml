@@ -22,7 +22,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full history needed for MinVer
+          fetch-depth: 0  # Full history for version context
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -31,6 +31,31 @@ jobs:
 
       - name: Verify .NET SDK
         run: dotnet --version
+
+      - name: Determine package version
+        id: version
+        shell: pwsh
+        run: |
+          if ("${{ github.event_name }}" -eq "release") {
+            $tag = "${{ github.event.release.tag_name }}"
+            # Strip optional 'v' prefix
+            $ver = $tag -replace '^v', ''
+            Write-Host "Release tag: $tag -> version: $ver"
+          } else {
+            # Read base version from Directory.Build.props
+            [xml]$props = Get-Content "Directory.Build.props"
+            $base = $props.Project.PropertyGroup.Version
+            $ver = "$base-ci.${{ github.run_number }}"
+            Write-Host "CI build: base=$base -> version: $ver"
+          }
+
+          # Validate semver format (with optional pre-release)
+          if ($ver -notmatch '^\d+\.\d+\.\d+(-[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*)?$') {
+            throw "Invalid semver version: $ver"
+          }
+
+          Write-Host "PACKAGE_VERSION=$ver"
+          echo "PACKAGE_VERSION=$ver" >> $env:GITHUB_OUTPUT
 
       - name: Add GitHub Packages source
         run: |
@@ -41,7 +66,7 @@ jobs:
         run: dotnet restore TrBlazeUI.sln
 
       - name: Build solution
-        run: dotnet build TrBlazeUI.sln -c Release --no-restore -p:CI=true
+        run: dotnet build TrBlazeUI.sln -c Release --no-restore -p:CI=true -p:Version=${{ steps.version.outputs.PACKAGE_VERSION }}
 
       - name: Pack NuGet packages
         shell: pwsh
@@ -55,7 +80,7 @@ jobs:
           )
           foreach ($project in $projects) {
             Write-Host "Packing $project..."
-            dotnet pack $project -c Release --no-restore -o ./nupkgs -p:CI=true
+            dotnet pack $project -c Release --no-restore -o ./nupkgs -p:CI=true -p:Version=${{ steps.version.outputs.PACKAGE_VERSION }}
             if ($LASTEXITCODE -ne 0) { throw "dotnet pack failed for $project with exit code $LASTEXITCODE" }
           }
 
@@ -70,6 +95,26 @@ jobs:
           foreach ($pkg in $packages) {
             Write-Host "  $($pkg.Name) ($($pkg.Length) bytes)"
           }
+
+      - name: Verify package versions
+        shell: pwsh
+        run: |
+          $expectedVersion = "${{ steps.version.outputs.PACKAGE_VERSION }}"
+          $packages = Get-ChildItem ./nupkgs -Filter *.nupkg
+          $mismatched = @()
+          foreach ($pkg in $packages) {
+            if ($pkg.Name -notlike "*$expectedVersion*") {
+              $mismatched += $pkg.Name
+            }
+          }
+          if ($mismatched.Count -gt 0) {
+            Write-Host "ERROR: Package version mismatch! Expected version: $expectedVersion"
+            foreach ($m in $mismatched) {
+              Write-Host "  Mismatched: $m"
+            }
+            throw "Package version verification failed"
+          }
+          Write-Host "All $($packages.Count) packages contain expected version: $expectedVersion"
 
       - name: Publish to GitHub Packages
         shell: pwsh
