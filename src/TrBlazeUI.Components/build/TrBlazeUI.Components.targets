@@ -17,19 +17,19 @@
 
   <!--
     Target: Extract AI Reference Documentation
-    Deploys TrBlazeUI-AI-Reference.md to .trblazeui/ in the project directory.
+    Deploys TrBlazeUI-AI-Reference.md to .trblazeui/ at the solution root.
     Always copies (SkipUnchangedFiles ensures efficiency). Updates on package upgrade.
   -->
   <Target Name="_ExtractTrBlazeUIAIDocs"
           AfterTargets="ResolvePackageAssets">
-    <MakeDir Directories="$(MSBuildProjectDirectory)\.trblazeui" />
+    <MakeDir Directories="$(_TrBlazeUISolutionRoot)\.trblazeui" />
     <Copy SourceFiles="$(MSBuildThisFileDirectory)..\docs\TrBlazeUI-AI-Reference.md"
-          DestinationFolder="$(MSBuildProjectDirectory)\.trblazeui"
+          DestinationFolder="$(_TrBlazeUISolutionRoot)\.trblazeui"
           SkipUnchangedFiles="true" />
-    <WriteLinesToFile File="$(MSBuildProjectDirectory)\.trblazeui\.gitignore"
+    <WriteLinesToFile File="$(_TrBlazeUISolutionRoot)\.trblazeui\.gitignore"
                      Lines="*"
                      Overwrite="true"
-                     Condition="!Exists('$(MSBuildProjectDirectory)\.trblazeui\.gitignore')" />
+                     Condition="!Exists('$(_TrBlazeUISolutionRoot)\.trblazeui\.gitignore')" />
   </Target>
 
   <!--
@@ -50,15 +50,15 @@
                      Overwrite="true"
                      Condition="!Exists('$(_TrBlazeUISolutionRoot)\.claude\commands\.gitignore')" />
 
-    <!-- OpenCode: .opencode/commands/trblazeui.md -->
-    <MakeDir Directories="$(_TrBlazeUISolutionRoot)\.opencode\commands" />
+    <!-- OpenCode: .opencode/command/trblazeui.md -->
+    <MakeDir Directories="$(_TrBlazeUISolutionRoot)\.opencode\command" />
     <Copy SourceFiles="$(MSBuildThisFileDirectory)..\skills\opencode-trblazeui.md"
-          DestinationFiles="$(_TrBlazeUISolutionRoot)\.opencode\commands\trblazeui.md"
+          DestinationFiles="$(_TrBlazeUISolutionRoot)\.opencode\command\trblazeui.md"
           SkipUnchangedFiles="true" />
-    <WriteLinesToFile File="$(_TrBlazeUISolutionRoot)\.opencode\commands\.gitignore"
+    <WriteLinesToFile File="$(_TrBlazeUISolutionRoot)\.opencode\command\.gitignore"
                      Lines="trblazeui.md"
                      Overwrite="true"
-                     Condition="!Exists('$(_TrBlazeUISolutionRoot)\.opencode\commands\.gitignore')" />
+                     Condition="!Exists('$(_TrBlazeUISolutionRoot)\.opencode\command\.gitignore')" />
 
     <Message Text="TrBlazeUI: AI skill files deployed to $(_TrBlazeUISolutionRoot)" Importance="normal" />
   </Target>
