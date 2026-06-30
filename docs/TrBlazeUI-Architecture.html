@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TrBlazeUI — Architecture</title>
+<script>
+/* Resolve the theme BEFORE first paint (no flash). Saved choice wins; otherwise
+   pick by time of day — light 07:00–19:00 local, softened dark at night. */
+(function(){
+  try{
+    var t = localStorage.getItem('tf-theme');
+    if(t!=='light' && t!=='dark'){ var h = new Date().getHours(); t = (h>=7 && h<19) ? 'light' : 'dark'; }
+    document.documentElement.setAttribute('data-theme', t);
+  }catch(e){ document.documentElement.setAttribute('data-theme','light'); }
+})();
+</script>
+<style>
+/* LIGHT is the default theme — a warm off-white, easy on the eyes (never bright white). */
+:root{
+  --bg:#f4f1e9; --panel:#efe9db; --panel2:#e7e0cd; --line:#d8cfb6;
+  --ink:#2e2a22; --muted:#6f6857; --accent:#2f6f9f; --accent2:#3f7d54;
+  --warn:#9a6b15; --danger:#b03a52; --ok:#3f7d54;
+  --code-bg:#ece5d3; --code-ink:#332f26; --row-alt:#eae2cf;
+  --h3:#3a352b; --h4:#2f6f9f; --quote:#4a4537; --cta-bg:#e6eef5;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+/* DARK — softened near-black (warmer / less harsh than pure #0f1115). */
+html[data-theme="dark"]{
+  --bg:#11141a; --panel:#171b23; --panel2:#1e2430; --line:#2b3240;
+  --ink:#dfe3ea; --muted:#99a2b1; --accent:#7cc4ff; --accent2:#a6e3a1;
+  --warn:#f9c74f; --danger:#f38ba8; --ok:#a6e3a1;
+  --code-bg:#0c1016; --code-ink:#d8dde8; --row-alt:#141821;
+  --h3:#cfd5e3; --h4:#7cc4ff; --quote:#cfd5e3; --cta-bg:#0d2030;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:15px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--mono);font-size:13px;background:var(--code-bg);color:var(--code-ink);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+pre{font-family:var(--mono);font-size:12.5px;background:var(--code-bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow:auto;color:var(--code-ink);position:relative}
+pre code{background:none;border:none;padding:0}
+.copy{position:absolute;top:8px;right:8px;background:var(--panel2);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:11px;font-family:var(--sans);cursor:pointer}
+.copy:hover{color:var(--accent);border-color:var(--accent)}
+/* floating light/dark toggle (top-right) */
+.theme-toggle{position:fixed;top:12px;right:14px;z-index:10000;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:12.5px;font-family:var(--sans);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.layout.no-toc{grid-template-columns:1fr}
+nav.side{position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--line);background:var(--panel);padding:18px 14px}
+nav.side h1{font-size:14px;margin:0 0 4px;letter-spacing:.5px;color:var(--ink)}
+nav.side .sub{font-size:11.5px;color:var(--muted);margin-bottom:14px}
+nav.side ol,nav.side ul{list-style:none;padding:0;margin:0}
+nav.side li{font-size:13px;margin:2px 0}
+nav.side li a{display:block;padding:5px 8px;color:var(--ink);border-radius:6px}
+nav.side li a:hover{background:var(--panel2);text-decoration:none}
+nav.side li.h3 a{padding-left:22px;font-size:12.5px;color:var(--h3)}
+nav.side .group{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin:14px 8px 4px}
+
+main{padding:28px 40px 80px;max-width:1100px}
+.layout.no-toc main{margin:0 auto}
+
+h1{font-size:28px;margin:0 0 6px}
+h2{font-size:22px;margin:32px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+h3{font-size:17px;margin:22px 0 6px;color:var(--h3);scroll-margin-top:16px}
+h4{font-size:14px;margin:14px 0 4px;color:var(--h4);scroll-margin-top:16px}
+.subtitle{color:var(--muted);font-size:14px;margin-top:-4px;margin-bottom:18px}
+p{margin:6px 0 10px}
+blockquote{border-left:3px solid var(--accent);background:var(--panel);margin:8px 0;padding:8px 14px;color:var(--quote)}
+ul,ol{padding-left:22px}
+li{margin:2px 0}
+
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin:8px 0}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);color:var(--h3);font-weight:600}
+tr:nth-child(even) td{background:var(--row-alt)}
+
+hr{border:none;border-top:1px solid var(--line);margin:24px 0}
+.anchor-link{color:var(--muted);font-weight:400;font-size:0.85em;margin-left:8px;opacity:0;transition:opacity .15s;text-decoration:none}
+h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
+
+/* inline TOC at top of main content */
+.toc-inline{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 16px;margin:14px 0 24px}
+.toc-inline > div{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.toc-inline ol,.toc-inline ul{margin:4px 0;padding-left:18px}
+.toc-inline li{font-size:13px;margin:1px 0}
+.toc-inline a{color:var(--h3)}
+
+/* mermaid diagram wrapper + toolbar */
+.diagram{position:relative;border:1px solid var(--line);border-radius:8px;background:var(--code-bg);margin:14px 0;overflow:hidden}
+.diagram .mermaid{padding:14px;margin:0;background:transparent;border:none;overflow:auto}
+.diagram .dt{display:flex;gap:6px;justify-content:flex-end;padding:6px 8px;background:var(--row-alt);border-bottom:1px solid var(--line)}
+.diagram .dt button{background:var(--panel2);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:3px 10px;font-size:12px;font-family:var(--sans);cursor:pointer;min-width:30px}
+.diagram .dt button:hover{color:var(--accent);border-color:var(--accent)}
+.diagram .dt .zlabel{padding:3px 6px;font-size:11px;color:var(--muted);font-family:var(--mono);align-self:center}
+.diagram.fs{position:fixed;inset:0;z-index:9999;border-radius:0;border:none}
+.diagram.fs .mermaid{height:calc(100vh - 40px);display:flex;align-items:center;justify-content:center}
+
+@media(max-width:900px){.layout{grid-template-columns:1fr}nav.side{position:static;height:auto}}
+</style>
+</head>
+<body>
+<button id="themeToggle" class="theme-toggle" title="Toggle light / dark">☾ Dark</button>
+<div class="layout">
+  <nav class="side">
+    <h1>TrBlazeUI — Architecture</h1>
+    <div class="sub">Last rendered: 2026-06-30</div>
+    <div class="group">Contents</div>
+    <ol>
+      <li><a href="#tech-stack">1. Tech stack</a></li>
+      <li><a href="#component-map">2. Component map</a></li>
+      <li><a href="#data-flow-primary-path">3. Data flow — primary path</a></li>
+      <li><a href="#module-responsibilities">4. Module responsibilities</a></li>
+      <li class="h3"><a href="#render-mode-hosting-flow">Render-mode hosting flow</a></li>
+      <li><a href="#cross-cutting-concerns">5. Cross-cutting concerns</a></li>
+      <li><a href="#deployment-architecture">6. Deployment architecture</a></li>
+      <li><a href="#architectural-decisions-adr-style-log">7. Architectural decisions (ADR-style log)</a></li>
+      <li><a href="#target-architecture">8. Target architecture</a></li>
+      <li><a href="#open-questions-risks">9. Open questions / risks</a></li>
+      <li><a href="#sources-harvested">10. Sources harvested</a></li>
+    </ol>
+  </nav>
+  <main>
+    <h1>TrBlazeUI — Architecture</h1>
+    <div class="subtitle">Last updated: 2026-06-30 · Status: Current (brownfield)</div>
+
+    <div class="toc-inline">
+      <div>Contents</div>
+      <ol>
+        <li><a href="#tech-stack">Tech stack</a></li>
+        <li><a href="#component-map">Component map</a></li>
+        <li><a href="#data-flow-primary-path">Data flow — primary path</a></li>
+        <li><a href="#module-responsibilities">Module responsibilities</a>
+          <ul><li><a href="#render-mode-hosting-flow">Render-mode hosting flow</a></li></ul>
+        </li>
+        <li><a href="#cross-cutting-concerns">Cross-cutting concerns</a></li>
+        <li><a href="#deployment-architecture">Deployment architecture</a></li>
+        <li><a href="#architectural-decisions-adr-style-log">Architectural decisions (ADR-style log)</a></li>
+        <li><a href="#target-architecture">Target architecture</a></li>
+        <li><a href="#open-questions-risks">Open questions / risks</a></li>
+        <li><a href="#sources-harvested">Sources harvested</a></li>
+      </ol>
+    </div>
+
+    <blockquote><strong>Depth mandate:</strong> this is a HUMAN document, read as rendered HTML. Module rows in §4 with non-trivial behavior get a prose paragraph beneath the table, and every significant runtime flow beyond §3's primary path gets its own diagram. Source-doc architecture content (from <code>TrBlazeUI-Doc.md</code>, the modernization plan, and the consumer issue reports) is carried forward, not summarized away.</blockquote>
+
+    <blockquote><strong>Mermaid mandate.</strong> Every diagram follows the authoring rules in <code>.tfcore/templates/v4custom/html-render-shell.md §5.5</code> — every node/edge/subgraph label is double-quoted; no <code>end</code> node ids.</blockquote>
+
+    <h2 id="tech-stack">1. Tech stack<a class="anchor-link" href="#tech-stack">#</a></h2>
+
+    <p>TrBlazeUI is a <strong>Blazor UI component library</strong> (not an application) — a renamed fork of the open-source <em>Blazor Blueprint</em> project (original author Mathew Taylor), distributed as NuGet packages and licensed Apache 2.0. It is styled with Tailwind CSS v4 and follows the shadcn/ui design system. There is <strong>no database, no server backend, no authentication, and no AI/RAG layer</strong> — the only runtime artifacts are the library assemblies and three demo host applications.</p>
+
+    <table>
+      <thead>
+        <tr><th>Layer</th><th>Choice</th><th>Version</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Runtime / SDK</td><td>.NET</td><td>10.0</td><td>Upgraded from .NET 8 during the modernization pass (all 10 projects on <code>net10.0</code>)</td></tr>
+        <tr><td>Language</td><td>C#</td><td>14</td><td><code>TreatWarningsAsErrors</code> + <code>EnforceCodeStyleInBuild</code> enabled</td></tr>
+        <tr><td>UI framework</td><td>Blazor (Server, WebAssembly, Auto)</td><td>.NET 10</td><td>Library is render-mode agnostic; demos exercise all three</td></tr>
+        <tr><td>Component templating</td><td>Razor</td><td>.NET 10</td><td>Code-behind pattern (<code>.razor</code> + <code>.razor.cs</code>)</td></tr>
+        <tr><td>Styling</td><td>Tailwind CSS</td><td>v4 (standalone binary)</td><td>Pre-built CSS shipped in the package; <code>tools/tailwindcss.exe</code>, no Node.js</td></tr>
+        <tr><td>Color system</td><td>CSS custom properties + OKLCH</td><td>—</td><td>shadcn/ui-compatible; dark mode via <code>.dark</code> class on <code>&lt;html&gt;</code></td></tr>
+        <tr><td>Charts</td><td>Blazor-ApexCharts</td><td>6.1.0</td><td>Wraps ApexCharts.js for the Chart component</td></tr>
+        <tr><td>Markdown</td><td>Markdig</td><td>0.44.0</td><td>Powers MarkdownEditor</td></tr>
+        <tr><td>HTML sanitization</td><td>HtmlSanitizer</td><td>9.0.892</td><td>Security layer for RichTextEditor output</td></tr>
+        <tr><td>Versioning</td><td>MinVer</td><td>7.0.0</td><td>Per-library semantic versioning from git tag prefixes</td></tr>
+        <tr><td>Blazor packages</td><td>Microsoft.AspNetCore.Components.*</td><td>10.0.2</td><td><code>.Web</code>, <code>.WebAssembly</code>, <code>.WebAssembly.DevServer</code>, <code>.WebAssembly.Server</code></td></tr>
+        <tr><td>Distribution</td><td>GitHub Packages (NuGet)</td><td>—</td><td><code>nuget.pkg.github.com/techierathore</code></td></tr>
+        <tr><td>AI tooling</td><td>TrBlazeUI agent skills</td><td>—</td><td><code>/trblazeui</code> Claude Code + OpenCode skills in <code>docs/skills/</code></td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>Build environment:</strong> the reference machine is WSL-on-Windows; builds run via the Windows dotnet (<code>cmd.exe /c "dotnet build ..."</code>) with <code>-p:CI=true</code> to skip the Tailwind step (pre-built CSS is committed). This application does <strong>not</strong> support hot-reload — build and restart to test changes.</p>
+
+    <h2 id="component-map">2. Component map<a class="anchor-link" href="#component-map">#</a></h2>
+
+    <p>The solution is a <strong>two-layer library</strong> (headless Primitives → styled Components) plus three pluggable Icon packages, consumed by a shared demo Razor Class Library that is hosted in three render-mode-specific demo apps.</p>
+
+    <div class="diagram">
+      <div class="dt">
+        <button data-zout title="Zoom out">−</button>
+        <span class="zlabel">100%</span>
+        <button data-zin title="Zoom in">+</button>
+        <button data-fit title="Fit to width">Fit</button>
+        <button data-one title="Actual size">1:1</button>
+        <button data-fs title="Fullscreen">⛶</button>
+        <button data-pop title="Open in new tab">↗</button>
+      </div>
+      <pre class="mermaid">flowchart TB
+  subgraph Libraries["Library packages (src/)"]
+    Prim["TrBlazeUI.Primitives<br/>(16 headless primitives + services)"]
+    Comp["TrBlazeUI.Components<br/>(~69 styled components)"]
+    Lucide["TrBlazeUI.Icons.Lucide<br/>(1,640+ icons)"]
+    Hero["TrBlazeUI.Icons.Heroicons<br/>(1,288 icons, 4 variants)"]
+    Feather["TrBlazeUI.Icons.Feather<br/>(286 icons)"]
+  end
+  subgraph Demos["Demo apps (demos/)"]
+    Shared["TrBlazeUI.Demo.Shared<br/>(pages, layout, demo services)"]
+    Server["TrBlazeUI.Demo.Server<br/>(InteractiveServer)"]
+    Wasm["TrBlazeUI.Demo.Wasm<br/>(WebAssembly)"]
+    Auto["TrBlazeUI.Demo.Auto<br/>(InteractiveAuto host)"]
+    AutoClient["TrBlazeUI.Demo.Auto.Client<br/>(WASM client)"]
+  end
+  Comp --> Prim
+  Shared --> Comp
+  Shared --> Lucide
+  Shared --> Hero
+  Shared --> Feather
+  Server --> Shared
+  Wasm --> Shared
+  Auto --> Shared
+  Auto --> AutoClient
+  AutoClient --> Shared</pre>
+    </div>
+
+    <h2 id="data-flow-primary-path">3. Data flow — primary path<a class="anchor-link" href="#data-flow-primary-path">#</a></h2>
+
+    <p>A component library has no request/response data path; its "primary path" is the <strong>interaction + portal-rendering flow</strong> for an overlay component (Dialog, Sheet, Popover, DropdownMenu). The portal mechanism — and the reactive-refresh fix applied after the AppStudio consumer report — is the single most architecturally significant runtime flow.</p>
+
+    <div class="diagram">
+      <div class="dt">
+        <button data-zout title="Zoom out">−</button>
+        <span class="zlabel">100%</span>
+        <button data-zin title="Zoom in">+</button>
+        <button data-fit title="Fit to width">Fit</button>
+        <button data-one title="Actual size">1:1</button>
+        <button data-fs title="Fullscreen">⛶</button>
+        <button data-pop title="Open in new tab">↗</button>
+      </div>
+      <pre class="mermaid">sequenceDiagram
+  actor U as "User"
+  participant Trig as "DialogTrigger (AsChild)"
+  participant Ctx as "Dialog context (cascading)"
+  participant Portal as "PortalService"
+  participant Host as "PortalHost (sibling in layout)"
+  participant JS as "portal.js (JS interop)"
+  U->>Trig: "click"
+  Trig->>Ctx: "set Open = true"
+  Ctx->>Portal: "register portal content"
+  Portal->>Host: "OnPortalsChanged event"
+  Host->>JS: "appendChild moves DOM to portal root"
+  JS-->>U: "overlay rendered, focus trapped"
+  U->>Ctx: "interact inside dialog (toggle, select)"
+  Ctx->>Portal: "RefreshPortal(id)"
+  Portal->>Host: "OnPortalsChanged → InvokeAsync(StateHasChanged)"
+  Host-->>U: "portal content re-renders (fix for Issue #1)"</pre>
+    </div>
+
+    <h2 id="module-responsibilities">4. Module responsibilities<a class="anchor-link" href="#module-responsibilities">#</a></h2>
+
+    <table>
+      <thead>
+        <tr><th>Module</th><th>Responsibility</th><th>Depends on</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>src/TrBlazeUI.Primitives</code></td><td>Headless, unstyled, accessible behavior primitives + shared services</td><td>(none)</td></tr>
+        <tr><td><code>src/TrBlazeUI.Components</code></td><td>Pre-styled shadcn/ui-compatible components + bundled Tailwind CSS</td><td>Primitives, Blazor-ApexCharts, Markdig, HtmlSanitizer</td></tr>
+        <tr><td><code>src/TrBlazeUI.Icons.Lucide</code></td><td>Lucide icon set as a Blazor component + generated data</td><td>Components.Web</td></tr>
+        <tr><td><code>src/TrBlazeUI.Icons.Heroicons</code></td><td>Heroicons (outline/solid/mini/micro) component + data</td><td>Components.Web</td></tr>
+        <tr><td><code>src/TrBlazeUI.Icons.Feather</code></td><td>Feather icon set component + data</td><td>Components.Web</td></tr>
+        <tr><td><code>demos/TrBlazeUI.Demo.Shared</code></td><td>All demo pages, sidebar layout, demo-only services</td><td>Components, all 3 Icon libs</td></tr>
+        <tr><td><code>demos/TrBlazeUI.Demo.Server</code></td><td>Blazor Server host (SignalR, fast initial load)</td><td>Demo.Shared</td></tr>
+        <tr><td><code>demos/TrBlazeUI.Demo.Wasm</code></td><td>Standalone WebAssembly host</td><td>Demo.Shared</td></tr>
+        <tr><td><code>demos/TrBlazeUI.Demo.Auto</code></td><td>Auto render-mode host (server-first, WASM after download)</td><td>Demo.Shared, Demo.Auto.Client</td></tr>
+        <tr><td><code>demos/TrBlazeUI.Demo.Auto.Client</code></td><td>WASM client entry point for the Auto host</td><td>Demo.Shared</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong><code>TrBlazeUI.Primitives</code> — the behavior layer.</strong> This project contains the 16 headless primitives (Accordion, Checkbox, Collapsible, Dialog, DropdownMenu, Floating, HoverCard, Label, Popover, RadioGroup, Select, Sheet, Switch, Table, Tabs, Tooltip), each implementing WCAG 2.1 AA keyboard navigation and ARIA semantics with <strong>zero styling</strong>. Alongside the components it ships the cross-cutting services registered by <code>AddTrBlazeUIPrimitives()</code>: <code>IPortalService</code>/<code>PortalService</code> (moves overlay DOM to a portal root and — post-fix — raises <code>OnPortalsChanged</code> so <code>PortalHost</code> re-renders on internal state changes), <code>IPositioningService</code>/<code>PositioningService</code> (Floating-UI-style anchor positioning), <code>IFocusManager</code>/<code>FocusManager</code> (focus trapping for modals), <code>IKeyboardShortcutService</code>/<code>KeyboardShortcutService</code> (global shortcut registration, e.g. Ctrl/Cmd+B), and <code>DropdownManagerService</code> (single-open-dropdown coordination). State flows parent→child through ~13 cascading context types. Behavior that needs the DOM is delegated to ~10 JS utility files under <code>wwwroot/js/primitives/</code> (click-outside, focus-trap, keyboard-nav, portal, positioning, etc.).</p>
+
+    <p><strong><code>TrBlazeUI.Components</code> — the styled layer.</strong> ~69 components (68 catalogued in the structure doc plus the later-added <strong>Toolbar</strong> family) compose the primitives and add Tailwind-based styling driven entirely by CSS variables, so any shadcn/ui or tweakcn theme works unmodified. Components follow a feature-folder layout (each component in its own folder with <code>.razor</code> markup, <code>.razor.cs</code> logic, and enum/config classes) and a code-behind pattern. Multi-part components compose many sub-components (Dialog = 8 parts, Sidebar = 22, Sheet/DropdownMenu/AlertDialog/Command ≈ 8–9 each). The project bundles the pre-built <code>trblazeui.css</code> (~83 KB, compiled by the standalone Tailwind binary from <code>trblazeui-input.css</code>) so consumers need no Tailwind toolchain. Rich-content components pull in third-party engines: Chart → Blazor-ApexCharts, MarkdownEditor → Markdig, RichTextEditor → Quill.js (via JS interop) with HtmlSanitizer guarding the HTML output. A key cross-cutting invariant — surfaced by two consumer issue reports and since fixed — is that essentially every component now implements <code>[Parameter(CaptureUnmatchedValues = true)]</code> attribute splatting so arbitrary HTML attributes and event handlers (<code>id</code>, <code>style</code>, <code>@onkeydown</code>, …) pass through to the rendered element rather than throwing at runtime.</p>
+
+    <p><strong>Icon packages.</strong> Three independent, separately-versioned packages each expose one Razor component (<code>LucideIcon</code>, <code>HeroIcon</code>, <code>FeatherIcon</code>) backed by an auto-generated <code>*IconData.cs</code> of SVG path data. They depend only on <code>Microsoft.AspNetCore.Components.Web</code> and are regenerated via the Node/PowerShell scripts under <code>tools/icon-generation/</code> (only needed when refreshing the source icon sets).</p>
+
+    <p><strong><code>TrBlazeUI.Demo.Shared</code> + hosts.</strong> The demo is a single Razor Class Library (90+ pages: home, architecture, getting-started, plus per-component / per-primitive / per-chart / per-icon demo pages) hosted by three thin render-mode apps. Demo-only services include <code>ThemeService</code> (light/dark + theme switching), <code>CollapsibleStateService</code> (sidebar persistence via localStorage), <code>MockDataService</code> (sample data for DataTable/Chart demos), and <code>LayoutService</code>/<code>LayoutToggle</code>/<code>HorizontalNav</code> (horizontal vs vertical nav, added during modernization). This split deliberately demonstrates that the same component code renders identically across Server, WASM, and Auto.</p>
+
+    <h3 id="render-mode-hosting-flow">Render-mode hosting flow<a class="anchor-link" href="#render-mode-hosting-flow">#</a></h3>
+
+    <p>Each demo host wires the same shared component tree behind a different Blazor render mode. The Auto host is the only multi-project one (server host + WASM client sharing <code>Demo.Shared</code>).</p>
+
+    <div class="diagram">
+      <div class="dt">
+        <button data-zout title="Zoom out">−</button>
+        <span class="zlabel">100%</span>
+        <button data-zin title="Zoom in">+</button>
+        <button data-fit title="Fit to width">Fit</button>
+        <button data-one title="Actual size">1:1</button>
+        <button data-fs title="Fullscreen">⛶</button>
+        <button data-pop title="Open in new tab">↗</button>
+      </div>
+      <pre class="mermaid">flowchart LR
+  subgraph Hosts["Demo hosts"]
+    S["Demo.Server<br/>(InteractiveServer · 5183/7172)"]
+    W["Demo.Wasm<br/>(WebAssembly · 5184/7173)"]
+    A["Demo.Auto<br/>(InteractiveAuto · 5185/7174)"]
+  end
+  RCL["Demo.Shared (RCL):<br/>Routes, MainLayout, all pages"]
+  S --> RCL
+  W --> RCL
+  A --> RCL
+  A --> AC["Demo.Auto.Client (WASM)"]
+  AC --> RCL</pre>
+    </div>
+
+    <h2 id="cross-cutting-concerns">5. Cross-cutting concerns<a class="anchor-link" href="#cross-cutting-concerns">#</a></h2>
+
+    <ul>
+      <li><strong>Accessibility (primary cross-cutting concern)</strong> — WCAG 2.1 AA across all primitives/components: keyboard navigation, ARIA roles/states, focus management, focus trapping for overlays. Realized via <code>AriaBuilder</code>, <code>KeyboardNavigator</code>, <code>IdGenerator</code> utilities in Primitives and the <code>FocusManager</code> service.</li>
+      <li><strong>Theming</strong> — CSS custom properties (shadcn/ui variable set) in OKLCH color space; light/dark via the <code>.dark</code> class on <code>&lt;html&gt;</code>; consumers supply a <code>theme.css</code> loaded <em>before</em> <code>trblazeui.css</code>.</li>
+      <li><strong>Portal / overlay management</strong> — <code>PortalService</code> + <code>PortalHost</code> + <code>portal.js</code> move overlay DOM to a portal root; reactive refresh added so internal state changes propagate (consumer-reported fix).</li>
+      <li><strong>JS interop</strong> — ~12 component JS files (file-upload, markdown-editor, masked-input, multiselect, navigation-menu, quill-interop, range-slider, resizable, responsive-nav, sidebar, slider, virtualization-scroll) + ~10 primitive JS files (click-outside, element-utils, focus-trap, keyboard-nav, keyboard-shortcuts, match-trigger-width, portal, positioning, select, table-row-nav).</li>
+      <li><strong>Attribute splatting</strong> — <code>CaptureUnmatchedValues</code> on (now) essentially all components so HTML attributes/events forward through (standard Blazor library pattern; retrofitted after consumer reports).</li>
+      <li><strong>Logging / error handling / telemetry</strong> — none beyond Blazor defaults; this is a UI library, not a service. Error handling follows the standards (specific catches, <code>throw;</code>, no bare catch).</li>
+      <li><strong>Versioning</strong> — MinVer per-package from git tag prefixes (<code>components/v</code>, <code>primitives/v</code>, <code>icons-lucide/v</code>, <code>icons-heroicons/v</code>, <code>icons-feather/v</code>).</li>
+      <li><strong>Code quality enforcement</strong> — <code>TreatWarningsAsErrors</code>, <code>EnforceCodeStyleInBuild</code>, <code>AnalysisLevel=latest-recommended</code>, <code>GenerateDocumentationFile=true</code>, nullable enabled — solution-wide via <code>Directory.Build.props</code>.</li>
+    </ul>
+
+    <h2 id="deployment-architecture">6. Deployment architecture<a class="anchor-link" href="#deployment-architecture">#</a></h2>
+
+    <p>There is no server deployment. "Deployment" means <strong>publishing NuGet packages</strong> to GitHub Packages via GitHub Actions, plus running the demo apps locally.</p>
+
+    <div class="diagram">
+      <div class="dt">
+        <button data-zout title="Zoom out">−</button>
+        <span class="zlabel">100%</span>
+        <button data-zin title="Zoom in">+</button>
+        <button data-fit title="Fit to width">Fit</button>
+        <button data-one title="Actual size">1:1</button>
+        <button data-fs title="Fullscreen">⛶</button>
+        <button data-pop title="Open in new tab">↗</button>
+      </div>
+      <pre class="mermaid">flowchart LR
+  Dev["Dev push"] --> Branch{"branch?"}
+  Branch -->|"non-master / PR"| BuildWF["build.yml<br/>(validate build)"]
+  Branch -->|"master"| PubWF["publish-nuget.yml<br/>(pack + push)"]
+  PubWF --> Pkgs["5 NuGet packages<br/>(MinVer-versioned)"]
+  Pkgs --> GHP["GitHub Packages<br/>(nuget.pkg.github.com/techierathore)"]
+  GHP --> Consumer["Consumer Blazor apps<br/>(dotnet add package)"]</pre>
+    </div>
+
+    <ul>
+      <li><strong><code>publish-nuget.yml</code></strong> — on push to <code>master</code>, on <code>windows-latest</code>, full git history for MinVer, builds Release with <code>-p:CI=true</code>, packs all 5 library projects, pushes with <code>--skip-duplicate</code> using <code>GITHUB_TOKEN</code>.</li>
+      <li><strong><code>build.yml</code></strong> — validation build on non-master pushes and PRs to master.</li>
+      <li><strong>Local run</strong> — <code>./scripts/run-demo.sh [server|wasm|auto]</code> or <code>dotnet run --project demos/TrBlazeUI.Demo.&lt;mode&gt;</code>. Per-package release scripts live under <code>scripts/</code> (<code>release-components.sh</code>, <code>release-primitives.sh</code>, <code>release-icons-*.sh</code>).</li>
+    </ul>
+
+    <h2 id="architectural-decisions-adr-style-log">7. Architectural decisions (ADR-style log)<a class="anchor-link" href="#architectural-decisions-adr-style-log">#</a></h2>
+
+    <ul>
+      <li><strong>ADR-001 — Current stack as-is (reverse-doc baseline).</strong> .NET 10 / Blazor / Tailwind v4 / shadcn-compatible CSS-variable theming, distributed as NuGet packages. Established by the original fork and the modernization pass.</li>
+      <li><strong>ADR-002 — Two-layer headless + styled architecture.</strong> Primitives provide behavior + accessibility; Components add styling. Lets consumers either drop in styled components or build custom UIs on headless primitives. Reason: mirror Radix UI / shadcn/ui separation of concerns.</li>
+      <li><strong>ADR-003 — Ship pre-built CSS, not a Tailwind dependency.</strong> The standalone Tailwind binary compiles <code>trblazeui.css</code> at build time and the output is committed/packaged, so consumers need zero Tailwind/Node tooling ("zero configuration"). <code>-p:CI=true</code> skips the compile when the binary is unavailable.</li>
+      <li><strong>ADR-004 — CSS-variable theming over baked-in colors.</strong> All colors/spacing via CSS custom properties so any shadcn/ui or tweakcn theme works unmodified, with runtime light/dark switching.</li>
+      <li><strong>ADR-005 — Per-package independent MinVer versioning.</strong> Each library version is derived from its own git tag prefix, so icon packages and core libraries release independently.</li>
+      <li><strong>ADR-006 — Universal attribute splatting (<code>CaptureUnmatchedValues</code>).</strong> Retrofitted across components after consumer apps hit runtime <code>InvalidOperationException</code> passing standard HTML attributes; now the default pattern for every component.</li>
+      <li><strong>ADR-007 — Reactive portal refresh.</strong> <code>PortalService.RefreshPortal</code> + <code>OnPortalsChanged</code> so <code>PortalHost</code> (a layout sibling, not a descendant) re-renders on internal overlay state changes. Reason: fix the AppStudio-reported "static dialog" blocker.</li>
+      <li><strong>ADR-008 — GitHub Packages distribution under <code>techierathore</code>.</strong> Chosen over nuget.org for the rename/beta phase; consumers configure a PAT-authenticated source.</li>
+      <li><strong>ADR-009 — Rename BlazorUI/BlazorBlueprint → TrBlazeUI.</strong> Namespaces, package names, CSS file, and service-registration method all renamed for the v2.0 fork; NOTICE retains original attribution per Apache 2.0.</li>
+    </ul>
+
+    <h2 id="target-architecture">8. Target architecture<a class="anchor-link" href="#target-architecture">#</a></h2>
+
+    <p>No structural change is in flight. The library is feature-complete for its current scope; future work is incremental (new components, broader XML-doc coverage, consumer-feedback fixes) rather than re-architecture. If a documentation/runtime change is later proposed, capture it here as a delta with a diagram.</p>
+
+    <h2 id="open-questions-risks">9. Open questions / risks<a class="anchor-link" href="#open-questions-risks">#</a></h2>
+
+    <ul>
+      <li><strong>XML-documentation coverage — RESOLVED (2026-06-30).</strong> Coverage is now 100%: all public members (including enums, DTOs, demo services, and Blazor lifecycle overrides) are documented, and the <code>CS1591</code> suppression has been removed from <code>Directory.Build.props</code>, so missing docs now fail the build. No remaining standards-debt on docs.</li>
+      <li><strong>Field-prefix convention — RESOLVED.</strong> Static analysis confirms the <code>obj</code>-prefix instance-field style dominates (<code>objLogger</code>, <code>objJsRuntime</code>, <code>objModule</code>, …) and the modernization pass reports 0 underscore-prefixed fields remaining. §4 / Coding Standards adopt <code>obj</code> prefix. No drift remediation needed.</li>
+      <li><strong>NativeSelect inside MAUI Blazor Hybrid overlays.</strong> A genuine WebView2/MAUI <em>platform</em> limitation (native <code>&lt;select&gt;</code> popup clipped in <code>position: fixed</code> overlays) — no library fix possible; guidance is to use <code>&lt;Select&gt;</code> instead. Carries forward as a documented known limitation, not a defect.</li>
+      <li><strong><code>.NET 8</code> vs <code>.NET 10</code> references in older docs.</strong> The reverse-doc baseline is .NET 10 (modernization complete). Any lingering <code>.NET 8</code> mention in harvested source docs is stale; the canonical answer is .NET 10 / C# 14.</li>
+      <li><strong>MinVer tag warnings.</strong> Expected when building without git tags present; not a defect.</li>
+      <li><strong>Demo data is mock-only.</strong> DataTable/Chart demos use <code>MockDataService</code>; there is no persistence layer to reason about.</li>
+    </ul>
+
+    <h2 id="sources-harvested">10. Sources harvested<a class="anchor-link" href="#sources-harvested">#</a></h2>
+
+    <ul>
+      <li><code>docs/TrBlazeUI-Doc.md</code> — overview, solution structure, tech-stack tables, project tree, service registration.</li>
+      <li><code>docs/TrBlazeUI-Update-plan.md</code> — modernization work streams (.NET 10 upgrade, CI/CD, AI reference, skills), completion statuses.</li>
+      <li><code>docs/toolbarplan.md</code> — Toolbar component design (now implemented).</li>
+      <li><code>docs/TrBlazeUI-Issues-Report-1.md</code>, <code>docs/trblazeui-issues-report-2.md</code> — consumer-reported bugs (portal refresh, attribute splatting, CSS path) and their fixes.</li>
+      <li><code>README.md</code>, <code>THEMING.md</code> — theming, installation, render-mode, AI-skill, and migration content.</li>
+      <li><code>docs/Coding-Standards.md</code> — naming/field conventions baseline.</li>
+    </ul>
+
+    <hr>
+    <p class="subtitle">Last updated: 2026-06-30</p>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+<script>
+// Light/dark toggle. The initial theme was already applied flash-free by the
+// <head> script (saved choice, else time-of-day). Clicking flips it, saves the
+// choice, and reloads so Mermaid re-renders in the matching theme.
+(function(){
+  var btn = document.getElementById('themeToggle');
+  if(!btn) return;
+  var relabel = function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.textContent = dark ? '☀ Light' : '☾ Dark';
+  };
+  relabel();
+  btn.addEventListener('click', function(){
+    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    try{ localStorage.setItem('tf-theme', next); }catch(e){}
+    location.reload();
+  });
+})();
+
+// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`:
+// mermaid reads the <pre>'s textContent as the diagram source, so a button
+// appended here glues "copy" onto the last line and breaks the parse
+// (flowcharts → "Syntax error"; sequence diagrams silently absorb it).
+// Mermaid blocks get copy/export from their own .diagram toolbar instead.
+document.querySelectorAll('pre:not(.mermaid)').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy';
+  btn.textContent = 'copy';
+  btn.addEventListener('click', () => {
+    const text = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'copied';
+      setTimeout(() => { btn.textContent = 'copy'; }, 1200);
+    });
+  });
+  pre.appendChild(btn);
+});
+
+// Mermaid init — theme follows the resolved light/dark theme
+if (window.mermaid) {
+  var mermaidTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default';
+  mermaid.initialize({ startOnLoad: true, theme: mermaidTheme, securityLevel: 'loose' });
+}
+
+// Mermaid toolbar wiring — run after mermaid renders
+function wireMermaidToolbars() {
+  document.querySelectorAll('.diagram').forEach(dia => {
+    if (dia.dataset.wired) return;
+    const merm = dia.querySelector('.mermaid');
+    const svg = merm && merm.querySelector('svg');
+    if (!svg) return;
+    dia.dataset.wired = '1';
+    let scale = 1;
+    const label = dia.querySelector('.zlabel');
+    const apply = () => {
+      svg.style.transform = `scale(${scale})`;
+      svg.style.transformOrigin = 'top left';
+      if (label) label.textContent = Math.round(scale * 100) + '%';
+    };
+    const setScale = (s) => { scale = Math.max(0.25, Math.min(4, s)); apply(); };
+    dia.querySelector('[data-zin]').onclick = () => setScale(scale * 1.2);
+    dia.querySelector('[data-zout]').onclick = () => setScale(scale / 1.2);
+    dia.querySelector('[data-fit]').onclick = () => {
+      svg.style.transform = '';
+      svg.removeAttribute('width');
+      svg.style.maxWidth = '100%';
+      svg.style.height = 'auto';
+      scale = 1;
+      if (label) label.textContent = 'Fit';
+    };
+    dia.querySelector('[data-one]').onclick = () => {
+      svg.style.transform = '';
+      svg.style.maxWidth = 'none';
+      svg.style.width = '';
+      svg.style.height = '';
+      scale = 1;
+      if (label) label.textContent = '100%';
+    };
+    dia.querySelector('[data-fs]').onclick = () => {
+      dia.classList.toggle('fs');
+      if (dia.classList.contains('fs')) {
+        document.addEventListener('keydown', escFs);
+      } else {
+        document.removeEventListener('keydown', escFs);
+      }
+    };
+    function escFs(e) { if (e.key === 'Escape') { dia.classList.remove('fs'); document.removeEventListener('keydown', escFs); } }
+    dia.querySelector('[data-pop]').onclick = () => openInNewTab(svg);
+    // Ctrl+wheel zoom
+    merm.addEventListener('wheel', (e) => {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      setScale(scale * (e.deltaY < 0 ? 1.1 : 1/1.1));
+    }, { passive: false });
+  });
+}
+
+function openInNewTab(svg) {
+  const svgSource = new XMLSerializer().serializeToString(svg);
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Diagram</title>
+<style>
+  html,body{margin:0;height:100%;background:#0f1115;color:#e6e8ee;font-family:system-ui,sans-serif}
+  .bar{position:fixed;top:0;left:0;right:0;padding:8px 12px;background:#161a22;border-bottom:1px solid #2a3142;display:flex;gap:8px;z-index:10}
+  .bar button{background:#1c2230;color:#9aa3b2;border:1px solid #2a3142;border-radius:6px;padding:5px 12px;font-size:13px;cursor:pointer}
+  .bar button:hover{color:#7cc4ff;border-color:#7cc4ff}
+  .bar .hint{margin-left:auto;color:#9aa3b2;font-size:11.5px;align-self:center}
+  #stage{position:absolute;top:42px;bottom:0;left:0;right:0;overflow:hidden}
+  #stage svg{width:100%;height:100%}
+</style>
+</head><body>
+<div class="bar">
+  <button onclick="zpz.zoomIn()">+</button>
+  <button onclick="zpz.zoomOut()">−</button>
+  <button onclick="zpz.fit();zpz.center()">Fit</button>
+  <button onclick="zpz.resetZoom();zpz.center()">1:1</button>
+  <button onclick="window.print()">Print</button>
+  <button onclick="dlPng()">PNG</button>
+  <button onclick="dlSvg()">SVG</button>
+  <span class="hint">Drag to pan · Ctrl+wheel to zoom · + / − keys</span>
+</div>
+<div id="stage">${svgSource}</div>
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"><\/script>
+<script>
+  const el = document.querySelector('#stage svg');
+  const zpz = svgPanZoom(el, { zoomScaleSensitivity: .3, minZoom: .2, maxZoom: 10, controlIconsEnabled: false, fit: true, center: true });
+  document.addEventListener('keydown', e => {
+    if (e.key === '+' || e.key === '=') zpz.zoomIn();
+    if (e.key === '-' || e.key === '_') zpz.zoomOut();
+    if (e.key === '0') { zpz.resetZoom(); zpz.center(); }
+  });
+  function dlSvg() {
+    const blob = new Blob([new XMLSerializer().serializeToString(el)], { type: 'image/svg+xml' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'diagram.svg'; a.click();
+  }
+  function dlPng() {
+    const src = new XMLSerializer().serializeToString(el);
+    const img = new Image();
+    const url = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(src)));
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = el.clientWidth * 2; c.height = el.clientHeight * 2;
+      const ctx = c.getContext('2d'); ctx.scale(2,2); ctx.drawImage(img, 0, 0);
+      c.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'diagram.png'; a.click(); });
+    };
+    img.src = url;
+  }
+<\/script>
+</body></html>`;
+  const w = window.open();
+  w.document.write(html);
+  w.document.close();
+}
+
+// Run wiring after mermaid finishes (it renders async)
+if (window.mermaid) {
+  setTimeout(wireMermaidToolbars, 400);
+  setTimeout(wireMermaidToolbars, 1200);  // safety re-run for slow renders
+}
+</script>
+</body>
+</html>

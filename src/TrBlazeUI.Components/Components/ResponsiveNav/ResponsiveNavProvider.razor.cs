@@ -3,6 +3,10 @@ using Microsoft.JSInterop;
 
 namespace TrBlazeUI.Components.ResponsiveNav;
 
+/// <summary>
+/// Provides the shared <see cref="ResponsiveNavContext"/> to descendant responsive navigation
+/// components, managing mobile detection through JS interop and notifying subscribers of state changes.
+/// </summary>
 public partial class ResponsiveNavProvider
 {
     private ResponsiveNavContext Context { get; set; } = new();
@@ -12,6 +16,12 @@ public partial class ResponsiveNavProvider
     [Inject]
     private IJSRuntime JSRuntime { get; set; } = default!;
 
+    /// <summary>
+    /// On the first render, imports the responsive navigation JavaScript module, initializes mobile
+    /// detection, and subscribes to context state changes so the UI re-renders when the layout changes.
+    /// </summary>
+    /// <param name="firstRender">True on the first render of the component; otherwise false.</param>
+    /// <returns>A task that represents the asynchronous post-render operation.</returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -52,6 +62,11 @@ public partial class ResponsiveNavProvider
     public void OnMobileChange(bool isMobile) =>
         Context.SetIsMobile(isMobile);
 
+    /// <summary>
+    /// Asynchronously disposes the provider, unsubscribing from context state changes and releasing
+    /// the JavaScript module and .NET object references.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous dispose operation.</returns>
     public async ValueTask DisposeAsync()
     {
         if (Context != null)

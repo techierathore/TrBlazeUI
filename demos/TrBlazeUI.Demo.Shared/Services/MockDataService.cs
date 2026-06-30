@@ -109,15 +109,58 @@ public class MockDataService
 /// </summary>
 public class Person
 {
+    /// <summary>
+    /// Gets or sets the unique identifier for the person.
+    /// </summary>
     public int Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the full name of the person.
+    /// </summary>
     public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the email address of the person.
+    /// </summary>
     public string Email { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the age of the person, in years.
+    /// </summary>
     public int Age { get; set; }
+
+    /// <summary>
+    /// Gets or sets the role assigned to the person.
+    /// </summary>
     public string Role { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the current status of the person (for example, Active or Inactive).
+    /// </summary>
     public string Status { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the department the person belongs to.
+    /// </summary>
     public string Department { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the date of the person's most recent promotion, or <c>null</c> if none.
+    /// </summary>
     public DateTimeOffset? LastPromotionDate { get; set; }
+
+    /// <summary>
+    /// Gets or sets the annual salary of the person.
+    /// </summary>
     public int Salary { get; set; }
+
+    /// <summary>
+    /// Gets or sets the date the person joined.
+    /// </summary>
     public DateTime JoinDate { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the person is currently active.
+    /// </summary>
     public bool IsActive { get; set; }
 }

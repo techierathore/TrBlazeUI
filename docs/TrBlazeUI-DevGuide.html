@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TrBlazeUI — Developer Guide</title>
+<script>
+/* Resolve the theme BEFORE first paint (no flash). Saved choice wins; otherwise
+   pick by time of day — light 07:00–19:00 local, softened dark at night. */
+(function(){
+  try{
+    var t = localStorage.getItem('tf-theme');
+    if(t!=='light' && t!=='dark'){ var h = new Date().getHours(); t = (h>=7 && h<19) ? 'light' : 'dark'; }
+    document.documentElement.setAttribute('data-theme', t);
+  }catch(e){ document.documentElement.setAttribute('data-theme','light'); }
+})();
+</script>
+<style>
+/* LIGHT is the default theme — a warm off-white, easy on the eyes (never bright white). */
+:root{
+  --bg:#f4f1e9; --panel:#efe9db; --panel2:#e7e0cd; --line:#d8cfb6;
+  --ink:#2e2a22; --muted:#6f6857; --accent:#2f6f9f; --accent2:#3f7d54;
+  --warn:#9a6b15; --danger:#b03a52; --ok:#3f7d54;
+  --code-bg:#ece5d3; --code-ink:#332f26; --row-alt:#eae2cf;
+  --h3:#3a352b; --h4:#2f6f9f; --quote:#4a4537; --cta-bg:#e6eef5;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+/* DARK — softened near-black (warmer / less harsh than pure #0f1115). */
+html[data-theme="dark"]{
+  --bg:#11141a; --panel:#171b23; --panel2:#1e2430; --line:#2b3240;
+  --ink:#dfe3ea; --muted:#99a2b1; --accent:#7cc4ff; --accent2:#a6e3a1;
+  --warn:#f9c74f; --danger:#f38ba8; --ok:#a6e3a1;
+  --code-bg:#0c1016; --code-ink:#d8dde8; --row-alt:#141821;
+  --h3:#cfd5e3; --h4:#7cc4ff; --quote:#cfd5e3; --cta-bg:#0d2030;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:15px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--mono);font-size:13px;background:var(--code-bg);color:var(--code-ink);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+pre{font-family:var(--mono);font-size:12.5px;background:var(--code-bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow:auto;color:var(--code-ink);position:relative}
+pre code{background:none;border:none;padding:0}
+.copy{position:absolute;top:8px;right:8px;background:var(--panel2);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:11px;font-family:var(--sans);cursor:pointer}
+.copy:hover{color:var(--accent);border-color:var(--accent)}
+/* floating light/dark toggle (top-right) */
+.theme-toggle{position:fixed;top:12px;right:14px;z-index:10000;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:12.5px;font-family:var(--sans);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.layout.no-toc{grid-template-columns:1fr}
+nav.side{position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--line);background:var(--panel);padding:18px 14px}
+nav.side h1{font-size:14px;margin:0 0 4px;letter-spacing:.5px;color:var(--ink)}
+nav.side .sub{font-size:11.5px;color:var(--muted);margin-bottom:14px}
+nav.side ol,nav.side ul{list-style:none;padding:0;margin:0}
+nav.side li{font-size:13px;margin:2px 0}
+nav.side li a{display:block;padding:5px 8px;color:var(--ink);border-radius:6px}
+nav.side li a:hover{background:var(--panel2);text-decoration:none}
+nav.side li.h3 a{padding-left:22px;font-size:12.5px;color:var(--h3)}
+nav.side .group{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin:14px 8px 4px}
+
+main{padding:28px 40px 80px;max-width:1100px}
+.layout.no-toc main{margin:0 auto}
+
+h1{font-size:28px;margin:0 0 6px}
+h2{font-size:22px;margin:32px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+h3{font-size:17px;margin:22px 0 6px;color:var(--h3);scroll-margin-top:16px}
+h4{font-size:14px;margin:14px 0 4px;color:var(--h4);scroll-margin-top:16px}
+.subtitle{color:var(--muted);font-size:14px;margin-top:-4px;margin-bottom:18px}
+p{margin:6px 0 10px}
+blockquote{border-left:3px solid var(--accent);background:var(--panel);margin:8px 0;padding:8px 14px;color:var(--quote)}
+ul,ol{padding-left:22px}
+li{margin:2px 0}
+
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin:8px 0}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);color:var(--h3);font-weight:600}
+tr:nth-child(even) td{background:var(--row-alt)}
+
+hr{border:none;border-top:1px solid var(--line);margin:24px 0}
+.anchor-link{color:var(--muted);font-weight:400;font-size:0.85em;margin-left:8px;opacity:0;transition:opacity .15s;text-decoration:none}
+h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
+
+/* inline TOC at top of main content */
+.toc-inline{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 16px;margin:14px 0 24px}
+.toc-inline > div{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.toc-inline ol,.toc-inline ul{margin:4px 0;padding-left:18px}
+.toc-inline li{font-size:13px;margin:1px 0}
+.toc-inline a{color:var(--h3)}
+
+/* mermaid diagram wrapper + toolbar */
+.diagram{position:relative;border:1px solid var(--line);border-radius:8px;background:var(--code-bg);margin:14px 0;overflow:hidden}
+.diagram .mermaid{padding:14px;margin:0;background:transparent;border:none;overflow:auto}
+.diagram .dt{display:flex;gap:6px;justify-content:flex-end;padding:6px 8px;background:var(--row-alt);border-bottom:1px solid var(--line)}
+.diagram .dt button{background:var(--panel2);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:3px 10px;font-size:12px;font-family:var(--sans);cursor:pointer;min-width:30px}
+.diagram .dt button:hover{color:var(--accent);border-color:var(--accent)}
+.diagram .dt .zlabel{padding:3px 6px;font-size:11px;color:var(--muted);font-family:var(--mono);align-self:center}
+.diagram.fs{position:fixed;inset:0;z-index:9999;border-radius:0;border:none}
+.diagram.fs .mermaid{height:calc(100vh - 40px);display:flex;align-items:center;justify-content:center}
+
+@media(max-width:900px){.layout{grid-template-columns:1fr}nav.side{position:static;height:auto}}
+</style>
+</head>
+<body>
+<button id="themeToggle" class="theme-toggle" title="Toggle light / dark">☾ Dark</button>
+<div class="layout no-toc">
+  <main>
+    <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
+    <div class="subtitle"><strong>Last updated:</strong> 2026-06-30</div>
+
+    <p><strong>Verification status:</strong> ✅ <strong>RUNTIME-VERIFIED (key screens sampled, 2026-06-30).</strong> The Blazor Server demo was booted and driven with headless Chromium (Playwright); a representative set of screens — Home, DataTable, Bar Chart, Toolbar, Icons — render correctly with real data and pass the visual check (screenshots in <code>docs/screenshots/TrBlazeUI/</code>). The remaining ~80 component/primitive demo pages were not each individually driven; run <code>*verify ui</code> / <code>*devguide TrBlazeUI --update</code> for exhaustive per-screen confirmation.</p>
+
+    <blockquote><strong>What this document is.</strong> The screen-by-screen, as-built map a developer uses to chase a bug or catch AI-hallucinated code. TrBlazeUI is a <strong>component library with a demo application</strong> and has <strong>no database, no API, no stored procedures, and no auth</strong> — so the usual <em>page → service → data-access → proc</em> lineage collapses to <strong>demo page → demo-shared composition → library component → primitive → JS interop / service</strong>. There is exactly one role: the <strong>anonymous demo visitor</strong>.</blockquote>
+
+    <div class="toc-inline">
+      <div>Contents</div>
+      <ol>
+        <li><a href="#roles-navigation">Roles &amp; navigation</a></li>
+        <li><a href="#app-shell-shared-services">App shell &amp; shared services</a></li>
+        <li><a href="#screen-map">Screen map</a></li>
+        <li><a href="#library-lineage-how-a-styled-component-resolves">Library lineage — how a styled component resolves</a></li>
+        <li><a href="#known-issues">Known issues</a></li>
+        <li><a href="#runtime-screenshots-sampled-2026-06-30">Runtime screenshots</a></li>
+      </ol>
+    </div>
+
+    <h2 id="roles-navigation">1. Roles &amp; navigation<a class="anchor-link" href="#roles-navigation">#</a></h2>
+
+    <ul>
+      <li><strong>Role:</strong> Anonymous demo visitor (no login). One sidebar navigation drives the whole app.</li>
+      <li><strong>Hosts:</strong> <code>Demo.Server</code> (5183/7172), <code>Demo.Wasm</code> (5184/7173), <code>Demo.Auto</code> (5185/7174) — all render the SAME <code>Demo.Shared</code> Razor Class Library, so the screen map below is host-independent.</li>
+      <li><strong>Nav source:</strong> <code>demos/TrBlazeUI.Demo.Shared/Shared/MainLayout.razor</code> (+ <code>.razor.cs</code>), with <code>HorizontalNav.razor</code> / <code>LayoutToggle.razor</code> for the horizontal/vertical layout switch, <code>DarkModeToggle.razor</code> for theme, and <code>CommandSearch.razor</code> for the command palette.</li>
+    </ul>
+
+    <div class="diagram">
+      <div class="dt">
+        <button data-zout title="Zoom out">−</button>
+        <span class="zlabel">100%</span>
+        <button data-zin title="Zoom in">+</button>
+        <button data-fit title="Fit to width">Fit</button>
+        <button data-one title="Actual size">1:1</button>
+        <button data-fs title="Fullscreen">⛶</button>
+        <button data-pop title="Open in new tab">↗</button>
+      </div>
+      <pre class="mermaid">flowchart TB
+  Shell["MainLayout (sidebar + topbar)"] --> Home["/ (Index)"]
+  Shell --> Arch["/architecture"]
+  Shell --> GS["/getting-started"]
+  Shell --> Comp["/components (73 demo pages)"]
+  Shell --> Prim["/primitives (15 demos)"]
+  Shell --> Charts["/charts/* (6 demos)"]
+  Shell --> Icons["/icons (browser)"]
+  Shell --> Theme["/ (DynamicThemeDemo)"]</pre>
+    </div>
+
+    <h2 id="app-shell-shared-services">2. App shell &amp; shared services<a class="anchor-link" href="#app-shell-shared-services">#</a></h2>
+
+    <table>
+      <thead>
+        <tr><th>Element</th><th>File</th><th>Responsibility</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>MainLayout</code></td><td><code>Shared/MainLayout.razor(.cs)</code></td><td>Sidebar + topbar shell; hosts <code>&lt;PortalHost/&gt;</code>, theme + layout toggles, command search</td></tr>
+        <tr><td><code>HorizontalNav</code> / <code>LayoutToggle</code></td><td><code>Shared/HorizontalNav.razor</code>, <code>Shared/LayoutToggle.razor</code></td><td>Switch between vertical sidebar and horizontal top nav</td></tr>
+        <tr><td><code>DarkModeToggle</code></td><td><code>Shared/DarkModeToggle.razor</code></td><td>Adds/removes <code>.dark</code> on <code>&lt;html&gt;</code></td></tr>
+        <tr><td><code>CommandSearch</code></td><td><code>Shared/CommandSearch.razor</code></td><td>Command-palette page jump</td></tr>
+        <tr><td><code>ThemeService</code></td><td><code>Services/ThemeService.cs</code></td><td>Current theme + light/dark state</td></tr>
+        <tr><td><code>CollapsibleStateService</code></td><td><code>Services/CollapsibleStateService.cs</code></td><td>Sidebar/collapsible persistence (localStorage)</td></tr>
+        <tr><td><code>MockDataService</code></td><td><code>Services/MockDataService.cs</code></td><td>Sample rows/series for DataTable + Chart demos (no DB)</td></tr>
+        <tr><td><code>LayoutService</code></td><td><code>Services/LayoutService.cs</code></td><td>Horizontal/vertical layout state</td></tr>
+      </tbody>
+    </table>
+
+    <p>There is <strong>no data-access layer</strong>: demo data comes entirely from <code>MockDataService</code> held in memory. Any code path that appears to read a database, call an API, or invoke a stored proc would be hallucinated — there is none in this repo.</p>
+
+    <h2 id="screen-map">3. Screen map<a class="anchor-link" href="#screen-map">#</a></h2>
+
+    <p>Each demo page lives under <code>demos/TrBlazeUI.Demo.Shared/Pages/</code> and composes one library component family. The full set is large (73 component demos + 15 primitive demos + 6 chart demos + icons + 5 top-level pages); the table below maps the representative/structural screens. Every <code>/components/{x}</code> page follows the same lineage shape: <strong>demo page → <code>&lt;Library component&gt;</code> → primitive (if any) → JS interop / service</strong>.</p>
+
+    <table>
+      <thead>
+        <tr><th>Screen</th><th>Route</th><th>Demo page file</th><th>Library surface exercised</th><th>Lineage notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Home</td><td><code>/</code></td><td><code>Pages/Index.razor</code></td><td>(overview)</td><td>Confirms CSS loaded</td></tr>
+        <tr><td>Architecture</td><td><code>/architecture</code></td><td><code>Pages/Architecture.razor</code></td><td>(static content)</td><td>—</td></tr>
+        <tr><td>Getting Started</td><td><code>/getting-started</code></td><td><code>Pages/GettingStarted.razor</code></td><td>(static content + snippets)</td><td>—</td></tr>
+        <tr><td>Dynamic Theme</td><td>(page)</td><td><code>Pages/DynamicThemeDemo.razor</code></td><td><code>ThemeService</code>, CSS variables</td><td>Live theme variable editing</td></tr>
+        <tr><td>Components index</td><td><code>/components</code></td><td><code>Pages/Components/Index.razor</code></td><td>grid of 73 component links</td><td>—</td></tr>
+        <tr><td>Button</td><td><code>/components/button</code></td><td><code>Pages/Components/ButtonDemo.razor</code></td><td><code>Button</code>, <code>ButtonIcon</code></td><td>no primitive; pure styled</td></tr>
+        <tr><td>Sidebar</td><td><code>/components/sidebar</code></td><td><code>Pages/Components/SidebarDemo.razor</code></td><td><code>Sidebar</code> (22 parts) → <code>CollapsibleStateService</code> + <code>sidebar.js</code></td><td>⚠ source trips REQ-NFR-005 (IDE0031)</td></tr>
+        <tr><td>Dialog</td><td><code>/components/dialog</code></td><td><code>Pages/Components/DialogDemo.razor</code></td><td><code>Dialog</code> → Dialog primitive → <code>PortalHost</code> + <code>portal.js</code>/<code>focus-trap.js</code></td><td>reactive portal refresh</td></tr>
+        <tr><td>Select</td><td><code>/components/select</code></td><td><code>Pages/Components/SelectDemo.razor</code></td><td><code>Select</code> → Select primitive → <code>positioning.js</code>/<code>select.js</code></td><td>custom dropdown (overlay-safe)</td></tr>
+        <tr><td>DataTable</td><td><code>/components/datatable</code></td><td><code>Pages/Components/DataTableDemo.razor</code></td><td><code>DataTable</code> → <code>MockDataService</code></td><td>sort/filter/paginate/select; runtime-verified (47 rows, real data)</td></tr>
+        <tr><td>Toolbar</td><td><code>/components/toolbar</code></td><td><code>Pages/Components/ToolbarDemo.razor</code></td><td><code>Toolbar</code>/<code>ToolbarGroup</code>/<code>ToolbarButton</code>/<code>ToolbarToggleButton</code>/<code>ToolbarSeparator</code></td><td>composes Button/DropdownMenu</td></tr>
+        <tr><td>RichTextEditor</td><td><code>/components/rich-text-editor</code></td><td><code>Pages/Components/RichTextEditorDemo.razor</code></td><td><code>RichTextEditor</code> → <code>quill-interop.js</code> + HtmlSanitizer</td><td>sanitized HTML output</td></tr>
+        <tr><td>MarkdownEditor</td><td><code>/components/markdown-editor</code></td><td><code>Pages/Components/MarkdownEditorDemo.razor</code></td><td><code>MarkdownEditor</code> → Markdig + <code>markdown-editor.js</code></td><td>live preview</td></tr>
+        <tr><td>Primitives index</td><td><code>/primitives</code></td><td><code>Pages/Primitives/Index.razor</code></td><td>15 headless-primitive demos</td><td>unstyled behavior + ARIA</td></tr>
+        <tr><td>Charts</td><td><code>/charts/{area,bar,line,pie,radar,radial}</code></td><td><code>Pages/Charts/*ChartDemo.razor</code></td><td><code>Chart</code> → Blazor-ApexCharts → <code>MockDataService</code></td><td>6 types</td></tr>
+        <tr><td>Icons</td><td><code>/icons</code></td><td><code>Pages/Icons/*</code></td><td><code>LucideIcon</code> / <code>HeroIcon</code> / <code>FeatherIcon</code></td><td>generated <code>*IconData.cs</code></td></tr>
+      </tbody>
+    </table>
+
+    <p><em>(The remaining ~60 component demos and ~14 primitive demos follow the identical lineage shape; they are enumerated in the demo <code>Pages/Components/</code> and <code>Pages/Primitives/</code> folders and indexed in the BRD §9 feature catalog. A runtime <code>--update</code> pass should stamp render-status per page.)</em></p>
+
+    <h2 id="library-lineage-how-a-styled-component-resolves">4. Library lineage — how a styled component resolves<a class="anchor-link" href="#library-lineage-how-a-styled-component-resolves">#</a></h2>
+
+    <div class="diagram">
+      <div class="dt">
+        <button data-zout title="Zoom out">−</button>
+        <span class="zlabel">100%</span>
+        <button data-zin title="Zoom in">+</button>
+        <button data-fit title="Fit to width">Fit</button>
+        <button data-one title="Actual size">1:1</button>
+        <button data-fs title="Fullscreen">⛶</button>
+        <button data-pop title="Open in new tab">↗</button>
+      </div>
+      <pre class="mermaid">flowchart LR
+  Demo["Demo page (Pages/Components/XDemo.razor)"] --> Styled["Styled component (src/TrBlazeUI.Components/Components/X)"]
+  Styled --> Prim["Headless primitive (src/TrBlazeUI.Primitives/Primitives/X)"]
+  Styled --> CSS["trblazeui.css (Tailwind v4, pre-built)"]
+  Prim --> Svc["Primitive services (Portal/Positioning/Focus/Keyboard)"]
+  Prim --> JS["JS interop (portal.js, focus-trap.js, positioning.js, ...)"]
+  Styled --> ThirdParty["3rd-party (ApexCharts / Quill / Markdig+HtmlSanitizer)"]</pre>
+    </div>
+
+    <p>A reader chasing a bug starts at the demo page, drops into the styled component (<code>.razor</code> markup + <code>.razor.cs</code> logic), then into the primitive it composes (for behavior/ARIA), and finally into the relevant JS interop file or DI service. Symbols that don't resolve to a real file/component in <code>src/</code> are hallucinations — verify against the folders listed in <code>docs/TrBlazeUI-Architecture.md §4</code>.</p>
+
+    <h2 id="known-issues">5. Known issues<a class="anchor-link" href="#known-issues">#</a></h2>
+
+    <ul>
+      <li><strong>Sidebar Release build error (REQ-NFR-005)</strong> — <em>Resolved 2026-06-30.</em> The IDE0031 hits were event-accessor null guards where <code>?.</code> is illegal (CS0131); fixed via a justified one-rule <code>.editorconfig</code> downgrade. Release build is clean (0/0).</li>
+      <li><strong>XML-doc coverage (REQ-FN-003)</strong> — <em>Resolved 2026-06-30.</em> Now 100% on public members; CS1591 suppression removed and build-enforced.</li>
+      <li><strong>NativeSelect in MAUI Hybrid overlays</strong> — platform limitation (WebView2); use <code>&lt;Select&gt;</code> inside overlays (<code>docs/TrBlazeUI-Issues-Report-1.md</code> #2). Not a library defect.</li>
+      <li><strong>Doc fix (found at runtime 2026-06-30):</strong> the DataTable demo route is <code>/components/datatable</code> (no hyphen), not <code>/components/data-table</code> as earlier drafts stated — corrected above and in the UsageGuide.</li>
+      <li>Status is reflected in <code>docs/TrBlazeUI-Checklist.md</code> (all REQs terminal). Key screens are runtime-verified with screenshots in <code>docs/screenshots/TrBlazeUI/</code>; run <code>*devguide TrBlazeUI --update</code> for exhaustive per-screen confirmation across all ~80 demo pages.</li>
+    </ul>
+
+    <h2 id="runtime-screenshots-sampled-2026-06-30">6. Runtime screenshots (sampled, 2026-06-30)<a class="anchor-link" href="#runtime-screenshots-sampled-2026-06-30">#</a></h2>
+
+    <p>Captured from the booted Blazor Server demo via headless Chromium (Playwright). These prove the as-built screens render with real data and correct layout.</p>
+
+    <h3 id="home">Home (<code>/</code>)<a class="anchor-link" href="#home">#</a></h3>
+    <img src="screenshots/TrBlazeUI/home.png" alt="Home" style="max-width:100%;border:1px solid var(--line);border-radius:8px;margin:8px 0">
+
+    <h3 id="datatable-components-datatable">DataTable (<code>/components/datatable</code>)<a class="anchor-link" href="#datatable-components-datatable">#</a></h3>
+    <img src="screenshots/TrBlazeUI/datatable.png" alt="DataTable" style="max-width:100%;border:1px solid var(--line);border-radius:8px;margin:8px 0">
+
+    <h3 id="bar-chart-charts-bar">Bar Chart (<code>/charts/bar</code>)<a class="anchor-link" href="#bar-chart-charts-bar">#</a></h3>
+    <img src="screenshots/TrBlazeUI/chart-bar.png" alt="Bar Chart" style="max-width:100%;border:1px solid var(--line);border-radius:8px;margin:8px 0">
+
+    <h3 id="toolbar-components-toolbar">Toolbar (<code>/components/toolbar</code>)<a class="anchor-link" href="#toolbar-components-toolbar">#</a></h3>
+    <img src="screenshots/TrBlazeUI/toolbar.png" alt="Toolbar" style="max-width:100%;border:1px solid var(--line);border-radius:8px;margin:8px 0">
+
+    <h3 id="icons-icons">Icons (<code>/icons</code>)<a class="anchor-link" href="#icons-icons">#</a></h3>
+    <img src="screenshots/TrBlazeUI/icons.png" alt="Icons" style="max-width:100%;border:1px solid var(--line);border-radius:8px;margin:8px 0">
+
+    <hr>
+    <p>Last updated: 2026-06-30 · RUNTIME-VERIFIED for sampled key screens (screenshots in docs/screenshots/TrBlazeUI/); run <code>*devguide --update</code> for exhaustive coverage</p>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+<script>
+// Light/dark toggle. The initial theme was already applied flash-free by the
+// <head> script (saved choice, else time-of-day). Clicking flips it, saves the
+// choice, and reloads so Mermaid re-renders in the matching theme.
+(function(){
+  var btn = document.getElementById('themeToggle');
+  if(!btn) return;
+  var relabel = function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.textContent = dark ? '☀ Light' : '☾ Dark';
+  };
+  relabel();
+  btn.addEventListener('click', function(){
+    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    try{ localStorage.setItem('tf-theme', next); }catch(e){}
+    location.reload();
+  });
+})();
+
+// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`:
+// mermaid reads the <pre>'s textContent as the diagram source, so a button
+// appended here glues "copy" onto the last line and breaks the parse
+// (flowcharts → "Syntax error"; sequence diagrams silently absorb it).
+// Mermaid blocks get copy/export from their own .diagram toolbar instead.
+document.querySelectorAll('pre:not(.mermaid)').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy';
+  btn.textContent = 'copy';
+  btn.addEventListener('click', () => {
+    const text = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'copied';
+      setTimeout(() => { btn.textContent = 'copy'; }, 1200);
+    });
+  });
+  pre.appendChild(btn);
+});
+
+// Mermaid init — theme follows the resolved light/dark theme
+if (window.mermaid) {
+  var mermaidTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default';
+  mermaid.initialize({ startOnLoad: true, theme: mermaidTheme, securityLevel: 'loose' });
+}
+
+// Mermaid toolbar wiring — run after mermaid renders
+function wireMermaidToolbars() {
+  document.querySelectorAll('.diagram').forEach(dia => {
+    if (dia.dataset.wired) return;
+    const merm = dia.querySelector('.mermaid');
+    const svg = merm && merm.querySelector('svg');
+    if (!svg) return;
+    dia.dataset.wired = '1';
+    let scale = 1;
+    const label = dia.querySelector('.zlabel');
+    const apply = () => {
+      svg.style.transform = `scale(${scale})`;
+      svg.style.transformOrigin = 'top left';
+      if (label) label.textContent = Math.round(scale * 100) + '%';
+    };
+    const setScale = (s) => { scale = Math.max(0.25, Math.min(4, s)); apply(); };
+    dia.querySelector('[data-zin]').onclick = () => setScale(scale * 1.2);
+    dia.querySelector('[data-zout]').onclick = () => setScale(scale / 1.2);
+    dia.querySelector('[data-fit]').onclick = () => {
+      svg.style.transform = '';
+      svg.removeAttribute('width');
+      svg.style.maxWidth = '100%';
+      svg.style.height = 'auto';
+      scale = 1;
+      if (label) label.textContent = 'Fit';
+    };
+    dia.querySelector('[data-one]').onclick = () => {
+      svg.style.transform = '';
+      svg.style.maxWidth = 'none';
+      svg.style.width = '';
+      svg.style.height = '';
+      scale = 1;
+      if (label) label.textContent = '100%';
+    };
+    dia.querySelector('[data-fs]').onclick = () => {
+      dia.classList.toggle('fs');
+      if (dia.classList.contains('fs')) {
+        document.addEventListener('keydown', escFs);
+      } else {
+        document.removeEventListener('keydown', escFs);
+      }
+    };
+    function escFs(e) { if (e.key === 'Escape') { dia.classList.remove('fs'); document.removeEventListener('keydown', escFs); } }
+    dia.querySelector('[data-pop]').onclick = () => openInNewTab(svg);
+    // Ctrl+wheel zoom
+    merm.addEventListener('wheel', (e) => {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      setScale(scale * (e.deltaY < 0 ? 1.1 : 1/1.1));
+    }, { passive: false });
+  });
+}
+
+function openInNewTab(svg) {
+  const svgSource = new XMLSerializer().serializeToString(svg);
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Diagram</title>
+<style>
+  html,body{margin:0;height:100%;background:#0f1115;color:#e6e8ee;font-family:system-ui,sans-serif}
+  .bar{position:fixed;top:0;left:0;right:0;padding:8px 12px;background:#161a22;border-bottom:1px solid #2a3142;display:flex;gap:8px;z-index:10}
+  .bar button{background:#1c2230;color:#9aa3b2;border:1px solid #2a3142;border-radius:6px;padding:5px 12px;font-size:13px;cursor:pointer}
+  .bar button:hover{color:#7cc4ff;border-color:#7cc4ff}
+  .bar .hint{margin-left:auto;color:#9aa3b2;font-size:11.5px;align-self:center}
+  #stage{position:absolute;top:42px;bottom:0;left:0;right:0;overflow:hidden}
+  #stage svg{width:100%;height:100%}
+</style>
+</head><body>
+<div class="bar">
+  <button onclick="zpz.zoomIn()">+</button>
+  <button onclick="zpz.zoomOut()">−</button>
+  <button onclick="zpz.fit();zpz.center()">Fit</button>
+  <button onclick="zpz.resetZoom();zpz.center()">1:1</button>
+  <button onclick="window.print()">Print</button>
+  <button onclick="dlPng()">PNG</button>
+  <button onclick="dlSvg()">SVG</button>
+  <span class="hint">Drag to pan · Ctrl+wheel to zoom · + / − keys</span>
+</div>
+<div id="stage">${svgSource}</div>
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"><\/script>
+<script>
+  const el = document.querySelector('#stage svg');
+  const zpz = svgPanZoom(el, { zoomScaleSensitivity: .3, minZoom: .2, maxZoom: 10, controlIconsEnabled: false, fit: true, center: true });
+  document.addEventListener('keydown', e => {
+    if (e.key === '+' || e.key === '=') zpz.zoomIn();
+    if (e.key === '-' || e.key === '_') zpz.zoomOut();
+    if (e.key === '0') { zpz.resetZoom(); zpz.center(); }
+  });
+  function dlSvg() {
+    const blob = new Blob([new XMLSerializer().serializeToString(el)], { type: 'image/svg+xml' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'diagram.svg'; a.click();
+  }
+  function dlPng() {
+    const src = new XMLSerializer().serializeToString(el);
+    const img = new Image();
+    const url = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(src)));
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = el.clientWidth * 2; c.height = el.clientHeight * 2;
+      const ctx = c.getContext('2d'); ctx.scale(2,2); ctx.drawImage(img, 0, 0);
+      c.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'diagram.png'; a.click(); });
+    };
+    img.src = url;
+  }
+<\/script>
+</body></html>`;
+  const w = window.open();
+  w.document.write(html);
+  w.document.close();
+}
+
+// Run wiring after mermaid finishes (it renders async)
+if (window.mermaid) {
+  setTimeout(wireMermaidToolbars, 400);
+  setTimeout(wireMermaidToolbars, 1200);  // safety re-run for slow renders
+}
+</script>
+</body>
+</html>

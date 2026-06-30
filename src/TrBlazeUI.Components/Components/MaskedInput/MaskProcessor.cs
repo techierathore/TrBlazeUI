@@ -10,6 +10,11 @@ public class MaskProcessor
     private readonly string objMask;
     private readonly char objPlaceholderChar;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MaskProcessor"/> class.
+    /// </summary>
+    /// <param name="mask">The mask pattern. Mask characters: 9 = digit, A = letter, * = alphanumeric; all other characters are literals.</param>
+    /// <param name="placeholderChar">The character used to represent unfilled editable positions. Defaults to '_'.</param>
     public MaskProcessor(string mask, char placeholderChar = '_')
     {
         objMask = mask;

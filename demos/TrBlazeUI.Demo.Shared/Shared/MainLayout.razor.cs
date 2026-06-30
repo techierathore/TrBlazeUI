@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Components;
 
 namespace TrBlazeUI.Demo.Shared;
 
+/// <summary>
+/// Main layout for the demo application, providing the sidebar navigation,
+/// layout mode handling, and persisted collapsible menu state.
+/// </summary>
 public partial class MainLayout : LayoutComponentBase, IDisposable
 {
     [Inject]
@@ -205,6 +209,9 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         ToastService.Show($"\"{name}\" toggled {(isPressed ? "ON" : "OFF")}", "Toolbar Toggle");
     }
 
+    /// <summary>
+    /// Unsubscribes from layout change events and releases resources used by the layout.
+    /// </summary>
     public void Dispose()
     {
         LayoutService.OnLayoutChanged -= HandleLayoutChanged;

@@ -4,6 +4,10 @@ using System;
 
 namespace TrBlazeUI.Components.Sidebar;
 
+/// <summary>
+/// Renders the sidebar surface, displaying a collapsible desktop panel or a mobile sheet
+/// based on the ambient <see cref="SidebarContext"/> provided by a parent provider.
+/// </summary>
 public partial class Sidebar : IDisposable
 {
     [CascadingParameter]
@@ -127,6 +131,10 @@ public partial class Sidebar : IDisposable
         return Collapsible ? "collapsed" : "closed";
     }
 
+    /// <summary>
+    /// Reacts to (re)assigned parameters by resubscribing to the cascaded <see cref="SidebarContext"/>'s
+    /// StateChanged event when the context reference changes, so the sidebar re-renders on state updates.
+    /// </summary>
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
@@ -154,6 +162,9 @@ public partial class Sidebar : IDisposable
         // Force re-render when sidebar state changes
         StateHasChanged();
 
+    /// <summary>
+    /// Unsubscribes from the sidebar context state-changed event to release the component.
+    /// </summary>
     public void Dispose()
     {
         GC.SuppressFinalize(this);

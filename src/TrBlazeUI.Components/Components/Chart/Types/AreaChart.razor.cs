@@ -83,6 +83,10 @@ public partial class AreaChart<TItem> : ChartBase<TItem> where TItem : class
         Class
     );
 
+    /// <summary>
+    /// Rebuilds the ApexCharts options whenever parameters are (re)assigned so that
+    /// variant, stroke, fill, stacking, and axis styling reflect the current values.
+    /// </summary>
     protected override void OnParametersSet()
     {
         base.OnParametersSet();

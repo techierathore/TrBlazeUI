@@ -133,6 +133,10 @@ public partial class CurrencyInput : ComponentBase
         }
     }
 
+    /// <summary>
+    /// Reacts to (re)assigned parameters by clearing the cached currency definition and culture
+    /// when the <see cref="CurrencyCode"/> changes so formatting and parsing use the new currency.
+    /// </summary>
     protected override void OnParametersSet()
     {
         // Reset currency cache if currency code changed

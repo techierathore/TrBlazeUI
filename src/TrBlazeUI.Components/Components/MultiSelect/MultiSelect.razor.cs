@@ -270,6 +270,12 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Wires up or tears down the multiselect JavaScript interop in response to the popover's
+    /// open state, importing the module and registering the search input when opened and cleaning up when closed.
+    /// </summary>
+    /// <param name="firstRender">True on the first render of the component; otherwise false.</param>
+    /// <returns>A task that represents the asynchronous post-render operation.</returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // Setup JS when popover opens
@@ -560,6 +566,10 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
     }
 
     // JSInvokable callbacks for keyboard navigation
+    /// <summary>
+    /// Handles the Space key from JavaScript. The checkbox toggle is already
+    /// performed by the item click, so the dropdown is left open with no further action.
+    /// </summary>
     [JSInvokable]
     public void HandleSpace()
     {
@@ -567,6 +577,9 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
         // No additional action needed, dropdown stays open
     }
 
+    /// <summary>
+    /// Handles the Enter key from JavaScript, closing the dropdown after the item toggle.
+    /// </summary>
     [JSInvokable]
     public void HandleEnter()
     {
@@ -575,6 +588,9 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Handles the Escape key from JavaScript, closing the dropdown.
+    /// </summary>
     [JSInvokable]
     public void HandleEscape()
     {
@@ -583,6 +599,10 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Asynchronously releases the JavaScript interop resources used by the component.
+    /// </summary>
+    /// <returns>A <see cref="ValueTask"/> that completes when cleanup has finished.</returns>
     public async ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);

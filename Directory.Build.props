@@ -17,8 +17,8 @@
     <!-- Build Configuration -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <!-- Suppress missing XML comment warnings -->
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!-- CS1591 (missing XML comment) enforced as of REQ-FN-003: public members are documented; suppression removed. -->
+    <NoWarn>$(NoWarn)</NoWarn>
 
     <!-- Code Style Enforcement -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
