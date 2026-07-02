@@ -44,6 +44,9 @@ NUL
 .devflow
 .claude
 .tfcore
+.opencode
 DEV-TASKS.md
 .instructions
 .reviews
+/CLAUDE.md
+/WORKFLOW.html
