@@ -15,8 +15,9 @@
             stroke-linecap="round"
             stroke-linejoin="round"
             class="@CssClass"
-            role="img"
+            role="@IconRole"
             aria-label="@AriaLabel"
+            aria-hidden="@AriaHiddenValue"
             @attributes="AdditionalAttributes">
             @((MarkupString)SvgContent)
         </svg>
@@ -30,8 +31,9 @@
             viewBox="@ViewBox"
             fill="@Fill"
             class="@CssClass"
-            role="img"
+            role="@IconRole"
             aria-label="@AriaLabel"
+            aria-hidden="@AriaHiddenValue"
             @attributes="AdditionalAttributes">
             @((MarkupString)SvgContent)
         </svg>
@@ -39,6 +41,11 @@
 }
 else
 {
-    @* Fallback for missing icons *@
-    <span class="text-destructive" role="alert" aria-label="Icon not found: @Name (@Variant)">⚠️</span>
+    @* Unknown icon id: render a size-preserving, screen-reader-silent placeholder
+       (never a warning glyph that could be mistaken for real content); a one-time
+       logger warning identifies the bad Name for the developer. *@
+    <span aria-hidden="true"
+          data-trblazeui-missing-icon="@Name"
+          class="@CssClass"
+          style="display:inline-block;width:@(ComputedSize)px;height:@(ComputedSize)px;vertical-align:middle;"></span>
 }

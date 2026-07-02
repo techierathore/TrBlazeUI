@@ -1,4 +1,6 @@
+using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using TrBlazeUI.Icons.Lucide.Data;
 
 namespace TrBlazeUI.Icons.Lucide.Components;
@@ -50,8 +52,10 @@ public partial class LucideIcon : ComponentBase
     public string? Class { get; set; }
 
     /// <summary>
-    /// ARIA label for accessibility. Recommended for icon-only buttons.
-    /// If not specified, the icon name will be used as the aria-label.
+    /// ARIA label for accessibility (screen readers).
+    /// When provided, the icon is exposed as an image with this accessible name
+    /// (role="img" + aria-label). When omitted, the icon is treated as decorative
+    /// and hidden from assistive technology (aria-hidden="true").
     /// </summary>
     [Parameter]
     public string? AriaLabel { get; set; }
@@ -116,6 +120,44 @@ public partial class LucideIcon : ComponentBase
             }
 
             return string.Join(" ", classes);
+        }
+    }
+
+    /// <summary>
+    /// Icon names that have already produced an unknown-name warning, so each
+    /// bad id is logged once per application rather than once per render.
+    /// </summary>
+    private static readonly ConcurrentDictionary<string, byte> WarnedUnknownNames = new();
+
+    /// <summary>
+    /// Cached LoggerMessage delegate for the unknown-icon-name warning (CA1848).
+    /// </summary>
+    private static readonly Action<ILogger, string, Exception?> LogUnknownIconName =
+        LoggerMessage.Define<string>(
+            LogLevel.Warning,
+            new EventId(1, "TrBlazeUIUnknownIconName"),
+            "TrBlazeUI LucideIcon: unknown icon name '{IconName}'. An empty placeholder is rendered instead. " +
+            "Check the Lucide icon id.");
+
+    [Inject]
+    private ILogger<LucideIcon> Logger { get; set; } = default!;
+
+    /// <summary>
+    /// The role attribute for the SVG: "img" when an accessible name is supplied, otherwise none.
+    /// </summary>
+    private string? IconRole => string.IsNullOrEmpty(AriaLabel) ? null : "img";
+
+    /// <summary>
+    /// aria-hidden="true" when the icon is decorative (no accessible name supplied).
+    /// </summary>
+    private string? AriaHiddenValue => string.IsNullOrEmpty(AriaLabel) ? "true" : null;
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        if (SvgContent == null && WarnedUnknownNames.TryAdd(Name, 0))
+        {
+            LogUnknownIconName(Logger, Name, null);
         }
     }
 }

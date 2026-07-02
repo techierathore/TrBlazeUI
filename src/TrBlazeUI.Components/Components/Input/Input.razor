@@ -1,7 +1,11 @@
 @namespace TrBlazeUI.Components.Input
 
+@if (!string.IsNullOrEmpty(Label))
+{
+    <label for="@EffectiveId" class="mb-2 block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">@Label</label>
+}
 <input
-    id="@Id"
+    id="@EffectiveId"
     type="@HtmlType"
     class="@CssClass"
     value="@Value"

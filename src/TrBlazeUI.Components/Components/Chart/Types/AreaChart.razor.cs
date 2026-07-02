@@ -128,7 +128,7 @@ public partial class AreaChart<TItem> : ChartBase<TItem> where TItem : class
         objOptions.Colors = ChartColor.DefaultColors.ToList();
 
         // Grid styling
-        objOptions.Grid = new Grid
+        objOptions.Grid = new ApexCharts.Grid
         {
             BorderColor = "var(--border)",
             StrokeDashArray = 4

@@ -2,11 +2,11 @@
 
 @if (!string.IsNullOrWhiteSpace(GetSelectedText()))
 {
-    @GetSelectedText()
+    <span id="@GetValueId()">@GetSelectedText()</span>
 }
 else
 {
-    <span class="text-muted-foreground">@Placeholder</span>
+    <span id="@GetValueId()" class="text-muted-foreground">@Placeholder</span>
 }
 
 @code {
@@ -19,5 +19,30 @@ else
     [Parameter]
     public string? Placeholder { get; set; }
 
-    private string? GetSelectedText() => SelectContext?.DisplayText;
+    /// <summary>
+    /// Resolves the display text synchronously so the trigger has an accessible name
+    /// from the very first render: registered display text first, then the raw bound
+    /// value as a fallback (items may not have registered yet).
+    /// </summary>
+    private string? GetSelectedText()
+    {
+        if (SelectContext == null)
+        {
+            return null;
+        }
+
+        string? vDisplayText = SelectContext.DisplayText;
+        if (!string.IsNullOrWhiteSpace(vDisplayText))
+        {
+            return vDisplayText;
+        }
+
+        object? vValue = SelectContext.Value;
+        return vValue?.ToString();
+    }
+
+    /// <summary>
+    /// Gets the scoped id for the value element so it can be referenced via aria-labelledby.
+    /// </summary>
+    private string? GetValueId() => SelectContext?.ValueId;
 }

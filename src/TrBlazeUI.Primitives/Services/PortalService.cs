@@ -72,4 +72,15 @@ public class PortalService : IPortalService
     /// <inheritdoc />
     public IReadOnlyDictionary<string, RenderFragment> GetPortals() =>
         objPortals;
+
+    private int objHostCount;
+
+    /// <inheritdoc />
+    public bool HasHost => Volatile.Read(ref objHostCount) > 0;
+
+    /// <inheritdoc />
+    public void AttachHost() => Interlocked.Increment(ref objHostCount);
+
+    /// <inheritdoc />
+    public void DetachHost() => Interlocked.Decrement(ref objHostCount);
 }

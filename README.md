@@ -1,10 +1,5 @@
 # TrBlazeUI
 
-[![NuGet](https://img.shields.io/nuget/v/TrBlazeUI.Components)](https://www.nuget.org/packages/TrBlazeUI.Components)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue)](LICENSE)
-
-> **Renamed from BlazorUI** — This project was previously published as `BlazorUI.*` packages. Starting with v2.0.0, we've renamed to `TrBlazeUI.*`. If you're migrating from BlazorUI, see the [Migration Guide](#migrating-from-blazorui) below.
-
 Beautiful, accessible UI components for Blazor. Inspired by [shadcn/ui](https://ui.shadcn.com/).
 
 <p align="center">
@@ -136,6 +131,13 @@ For GitHub Actions workflows that need to restore TrBlazeUI packages:
 
 <PortalHost />
 ```
+
+   > **Important:** the layout hosting `PortalHost` (and `ToastProvider`) must be in an **interactive**
+   > render tree. A static-SSR layout combined with per-page `@rendermode` silently breaks overlays
+   > (no toasts, dialogs don't open, Select popups time out). Prefer global interactivity in `App.razor`
+   > (`<Routes @rendermode="InteractiveServer" />` + `<HeadOutlet @rendermode="InteractiveServer" />`)
+   > or wrap the PortalHost in an interactive boundary. Select/Popover/DropdownMenu fall back to inline
+   > rendering (with a console warning) when no interactive PortalHost is attached; Toast and Dialog require one.
 
 3. **Add CSS to your `App.razor`:**
 

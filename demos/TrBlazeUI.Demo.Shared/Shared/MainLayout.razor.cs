@@ -90,6 +90,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         new("components/empty", "Empty"),
         new("components/field", "Field"),
         new("components/file-upload", "File Upload"),
+        new("components/grid", "Grid"),
         new("components/hovercard", "Hover Card"),
         new("components/input", "Input"),
         new("components/input-group", "Input Group"),

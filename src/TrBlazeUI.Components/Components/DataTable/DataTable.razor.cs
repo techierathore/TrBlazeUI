@@ -269,9 +269,12 @@ public partial class DataTable<TData> : ComponentBase where TData : class
 
     /// <summary>
     /// Gets the computed CSS classes for the table container.
+    /// relative + overflow-auto give the table a contained scroll region (shadcn Table
+    /// pattern) and make this div the containing block for absolutely-positioned
+    /// visually-hidden spans, so a wide table can never widen the page (TechieRag TR-004).
     /// </summary>
     private static string TableContainerCssClass => ClassNames.cn(
-        "rounded-md border"
+        "relative w-full overflow-auto rounded-md border"
     );
 
     /// <summary>

@@ -1,5 +1,6 @@
 @page "/components/dropdown-menu"
 @using TrBlazeUI.Primitives.Services
+@using TrBlazeUI.Components.Button
 @using TrBlazeUI.Components.DropdownMenu
 @using TrBlazeUI.Components.Kbd
 @inject IKeyboardShortcutService KeyboardShortcuts
@@ -41,6 +42,34 @@
             @if (!string.IsNullOrEmpty(basicAction))
             {
                 <p class="text-sm">Last action: <strong>@basicAction</strong></p>
+            }
+        </div>
+    </section>
+
+    <!-- Button as trigger via AsChild (no nested interactive controls) -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Button As Trigger (AsChild)</h2>
+        <p class="text-sm text-muted-foreground">
+            Set <code>AsChild="true"</code> to make a slotted <code>Button</code> the trigger element itself.
+            Without it, the trigger renders its own <code>&lt;button&gt;</code> around your content, so slotting
+            an interactive component would produce nested buttons (an axe <code>nested-interactive</code> violation).
+            Use AsChild whenever the trigger content is itself interactive.
+        </p>
+
+        <div class="flex items-start gap-2" data-demo="dropdown-aschild">
+            <DropdownMenu>
+                <DropdownMenuTrigger AsChild="true">
+                    <Button Variant="ButtonVariant.Outline">Insights</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                    <DropdownMenuItem OnClick="@(() => HandleAsChildAction("Daily"))">Daily insights</DropdownMenuItem>
+                    <DropdownMenuItem OnClick="@(() => HandleAsChildAction("Weekly"))">Weekly insights</DropdownMenuItem>
+                    <DropdownMenuItem OnClick="@(() => HandleAsChildAction("Monthly"))">Monthly insights</DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+            @if (!string.IsNullOrEmpty(asChildAction))
+            {
+                <p class="text-sm">Last action: <strong>@asChildAction</strong></p>
             }
         </div>
     </section>
@@ -478,6 +507,7 @@
 @code {
     // Independent state for each menu section
     private string? basicAction;
+    private string? asChildAction;
     private string? labelsAction;
     private string? groupsAction;
     private string? shortcutsAction;
@@ -534,6 +564,7 @@
 
     // Individual handlers for each section
     private void HandleBasicAction(string action) => basicAction = action;
+    private void HandleAsChildAction(string action) => asChildAction = action;
     private void HandleLabelsAction(string action) => labelsAction = action;
     private void HandleGroupsAction(string action) => groupsAction = action;
     private void HandleShortcutsAction(string action) => _ = HandleShortcutAsync(action);

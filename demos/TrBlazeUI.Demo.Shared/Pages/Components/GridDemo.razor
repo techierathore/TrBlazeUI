@@ -1,0 +1,95 @@
+@page "/components/grid"
+@using TrBlazeUI.Components.Grid
+
+<PageTitle>Grid Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div>
+        <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Grid Component</h1>
+        <p class="text-xl text-muted-foreground">
+            A responsive 12-column CSS grid layout. Grid defines the columns and gap;
+            GridItem declares how many columns it spans per breakpoint (mobile-first).
+        </p>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+    </div>
+
+    <!-- Basic responsive grid -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Responsive Columns</h2>
+        <p class="text-sm text-muted-foreground">
+            Full width on mobile (<code>Xs="12"</code>), half from the small breakpoint
+            (<code>Sm="6"</code>), a third from the large breakpoint (<code>Lg="4"</code>).
+        </p>
+        <Grid Spacing="3" data-demo="grid-basic">
+            @for (var i = 1; i <= 6; i++)
+            {
+                var index = i;
+                <GridItem Xs="12" Sm="6" Lg="4">
+                    <div class="rounded-md border bg-muted/50 p-4 text-center text-sm">Item @index</div>
+                </GridItem>
+            }
+        </Grid>
+    </section>
+
+    <!-- Mixed spans -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Mixed Spans</h2>
+        <p class="text-sm text-muted-foreground">
+            Items can span any number of the 12 columns; rows wrap automatically.
+        </p>
+        <Grid Spacing="3">
+            <GridItem Xs="12" Md="8">
+                <div class="rounded-md border bg-muted/50 p-4 text-sm">Main content (Md=8)</div>
+            </GridItem>
+            <GridItem Xs="12" Md="4">
+                <div class="rounded-md border bg-muted/50 p-4 text-sm">Sidebar (Md=4)</div>
+            </GridItem>
+            <GridItem Xs="6" Md="3">
+                <div class="rounded-md border bg-muted/50 p-4 text-sm">Md=3</div>
+            </GridItem>
+            <GridItem Xs="6" Md="3">
+                <div class="rounded-md border bg-muted/50 p-4 text-sm">Md=3</div>
+            </GridItem>
+            <GridItem Xs="6" Md="3">
+                <div class="rounded-md border bg-muted/50 p-4 text-sm">Md=3</div>
+            </GridItem>
+            <GridItem Xs="6" Md="3">
+                <div class="rounded-md border bg-muted/50 p-4 text-sm">Md=3</div>
+            </GridItem>
+        </Grid>
+    </section>
+
+    <!-- Custom gap + column count -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Custom Gap And Column Count</h2>
+        <p class="text-sm text-muted-foreground">
+            <code>Gap</code> accepts any CSS gap value and overrides <code>Spacing</code>;
+            <code>Columns</code> changes the track count (spans are still capped at 12).
+        </p>
+        <Grid Columns="4" Gap="0.5rem 1.5rem">
+            @for (var i = 1; i <= 4; i++)
+            {
+                var index = i;
+                <GridItem Xs="1">
+                    <div class="rounded-md border bg-muted/50 p-4 text-center text-sm">@index</div>
+                </GridItem>
+            }
+        </Grid>
+    </section>
+
+    <!-- FluentUI migration note -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Migrating From FluentUI</h2>
+        <p class="text-sm text-muted-foreground">
+            FluentUI's <code>xs</code>/<code>sm</code>/<code>md</code>/<code>lg</code> and <code>Spacing</code>
+            attributes are inert on plain HTML elements — replace
+            <code>&lt;div xs="12" sm="6"&gt;</code> with <code>&lt;GridItem Xs="12" Sm="6"&gt;</code>
+            inside a <code>&lt;Grid Spacing="…"&gt;</code>, or use Tailwind's
+            <code>col-span-*</code> utilities directly.
+        </p>
+    </section>
+</div>

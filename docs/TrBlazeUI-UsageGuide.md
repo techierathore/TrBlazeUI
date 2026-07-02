@@ -108,6 +108,14 @@ dotnet test
 - [ ] Open `/icons` — switch icon library, icons render
 - [ ] Toggle dark mode — components restyle without breakage
 
+## Consumer integration notes (added 2026-07-02, AstroLyfe feedback pass — REQ-UI-014)
+
+- **PortalHost:** add `<PortalHost />` (namespace `TrBlazeUI.Primitives.Services`) at the end of your root layout, inside the interactive render root. Overlay content (Select, Popover, DropdownMenu, Tooltip, …) renders through it for correct stacking. If it's missing, the library now **falls back to rendering popups inline** (fully functional, JS-positioned) and logs a one-time console warning — but the host is still the recommended setup.
+- **Interactive triggers in DropdownMenu:** never slot a `Button` (or any interactive element) inside a plain `DropdownMenuTrigger` — that nests buttons. Use `AsChild="true"` so the slotted `Button` becomes the trigger itself (see `/components/dropdown-menu` → "Button As Trigger").
+- **Input labels:** `<Input Label="Full Name" …>` renders a visible, `for`/`id`-associated `<label>`.
+- **Icons & screen readers:** icons are decorative by default (`aria-hidden="true"`). Pass `AriaLabel="…"` to expose `role="img"` + accessible name. Unknown icon names render an empty placeholder (`data-trblazeui-missing-icon="<name>"`) and log a one-time warning — grep the DOM or logs for stragglers after migrations.
+- **FluentUI migration cheatsheet:** FluentUI/Blazorise `xs`/`sm`/`md`/`lg`/`Spacing` attributes are **inert on plain HTML elements** — they silently collapse layouts. Rewrite them either as TrBlazeUI `<Grid Spacing="3"><GridItem Xs="12" Sm="6">…</GridItem></Grid>` (12-column, breakpoints 640/768/1024/1280px, demo at `/components/grid`) or as Tailwind `grid grid-cols-12 gap-*` + `col-span-* sm:col-span-*` classes.
+
 ## Known limitations
 - **NativeSelect inside MAUI Blazor Hybrid overlays** — native `<select>` popup is clipped in WebView2 `position: fixed` overlays (platform limitation). Use `<Select>` instead inside dialogs/sheets. See `docs/TrBlazeUI-Issues-Report-1.md` (Issue #2).
 - _(Resolved 2026-06-30: the strict Release build is clean 0/0, and XML-doc coverage is 100% with CS1591 build-enforced — previously-listed limitations cleared.)_

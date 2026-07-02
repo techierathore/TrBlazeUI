@@ -146,7 +146,7 @@ public partial class LineChart<TItem> : ChartBase<TItem> where TItem : class
         }
 
         // Grid styling
-        objOptions.Grid = new Grid
+        objOptions.Grid = new ApexCharts.Grid
         {
             BorderColor = "var(--border)",
             StrokeDashArray = 4

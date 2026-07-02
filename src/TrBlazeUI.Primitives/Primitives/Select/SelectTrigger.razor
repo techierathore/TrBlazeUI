@@ -16,7 +16,6 @@
             data-state="@(objContext.IsOpen ? "open" : "closed")"
             @onclick="HandleClick"
             @onkeydown="HandleKeyDown"
-            @onkeydown:preventDefault="true"
             @attributes="AdditionalAttributes">
         @ChildContent
     </button>
@@ -49,10 +48,12 @@
     {
         if (objContext == null || objContext.Disabled) return;
 
+        // Tab (and every unhandled key) must bubble with its default behavior so the
+        // trigger is never a keyboard trap (WCAG 2.1.2). Enter and Space are not handled
+        // here either: the browser translates them into a native click on the button,
+        // which HandleClick turns into a toggle.
         switch (args.Key)
         {
-            case "Enter":
-            case " ": // Space
             case "ArrowDown":
             case "ArrowUp":
                 objContext.Open(objButtonElement);
