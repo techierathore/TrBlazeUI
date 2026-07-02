@@ -44,18 +44,69 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// </summary>
     public class ColumnData
     {
+        /// <summary>
+        /// Gets or sets the unique identifier for the column.
+        /// </summary>
         public string Id { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the header text displayed for the column.
+        /// </summary>
         public string Header { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the function that extracts the column value from a data item.
+        /// </summary>
         public Func<TData, object?> Property { get; set; } = null!;
+
+        /// <summary>
+        /// Gets or sets the format string used to format the cell value.
+        /// </summary>
         public string? Format { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the column can be sorted.
+        /// </summary>
         public bool Sortable { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the column can be filtered.
+        /// </summary>
         public bool Filterable { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the column is currently visible.
+        /// </summary>
         public bool Visible { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the width of the column (e.g., "200px", "20%", "auto").
+        /// </summary>
         public string? Width { get; set; }
+
+        /// <summary>
+        /// Gets or sets the minimum width of the column.
+        /// </summary>
         public string? MinWidth { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum width of the column.
+        /// </summary>
         public string? MaxWidth { get; set; }
+
+        /// <summary>
+        /// Gets or sets a custom template for rendering cell values.
+        /// </summary>
         public RenderFragment<TData>? CellTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets additional CSS classes to apply to cells in the column.
+        /// </summary>
         public string? CellClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets additional CSS classes to apply to the header cell.
+        /// </summary>
         public string? HeaderClass { get; set; }
     }
 
@@ -230,6 +281,10 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         "w-full caption-bottom text-sm"
     );
 
+    /// <summary>
+    /// Performs one-time initialization of the table state, seeding the pagination page size and
+    /// current page from <see cref="InitialPageSize"/> and applying the configured selection mode.
+    /// </summary>
     protected override void OnInitialized()
     {
         objTableState.Pagination.PageSize = InitialPageSize;
@@ -238,6 +293,11 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         objTableState.Selection.Mode = GetPrimitiveSelectionMode();
     }
 
+    /// <summary>
+    /// Reacts to (re)assigned parameters by keeping the selection mode in sync, synchronizing the
+    /// externally supplied <see cref="SelectedItems"/> into internal state, and reprocessing the data.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous parameter-processing operation.</returns>
     protected override async Task OnParametersSetAsync()
     {
         // Keep selection mode in sync with parameter

@@ -156,12 +156,26 @@ public partial class MaskedInput : ComponentBase, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Performs one-time initialization by computing the initial masked display value from
+    /// the bound <see cref="Value"/>.
+    /// </summary>
     protected override void OnInitialized() =>
         UpdateDisplayValue();
 
+    /// <summary>
+    /// Reacts to (re)assigned parameters by recomputing the masked display value so it stays in
+    /// sync with the current <see cref="Value"/> and mask configuration.
+    /// </summary>
     protected override void OnParametersSet() =>
         UpdateDisplayValue();
 
+    /// <summary>
+    /// On the first render, imports the masked input JavaScript module used to set the input value
+    /// and cursor position atomically.
+    /// </summary>
+    /// <param name="firstRender">True on the first render of the component; otherwise false.</param>
+    /// <returns>A task that represents the asynchronous post-render operation.</returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -372,6 +386,10 @@ public partial class MaskedInput : ComponentBase, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Asynchronously releases the JavaScript module reference used by the component.
+    /// </summary>
+    /// <returns>A <see cref="ValueTask"/> that completes when disposal finishes.</returns>
     public async ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);

@@ -137,6 +137,12 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
         "[&_li]:mb-1 [&_strong]:font-bold [&_em]:italic [&_u]:underline"
     );
 
+    /// <summary>
+    /// On the first render, imports the markdown editor JavaScript module and initializes the
+    /// textarea's list-continuation and undo/redo behavior via JS interop.
+    /// </summary>
+    /// <param name="firstRender">True on the first render of the component; otherwise false.</param>
+    /// <returns>A task that represents the asynchronous post-render operation.</returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -409,6 +415,11 @@ public partial class MarkdownEditor : ComponentBase, IAsyncDisposable
         );
     }
 
+    /// <summary>
+    /// Asynchronously disposes the editor, removing the list-continuation listener and releasing
+    /// the JavaScript module and .NET object references.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous dispose operation.</returns>
     public async ValueTask DisposeAsync()
     {
         if (objModule != null)

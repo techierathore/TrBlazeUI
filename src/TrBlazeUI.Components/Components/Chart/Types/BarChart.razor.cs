@@ -94,6 +94,10 @@ public partial class BarChart<TItem> : ChartBase<TItem> where TItem : class
         Class
     );
 
+    /// <summary>
+    /// Rebuilds the ApexCharts options whenever parameters are (re)assigned so that
+    /// orientation, bar sizing, stacking, and axis styling reflect the current values.
+    /// </summary>
     protected override void OnParametersSet()
     {
         base.OnParametersSet();

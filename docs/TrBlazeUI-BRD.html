@@ -1,0 +1,797 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TrBlazeUI — Business Requirements</title>
+<script>
+/* Resolve the theme BEFORE first paint (no flash). Saved choice wins; otherwise
+   pick by time of day — light 07:00–19:00 local, softened dark at night. */
+(function(){
+  try{
+    var t = localStorage.getItem('tf-theme');
+    if(t!=='light' && t!=='dark'){ var h = new Date().getHours(); t = (h>=7 && h<19) ? 'light' : 'dark'; }
+    document.documentElement.setAttribute('data-theme', t);
+  }catch(e){ document.documentElement.setAttribute('data-theme','light'); }
+})();
+</script>
+<style>
+/* LIGHT is the default theme — a warm off-white, easy on the eyes (never bright white). */
+:root{
+  --bg:#f4f1e9; --panel:#efe9db; --panel2:#e7e0cd; --line:#d8cfb6;
+  --ink:#2e2a22; --muted:#6f6857; --accent:#2f6f9f; --accent2:#3f7d54;
+  --warn:#9a6b15; --danger:#b03a52; --ok:#3f7d54;
+  --code-bg:#ece5d3; --code-ink:#332f26; --row-alt:#eae2cf;
+  --h3:#3a352b; --h4:#2f6f9f; --quote:#4a4537; --cta-bg:#e6eef5;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+/* DARK — softened near-black (warmer / less harsh than pure #0f1115). */
+html[data-theme="dark"]{
+  --bg:#11141a; --panel:#171b23; --panel2:#1e2430; --line:#2b3240;
+  --ink:#dfe3ea; --muted:#99a2b1; --accent:#7cc4ff; --accent2:#a6e3a1;
+  --warn:#f9c74f; --danger:#f38ba8; --ok:#a6e3a1;
+  --code-bg:#0c1016; --code-ink:#d8dde8; --row-alt:#141821;
+  --h3:#cfd5e3; --h4:#7cc4ff; --quote:#cfd5e3; --cta-bg:#0d2030;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:15px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--mono);font-size:13px;background:var(--code-bg);color:var(--code-ink);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+pre{font-family:var(--mono);font-size:12.5px;background:var(--code-bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow:auto;color:var(--code-ink);position:relative}
+pre code{background:none;border:none;padding:0}
+.copy{position:absolute;top:8px;right:8px;background:var(--panel2);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:11px;font-family:var(--sans);cursor:pointer}
+.copy:hover{color:var(--accent);border-color:var(--accent)}
+/* floating light/dark toggle (top-right) */
+.theme-toggle{position:fixed;top:12px;right:14px;z-index:10000;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:12.5px;font-family:var(--sans);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.layout.no-toc{grid-template-columns:1fr}
+nav.side{position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--line);background:var(--panel);padding:18px 14px}
+nav.side h1{font-size:14px;margin:0 0 4px;letter-spacing:.5px;color:var(--ink)}
+nav.side .sub{font-size:11.5px;color:var(--muted);margin-bottom:14px}
+nav.side ol,nav.side ul{list-style:none;padding:0;margin:0}
+nav.side li{font-size:13px;margin:2px 0}
+nav.side li a{display:block;padding:5px 8px;color:var(--ink);border-radius:6px}
+nav.side li a:hover{background:var(--panel2);text-decoration:none}
+nav.side li.h3 a{padding-left:22px;font-size:12.5px;color:var(--h3)}
+nav.side .group{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin:14px 8px 4px}
+
+main{padding:28px 40px 80px;max-width:1100px}
+.layout.no-toc main{margin:0 auto}
+
+h1{font-size:28px;margin:0 0 6px}
+h2{font-size:22px;margin:32px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+h3{font-size:17px;margin:22px 0 6px;color:var(--h3);scroll-margin-top:16px}
+h4{font-size:14px;margin:14px 0 4px;color:var(--h4);scroll-margin-top:16px}
+.subtitle{color:var(--muted);font-size:14px;margin-top:-4px;margin-bottom:18px}
+p{margin:6px 0 10px}
+blockquote{border-left:3px solid var(--accent);background:var(--panel);margin:8px 0;padding:8px 14px;color:var(--quote)}
+ul,ol{padding-left:22px}
+li{margin:2px 0}
+
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin:8px 0}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);color:var(--h3);font-weight:600}
+tr:nth-child(even) td{background:var(--row-alt)}
+
+hr{border:none;border-top:1px solid var(--line);margin:24px 0}
+.anchor-link{color:var(--muted);font-weight:400;font-size:0.85em;margin-left:8px;opacity:0;transition:opacity .15s;text-decoration:none}
+h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
+
+/* inline TOC at top of main content */
+.toc-inline{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 16px;margin:14px 0 24px}
+.toc-inline > div{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.toc-inline ol,.toc-inline ul{margin:4px 0;padding-left:18px}
+.toc-inline li{font-size:13px;margin:1px 0}
+.toc-inline a{color:var(--h3)}
+
+/* mermaid diagram wrapper + toolbar */
+.diagram{position:relative;border:1px solid var(--line);border-radius:8px;background:var(--code-bg);margin:14px 0;overflow:hidden}
+.diagram .mermaid{padding:14px;margin:0;background:transparent;border:none;overflow:auto}
+.diagram .dt{display:flex;gap:6px;justify-content:flex-end;padding:6px 8px;background:var(--row-alt);border-bottom:1px solid var(--line)}
+.diagram .dt button{background:var(--panel2);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:3px 10px;font-size:12px;font-family:var(--sans);cursor:pointer;min-width:30px}
+.diagram .dt button:hover{color:var(--accent);border-color:var(--accent)}
+.diagram .dt .zlabel{padding:3px 6px;font-size:11px;color:var(--muted);font-family:var(--mono);align-self:center}
+.diagram.fs{position:fixed;inset:0;z-index:9999;border-radius:0;border:none}
+.diagram.fs .mermaid{height:calc(100vh - 40px);display:flex;align-items:center;justify-content:center}
+
+@media(max-width:900px){.layout{grid-template-columns:1fr}nav.side{position:static;height:auto}}
+</style>
+</head>
+<body>
+<button id="themeToggle" class="theme-toggle" title="Toggle light / dark">☾ Dark</button>
+<div class="layout">
+  <nav class="side">
+    <h1>TrBlazeUI — Business Requirements</h1>
+    <div class="sub">Last rendered: 2026-06-30</div>
+    <div class="group">Contents</div>
+    <ol>
+      <li><a href="#executive-summary">1. Executive summary</a></li>
+      <li><a href="#business-objectives">2. Business objectives</a></li>
+      <li><a href="#scope">3. Scope</a></li>
+      <li><a href="#development-status">4. Development status</a></li>
+      <li><a href="#stakeholders-users">5. Stakeholders / users</a></li>
+      <li><a href="#context-diagram">6. Context diagram</a></li>
+      <li><a href="#user-journey-primary-use-case">7. User journey — primary use case</a></li>
+      <li><a href="#component-sketch">8. Component sketch</a></li>
+      <li><a href="#feature-catalog">9. Feature catalog</a></li>
+      <li class="h3"><a href="#f-prim-headless-primitives">F-PRIM: Headless primitives</a></li>
+      <li class="h3"><a href="#f-form-form-components">F-FORM: Form components</a></li>
+      <li class="h3"><a href="#f-layout-layout-navigation-components">F-LAYOUT: Layout &amp; navigation</a></li>
+      <li class="h3"><a href="#f-overlay-overlay-feedback-components">F-OVERLAY: Overlay &amp; feedback</a></li>
+      <li class="h3"><a href="#f-data-data-content-components">F-DATA: Data &amp; content</a></li>
+      <li class="h3"><a href="#f-display-display-components">F-DISPLAY: Display components</a></li>
+      <li class="h3"><a href="#f-toolbar-toolbar-component">F-TOOLBAR: Toolbar component</a></li>
+      <li class="h3"><a href="#f-chart-charts">F-CHART: Charts</a></li>
+      <li class="h3"><a href="#f-icons-icon-libraries">F-ICONS: Icon libraries</a></li>
+      <li class="h3"><a href="#f-theme-theming-dark-mode">F-THEME: Theming &amp; dark mode</a></li>
+      <li class="h3"><a href="#f-a11y-accessibility">F-A11Y: Accessibility</a></li>
+      <li class="h3"><a href="#f-demo-demo-applications">F-DEMO: Demo applications</a></li>
+      <li class="h3"><a href="#f-dist-packaging-distribution">F-DIST: Packaging &amp; distribution</a></li>
+      <li class="h3"><a href="#f-ai-ai-agent-skills">F-AI: AI agent skills</a></li>
+      <li><a href="#functional-requirements-brd-ledger">10. Functional requirements (BRD ledger)</a></li>
+      <li><a href="#non-functional-requirements">11. Non-functional requirements</a></li>
+      <li><a href="#constraints-assumptions">12. Constraints &amp; assumptions</a></li>
+      <li><a href="#success-metrics">13. Success metrics</a></li>
+      <li><a href="#risks">14. Risks</a></li>
+      <li><a href="#glossary">15. Glossary</a></li>
+    </ol>
+  </nav>
+  <main>
+    <h1>TrBlazeUI — Business Requirements</h1>
+    <div class="subtitle">Renamed fork of Blazor Blueprint — a .NET 10 Blazor UI component library.</div>
+
+    <blockquote><p>Stable IDs: every requirement has a BRD-{N} ID. IDs are append-only across revisions.</p></blockquote>
+    <blockquote><p><strong>Depth mandate.</strong> This is a HUMAN document, read as rendered HTML by the product owner. It is NOT the coding checklist (<code>docs/TrBlazeUI-Checklist.md</code>). One-line entries belong ONLY in §10's ledger. §9 Feature catalog is the heart of the doc. This BRD is an information-preserving superset of the harvested source docs (<code>TrBlazeUI-Doc.md</code>, the modernization plan, the toolbar plan, the two consumer issue reports, README, THEMING).</p></blockquote>
+    <blockquote><p><strong>Mermaid mandate.</strong> Every diagram follows <code>.tfcore/templates/v4custom/html-render-shell.md §5.5</code> — every label double-quoted; no <code>end</code> node ids.</p></blockquote>
+
+    <div class="toc-inline">
+      <div>Contents</div>
+      <ol>
+        <li><a href="#executive-summary">Executive summary</a></li>
+        <li><a href="#business-objectives">Business objectives</a></li>
+        <li><a href="#scope">Scope</a></li>
+        <li><a href="#development-status">Development status</a></li>
+        <li><a href="#stakeholders-users">Stakeholders / users</a></li>
+        <li><a href="#context-diagram">Context diagram</a></li>
+        <li><a href="#user-journey-primary-use-case">User journey — primary use case</a></li>
+        <li><a href="#component-sketch">Component sketch</a></li>
+        <li><a href="#feature-catalog">Feature catalog</a>
+          <ul>
+            <li><a href="#f-prim-headless-primitives">F-PRIM: Headless primitives</a></li>
+            <li><a href="#f-form-form-components">F-FORM: Form components</a></li>
+            <li><a href="#f-layout-layout-navigation-components">F-LAYOUT: Layout &amp; navigation components</a></li>
+            <li><a href="#f-overlay-overlay-feedback-components">F-OVERLAY: Overlay &amp; feedback components</a></li>
+            <li><a href="#f-data-data-content-components">F-DATA: Data &amp; content components</a></li>
+            <li><a href="#f-display-display-components">F-DISPLAY: Display components</a></li>
+            <li><a href="#f-toolbar-toolbar-component">F-TOOLBAR: Toolbar component</a></li>
+            <li><a href="#f-chart-charts">F-CHART: Charts</a></li>
+            <li><a href="#f-icons-icon-libraries">F-ICONS: Icon libraries</a></li>
+            <li><a href="#f-theme-theming-dark-mode">F-THEME: Theming &amp; dark mode</a></li>
+            <li><a href="#f-a11y-accessibility">F-A11Y: Accessibility</a></li>
+            <li><a href="#f-demo-demo-applications">F-DEMO: Demo applications</a></li>
+            <li><a href="#f-dist-packaging-distribution">F-DIST: Packaging &amp; distribution</a></li>
+            <li><a href="#f-ai-ai-agent-skills">F-AI: AI agent skills</a></li>
+          </ul>
+        </li>
+        <li><a href="#functional-requirements-brd-ledger">Functional requirements (BRD ledger)</a></li>
+        <li><a href="#non-functional-requirements">Non-functional requirements</a></li>
+        <li><a href="#constraints-assumptions">Constraints &amp; assumptions</a></li>
+        <li><a href="#success-metrics">Success metrics</a></li>
+        <li><a href="#risks">Risks</a></li>
+        <li><a href="#glossary">Glossary</a></li>
+      </ol>
+    </div>
+
+    <h2 id="executive-summary">1. Executive summary<a class="anchor-link" href="#executive-summary">#</a></h2>
+    <p><strong>TrBlazeUI</strong> is a comprehensive, production-ready <strong>Blazor UI component library</strong> for .NET 10 that brings the shadcn/ui design system to Blazor. It is a renamed fork of the open-source <em>Blazor Blueprint</em> project (Apache 2.0), restructured into a layered architecture: <strong>16 headless, accessible primitives</strong> at the base and <strong>~69 pre-styled components</strong> on top, complemented by <strong>three icon packages</strong> (Lucide, Heroicons, Feather; 3,200+ icons total). It ships pre-built Tailwind CSS so consumers need no Node.js or Tailwind toolchain ("zero configuration"), is 100% compatible with shadcn/ui and tweakcn themes, and works identically across all three Blazor hosting models — Server, WebAssembly, and Auto.</p>
+    <p>The product solves a real gap: Blazor developers have lacked a modern, system-first UI library equivalent to React's shadcn/ui. TrBlazeUI fills it with WCAG 2.1 AA-accessible components, built-in light/dark theming via CSS variables, and a familiar React-inspired API (<code>@bind-Value</code>, <code>AsChild</code>, composition over inheritance). The library is distributed as NuGet packages via GitHub Packages and is consumed by real downstream applications (e.g. an AppStudio IDE and a TechieRag web sample), whose feedback has driven hardening fixes.</p>
+    <p>This document captures, for the product owner, what TrBlazeUI delivers today (the bulk of which is <strong>built and shipping</strong> following a .NET 8→10 modernization pass) and the small set of open enhancements. Because the codebase is brownfield, §4 is the first thing to read: it states feature-by-feature what is Done versus pending.</p>
+
+    <h2 id="business-objectives">2. Business objectives<a class="anchor-link" href="#business-objectives">#</a></h2>
+    <ul>
+      <li>Provide Blazor developers a <strong>drop-in, shadcn/ui-equivalent component library</strong> so they don't design accessible UI components from scratch.</li>
+      <li>Guarantee <strong>zero-configuration adoption</strong> — pre-built CSS, no Tailwind/Node setup, works in Server/WASM/Auto unchanged.</li>
+      <li>Achieve <strong>WCAG 2.1 AA accessibility</strong> as a baseline for every interactive component.</li>
+      <li>Be <strong>100% theme-compatible</strong> with the existing shadcn/ui and tweakcn ecosystems.</li>
+      <li>Enable <strong>AI-assisted UI generation</strong> by shipping agent skills + a component reference so Claude Code / OpenCode can scaffold TrBlazeUI UIs.</li>
+      <li>Maintain a <strong>clean, modern, standards-compliant codebase</strong> (.NET 10, C# 14, strict warnings-as-errors, mandatory XML docs) suitable for long-term maintenance and confident downstream consumption.</li>
+    </ul>
+
+    <h2 id="scope">3. Scope<a class="anchor-link" href="#scope">#</a></h2>
+    <p><strong>In scope:</strong></p>
+    <ul>
+      <li>Headless primitive components (behavior + accessibility, unstyled).</li>
+      <li>Pre-styled components matching shadcn/ui across forms, layout, navigation, overlays, feedback, data display, rich content (charts, markdown/rich-text editors), and a desktop-style toolbar.</li>
+      <li>Three icon-library packages.</li>
+      <li>CSS-variable theming with light/dark mode and shadcn/tweakcn compatibility.</li>
+      <li>A demo application in all three render modes showcasing every component.</li>
+      <li>NuGet packaging + GitHub Packages CI/CD distribution.</li>
+      <li>AI agent skills (Claude Code + OpenCode) and a component reference document.</li>
+    </ul>
+    <p><strong>Out of scope (explicit):</strong></p>
+    <ul>
+      <li>Any backend, database, persistence, or server API (this is a UI library).</li>
+      <li>Authentication / authorization / user management.</li>
+      <li>AI/RAG runtime features inside the library (TechieRag is a <em>consumer</em>, not a dependency).</li>
+      <li>A hosted public documentation website (the demo app is the reference; doc-site links are TODO).</li>
+      <li>Mobile-native (MAUI) component variants — MAUI Blazor Hybrid is a <em>consumer host</em>, and one known platform limitation (NativeSelect in overlays) is documented, not fixed in the library.</li>
+      <li>Publishing to nuget.org (currently GitHub Packages under <code>techierathore</code>).</li>
+    </ul>
+
+    <h2 id="development-status">4. Development status<a class="anchor-link" href="#development-status">#</a></h2>
+    <p><strong>Snapshot as of 2026-06-30.</strong> Live, per-requirement status: see <code>PROJECT-STATUS.md</code> and the <strong>Requirements Status</strong> table in <code>docs/TrBlazeUI-Checklist.md</code>. Status is derived from the migrated modernization/toolbar plans (both fully delivered) and a static scan of the as-built codebase.</p>
+    <table>
+      <thead>
+        <tr><th>Feature (F-code)</th><th>Phase</th><th>Status</th><th>%</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>F-PRIM: Headless primitives</td><td>Pre-existing</td><td>Done</td><td>100</td><td>16 primitives + portal/focus/keyboard/positioning services</td></tr>
+        <tr><td>F-FORM: Form components</td><td>Pre-existing</td><td>Done</td><td>100</td><td>~28 form components incl. pickers, OTP, masked, multiselect</td></tr>
+        <tr><td>F-LAYOUT: Layout &amp; navigation</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Sidebar (22 parts), nav menu, tabs, breadcrumb, pagination, resizable</td></tr>
+        <tr><td>F-OVERLAY: Overlay &amp; feedback</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Dialog, Sheet, Drawer, Popover, Toast, Tooltip, Command, menus</td></tr>
+        <tr><td>F-DATA: Data &amp; content</td><td>Pre-existing</td><td>Done</td><td>100</td><td>DataTable, MarkdownEditor, RichTextEditor</td></tr>
+        <tr><td>F-DISPLAY: Display components</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Avatar, Badge, Alert, Progress, Skeleton, Spinner, Typography, etc.</td></tr>
+        <tr><td>F-TOOLBAR: Toolbar</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Toolbar + Group/Button/ToggleButton/Separator (per toolbar plan)</td></tr>
+        <tr><td>F-CHART: Charts</td><td>Pre-existing</td><td>Done</td><td>100</td><td>6 chart types via Blazor-ApexCharts</td></tr>
+        <tr><td>F-ICONS: Icon libraries</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Lucide / Heroicons / Feather (3,200+ icons)</td></tr>
+        <tr><td>F-THEME: Theming &amp; dark mode</td><td>Pre-existing</td><td>Done</td><td>100</td><td>CSS variables, OKLCH, shadcn/tweakcn compatible, <code>.dark</code> toggle</td></tr>
+        <tr><td>F-A11Y: Accessibility</td><td>Pre-existing</td><td>Done</td><td>90</td><td>WCAG 2.1 AA patterns library-wide; not independently audited</td></tr>
+        <tr><td>F-DEMO: Demo applications</td><td>Pre-existing</td><td>Done</td><td>100</td><td>90+ pages across Server / WASM / Auto</td></tr>
+        <tr><td>F-DIST: Packaging &amp; distribution</td><td>Pre-existing</td><td>Done</td><td>100</td><td>MinVer, 5 packages, GitHub Actions → GitHub Packages</td></tr>
+        <tr><td>F-AI: AI agent skills</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Claude Code + OpenCode skills + AI reference doc</td></tr>
+        <tr><td>(cross-cutting) XML documentation</td><td>Pre-existing</td><td>Done</td><td>100</td><td>All public members documented; CS1591 suppression removed (now build-enforced)</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Legend:</strong> <strong>Done</strong> = shipped &amp; working · <strong>In progress</strong> = actively being built · <strong>Partial</strong> = some sub-features done · <strong>Planned</strong> = not started. (Maps to checklist <code>Done (pre-existing)</code> / <code>In Progress</code> / <code>PARTIAL</code> / <code>Not Started</code>.)</p>
+    <blockquote><p>Note (resolved 2026-06-30): the strict Release build is now clean (0 warnings / 0 errors). The IDE0031 analyzer errors in the Sidebar component were event-accessor null guards where <code>?.</code> is illegal (CS0131), resolved via a justified one-rule <code>.editorconfig</code> downgrade; XML-doc coverage was completed to 100% and the CS1591 suppression removed. All features are <code>Done</code> and the build is green.</p></blockquote>
+
+    <h2 id="stakeholders-users">5. Stakeholders / users<a class="anchor-link" href="#stakeholders-users">#</a></h2>
+    <p>TrBlazeUI has no end-user accounts — its "users" are <strong>developers</strong> who consume the library, plus the maintainers. There is no authentication or role system anywhere in the product.</p>
+    <table>
+      <thead>
+        <tr><th>Role</th><th>Needs</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Consuming Blazor developer</strong></td><td>Install packages, add CSS + <code>PortalHost</code>, compose components, theme the app, ship accessible UI fast without Tailwind setup.</td></tr>
+        <tr><td><strong>Library maintainer / contributor</strong></td><td>Build the solution, follow coding standards, add/maintain components, run the demo to verify, publish packages.</td></tr>
+        <tr><td><strong>AI coding agent (Claude Code / OpenCode)</strong></td><td>Read the AI reference + skills, generate correct TrBlazeUI Razor (pages, forms, dashboards) using the right components and binding patterns.</td></tr>
+        <tr><td><strong>Downstream app teams (e.g. AppStudio IDE, TechieRag web sample)</strong></td><td>Depend on the packages, report issues, receive fixes; some run inside MAUI Blazor Hybrid (WebView2).</td></tr>
+        <tr><td><strong>Theme author</strong></td><td>Drop shadcn/ui or tweakcn CSS variables into <code>theme.css</code> and have every component adopt them, including dark mode.</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Persona detail — Consuming developer onboarding path:</strong> (1) create a GitHub PAT with <code>read:packages</code>; (2) add the <code>techierathore</code> GitHub Packages NuGet source; (3) <code>dotnet add package TrBlazeUI.Components</code> (+ optional Primitives/Icons); (4) add <code>@using</code> lines to <code>_Imports.razor</code>; (5) add <code>&lt;PortalHost /&gt;</code> to the root layout; (6) link <code>theme.css</code> then <code>trblazeui.css</code> in <code>App.razor</code>; (7) register services (<code>AddTrBlazeUIPrimitives()</code>, <code>AddScoped&lt;ToastService&gt;()</code>); (8) start composing components.</p>
+
+    <h2 id="context-diagram">6. Context diagram<a class="anchor-link" href="#context-diagram">#</a></h2>
+    <div class="diagram">
+      <div class="dt">
+        <button data-zout title="Zoom out">−</button>
+        <span class="zlabel">100%</span>
+        <button data-zin title="Zoom in">+</button>
+        <button data-fit title="Fit to width">Fit</button>
+        <button data-one title="Actual size">1:1</button>
+        <button data-fs title="Fullscreen">⛶</button>
+        <button data-pop title="Open in new tab">↗</button>
+      </div>
+      <pre class="mermaid">flowchart LR
+  Dev(["Consuming developer"]) --> Lib["TrBlazeUI packages"]
+  Agent(["AI coding agent"]) --> Skills["TrBlazeUI agent skills + AI reference"]
+  Skills --> Lib
+  Lib --> GHP[("GitHub Packages (techierathore)")]
+  Lib --> Theme["shadcn/ui &amp; tweakcn themes"]
+  Lib --> ConsumerApp["Consumer Blazor app (Server / WASM / Auto / MAUI Hybrid)"]
+  Maintainer(["Maintainer"]) --> Repo["TrBlazeUI repo + demo apps"]
+  Repo --> CI["GitHub Actions"]
+  CI --> GHP</pre>
+    </div>
+
+    <h2 id="user-journey-primary-use-case">7. User journey — primary use case<a class="anchor-link" href="#user-journey-primary-use-case">#</a></h2>
+    <p>The primary journey is a developer adding TrBlazeUI to an existing Blazor app and rendering a themed, accessible component.</p>
+    <div class="diagram">
+      <div class="dt">
+        <button data-zout title="Zoom out">−</button>
+        <span class="zlabel">100%</span>
+        <button data-zin title="Zoom in">+</button>
+        <button data-fit title="Fit to width">Fit</button>
+        <button data-one title="Actual size">1:1</button>
+        <button data-fs title="Fullscreen">⛶</button>
+        <button data-pop title="Open in new tab">↗</button>
+      </div>
+      <pre class="mermaid">sequenceDiagram
+  actor D as "Developer"
+  participant N as "NuGet (GitHub Packages)"
+  participant App as "Their Blazor app"
+  participant UI as "TrBlazeUI component"
+  D->>N: "dotnet add package TrBlazeUI.Components"
+  D->>App: "add _Imports, PortalHost, theme.css + trblazeui.css, AddTrBlazeUIPrimitives()"
+  D->>App: "write &lt;Dialog&gt;, &lt;Button&gt;, &lt;DataTable&gt; ..."
+  App->>UI: "render with consumer theme variables"
+  UI-->>D: "accessible, themed, dark-mode-ready UI"</pre>
+    </div>
+
+    <h2 id="component-sketch">8. Component sketch<a class="anchor-link" href="#component-sketch">#</a></h2>
+    <div class="diagram">
+      <div class="dt">
+        <button data-zout title="Zoom out">−</button>
+        <span class="zlabel">100%</span>
+        <button data-zin title="Zoom in">+</button>
+        <button data-fit title="Fit to width">Fit</button>
+        <button data-one title="Actual size">1:1</button>
+        <button data-fs title="Fullscreen">⛶</button>
+        <button data-pop title="Open in new tab">↗</button>
+      </div>
+      <pre class="mermaid">flowchart TB
+  Consumer["Consumer Blazor app"] --> Comp["TrBlazeUI.Components (styled)"]
+  Consumer --> Icons["Icon packages (Lucide / Heroicons / Feather)"]
+  Comp --> Prim["TrBlazeUI.Primitives (headless + services)"]
+  Comp --> CSS["Pre-built trblazeui.css (Tailwind v4)"]
+  Comp --> Apex["Blazor-ApexCharts"]
+  Comp --> Markdig["Markdig + HtmlSanitizer"]
+  Prim --> JS["JS interop (portal, focus, positioning, keyboard)"]</pre>
+    </div>
+
+    <h2 id="feature-catalog">9. Feature catalog<a class="anchor-link" href="#feature-catalog">#</a></h2>
+
+    <h3 id="f-prim-headless-primitives">F-PRIM: Headless primitives<a class="anchor-link" href="#f-prim-headless-primitives">#</a></h3>
+    <p><strong>Personas:</strong> Consuming developer (custom-UI builders) · <strong>Phase:</strong> Pre-existing (Done)</p>
+    <p>Sixteen headless, unstyled primitive components provide behavior, keyboard navigation, and ARIA semantics with no styling, so developers can build fully custom-styled UIs while inheriting accessibility. They are also the foundation the styled Components layer composes. Backing them are shared services (Portal, Positioning, Focus, Keyboard, Dropdown manager) registered by <code>AddTrBlazeUIPrimitives()</code>.</p>
+    <table>
+      <thead><tr><th>Surface</th><th>Route (demo)</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Primitives overview</td><td><code>/primitives</code></td><td>Index of all primitives</td></tr>
+        <tr><td>Per-primitive demos</td><td><code>/primitives/*</code></td><td>Accordion, Checkbox, Collapsible, Dialog, DropdownMenu, HoverCard, Label, Popover, RadioGroup, Select, Sheet, Switch, Table, Tabs, Tooltip</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Primitives:</strong> Accordion, Checkbox, Collapsible, Dialog, DropdownMenu, Floating, HoverCard, Label, Popover, RadioGroup, Select, Sheet, Switch, Table, Tabs, Tooltip.</p>
+    <p><strong>Workflow:</strong> 1) consumer installs <code>TrBlazeUI.Primitives</code>; 2) registers services; 3) composes a primitive and supplies their own classes/styles; 4) primitive handles keyboard/focus/ARIA + portal positioning.</p>
+    <p><strong>Requirements:</strong> BRD-1, BRD-2, BRD-3 (see §10)</p>
+
+    <h3 id="f-form-form-components">F-FORM: Form components<a class="anchor-link" href="#f-form-form-components">#</a></h3>
+    <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
+    <p>~28 pre-styled form controls covering text entry, selection, dates/times, numeric/currency, file upload, ratings, toggles, and grouping — all with two-way binding (<code>@bind-Value</code>/<code>@bind-Checked</code>) and Blazor form-validation compatibility.</p>
+    <table>
+      <thead><tr><th>Component (representative)</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Button, ButtonGroup</td><td>Variants (Default/Destructive/Outline/Secondary/Ghost/Link), sizes, icon support; <code>ButtonIcon</code> wrapper avoids RZ10012</td></tr>
+        <tr><td>Input, Textarea, Label, Field</td><td>Text entry + accessible labeling/help/validation grouping; attribute splatting for <code>style</code>/events</td></tr>
+        <tr><td>Checkbox, Switch, RadioGroup, Toggle, ToggleGroup</td><td>Binary / single-select toggles</td></tr>
+        <tr><td>Select, NativeSelect, Combobox, MultiSelect</td><td>Dropdown selection (custom + native + searchable + multi)</td></tr>
+        <tr><td>Calendar, DatePicker, DateRangePicker, TimePicker</td><td>Date/time selection</td></tr>
+        <tr><td>NumericInput, CurrencyInput, MaskedInput, InputOTP, InputGroup</td><td>Specialized inputs</td></tr>
+        <tr><td>Slider, RangeSlider, Rating, ColorPicker, FileUpload</td><td>Range, rating, color, drag-and-drop upload</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Workflow:</strong> compose control → bind value → optional <code>Field</code> wrapper for label/validation → submit with <code>Button</code> → feedback via <code>ToastService</code>.</p>
+    <p><strong>Requirements:</strong> BRD-4 … BRD-12 (see §10)</p>
+    <div class="diagram">
+      <div class="dt">
+        <button data-zout title="Zoom out">−</button>
+        <span class="zlabel">100%</span>
+        <button data-zin title="Zoom in">+</button>
+        <button data-fit title="Fit to width">Fit</button>
+        <button data-one title="Actual size">1:1</button>
+        <button data-fs title="Fullscreen">⛶</button>
+        <button data-pop title="Open in new tab">↗</button>
+      </div>
+      <pre class="mermaid">flowchart LR
+  A["User input"] --> B["Form control (@bind-Value)"]
+  B --> C{"Valid?"}
+  C -->|"yes"| D["Submit + Toast success"]
+  C -->|"no"| E["Field shows validation message"]</pre>
+    </div>
+
+    <h3 id="f-layout-layout-navigation-components">F-LAYOUT: Layout &amp; navigation components<a class="anchor-link" href="#f-layout-layout-navigation-components">#</a></h3>
+    <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
+    <p>Structural and navigation components for app shells: a feature-rich <strong>Sidebar</strong> (22 sub-components; collapsible icon mode, floating/inset variants, mobile sheet integration, Ctrl/Cmd+B toggle, cookie/localStorage persistence), plus Card, AspectRatio, Resizable, ScrollArea, Separator, Accordion, Collapsible, Item, and navigation (Breadcrumb, NavigationMenu, Menubar, Pagination, ResponsiveNav, Tabs).</p>
+    <table>
+      <thead><tr><th>Component</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Sidebar</td><td>Responsive collapsible sidebar with variants + mobile sheet</td></tr>
+        <tr><td>NavigationMenu, Menubar, Breadcrumb, Pagination, ResponsiveNav, Tabs</td><td>Navigation primitives (horizontal nav uses FloatingPortal to fix overflow)</td></tr>
+        <tr><td>Card, Resizable, ScrollArea, AspectRatio, Separator, Item</td><td>Layout containers</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Requirements:</strong> BRD-13 … BRD-18 (see §10)</p>
+
+    <h3 id="f-overlay-overlay-feedback-components">F-OVERLAY: Overlay &amp; feedback components<a class="anchor-link" href="#f-overlay-overlay-feedback-components">#</a></h3>
+    <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
+    <p>Floating/overlay components rendered through the <strong>portal</strong> system (Dialog, AlertDialog, Sheet, Drawer, Popover, HoverCard, Tooltip, DropdownMenu, ContextMenu, Menubar, Command) plus Alert and Toast feedback. The portal was hardened with reactive refresh so internal state changes re-render correctly (consumer-reported blocker, fixed).</p>
+    <table>
+      <thead><tr><th>Component</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Dialog, AlertDialog, Sheet, Drawer</td><td>Modal/side overlays via PortalHost with focus trap</td></tr>
+        <tr><td>Popover, HoverCard, Tooltip, DropdownMenu, ContextMenu, Command</td><td>Floating panels / menus / command palette</td></tr>
+        <tr><td>Alert, Toast</td><td>Inline callouts + transient notifications (<code>ToastService.ShowSuccess/Error/Warning/Info</code>)</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Workflow (overlay):</strong> trigger (often <code>AsChild</code>) opens overlay → content rendered into portal root → focus trapped → internal interactions refresh the portal → close restores focus.</p>
+    <p><strong>Requirements:</strong> BRD-19 … BRD-24 (see §10)</p>
+    <div class="diagram">
+      <div class="dt">
+        <button data-zout title="Zoom out">−</button>
+        <span class="zlabel">100%</span>
+        <button data-zin title="Zoom in">+</button>
+        <button data-fit title="Fit to width">Fit</button>
+        <button data-one title="Actual size">1:1</button>
+        <button data-fs title="Fullscreen">⛶</button>
+        <button data-pop title="Open in new tab">↗</button>
+      </div>
+      <pre class="mermaid">sequenceDiagram
+  actor U as "User"
+  participant T as "Trigger (AsChild)"
+  participant P as "PortalHost"
+  U->>T: "open"
+  T->>P: "render content into portal root"
+  P-->>U: "overlay shown, focus trapped"
+  U->>P: "interact (toggle/select)"
+  P-->>U: "RefreshPortal re-renders content"</pre>
+    </div>
+
+    <h3 id="f-data-data-content-components">F-DATA: Data &amp; content components<a class="anchor-link" href="#f-data-data-content-components">#</a></h3>
+    <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
+    <p>Powerful data and rich-content editors: <strong>DataTable</strong> (sorting, filtering, pagination, selection, toolbar, column config), <strong>MarkdownEditor</strong> (Markdig-powered, toolbar + live preview), and <strong>RichTextEditor</strong> (Quill.js WYSIWYG with HtmlSanitizer-guarded HTML output).</p>
+    <table>
+      <thead><tr><th>Component</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>DataTable</td><td>Column/SelectionMode/Toolbar; sortable, filterable, paginated, selectable</td></tr>
+        <tr><td>MarkdownEditor</td><td>Markdown editing + preview</td></tr>
+        <tr><td>RichTextEditor</td><td>WYSIWYG with sanitized HTML output</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Requirements:</strong> BRD-25, BRD-26, BRD-27 (see §10)</p>
+
+    <h3 id="f-display-display-components">F-DISPLAY: Display components<a class="anchor-link" href="#f-display-display-components">#</a></h3>
+    <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
+    <p>Presentational components: Avatar, Badge, Empty, Item, Kbd, Progress, Skeleton, Spinner, Typography. Several were hardened to forward <code>style</code>/<code>id</code>/<code>data-*</code> via attribute splatting after consumer reports.</p>
+    <p><strong>Requirements:</strong> BRD-28, BRD-29 (see §10)</p>
+
+    <h3 id="f-toolbar-toolbar-component">F-TOOLBAR: Toolbar component<a class="anchor-link" href="#f-toolbar-toolbar-component">#</a></h3>
+    <p><strong>Personas:</strong> Consuming developer (desktop/hybrid apps) · <strong>Phase:</strong> Pre-existing (Done)</p>
+    <p>A compound <strong>Toolbar</strong> for desktop/hybrid Blazor apps (Visual-Studio-style action bars): <code>Toolbar</code> container (Default/Compact/Dense density, horizontal/vertical) with <code>ToolbarGroup</code>, <code>ToolbarButton</code>, <code>ToolbarToggleButton</code> (<code>@bind-IsPressed</code>), and <code>ToolbarSeparator</code>. Full <code>role="toolbar"</code> / <code>aria-pressed</code> accessibility; composes existing Button/DropdownMenu/Select as children.</p>
+    <table>
+      <thead><tr><th>Surface</th><th>Route (demo)</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Toolbar demo</td><td><code>/components/toolbar</code></td><td>Basic, grouped, variants, toggle, dropdowns, vertical, IDE/editor examples</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Workflow:</strong> compose <code>Toolbar</code> → add <code>ToolbarGroup</code>s of <code>ToolbarButton</code>/<code>ToolbarToggleButton</code> → divide with <code>ToolbarSeparator</code> → wire click/toggle handlers.</p>
+    <p><strong>Requirements:</strong> BRD-30, BRD-31 (see §10)</p>
+
+    <h3 id="f-chart-charts">F-CHART: Charts<a class="anchor-link" href="#f-chart-charts">#</a></h3>
+    <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
+    <p>Six chart types (Area, Bar, Line, Pie, Radar, Radial) built on Blazor-ApexCharts, themed via the chart CSS variables (<code>--chart-1..5</code>).</p>
+    <table>
+      <thead><tr><th>Surface</th><th>Route (demo)</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Chart demos</td><td><code>/charts/*</code></td><td>Area, Bar, Line, Pie, Radar, Radial</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Requirements:</strong> BRD-32 (see §10)</p>
+
+    <h3 id="f-icons-icon-libraries">F-ICONS: Icon libraries<a class="anchor-link" href="#f-icons-icon-libraries">#</a></h3>
+    <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
+    <p>Three independent, separately-versioned icon packages, 3,200+ icons total: Lucide (1,640+, ISC), Heroicons (1,288 across outline/solid/mini/micro, MIT), Feather (286, MIT). Each exposes one strongly-typed Razor component.</p>
+    <table>
+      <thead><tr><th>Library</th><th>Component</th><th>Count / variants</th></tr></thead>
+      <tbody>
+        <tr><td>Lucide</td><td><code>LucideIcon</code></td><td>1,640+</td></tr>
+        <tr><td>Heroicons</td><td><code>HeroIcon</code></td><td>1,288 (4 variants)</td></tr>
+        <tr><td>Feather</td><td><code>FeatherIcon</code></td><td>286</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Requirements:</strong> BRD-33, BRD-34 (see §10)</p>
+
+    <h3 id="f-theme-theming-dark-mode">F-THEME: Theming &amp; dark mode<a class="anchor-link" href="#f-theme-theming-dark-mode">#</a></h3>
+    <p><strong>Personas:</strong> Consuming developer, theme author · <strong>Phase:</strong> Pre-existing (Done)</p>
+    <p>100% shadcn/ui + tweakcn theme compatibility via CSS custom properties in OKLCH color space. Consumers drop variables into <code>theme.css</code> (loaded before <code>trblazeui.css</code>); dark mode toggles by adding/removing <code>.dark</code> on <code>&lt;html&gt;</code>. Pre-built CSS means no Tailwind setup.</p>
+    <p><strong>Requirements:</strong> BRD-35, BRD-36, BRD-37 (see §10)</p>
+
+    <h3 id="f-a11y-accessibility">F-A11Y: Accessibility<a class="anchor-link" href="#f-a11y-accessibility">#</a></h3>
+    <p><strong>Personas:</strong> All end-users of consumer apps · <strong>Phase:</strong> Pre-existing (Done, not independently audited)</p>
+    <p>WCAG 2.1 AA across interactive components: keyboard navigation, ARIA roles/states, focus management + trapping, screen-reader support, keyboard shortcuts.</p>
+    <p><strong>Requirements:</strong> BRD-38, BRD-39 (see §10)</p>
+
+    <h3 id="f-demo-demo-applications">F-DEMO: Demo applications<a class="anchor-link" href="#f-demo-demo-applications">#</a></h3>
+    <p><strong>Personas:</strong> Maintainer, evaluating developer · <strong>Phase:</strong> Pre-existing (Done)</p>
+    <p>A shared demo RCL (90+ pages) hosted in three render modes (Server 5183/7172, WASM 5184/7173, Auto 5185/7174) demonstrating every component, primitive, chart, and icon set, plus architecture and getting-started pages and a horizontal/vertical layout toggle. Run via <code>./scripts/run-demo.sh</code> or <code>dotnet run</code>.</p>
+    <p><strong>Requirements:</strong> BRD-40, BRD-41 (see §10)</p>
+
+    <h3 id="f-dist-packaging-distribution">F-DIST: Packaging &amp; distribution<a class="anchor-link" href="#f-dist-packaging-distribution">#</a></h3>
+    <p><strong>Personas:</strong> Maintainer · <strong>Phase:</strong> Pre-existing (Done)</p>
+    <p>Five NuGet packages with per-package MinVer versioning, published to GitHub Packages (<code>techierathore</code>) by GitHub Actions (<code>publish-nuget.yml</code> on master; <code>build.yml</code> validates PRs). <code>Directory.Build.props</code> centralizes metadata, Apache-2.0 license, repo URLs, and strict build settings. NOTICE preserves original attribution.</p>
+    <p><strong>Requirements:</strong> BRD-42, BRD-43, BRD-44 (see §10)</p>
+
+    <h3 id="f-ai-ai-agent-skills">F-AI: AI agent skills<a class="anchor-link" href="#f-ai-ai-agent-skills">#</a></h3>
+    <p><strong>Personas:</strong> AI coding agent + their developer · <strong>Phase:</strong> Pre-existing (Done)</p>
+    <p>Claude Code (<code>/trblazeui</code>) and OpenCode agent skills (distributable copies in <code>docs/skills/</code>) turn an AI assistant into a TrBlazeUI-aware .NET/Blazor developer (integrate, generate page/form/dashboard/component/service, setup-theme, list-components), backed by the <code>TrBlazeUI-AI-Reference.md</code> component reference.</p>
+    <p><strong>Requirements:</strong> BRD-45, BRD-46, BRD-47 (see §10)</p>
+
+    <h2 id="functional-requirements-brd-ledger">10. Functional requirements (BRD ledger)<a class="anchor-link" href="#functional-requirements-brd-ledger">#</a></h2>
+    <ul>
+      <li><strong>BRD-1</strong> — A developer can install and register the headless primitives via <code>AddTrBlazeUIPrimitives()</code>. <em>(F-PRIM)</em></li>
+      <li><strong>BRD-2</strong> — Each of the 16 primitives provides keyboard navigation and ARIA semantics with no styling. <em>(F-PRIM)</em></li>
+      <li><strong>BRD-3</strong> — A developer can style any primitive with Tailwind, CSS modules, or inline styles. <em>(F-PRIM)</em></li>
+      <li><strong>BRD-4</strong> — A developer can render Buttons with variants (Default/Destructive/Outline/Secondary/Ghost/Link), sizes, and icons. <em>(F-FORM)</em></li>
+      <li><strong>BRD-5</strong> — A developer can two-way bind text inputs (Input, Textarea) and pass arbitrary HTML attributes/events to them. <em>(F-FORM)</em></li>
+      <li><strong>BRD-6</strong> — A developer can use selection controls: Checkbox, Switch, RadioGroup, Toggle, ToggleGroup. <em>(F-FORM)</em></li>
+      <li><strong>BRD-7</strong> — A developer can use dropdown selection: Select, NativeSelect, Combobox, MultiSelect. <em>(F-FORM)</em></li>
+      <li><strong>BRD-8</strong> — A developer can pick dates/times via Calendar, DatePicker, DateRangePicker, TimePicker. <em>(F-FORM)</em></li>
+      <li><strong>BRD-9</strong> — A developer can capture numeric/currency/masked/OTP input via NumericInput, CurrencyInput, MaskedInput, InputOTP, InputGroup. <em>(F-FORM)</em></li>
+      <li><strong>BRD-10</strong> — A developer can use Slider, RangeSlider, and Rating controls. <em>(F-FORM)</em></li>
+      <li><strong>BRD-11</strong> — A developer can pick colors via ColorPicker and upload files via drag-and-drop FileUpload. <em>(F-FORM)</em></li>
+      <li><strong>BRD-12</strong> — A developer can compose accessible forms with Field (label, control, help text, validation message). <em>(F-FORM)</em></li>
+      <li><strong>BRD-13</strong> — A developer can build an app shell with a responsive, collapsible Sidebar (variants + mobile sheet + Ctrl/Cmd+B toggle). <em>(F-LAYOUT)</em></li>
+      <li><strong>BRD-14</strong> — The Sidebar persists its collapsed state across sessions. <em>(F-LAYOUT)</em></li>
+      <li><strong>BRD-15</strong> — A developer can build navigation with Breadcrumb, NavigationMenu, Menubar, Pagination, ResponsiveNav, Tabs. <em>(F-LAYOUT)</em></li>
+      <li><strong>BRD-16</strong> — A developer can lay out content with Card, Resizable, ScrollArea, AspectRatio, Separator, Item. <em>(F-LAYOUT)</em></li>
+      <li><strong>BRD-17</strong> — A developer can group collapsible content with Accordion and Collapsible. <em>(F-LAYOUT)</em></li>
+      <li><strong>BRD-18</strong> — Horizontal navigation dropdowns render without overflow clipping (FloatingPortal). <em>(F-LAYOUT)</em></li>
+      <li><strong>BRD-19</strong> — A developer can show modal overlays (Dialog, AlertDialog) with focus trap and ARIA. <em>(F-OVERLAY)</em></li>
+      <li><strong>BRD-20</strong> — A developer can show side panels (Sheet on any edge, Drawer). <em>(F-OVERLAY)</em></li>
+      <li><strong>BRD-21</strong> — A developer can show floating panels and menus (Popover, HoverCard, Tooltip, DropdownMenu, ContextMenu, Menubar). <em>(F-OVERLAY)</em></li>
+      <li><strong>BRD-22</strong> — A developer can show a command palette (Command) with keyboard navigation and filtering. <em>(F-OVERLAY)</em></li>
+      <li><strong>BRD-23</strong> — Internal state changes inside an overlay re-render correctly through the reactive portal. <em>(F-OVERLAY)</em></li>
+      <li><strong>BRD-24</strong> — A developer can show inline Alerts and transient Toasts via ToastService (success/error/warning/info). <em>(F-OVERLAY)</em></li>
+      <li><strong>BRD-25</strong> — A developer can render a DataTable with sorting, filtering, pagination, selection, and a toolbar. <em>(F-DATA)</em></li>
+      <li><strong>BRD-26</strong> — A developer can edit markdown with a toolbar and live preview (MarkdownEditor). <em>(F-DATA)</em></li>
+      <li><strong>BRD-27</strong> — A developer can edit rich text (RichTextEditor) with sanitized HTML output. <em>(F-DATA)</em></li>
+      <li><strong>BRD-28</strong> — A developer can display Avatar, Badge, Empty, Item, Kbd, Progress, Skeleton, Spinner. <em>(F-DISPLAY)</em></li>
+      <li><strong>BRD-29</strong> — A developer can apply consistent text styling via Typography variants (H1–H4, P, Lead, Large, Small, Muted). <em>(F-DISPLAY)</em></li>
+      <li><strong>BRD-30</strong> — A developer can build a desktop-style Toolbar (Default/Compact/Dense, horizontal/vertical) with groups and separators. <em>(F-TOOLBAR)</em></li>
+      <li><strong>BRD-31</strong> — A developer can use ToolbarButton and toggle-able ToolbarToggleButton (<code>@bind-IsPressed</code>). <em>(F-TOOLBAR)</em></li>
+      <li><strong>BRD-32</strong> — A developer can render Area, Bar, Line, Pie, Radar, and Radial charts themed via chart CSS variables. <em>(F-CHART)</em></li>
+      <li><strong>BRD-33</strong> — A developer can render icons from Lucide, Heroicons (4 variants), and Feather via typed components. <em>(F-ICONS)</em></li>
+      <li><strong>BRD-34</strong> — Icon packages are installable independently and versioned separately. <em>(F-ICONS)</em></li>
+      <li><strong>BRD-35</strong> — A developer can theme the whole app with shadcn/ui or tweakcn CSS variables in <code>theme.css</code>. <em>(F-THEME)</em></li>
+      <li><strong>BRD-36</strong> — A developer can toggle dark mode by adding/removing <code>.dark</code> on <code>&lt;html&gt;</code>. <em>(F-THEME)</em></li>
+      <li><strong>BRD-37</strong> — Components require no Tailwind/Node setup (pre-built CSS shipped). <em>(F-THEME)</em></li>
+      <li><strong>BRD-38</strong> — Every interactive component meets WCAG 2.1 AA keyboard + ARIA expectations. <em>(F-A11Y)</em></li>
+      <li><strong>BRD-39</strong> — Overlays trap and restore focus correctly. <em>(F-A11Y)</em></li>
+      <li><strong>BRD-40</strong> — A maintainer can run a demo app in Server, WASM, or Auto mode showing every component. <em>(F-DEMO)</em></li>
+      <li><strong>BRD-41</strong> — A user can switch the demo between horizontal and vertical navigation layouts. <em>(F-DEMO)</em></li>
+      <li><strong>BRD-42</strong> — A maintainer can publish all 5 packages to GitHub Packages via GitHub Actions on master. <em>(F-DIST)</em></li>
+      <li><strong>BRD-43</strong> — Each package is versioned independently from its own git tag prefix (MinVer). <em>(F-DIST)</em></li>
+      <li><strong>BRD-44</strong> — A consumer can install packages from the <code>techierathore</code> GitHub Packages source with a PAT. <em>(F-DIST)</em></li>
+      <li><strong>BRD-45</strong> — An AI agent can be activated as <code>/trblazeui</code> (Claude Code) or the OpenCode equivalent. <em>(F-AI)</em></li>
+      <li><strong>BRD-46</strong> — The AI agent can integrate TrBlazeUI into an app and generate pages/forms/dashboards/components/services/themes. <em>(F-AI)</em></li>
+      <li><strong>BRD-47</strong> — The AI agent draws on <code>TrBlazeUI-AI-Reference.md</code> for component parameters and patterns. <em>(F-AI)</em></li>
+    </ul>
+
+    <h2 id="non-functional-requirements">11. Non-functional requirements<a class="anchor-link" href="#non-functional-requirements">#</a></h2>
+    <ul>
+      <li><strong>BRD-48</strong> — Performance: pre-built minified CSS (~83 KB); components render identically across Server/WASM/Auto with no per-component JS bundle bloat.</li>
+      <li><strong>BRD-49</strong> — Security: RichTextEditor HTML output is sanitized via HtmlSanitizer; no credentials or secrets in the library; consumers keep PATs out of source control.</li>
+      <li><strong>BRD-50</strong> — Accessibility: WCAG 2.1 AA baseline (keyboard, ARIA, focus, screen reader) for all interactive components.</li>
+      <li><strong>BRD-51</strong> — Compatibility: 100% shadcn/ui + tweakcn theme compatibility; works on .NET 10 across all three Blazor render modes; usable from MAUI Blazor Hybrid (with the documented NativeSelect-in-overlay caveat).</li>
+      <li><strong>BRD-52</strong> — Maintainability: .NET 10 / C# 14, <code>TreatWarningsAsErrors</code>, <code>EnforceCodeStyleInBuild</code>, mandatory XML docs on public members, one-class-per-file, file-scoped namespaces, <code>obj</code>-prefixed instance fields.</li>
+      <li><strong>BRD-53</strong> — Reliability: every component implements <code>CaptureUnmatchedValues</code> so arbitrary HTML attributes/events never cause runtime <code>InvalidOperationException</code>.</li>
+    </ul>
+    <table>
+      <thead><tr><th>NFR area</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td>Pre-built CSS size</td><td>~83 KB minified</td></tr>
+        <tr><td>Render modes supported</td><td>Server, WebAssembly, Auto</td></tr>
+        <tr><td>Accessibility</td><td>WCAG 2.1 AA</td></tr>
+        <tr><td>Build warnings</td><td>0 (warnings-as-errors)</td></tr>
+        <tr><td>Theme compatibility</td><td>shadcn/ui + tweakcn, light + dark</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="constraints-assumptions">12. Constraints &amp; assumptions<a class="anchor-link" href="#constraints-assumptions">#</a></h2>
+    <ul>
+      <li>Apache 2.0 license; the NOTICE file (original <em>Blazor Blueprint</em> attribution) MUST ship with any distribution.</li>
+      <li>Distribution is via GitHub Packages under <code>techierathore</code>; consumers need a PAT with <code>read:packages</code>.</li>
+      <li>Build relies on the standalone <code>tools/tailwindcss.exe</code> (Windows); CI/skip via <code>-p:CI=true</code> using committed pre-built CSS.</li>
+      <li>Reference build environment is WSL-on-Windows using the Windows dotnet; no hot-reload (build + restart).</li>
+      <li>The library has no backend/DB/auth; any such concern is the consumer's.</li>
+    </ul>
+
+    <h2 id="success-metrics">13. Success metrics<a class="anchor-link" href="#success-metrics">#</a></h2>
+    <ul>
+      <li>A new consumer can install and render a themed, accessible component in under ~10 minutes following the README.</li>
+      <li>Zero runtime attribute-splatting crashes in consumer apps.</li>
+      <li>Clean Release build: 0 warnings / 0 errors under warnings-as-errors.</li>
+      <li>All 5 packages publish successfully on each master push.</li>
+      <li>Consumer-reported issues resolved and tracked (5/5 + 5/5 from the two reports already fixed).</li>
+    </ul>
+
+    <h2 id="risks">14. Risks<a class="anchor-link" href="#risks">#</a></h2>
+    <table>
+      <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+      <tbody>
+        <tr><td>Strict analyzer (IDE0031) errors block clean Release build</td><td>Resolved</td><td>—</td><td>Fixed 2026-06-30: justified one-rule <code>.editorconfig</code> downgrade (event-accessor null guards can't use <code>?.</code>); build clean</td></tr>
+        <tr><td>XML-doc coverage incomplete blocks CS1591 enforcement</td><td>Resolved</td><td>—</td><td>Fixed 2026-06-30: 100% public-member coverage; CS1591 suppression removed and now build-enforced</td></tr>
+        <tr><td>MAUI WebView2 overlay limitations surprise consumers</td><td>Medium</td><td>Medium</td><td>Document <code>&lt;Select&gt;</code>-in-overlay guidance (already in known limitations)</td></tr>
+        <tr><td>Third-party dependency drift (ApexCharts/Quill/Markdig)</td><td>Low</td><td>Medium</td><td>Pin versions; validate on upgrade</td></tr>
+        <tr><td>GitHub Packages PAT friction for consumers</td><td>Medium</td><td>Low</td><td>Clear README setup + CI token guidance</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="glossary">15. Glossary<a class="anchor-link" href="#glossary">#</a></h2>
+    <ul>
+      <li><strong>TrBlazeUI</strong> — this Blazor component library (renamed fork of Blazor Blueprint).</li>
+      <li><strong>Primitive</strong> — a headless, unstyled, accessible component (behavior only).</li>
+      <li><strong>Styled component</strong> — a pre-styled component built on a primitive, matching shadcn/ui.</li>
+      <li><strong>Portal / PortalHost</strong> — mechanism that renders overlay DOM at a portal root.</li>
+      <li><strong>AsChild</strong> — pattern letting a trigger use a custom element instead of a default button.</li>
+      <li><strong>OKLCH</strong> — perceptually-uniform color space used for theme variables.</li>
+      <li><strong>MinVer</strong> — git-tag-driven semantic versioning tool.</li>
+      <li><strong>TechieRag</strong> — a <em>consumer</em> app (RAG sample); not a dependency of this library.</li>
+      <li><strong>REQ-UI-* / REQ-FN-* / REQ-NFR-*</strong> — requirement prefixes used in <code>docs/TrBlazeUI-Checklist.md</code>.</li>
+    </ul>
+
+    <hr>
+    <p class="subtitle">Last updated: 2026-06-30<br>
+    Highest BRD ID: BRD-53<br>
+    Sources harvested: docs/TrBlazeUI-Doc.md, docs/TrBlazeUI-Update-plan.md, docs/toolbarplan.md, docs/TrBlazeUI-Issues-Report-1.md, docs/trblazeui-issues-report-2.md, README.md, THEMING.md<br>
+    Custom instructions applied: none<br>
+    Drafted from reverse-doc — review and edit. New BRDs may be added (append-only); do not renumber.</p>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+<script>
+// Light/dark toggle. The initial theme was already applied flash-free by the
+// <head> script (saved choice, else time-of-day). Clicking flips it, saves the
+// choice, and reloads so Mermaid re-renders in the matching theme.
+(function(){
+  var btn = document.getElementById('themeToggle');
+  if(!btn) return;
+  var relabel = function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.textContent = dark ? '☀ Light' : '☾ Dark';
+  };
+  relabel();
+  btn.addEventListener('click', function(){
+    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    try{ localStorage.setItem('tf-theme', next); }catch(e){}
+    location.reload();
+  });
+})();
+
+// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`:
+// mermaid reads the <pre>'s textContent as the diagram source, so a button
+// appended here glues "copy" onto the last line and breaks the parse
+// (flowcharts → "Syntax error"; sequence diagrams silently absorb it).
+// Mermaid blocks get copy/export from their own .diagram toolbar instead.
+document.querySelectorAll('pre:not(.mermaid)').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy';
+  btn.textContent = 'copy';
+  btn.addEventListener('click', () => {
+    const text = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'copied';
+      setTimeout(() => { btn.textContent = 'copy'; }, 1200);
+    });
+  });
+  pre.appendChild(btn);
+});
+
+// Mermaid init — theme follows the resolved light/dark theme
+if (window.mermaid) {
+  var mermaidTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default';
+  mermaid.initialize({ startOnLoad: true, theme: mermaidTheme, securityLevel: 'loose' });
+}
+
+// Mermaid toolbar wiring — run after mermaid renders
+function wireMermaidToolbars() {
+  document.querySelectorAll('.diagram').forEach(dia => {
+    if (dia.dataset.wired) return;
+    const merm = dia.querySelector('.mermaid');
+    const svg = merm && merm.querySelector('svg');
+    if (!svg) return;
+    dia.dataset.wired = '1';
+    let scale = 1;
+    const label = dia.querySelector('.zlabel');
+    const apply = () => {
+      svg.style.transform = `scale(${scale})`;
+      svg.style.transformOrigin = 'top left';
+      if (label) label.textContent = Math.round(scale * 100) + '%';
+    };
+    const setScale = (s) => { scale = Math.max(0.25, Math.min(4, s)); apply(); };
+    dia.querySelector('[data-zin]').onclick = () => setScale(scale * 1.2);
+    dia.querySelector('[data-zout]').onclick = () => setScale(scale / 1.2);
+    dia.querySelector('[data-fit]').onclick = () => {
+      svg.style.transform = '';
+      svg.removeAttribute('width');
+      svg.style.maxWidth = '100%';
+      svg.style.height = 'auto';
+      scale = 1;
+      if (label) label.textContent = 'Fit';
+    };
+    dia.querySelector('[data-one]').onclick = () => {
+      svg.style.transform = '';
+      svg.style.maxWidth = 'none';
+      svg.style.width = '';
+      svg.style.height = '';
+      scale = 1;
+      if (label) label.textContent = '100%';
+    };
+    dia.querySelector('[data-fs]').onclick = () => {
+      dia.classList.toggle('fs');
+      if (dia.classList.contains('fs')) {
+        document.addEventListener('keydown', escFs);
+      } else {
+        document.removeEventListener('keydown', escFs);
+      }
+    };
+    function escFs(e) { if (e.key === 'Escape') { dia.classList.remove('fs'); document.removeEventListener('keydown', escFs); } }
+    dia.querySelector('[data-pop]').onclick = () => openInNewTab(svg);
+    // Ctrl+wheel zoom
+    merm.addEventListener('wheel', (e) => {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      setScale(scale * (e.deltaY < 0 ? 1.1 : 1/1.1));
+    }, { passive: false });
+  });
+}
+
+function openInNewTab(svg) {
+  const svgSource = new XMLSerializer().serializeToString(svg);
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Diagram</title>
+<style>
+  html,body{margin:0;height:100%;background:#0f1115;color:#e6e8ee;font-family:system-ui,sans-serif}
+  .bar{position:fixed;top:0;left:0;right:0;padding:8px 12px;background:#161a22;border-bottom:1px solid #2a3142;display:flex;gap:8px;z-index:10}
+  .bar button{background:#1c2230;color:#9aa3b2;border:1px solid #2a3142;border-radius:6px;padding:5px 12px;font-size:13px;cursor:pointer}
+  .bar button:hover{color:#7cc4ff;border-color:#7cc4ff}
+  .bar .hint{margin-left:auto;color:#9aa3b2;font-size:11.5px;align-self:center}
+  #stage{position:absolute;top:42px;bottom:0;left:0;right:0;overflow:hidden}
+  #stage svg{width:100%;height:100%}
+</style>
+</head><body>
+<div class="bar">
+  <button onclick="zpz.zoomIn()">+</button>
+  <button onclick="zpz.zoomOut()">−</button>
+  <button onclick="zpz.fit();zpz.center()">Fit</button>
+  <button onclick="zpz.resetZoom();zpz.center()">1:1</button>
+  <button onclick="window.print()">Print</button>
+  <button onclick="dlPng()">PNG</button>
+  <button onclick="dlSvg()">SVG</button>
+  <span class="hint">Drag to pan · Ctrl+wheel to zoom · + / − keys</span>
+</div>
+<div id="stage">${svgSource}</div>
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"><\/script>
+<script>
+  const el = document.querySelector('#stage svg');
+  const zpz = svgPanZoom(el, { zoomScaleSensitivity: .3, minZoom: .2, maxZoom: 10, controlIconsEnabled: false, fit: true, center: true });
+  document.addEventListener('keydown', e => {
+    if (e.key === '+' || e.key === '=') zpz.zoomIn();
+    if (e.key === '-' || e.key === '_') zpz.zoomOut();
+    if (e.key === '0') { zpz.resetZoom(); zpz.center(); }
+  });
+  function dlSvg() {
+    const blob = new Blob([new XMLSerializer().serializeToString(el)], { type: 'image/svg+xml' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'diagram.svg'; a.click();
+  }
+  function dlPng() {
+    const src = new XMLSerializer().serializeToString(el);
+    const img = new Image();
+    const url = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(src)));
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = el.clientWidth * 2; c.height = el.clientHeight * 2;
+      const ctx = c.getContext('2d'); ctx.scale(2,2); ctx.drawImage(img, 0, 0);
+      c.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'diagram.png'; a.click(); });
+    };
+    img.src = url;
+  }
+<\/script>
+</body></html>`;
+  const w = window.open();
+  w.document.write(html);
+  w.document.close();
+}
+
+// Run wiring after mermaid finishes (it renders async)
+if (window.mermaid) {
+  setTimeout(wireMermaidToolbars, 400);
+  setTimeout(wireMermaidToolbars, 1200);  // safety re-run for slow renders
+}
+</script>
+</body>
+</html>

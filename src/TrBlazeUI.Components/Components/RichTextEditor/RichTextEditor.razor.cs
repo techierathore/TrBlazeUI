@@ -196,6 +196,11 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
 
     // === Lifecycle Methods ===
 
+    /// <summary>
+    /// On the first render, initializes the Quill.js editor instance through JavaScript interop.
+    /// </summary>
+    /// <param name="firstRender">True on the first render of the component; otherwise false.</param>
+    /// <returns>A task that represents the asynchronous post-render operation.</returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -204,6 +209,11 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Reacts to (re)assigned parameters by pushing an externally changed <see cref="Value"/> into
+    /// the initialized editor so its HTML content stays in sync with the bound value.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous parameter-processing operation.</returns>
     protected override async Task OnParametersSetAsync()
     {
         // If Value changed externally, update the editor
@@ -262,6 +272,12 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
 
     // === JSInvokable Callbacks ===
 
+    /// <summary>
+    /// Handles text change events raised by the underlying Quill editor through JS interop,
+    /// updating the bound HTML and Delta values and notifying subscribers.
+    /// </summary>
+    /// <param name="args">The text change event data containing the updated HTML and Delta content.</param>
+    /// <returns>A task that represents the asynchronous callback operation.</returns>
     [JSInvokable]
     public async Task OnTextChangeCallback(TextChangeEventArgs args)
     {
@@ -275,6 +291,12 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
         await OnTextChange.InvokeAsync(args);
     }
 
+    /// <summary>
+    /// Handles selection change events raised by the underlying Quill editor through JS interop,
+    /// synchronizing the toolbar format state and raising focus/blur callbacks as the selection enters or leaves the editor.
+    /// </summary>
+    /// <param name="args">The selection change event data containing the new and previous ranges and the active format.</param>
+    /// <returns>A task that represents the asynchronous callback operation.</returns>
     [JSInvokable]
     public async Task OnSelectionChangeCallback(SelectionChangeEventArgs args)
     {
@@ -754,6 +776,11 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
 
     // === Dispose ===
 
+    /// <summary>
+    /// Asynchronously disposes the editor, tearing down the Quill instance and releasing the
+    /// JavaScript module and .NET object references.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous dispose operation.</returns>
     public async ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);

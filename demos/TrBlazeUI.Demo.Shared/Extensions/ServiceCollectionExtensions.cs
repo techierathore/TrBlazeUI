@@ -5,8 +5,17 @@ using TrBlazeUI.Components.Toast;
 
 namespace TrBlazeUI.Demo.Extensions;
 
+/// <summary>
+/// Extension methods for registering the TrBlazeUI demo services with the dependency injection container.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Registers the TrBlazeUI primitives and demo services (theme, layout, collapsible state,
+    /// mock data, and toast notifications) with the service collection.
+    /// </summary>
+    /// <param name="services">The service collection to add the services to.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
     public static IServiceCollection AddTrBlazeUIDemo(this IServiceCollection services)
     {
         // Add TrBlazeUI.Primitives services

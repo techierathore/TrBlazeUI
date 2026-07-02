@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TrBlazeUI — Usage Guide</title>
+<script>
+/* Resolve the theme BEFORE first paint (no flash). Saved choice wins; otherwise
+   pick by time of day — light 07:00–19:00 local, softened dark at night. */
+(function(){
+  try{
+    var t = localStorage.getItem('tf-theme');
+    if(t!=='light' && t!=='dark'){ var h = new Date().getHours(); t = (h>=7 && h<19) ? 'light' : 'dark'; }
+    document.documentElement.setAttribute('data-theme', t);
+  }catch(e){ document.documentElement.setAttribute('data-theme','light'); }
+})();
+</script>
+<style>
+/* LIGHT is the default theme — a warm off-white, easy on the eyes (never bright white). */
+:root{
+  --bg:#f4f1e9; --panel:#efe9db; --panel2:#e7e0cd; --line:#d8cfb6;
+  --ink:#2e2a22; --muted:#6f6857; --accent:#2f6f9f; --accent2:#3f7d54;
+  --warn:#9a6b15; --danger:#b03a52; --ok:#3f7d54;
+  --code-bg:#ece5d3; --code-ink:#332f26; --row-alt:#eae2cf;
+  --h3:#3a352b; --h4:#2f6f9f; --quote:#4a4537; --cta-bg:#e6eef5;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+/* DARK — softened near-black (warmer / less harsh than pure #0f1115). */
+html[data-theme="dark"]{
+  --bg:#11141a; --panel:#171b23; --panel2:#1e2430; --line:#2b3240;
+  --ink:#dfe3ea; --muted:#99a2b1; --accent:#7cc4ff; --accent2:#a6e3a1;
+  --warn:#f9c74f; --danger:#f38ba8; --ok:#a6e3a1;
+  --code-bg:#0c1016; --code-ink:#d8dde8; --row-alt:#141821;
+  --h3:#cfd5e3; --h4:#7cc4ff; --quote:#cfd5e3; --cta-bg:#0d2030;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:15px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--mono);font-size:13px;background:var(--code-bg);color:var(--code-ink);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+pre{font-family:var(--mono);font-size:12.5px;background:var(--code-bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow:auto;color:var(--code-ink);position:relative}
+pre code{background:none;border:none;padding:0}
+.copy{position:absolute;top:8px;right:8px;background:var(--panel2);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:11px;font-family:var(--sans);cursor:pointer}
+.copy:hover{color:var(--accent);border-color:var(--accent)}
+/* floating light/dark toggle (top-right) */
+.theme-toggle{position:fixed;top:12px;right:14px;z-index:10000;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:12.5px;font-family:var(--sans);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.layout.no-toc{grid-template-columns:1fr}
+nav.side{position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--line);background:var(--panel);padding:18px 14px}
+nav.side h1{font-size:14px;margin:0 0 4px;letter-spacing:.5px;color:var(--ink)}
+nav.side .sub{font-size:11.5px;color:var(--muted);margin-bottom:14px}
+nav.side ol,nav.side ul{list-style:none;padding:0;margin:0}
+nav.side li{font-size:13px;margin:2px 0}
+nav.side li a{display:block;padding:5px 8px;color:var(--ink);border-radius:6px}
+nav.side li a:hover{background:var(--panel2);text-decoration:none}
+nav.side li.h3 a{padding-left:22px;font-size:12.5px;color:var(--h3)}
+nav.side .group{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin:14px 8px 4px}
+
+main{padding:28px 40px 80px;max-width:1100px}
+.layout.no-toc main{margin:0 auto}
+
+h1{font-size:28px;margin:0 0 6px}
+h2{font-size:22px;margin:32px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+h3{font-size:17px;margin:22px 0 6px;color:var(--h3);scroll-margin-top:16px}
+h4{font-size:14px;margin:14px 0 4px;color:var(--h4);scroll-margin-top:16px}
+.subtitle{color:var(--muted);font-size:14px;margin-top:-4px;margin-bottom:18px}
+p{margin:6px 0 10px}
+blockquote{border-left:3px solid var(--accent);background:var(--panel);margin:8px 0;padding:8px 14px;color:var(--quote)}
+ul,ol{padding-left:22px}
+li{margin:2px 0}
+
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin:8px 0}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);color:var(--h3);font-weight:600}
+tr:nth-child(even) td{background:var(--row-alt)}
+
+hr{border:none;border-top:1px solid var(--line);margin:24px 0}
+.anchor-link{color:var(--muted);font-weight:400;font-size:0.85em;margin-left:8px;opacity:0;transition:opacity .15s;text-decoration:none}
+h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
+
+/* inline TOC at top of main content */
+.toc-inline{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 16px;margin:14px 0 24px}
+.toc-inline > div{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.toc-inline ol,.toc-inline ul{margin:4px 0;padding-left:18px}
+.toc-inline li{font-size:13px;margin:1px 0}
+.toc-inline a{color:var(--h3)}
+
+/* mermaid diagram wrapper + toolbar */
+.diagram{position:relative;border:1px solid var(--line);border-radius:8px;background:var(--code-bg);margin:14px 0;overflow:hidden}
+.diagram .mermaid{padding:14px;margin:0;background:transparent;border:none;overflow:auto}
+.diagram .dt{display:flex;gap:6px;justify-content:flex-end;padding:6px 8px;background:var(--row-alt);border-bottom:1px solid var(--line)}
+.diagram .dt button{background:var(--panel2);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:3px 10px;font-size:12px;font-family:var(--sans);cursor:pointer;min-width:30px}
+.diagram .dt button:hover{color:var(--accent);border-color:var(--accent)}
+.diagram .dt .zlabel{padding:3px 6px;font-size:11px;color:var(--muted);font-family:var(--mono);align-self:center}
+.diagram.fs{position:fixed;inset:0;z-index:9999;border-radius:0;border:none}
+.diagram.fs .mermaid{height:calc(100vh - 40px);display:flex;align-items:center;justify-content:center}
+
+@media(max-width:900px){.layout{grid-template-columns:1fr}nav.side{position:static;height:auto}}
+</style>
+</head>
+<body>
+<button id="themeToggle" class="theme-toggle" title="Toggle light / dark">☾ Dark</button>
+<div class="layout">
+  <nav class="side">
+    <h1>TrBlazeUI — Usage Guide</h1>
+    <div class="sub">Test Users · Test Plan · Setup</div>
+    <div class="group">Contents</div>
+    <ol>
+      <li><a href="#test-users-canonical-use-these-for-all-smoke-verify-uat">Test users (canonical)</a></li>
+      <li><a href="#how-to-test-screen-by-screen-menu-by-menu">How to test — screen by screen / menu by menu</a></li>
+      <li class="h3"><a href="#home">Home (/)</a></li>
+      <li class="h3"><a href="#architecture">Architecture (/architecture)</a></li>
+      <li class="h3"><a href="#getting-started">Getting Started (/getting-started)</a></li>
+      <li class="h3"><a href="#components-index-components">Components index (/components)</a></li>
+      <li class="h3"><a href="#forms-e-g-components-button-components-input-components-select-components-date-picker">Forms</a></li>
+      <li class="h3"><a href="#layout-navigation-sidebar-components-sidebar-navigationmenu-tabs-pagination">Layout &amp; navigation</a></li>
+      <li class="h3"><a href="#overlays-feedback-dialog-sheet-drawer-popover-toast-command">Overlays &amp; feedback</a></li>
+      <li class="h3"><a href="#data-content-components-datatable-markdowneditor-richtexteditor">Data &amp; content</a></li>
+      <li class="h3"><a href="#toolbar-components-toolbar">Toolbar (/components/toolbar)</a></li>
+      <li class="h3"><a href="#charts-charts-area-bar-line-pie-radar-radial">Charts</a></li>
+      <li class="h3"><a href="#icons-icons">Icons (/icons)</a></li>
+      <li class="h3"><a href="#theming-dark-mode-any-page">Theming &amp; dark mode</a></li>
+      <li class="h3"><a href="#render-mode-parity">Render-mode parity</a></li>
+      <li><a href="#prerequisites">Prerequisites</a></li>
+      <li><a href="#setup-deployment-steps-runbook-one-command-per-line-in-order">Setup / Deployment steps</a></li>
+      <li><a href="#test-automated">Test (automated)</a></li>
+      <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist</a></li>
+      <li><a href="#known-limitations">Known limitations</a></li>
+    </ol>
+  </nav>
+  <main>
+    <h1>TrBlazeUI — Usage Guide</h1>
+    <div class="subtitle">Test Users · Test Plan · Setup</div>
+
+    <div class="toc-inline">
+      <div>Contents</div>
+      <ol>
+        <li><a href="#test-users-canonical-use-these-for-all-smoke-verify-uat">Test users (canonical — use THESE for all smoke / verify / UAT)</a></li>
+        <li><a href="#how-to-test-screen-by-screen-menu-by-menu">How to test — screen by screen / menu by menu</a>
+          <ul>
+            <li><a href="#home">Home (/)</a></li>
+            <li><a href="#architecture">Architecture (/architecture)</a></li>
+            <li><a href="#getting-started">Getting Started (/getting-started)</a></li>
+            <li><a href="#components-index-components">Components index (/components)</a></li>
+            <li><a href="#forms-e-g-components-button-components-input-components-select-components-date-picker">Forms</a></li>
+            <li><a href="#layout-navigation-sidebar-components-sidebar-navigationmenu-tabs-pagination">Layout &amp; navigation</a></li>
+            <li><a href="#overlays-feedback-dialog-sheet-drawer-popover-toast-command">Overlays &amp; feedback</a></li>
+            <li><a href="#data-content-components-datatable-markdowneditor-richtexteditor">Data &amp; content</a></li>
+            <li><a href="#toolbar-components-toolbar">Toolbar (/components/toolbar)</a></li>
+            <li><a href="#charts-charts-area-bar-line-pie-radar-radial">Charts</a></li>
+            <li><a href="#icons-icons">Icons (/icons)</a></li>
+            <li><a href="#theming-dark-mode-any-page">Theming &amp; dark mode</a></li>
+            <li><a href="#render-mode-parity">Render-mode parity</a></li>
+          </ul>
+        </li>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#setup-deployment-steps-runbook-one-command-per-line-in-order">Setup / Deployment steps (runbook)</a></li>
+        <li><a href="#test-automated">Test (automated)</a></li>
+        <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
+        <li><a href="#known-limitations">Known limitations</a></li>
+      </ol>
+    </div>
+
+    <blockquote>The single source for <strong>how to test and run</strong> this app. Every agent (flow-master self-smoke, the verifier) <strong>and</strong> the human UAT use the SAME walkthrough listed here. TrBlazeUI is a <strong>component library with a demo application</strong> — it has <strong>no authentication and no user accounts</strong>, so the test-user table below is N/A; testing means walking the demo app's pages and exercising each component.</blockquote>
+
+    <h2 id="test-users-canonical-use-these-for-all-smoke-verify-uat">Test users (canonical — use THESE for all smoke / verify / UAT)<a class="anchor-link" href="#test-users-canonical-use-these-for-all-smoke-verify-uat">#</a></h2>
+    <p><strong>Not applicable — TrBlazeUI has no login, no database, and no user accounts.</strong> The demo apps (Server/WASM/Auto) are open and require no credentials. No accounts are created or needed.</p>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Username / Email</th><th>Password</th><th>Role / Permission</th><th>Created?</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>—</td><td>(none)</td><td>(none)</td><td>Anonymous demo visitor</td><td>N/A</td><td>No auth anywhere in the product; open the demo URL and browse</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="how-to-test-screen-by-screen-menu-by-menu">How to test — screen by screen / menu by menu<a class="anchor-link" href="#how-to-test-screen-by-screen-menu-by-menu">#</a></h2>
+    <p>The demo app exposes the whole library through a sidebar navigation. Walk these sections in order; no login is required for any of them.</p>
+
+    <h3 id="home">Home (<code>/</code>)<a class="anchor-link" href="#home">#</a></h3>
+    <ul>
+      <li><strong>Log in as:</strong> n/a (anonymous)</li>
+      <li><strong>Steps:</strong> 1) Run a demo host → 2) open the root URL → 3) read the landing/overview.</li>
+      <li><strong>Expected:</strong> landing page renders styled (sidebar visible, not bullet-point links — confirms <code>trblazeui.css</code> loaded correctly).</li>
+      <li><strong>Covers:</strong> BRD-37, REQ-NFR-002</li>
+    </ul>
+
+    <h3 id="architecture">Architecture (<code>/architecture</code>)<a class="anchor-link" href="#architecture">#</a></h3>
+    <ul>
+      <li><strong>Steps:</strong> open from sidebar.</li>
+      <li><strong>Expected:</strong> architecture overview page renders.</li>
+      <li><strong>Covers:</strong> F-DEMO / BRD-40</li>
+    </ul>
+
+    <h3 id="getting-started">Getting Started (<code>/getting-started</code>)<a class="anchor-link" href="#getting-started">#</a></h3>
+    <ul>
+      <li><strong>Steps:</strong> open from sidebar.</li>
+      <li><strong>Expected:</strong> quick-start guide renders with setup snippets.</li>
+      <li><strong>Covers:</strong> BRD-40</li>
+    </ul>
+
+    <h3 id="components-index-components">Components index (<code>/components</code>)<a class="anchor-link" href="#components-index-components">#</a></h3>
+    <ul>
+      <li><strong>Steps:</strong> open <code>/components</code> → click into each component demo.</li>
+      <li><strong>Expected:</strong> ~69 component demo cards link to working demo pages; each renders interactive examples.</li>
+      <li><strong>Covers:</strong> REQ-UI-002, REQ-UI-003, REQ-UI-004, REQ-UI-005, REQ-UI-006</li>
+    </ul>
+
+    <h3 id="forms-e-g-components-button-components-input-components-select-components-date-picker">Forms (e.g. <code>/components/button</code>, <code>/components/input</code>, <code>/components/select</code>, <code>/components/date-picker</code>)<a class="anchor-link" href="#forms-e-g-components-button-components-input-components-select-components-date-picker">#</a></h3>
+    <ul>
+      <li><strong>Steps:</strong> type into Input/Textarea; toggle Checkbox/Switch; open Select/Combobox/MultiSelect; pick a date; adjust Slider/Rating.</li>
+      <li><strong>Expected:</strong> two-way binding updates shown state; dropdowns open; pickers select values.</li>
+      <li><strong>Covers:</strong> BRD-4…BRD-12 (REQ-UI-002)</li>
+    </ul>
+
+    <h3 id="layout-navigation-sidebar-components-sidebar-navigationmenu-tabs-pagination">Layout &amp; navigation (Sidebar, <code>/components/sidebar</code>, NavigationMenu, Tabs, Pagination)<a class="anchor-link" href="#layout-navigation-sidebar-components-sidebar-navigationmenu-tabs-pagination">#</a></h3>
+    <ul>
+      <li><strong>Steps:</strong> collapse/expand the Sidebar (and Ctrl/Cmd+B); reload to confirm persistence; open a horizontal NavigationMenu dropdown; switch Tabs; page through Pagination.</li>
+      <li><strong>Expected:</strong> sidebar collapse persists across reload; nav dropdown does not clip; tabs/pagination work.</li>
+      <li><strong>Covers:</strong> BRD-13…BRD-18 (REQ-UI-003)</li>
+    </ul>
+
+    <h3 id="overlays-feedback-dialog-sheet-drawer-popover-toast-command">Overlays &amp; feedback (Dialog, Sheet, Drawer, Popover, Toast, Command)<a class="anchor-link" href="#overlays-feedback-dialog-sheet-drawer-popover-toast-command">#</a></h3>
+    <ul>
+      <li><strong>Steps:</strong> open a Dialog; interact with controls <em>inside</em> it (toggle/select); open a Sheet/Drawer; trigger a Toast; open the Command palette and filter.</li>
+      <li><strong>Expected:</strong> overlays open with focus trap; <strong>internal state changes re-render</strong> (reactive-portal fix); Toasts appear; Command filters.</li>
+      <li><strong>Covers:</strong> BRD-19…BRD-24 (REQ-UI-004)</li>
+    </ul>
+
+    <h3 id="data-content-components-datatable-markdowneditor-richtexteditor">Data &amp; content (<code>/components/datatable</code>, MarkdownEditor, RichTextEditor)<a class="anchor-link" href="#data-content-components-datatable-markdowneditor-richtexteditor">#</a></h3>
+    <ul>
+      <li><strong>Steps:</strong> sort/filter/paginate/select rows in DataTable; edit markdown and view preview; type in RichTextEditor.</li>
+      <li><strong>Expected:</strong> DataTable operations work; editors render/preview; rich-text HTML is sanitized.</li>
+      <li><strong>Covers:</strong> BRD-25…BRD-27 (REQ-UI-005)</li>
+    </ul>
+
+    <h3 id="toolbar-components-toolbar">Toolbar (<code>/components/toolbar</code>)<a class="anchor-link" href="#toolbar-components-toolbar">#</a></h3>
+    <ul>
+      <li><strong>Steps:</strong> click ToolbarButtons; toggle ToolbarToggleButtons (Bold/Italic); try Default/Compact/Dense and vertical orientation; open a toolbar dropdown.</li>
+      <li><strong>Expected:</strong> buttons fire actions; toggles reflect pressed state (<code>aria-pressed</code>); variants/orientation render; IDE/editor examples work.</li>
+      <li><strong>Covers:</strong> BRD-30, BRD-31 (REQ-UI-007)</li>
+    </ul>
+
+    <h3 id="charts-charts-area-bar-line-pie-radar-radial">Charts (<code>/charts/area</code>, <code>/bar</code>, <code>/line</code>, <code>/pie</code>, <code>/radar</code>, <code>/radial</code>)<a class="anchor-link" href="#charts-charts-area-bar-line-pie-radar-radial">#</a></h3>
+    <ul>
+      <li><strong>Steps:</strong> open each chart demo.</li>
+      <li><strong>Expected:</strong> each of the 6 chart types renders with theme colors.</li>
+      <li><strong>Covers:</strong> BRD-32 (REQ-UI-008)</li>
+    </ul>
+
+    <h3 id="icons-icons">Icons (<code>/icons</code>)<a class="anchor-link" href="#icons-icons">#</a></h3>
+    <ul>
+      <li><strong>Steps:</strong> open the icon browser; switch between Lucide / Heroicons / Feather; search.</li>
+      <li><strong>Expected:</strong> icon grids render; typed names resolve; Heroicons shows 4 variants.</li>
+      <li><strong>Covers:</strong> BRD-33, BRD-34 (REQ-UI-009)</li>
+    </ul>
+
+    <h3 id="theming-dark-mode-any-page">Theming &amp; dark mode (any page)<a class="anchor-link" href="#theming-dark-mode-any-page">#</a></h3>
+    <ul>
+      <li><strong>Steps:</strong> toggle the theme (adds/removes <code>.dark</code> on <code>&lt;html&gt;</code>); switch demo theme if available.</li>
+      <li><strong>Expected:</strong> all components restyle; dark mode applies; no contrast breakage.</li>
+      <li><strong>Covers:</strong> BRD-35, BRD-36 (REQ-UI-010)</li>
+    </ul>
+
+    <h3 id="render-mode-parity">Render-mode parity<a class="anchor-link" href="#render-mode-parity">#</a></h3>
+    <ul>
+      <li><strong>Steps:</strong> repeat a few of the above in Server (5183/7172), WASM (5184/7173), and Auto (5185/7174).</li>
+      <li><strong>Expected:</strong> identical component behavior across all three hosts.</li>
+      <li><strong>Covers:</strong> REQ-NFR-004 (BRD-40), REQ-UI-011</li>
+    </ul>
+
+    <h2 id="prerequisites">Prerequisites<a class="anchor-link" href="#prerequisites">#</a></h2>
+    <ul>
+      <li>.NET 10 SDK (Windows side; reference machine builds via Windows dotnet from WSL)</li>
+      <li>A web browser (Chrome/Edge/Firefox/Safari)</li>
+      <li>Node.js / PowerShell — ONLY if regenerating icon data (not needed to run/test)</li>
+    </ul>
+
+    <h2 id="setup-deployment-steps-runbook-one-command-per-line-in-order">Setup / Deployment steps (runbook — one command per line, in order)<a class="anchor-link" href="#setup-deployment-steps-runbook-one-command-per-line-in-order">#</a></h2>
+    <ol>
+      <li><code>git clone &lt;repo&gt; TrBlazeUI &amp;&amp; cd TrBlazeUI</code></li>
+      <li><code>dotnet restore TrBlazeUI.sln</code></li>
+      <li><code>cmd.exe /c "dotnet build TrBlazeUI.sln -c Release -p:CI=true"</code>  <em>(WSL rung #4; <code>-p:CI=true</code> skips Tailwind, uses committed CSS)</em></li>
+      <li><code>./scripts/run-demo.sh server</code>  <em>(or <code>wasm</code> / <code>auto</code>; or <code>dotnet run --project demos/TrBlazeUI.Demo.Server</code>)</em></li>
+      <li>Open <code>http://localhost:5183</code> (Server) — no login; browse the sidebar to exercise every component.</li>
+    </ol>
+
+    <h2 id="test-automated">Test (automated)<a class="anchor-link" href="#test-automated">#</a></h2>
+    <pre><code class="language-bash">dotnet test</code></pre>
+    <blockquote>No unit/Playwright test projects are checked into the solution today; verification is the demo-app walkthrough above. (Add a test project + <code>npx playwright test</code> if/when automated UI tests are introduced.)</blockquote>
+
+    <h2 id="smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)<a class="anchor-link" href="#smoke-checklist-quick-capability-pass">#</a></h2>
+    <ul>
+      <li>☐ Demo host boots and the home page renders <strong>styled</strong> (sidebar, not bullet links) — confirms CSS path</li>
+      <li>☐ Open a few component demos (Button, Input, Select) — they render and bind</li>
+      <li>☐ Open a Dialog and change a control inside it — content re-renders (portal fix)</li>
+      <li>☐ Open <code>/components/toolbar</code> — toggle a button, confirm pressed state</li>
+      <li>☐ Open <code>/charts/bar</code> — chart renders with theme colors</li>
+      <li>☐ Open <code>/icons</code> — switch icon library, icons render</li>
+      <li>☐ Toggle dark mode — components restyle without breakage</li>
+    </ul>
+
+    <h2 id="known-limitations">Known limitations<a class="anchor-link" href="#known-limitations">#</a></h2>
+    <ul>
+      <li><strong>NativeSelect inside MAUI Blazor Hybrid overlays</strong> — native <code>&lt;select&gt;</code> popup is clipped in WebView2 <code>position: fixed</code> overlays (platform limitation). Use <code>&lt;Select&gt;</code> instead inside dialogs/sheets. See <code>docs/TrBlazeUI-Issues-Report-1.md</code> (Issue #2).</li>
+      <li><em>(Resolved 2026-06-30: the strict Release build is clean 0/0, and XML-doc coverage is 100% with CS1591 build-enforced — previously-listed limitations cleared.)</em></li>
+    </ul>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+<script>
+// Light/dark toggle. The initial theme was already applied flash-free by the
+// <head> script (saved choice, else time-of-day). Clicking flips it, saves the
+// choice, and reloads so Mermaid re-renders in the matching theme.
+(function(){
+  var btn = document.getElementById('themeToggle');
+  if(!btn) return;
+  var relabel = function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.textContent = dark ? '☀ Light' : '☾ Dark';
+  };
+  relabel();
+  btn.addEventListener('click', function(){
+    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    try{ localStorage.setItem('tf-theme', next); }catch(e){}
+    location.reload();
+  });
+})();
+
+// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`:
+// mermaid reads the <pre>'s textContent as the diagram source, so a button
+// appended here glues "copy" onto the last line and breaks the parse
+// (flowcharts → "Syntax error"; sequence diagrams silently absorb it).
+// Mermaid blocks get copy/export from their own .diagram toolbar instead.
+document.querySelectorAll('pre:not(.mermaid)').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy';
+  btn.textContent = 'copy';
+  btn.addEventListener('click', () => {
+    const text = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'copied';
+      setTimeout(() => { btn.textContent = 'copy'; }, 1200);
+    });
+  });
+  pre.appendChild(btn);
+});
+
+// Mermaid init — theme follows the resolved light/dark theme
+if (window.mermaid) {
+  var mermaidTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default';
+  mermaid.initialize({ startOnLoad: true, theme: mermaidTheme, securityLevel: 'loose' });
+}
+
+// Mermaid toolbar wiring — run after mermaid renders
+function wireMermaidToolbars() {
+  document.querySelectorAll('.diagram').forEach(dia => {
+    if (dia.dataset.wired) return;
+    const merm = dia.querySelector('.mermaid');
+    const svg = merm && merm.querySelector('svg');
+    if (!svg) return;
+    dia.dataset.wired = '1';
+    let scale = 1;
+    const label = dia.querySelector('.zlabel');
+    const apply = () => {
+      svg.style.transform = `scale(${scale})`;
+      svg.style.transformOrigin = 'top left';
+      if (label) label.textContent = Math.round(scale * 100) + '%';
+    };
+    const setScale = (s) => { scale = Math.max(0.25, Math.min(4, s)); apply(); };
+    dia.querySelector('[data-zin]').onclick = () => setScale(scale * 1.2);
+    dia.querySelector('[data-zout]').onclick = () => setScale(scale / 1.2);
+    dia.querySelector('[data-fit]').onclick = () => {
+      svg.style.transform = '';
+      svg.removeAttribute('width');
+      svg.style.maxWidth = '100%';
+      svg.style.height = 'auto';
+      scale = 1;
+      if (label) label.textContent = 'Fit';
+    };
+    dia.querySelector('[data-one]').onclick = () => {
+      svg.style.transform = '';
+      svg.style.maxWidth = 'none';
+      svg.style.width = '';
+      svg.style.height = '';
+      scale = 1;
+      if (label) label.textContent = '100%';
+    };
+    dia.querySelector('[data-fs]').onclick = () => {
+      dia.classList.toggle('fs');
+      if (dia.classList.contains('fs')) {
+        document.addEventListener('keydown', escFs);
+      } else {
+        document.removeEventListener('keydown', escFs);
+      }
+    };
+    function escFs(e) { if (e.key === 'Escape') { dia.classList.remove('fs'); document.removeEventListener('keydown', escFs); } }
+    dia.querySelector('[data-pop]').onclick = () => openInNewTab(svg);
+    // Ctrl+wheel zoom
+    merm.addEventListener('wheel', (e) => {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      setScale(scale * (e.deltaY < 0 ? 1.1 : 1/1.1));
+    }, { passive: false });
+  });
+}
+
+function openInNewTab(svg) {
+  const svgSource = new XMLSerializer().serializeToString(svg);
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Diagram</title>
+<style>
+  html,body{margin:0;height:100%;background:#0f1115;color:#e6e8ee;font-family:system-ui,sans-serif}
+  .bar{position:fixed;top:0;left:0;right:0;padding:8px 12px;background:#161a22;border-bottom:1px solid #2a3142;display:flex;gap:8px;z-index:10}
+  .bar button{background:#1c2230;color:#9aa3b2;border:1px solid #2a3142;border-radius:6px;padding:5px 12px;font-size:13px;cursor:pointer}
+  .bar button:hover{color:#7cc4ff;border-color:#7cc4ff}
+  .bar .hint{margin-left:auto;color:#9aa3b2;font-size:11.5px;align-self:center}
+  #stage{position:absolute;top:42px;bottom:0;left:0;right:0;overflow:hidden}
+  #stage svg{width:100%;height:100%}
+</style>
+</head><body>
+<div class="bar">
+  <button onclick="zpz.zoomIn()">+</button>
+  <button onclick="zpz.zoomOut()">−</button>
+  <button onclick="zpz.fit();zpz.center()">Fit</button>
+  <button onclick="zpz.resetZoom();zpz.center()">1:1</button>
+  <button onclick="window.print()">Print</button>
+  <button onclick="dlPng()">PNG</button>
+  <button onclick="dlSvg()">SVG</button>
+  <span class="hint">Drag to pan · Ctrl+wheel to zoom · + / − keys</span>
+</div>
+<div id="stage">${svgSource}</div>
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"><\/script>
+<script>
+  const el = document.querySelector('#stage svg');
+  const zpz = svgPanZoom(el, { zoomScaleSensitivity: .3, minZoom: .2, maxZoom: 10, controlIconsEnabled: false, fit: true, center: true });
+  document.addEventListener('keydown', e => {
+    if (e.key === '+' || e.key === '=') zpz.zoomIn();
+    if (e.key === '-' || e.key === '_') zpz.zoomOut();
+    if (e.key === '0') { zpz.resetZoom(); zpz.center(); }
+  });
+  function dlSvg() {
+    const blob = new Blob([new XMLSerializer().serializeToString(el)], { type: 'image/svg+xml' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'diagram.svg'; a.click();
+  }
+  function dlPng() {
+    const src = new XMLSerializer().serializeToString(el);
+    const img = new Image();
+    const url = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(src)));
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = el.clientWidth * 2; c.height = el.clientHeight * 2;
+      const ctx = c.getContext('2d'); ctx.scale(2,2); ctx.drawImage(img, 0, 0);
+      c.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'diagram.png'; a.click(); });
+    };
+    img.src = url;
+  }
+<\/script>
+</body></html>`;
+  const w = window.open();
+  w.document.write(html);
+  w.document.close();
+}
+
+// Run wiring after mermaid finishes (it renders async)
+if (window.mermaid) {
+  setTimeout(wireMermaidToolbars, 400);
+  setTimeout(wireMermaidToolbars, 1200);  // safety re-run for slow renders
+}
+</script>
+</body>
+</html>

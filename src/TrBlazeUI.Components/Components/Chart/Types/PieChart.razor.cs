@@ -93,6 +93,10 @@ public partial class PieChart<TItem> : ChartBase<TItem> where TItem : class
         Class
     );
 
+    /// <summary>
+    /// Rebuilds the ApexCharts options whenever parameters are (re)assigned so that
+    /// the pie/donut layout, center labels, gradient fill, and slice stroke reflect the current values.
+    /// </summary>
     protected override void OnParametersSet()
     {
         base.OnParametersSet();

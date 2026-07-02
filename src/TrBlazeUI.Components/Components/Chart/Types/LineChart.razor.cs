@@ -93,6 +93,10 @@ public partial class LineChart<TItem> : ChartBase<TItem> where TItem : class
         Class
     );
 
+    /// <summary>
+    /// Rebuilds the ApexCharts options whenever parameters are (re)assigned so that
+    /// variant, stroke, markers, gradient fill, and axis styling reflect the current values.
+    /// </summary>
     protected override void OnParametersSet()
     {
         base.OnParametersSet();

@@ -3,6 +3,10 @@ using Microsoft.JSInterop;
 
 namespace TrBlazeUI.Components.Sidebar;
 
+/// <summary>
+/// Provides the shared <see cref="SidebarContext"/> to descendant sidebar components, managing
+/// open/collapsed state, mobile detection, keyboard shortcuts, and optional cookie persistence.
+/// </summary>
 public partial class SidebarProvider
 {
     private SidebarContext Context { get; set; } = new();
@@ -12,6 +16,10 @@ public partial class SidebarProvider
     [Inject]
     private IJSRuntime JSRuntime { get; set; } = default!;
 
+    /// <summary>
+    /// Reacts to (re)assigned parameters by propagating the current <see cref="Variant"/> and
+    /// <see cref="Side"/> values into the shared <see cref="SidebarContext"/>.
+    /// </summary>
     protected override void OnParametersSet()
     {
         // Update context when parameters change
@@ -19,6 +27,13 @@ public partial class SidebarProvider
         Context.SetSide(Side);
     }
 
+    /// <summary>
+    /// On the first render, imports the sidebar JavaScript module, restores any persisted open state
+    /// from the cookie, initializes the context, wires up mobile detection and keyboard shortcuts,
+    /// and subscribes to state changes for persistence.
+    /// </summary>
+    /// <param name="firstRender">True on the first render of the component; otherwise false.</param>
+    /// <returns>A task that represents the asynchronous post-render operation.</returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -99,6 +114,11 @@ public partial class SidebarProvider
         StateHasChanged(); // Force re-render after toggle
     }
 
+    /// <summary>
+    /// Asynchronously disposes the provider, unsubscribing from context state changes and releasing
+    /// the JavaScript module and .NET object references.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous dispose operation.</returns>
     public async ValueTask DisposeAsync()
     {
         if (Context != null)

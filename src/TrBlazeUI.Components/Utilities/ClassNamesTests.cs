@@ -9,6 +9,11 @@ public static class ClassNamesTests
     private static readonly string[] AbcArray = ["a", "b", "c"];
     private static readonly string[] BcArray = ["b", "c"];
 
+    /// <summary>
+    /// Runs the suite of manual assertions verifying that <see cref="ClassNames.cn"/> handles
+    /// concatenation, null/empty filtering, conditional classes, arrays, and Tailwind conflict resolution,
+    /// writing pass/fail results to the console.
+    /// </summary>
     public static void RunTests()
     {
         Console.WriteLine("=== ClassNames (cn) Utility Tests ===\n");

@@ -22,6 +22,10 @@ public class ThemeService
     /// </summary>
     public bool IsDarkMode => objIsDarkMode;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ThemeService"/> class.
+    /// </summary>
+    /// <param name="jsRuntime">The JavaScript runtime used to read and apply the theme.</param>
     public ThemeService(IJSRuntime jsRuntime)
     {
         objJsRuntime = jsRuntime;

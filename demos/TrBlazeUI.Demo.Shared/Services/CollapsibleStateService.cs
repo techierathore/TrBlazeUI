@@ -10,6 +10,10 @@ public class CollapsibleStateService
     private readonly IJSRuntime objJsRuntime;
     private const string LocalStoragePrefix = "trblazeui:collapsible:";
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CollapsibleStateService"/> class.
+    /// </summary>
+    /// <param name="jsRuntime">The JavaScript runtime used to read and persist collapsible state in localStorage.</param>
     public CollapsibleStateService(IJSRuntime jsRuntime)
     {
         objJsRuntime = jsRuntime;

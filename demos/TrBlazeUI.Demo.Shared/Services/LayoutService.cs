@@ -22,6 +22,10 @@ public class LayoutService
     /// </summary>
     public bool IsHorizontal => objIsHorizontal;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LayoutService"/> class.
+    /// </summary>
+    /// <param name="jsRuntime">The JavaScript runtime used to read and persist the layout preference.</param>
     public LayoutService(IJSRuntime jsRuntime)
     {
         objJsRuntime = jsRuntime;

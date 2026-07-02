@@ -156,6 +156,10 @@ public class ChartConfig : IEnumerable<KeyValuePair<string, ChartSeriesConfig>>
         return chartConfig;
     }
 
+    /// <summary>
+    /// Returns an enumerator that iterates over the configured series key/configuration pairs.
+    /// </summary>
+    /// <returns>An enumerator over the series key/configuration pairs.</returns>
     public IEnumerator<KeyValuePair<string, ChartSeriesConfig>> GetEnumerator() =>
         objConfigs.GetEnumerator();
 

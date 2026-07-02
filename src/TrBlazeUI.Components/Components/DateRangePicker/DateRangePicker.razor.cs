@@ -105,6 +105,10 @@ public partial class DateRangePicker : ComponentBase
 
     private bool CanApply => objSelectionStart.HasValue && objSelectionEnd.HasValue;
 
+    /// <summary>
+    /// Performs one-time initialization of the two-month display range and seeds the working
+    /// selection from the initial <see cref="Value"/> if one was supplied.
+    /// </summary>
     protected override void OnInitialized()
     {
         InitializeDisplayMonths();
@@ -115,6 +119,10 @@ public partial class DateRangePicker : ComponentBase
         }
     }
 
+    /// <summary>
+    /// Reacts to a (re)assigned <see cref="Value"/> parameter by updating the working selection
+    /// start and end dates to match the supplied range.
+    /// </summary>
     protected override void OnParametersSet()
     {
         if (Value != null)
