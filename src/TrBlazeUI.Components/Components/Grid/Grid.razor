@@ -1,0 +1,76 @@
+@namespace TrBlazeUI.Components.Grid
+
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+    @ChildContent
+</div>
+
+@code {
+    /// <summary>
+    /// Gets or sets the number of columns in the grid.
+    /// Default is 12 (matching the common FluentUI/Bootstrap 12-column layout model).
+    /// </summary>
+    [Parameter]
+    public int Columns { get; set; } = 12;
+
+    /// <summary>
+    /// Gets or sets the spacing between grid cells on the FluentUI-style spacing scale,
+    /// where one unit equals 0.25rem (so Spacing="3" renders a 0.75rem gap).
+    /// Ignored when <see cref="Gap"/> is set.
+    /// </summary>
+    [Parameter]
+    public int? Spacing { get; set; }
+
+    /// <summary>
+    /// Gets or sets an explicit CSS gap value (e.g. "1rem" or "8px 16px").
+    /// Takes precedence over <see cref="Spacing"/>.
+    /// </summary>
+    [Parameter]
+    public string? Gap { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes to apply to the grid container.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets the content of the grid. Should contain GridItem components.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional attributes to apply to the grid container element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Gets the computed CSS classes for the grid container.
+    /// </summary>
+    private string CssClass => ClassNames.cn("trblazeui-grid", Class);
+
+    /// <summary>
+    /// Gets the computed inline style: the column track definition plus the resolved gap.
+    /// </summary>
+    private string CssStyle
+    {
+        get
+        {
+            var vColumns = Math.Clamp(Columns, 1, 24);
+            var vStyle = $"grid-template-columns:repeat({vColumns},minmax(0,1fr));";
+
+            if (!string.IsNullOrWhiteSpace(Gap))
+            {
+                vStyle += $"gap:{Gap};";
+            }
+            else if (Spacing.HasValue)
+            {
+                var vSpacing = Math.Clamp(Spacing.Value, 0, 24);
+                vStyle += $"gap:{vSpacing * 0.25}rem;";
+            }
+
+            return vStyle;
+        }
+    }
+}

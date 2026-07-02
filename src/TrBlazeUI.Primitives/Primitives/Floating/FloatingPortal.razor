@@ -13,6 +13,15 @@
     Use this as the base layer for Select, Popover, DropdownMenu, Tooltip, etc.
 *@
 
+@if (IsOpen && objUseInlineFallback)
+{
+    @* No PortalHost is attached (e.g. the consuming app omitted <PortalHost /> from its
+       layout, or the layout is not interactive). Render the floating content inline at the
+       declaration site so the component remains fully operable; JS positioning still places
+       it at viewport coordinates. *@
+    @RenderPortalContent()
+}
+
 @code {
     /// <summary>
     /// The content to render in the floating portal.
@@ -95,9 +104,12 @@
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
+    private static bool HasWarnedAboutMissingHost;
+
     private IAsyncDisposable? objPositioningCleanup;
     private bool objIsInitialized = false;
     private bool objIsPositioned = false;
+    private bool objUseInlineFallback = false;
     private ElementReference objPortalContentRef;
     private TaskCompletionSource<bool>? objPortalReadyTcs;
 
@@ -130,10 +142,27 @@
     {
         base.OnParametersSet();
 
+        // Decide the render mode for this open cycle before the first open render.
+        // Without an attached PortalHost, portal registration would render nothing at all,
+        // so fall back to inline rendering (the mode stays fixed while open).
+        if (IsOpen && !objIsInitialized)
+        {
+            objUseInlineFallback = !PortalService.HasHost;
+
+            if (objUseInlineFallback && !HasWarnedAboutMissingHost)
+            {
+                HasWarnedAboutMissingHost = true;
+                Console.WriteLine(
+                    "TrBlazeUI warning: no <PortalHost /> is attached — floating content " +
+                    "(Select, Popover, DropdownMenu, …) is rendering inline as a fallback. " +
+                    "Add <PortalHost /> to your root layout for correct stacking behavior.");
+            }
+        }
+
         // Re-register portal with updated ChildContent to ensure content updates are reflected
         // Safe because GetInitialStyle() includes the stored position,
         // so re-renders won't lose the position styling
-        if (objIsInitialized && IsOpen && !string.IsNullOrEmpty(PortalId))
+        if (objIsInitialized && IsOpen && !objUseInlineFallback && !string.IsNullOrEmpty(PortalId))
         {
             PortalService.RegisterPortal(PortalId, RenderPortalContent());
         }
@@ -145,6 +174,15 @@
         {
             objIsInitialized = true;
             objIsPositioned = false;
+
+            if (objUseInlineFallback)
+            {
+                // Inline fallback: the content div was rendered directly by this component
+                // in the render pass that triggered this callback, so objPortalContentRef
+                // is already valid — position it straight away.
+                await SetupAsync();
+                return;
+            }
 
             // Create completion source BEFORE registering portal
             objPortalReadyTcs = new TaskCompletionSource<bool>();
@@ -324,14 +362,15 @@
             objPositioningCleanup = null;
         }
 
-        // Unregister portal when content closes
-        if (!string.IsNullOrEmpty(PortalId))
+        // Unregister portal when content closes (inline fallback never registered one)
+        if (!objUseInlineFallback && !string.IsNullOrEmpty(PortalId))
         {
             PortalService.UnregisterPortal(PortalId);
         }
 
         objIsInitialized = false;
         objIsPositioned = false;
+        objUseInlineFallback = false;
     }
 
     public async ValueTask DisposeAsync()

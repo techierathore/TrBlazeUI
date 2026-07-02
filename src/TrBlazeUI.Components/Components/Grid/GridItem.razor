@@ -1,0 +1,69 @@
+@namespace TrBlazeUI.Components.Grid
+
+<div @attributes="AdditionalAttributes" class="@CssClass">
+    @ChildContent
+</div>
+
+@code {
+    /// <summary>
+    /// Gets or sets the number of columns this item spans on all viewports (mobile-first base).
+    /// Default is 12 (full width). Valid range is 1–12.
+    /// </summary>
+    [Parameter]
+    public int Xs { get; set; } = 12;
+
+    /// <summary>
+    /// Gets or sets the column span from the small breakpoint (≥640px) upward.
+    /// </summary>
+    [Parameter]
+    public int? Sm { get; set; }
+
+    /// <summary>
+    /// Gets or sets the column span from the medium breakpoint (≥768px) upward.
+    /// </summary>
+    [Parameter]
+    public int? Md { get; set; }
+
+    /// <summary>
+    /// Gets or sets the column span from the large breakpoint (≥1024px) upward.
+    /// </summary>
+    [Parameter]
+    public int? Lg { get; set; }
+
+    /// <summary>
+    /// Gets or sets the column span from the extra-large breakpoint (≥1280px) upward.
+    /// </summary>
+    [Parameter]
+    public int? Xl { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes to apply to the grid item.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets the content of the grid item.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional attributes to apply to the grid item element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Gets the computed CSS classes for the grid item, mapping the responsive span
+    /// parameters to the trblazeui-col-* classes shipped in trblazeui.css.
+    /// </summary>
+    private string CssClass => ClassNames.cn(
+        $"trblazeui-col-{Math.Clamp(Xs, 1, 12)}",
+        Sm.HasValue ? $"trblazeui-col-sm-{Math.Clamp(Sm.Value, 1, 12)}" : null,
+        Md.HasValue ? $"trblazeui-col-md-{Math.Clamp(Md.Value, 1, 12)}" : null,
+        Lg.HasValue ? $"trblazeui-col-lg-{Math.Clamp(Lg.Value, 1, 12)}" : null,
+        Xl.HasValue ? $"trblazeui-col-xl-{Math.Clamp(Xl.Value, 1, 12)}" : null,
+        Class
+    );
+}

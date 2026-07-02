@@ -34,7 +34,10 @@
 
     private string GetClasses()
     {
-        var baseClasses = "relative flex h-full flex-1 flex-col bg-background focus:outline-none";
+        // min-w-0 lets the inset shrink to the viewport instead of growing to its
+        // content's min-width — over-wide page content must scroll inside the content
+        // region, never widen the shell/header past the screen (TechieRag TR-003).
+        var baseClasses = "relative flex h-full min-w-0 flex-1 flex-col bg-background focus:outline-none";
 
         // Floating variant margins - push content when sidebar is visible
         // When sidebar is closed (hidden), remove margins

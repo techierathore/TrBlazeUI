@@ -180,9 +180,9 @@
                         PageSizes="@PageSizes"
                         OnPageChanged="@HandlePageChanged"
                         OnPageSizeChanged="@HandlePageSizeChanged"
-                        Class="flex items-center justify-between px-2 py-4">
+                        Class="flex flex-wrap items-center justify-between gap-2 px-2 py-4">
                 <PaginationInfo />
-                <PaginationContent Class="flex items-center gap-6 lg:gap-8">
+                <PaginationContent Class="flex flex-wrap items-center gap-2 sm:gap-6 lg:gap-8">
                     <PaginationPageSizeSelector />
                     <div class="flex items-center gap-2">
                         <PaginationPageDisplay />

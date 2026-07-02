@@ -109,6 +109,18 @@ public partial class Input : ComponentBase
     public string? Class { get; set; }
 
     /// <summary>
+    /// Gets or sets the visible label text for the input.
+    /// </summary>
+    /// <remarks>
+    /// When provided, a &lt;label&gt; element is rendered immediately before the input and
+    /// associated with it via the label's 'for' attribute (an id is generated when the
+    /// <see cref="Id"/> parameter is not set). This gives the input both a visible label
+    /// and an accessible name.
+    /// </remarks>
+    [Parameter]
+    public string? Label { get; set; }
+
+    /// <summary>
     /// Gets or sets the HTML id attribute for the input element.
     /// </summary>
     /// <remarks>
@@ -183,6 +195,36 @@ public partial class Input : ComponentBase
         // Custom classes (if provided)
         Class
     );
+
+    /// <summary>
+    /// Generated id used to associate the rendered label with the input
+    /// when a Label is provided but no explicit Id is set.
+    /// </summary>
+    private string? objGeneratedId;
+
+    /// <summary>
+    /// Gets the effective id for the input element: the explicit <see cref="Id"/> when set,
+    /// otherwise a generated id when a <see cref="Label"/> requires the association,
+    /// otherwise null (no id attribute is rendered).
+    /// </summary>
+    private string? EffectiveId
+    {
+        get
+        {
+            if (!string.IsNullOrEmpty(Id))
+            {
+                return Id;
+            }
+
+            if (string.IsNullOrEmpty(Label))
+            {
+                return null;
+            }
+
+            objGeneratedId ??= $"trblazeui-input-{Guid.NewGuid():N}";
+            return objGeneratedId;
+        }
+    }
 
     /// <summary>
     /// Gets the HTML input type attribute value.

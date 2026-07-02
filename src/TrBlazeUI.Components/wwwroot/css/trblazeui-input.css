@@ -282,3 +282,106 @@
     font-style: italic !important;
   }
 }
+
+/* Harden .sr-only so visually-hidden text can never extend the page scroll width.
+   Tailwind's default .sr-only is position:absolute WITHOUT a left/top, so the span keeps
+   its static-position x. When its nearest positioned ancestor is the <body> (none of the
+   ancestors are positioned), it escapes any overflow-clipped card it visually sits in and
+   forces page-level horizontal overflow on narrow viewports (AstroLyfe issue TR-006,
+   DataTable pagination "Go to first/last page" spans). Pinning left to 0 with the standard
+   clipped visually-hidden pattern guarantees a zero scroll footprint everywhere. */
+.sr-only {
+  position: absolute;
+  left: 0 !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* TrBlazeUI Grid system (Grid / GridItem components).
+   Hand-authored (not Tailwind-generated) because the shipped CSS is pre-built and the
+   GridItem component composes these class names at runtime. 12-column, mobile-first;
+   breakpoints match Tailwind defaults (sm 640px, md 768px, lg 1024px, xl 1280px). */
+.trblazeui-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.trblazeui-col-1 { grid-column: span 1 / span 1; }
+.trblazeui-col-2 { grid-column: span 2 / span 2; }
+.trblazeui-col-3 { grid-column: span 3 / span 3; }
+.trblazeui-col-4 { grid-column: span 4 / span 4; }
+.trblazeui-col-5 { grid-column: span 5 / span 5; }
+.trblazeui-col-6 { grid-column: span 6 / span 6; }
+.trblazeui-col-7 { grid-column: span 7 / span 7; }
+.trblazeui-col-8 { grid-column: span 8 / span 8; }
+.trblazeui-col-9 { grid-column: span 9 / span 9; }
+.trblazeui-col-10 { grid-column: span 10 / span 10; }
+.trblazeui-col-11 { grid-column: span 11 / span 11; }
+.trblazeui-col-12 { grid-column: span 12 / span 12; }
+
+@media (min-width: 40rem) {
+  .trblazeui-col-sm-1 { grid-column: span 1 / span 1; }
+  .trblazeui-col-sm-2 { grid-column: span 2 / span 2; }
+  .trblazeui-col-sm-3 { grid-column: span 3 / span 3; }
+  .trblazeui-col-sm-4 { grid-column: span 4 / span 4; }
+  .trblazeui-col-sm-5 { grid-column: span 5 / span 5; }
+  .trblazeui-col-sm-6 { grid-column: span 6 / span 6; }
+  .trblazeui-col-sm-7 { grid-column: span 7 / span 7; }
+  .trblazeui-col-sm-8 { grid-column: span 8 / span 8; }
+  .trblazeui-col-sm-9 { grid-column: span 9 / span 9; }
+  .trblazeui-col-sm-10 { grid-column: span 10 / span 10; }
+  .trblazeui-col-sm-11 { grid-column: span 11 / span 11; }
+  .trblazeui-col-sm-12 { grid-column: span 12 / span 12; }
+}
+
+@media (min-width: 48rem) {
+  .trblazeui-col-md-1 { grid-column: span 1 / span 1; }
+  .trblazeui-col-md-2 { grid-column: span 2 / span 2; }
+  .trblazeui-col-md-3 { grid-column: span 3 / span 3; }
+  .trblazeui-col-md-4 { grid-column: span 4 / span 4; }
+  .trblazeui-col-md-5 { grid-column: span 5 / span 5; }
+  .trblazeui-col-md-6 { grid-column: span 6 / span 6; }
+  .trblazeui-col-md-7 { grid-column: span 7 / span 7; }
+  .trblazeui-col-md-8 { grid-column: span 8 / span 8; }
+  .trblazeui-col-md-9 { grid-column: span 9 / span 9; }
+  .trblazeui-col-md-10 { grid-column: span 10 / span 10; }
+  .trblazeui-col-md-11 { grid-column: span 11 / span 11; }
+  .trblazeui-col-md-12 { grid-column: span 12 / span 12; }
+}
+
+@media (min-width: 64rem) {
+  .trblazeui-col-lg-1 { grid-column: span 1 / span 1; }
+  .trblazeui-col-lg-2 { grid-column: span 2 / span 2; }
+  .trblazeui-col-lg-3 { grid-column: span 3 / span 3; }
+  .trblazeui-col-lg-4 { grid-column: span 4 / span 4; }
+  .trblazeui-col-lg-5 { grid-column: span 5 / span 5; }
+  .trblazeui-col-lg-6 { grid-column: span 6 / span 6; }
+  .trblazeui-col-lg-7 { grid-column: span 7 / span 7; }
+  .trblazeui-col-lg-8 { grid-column: span 8 / span 8; }
+  .trblazeui-col-lg-9 { grid-column: span 9 / span 9; }
+  .trblazeui-col-lg-10 { grid-column: span 10 / span 10; }
+  .trblazeui-col-lg-11 { grid-column: span 11 / span 11; }
+  .trblazeui-col-lg-12 { grid-column: span 12 / span 12; }
+}
+
+@media (min-width: 80rem) {
+  .trblazeui-col-xl-1 { grid-column: span 1 / span 1; }
+  .trblazeui-col-xl-2 { grid-column: span 2 / span 2; }
+  .trblazeui-col-xl-3 { grid-column: span 3 / span 3; }
+  .trblazeui-col-xl-4 { grid-column: span 4 / span 4; }
+  .trblazeui-col-xl-5 { grid-column: span 5 / span 5; }
+  .trblazeui-col-xl-6 { grid-column: span 6 / span 6; }
+  .trblazeui-col-xl-7 { grid-column: span 7 / span 7; }
+  .trblazeui-col-xl-8 { grid-column: span 8 / span 8; }
+  .trblazeui-col-xl-9 { grid-column: span 9 / span 9; }
+  .trblazeui-col-xl-10 { grid-column: span 10 / span 10; }
+  .trblazeui-col-xl-11 { grid-column: span 11 / span 11; }
+  .trblazeui-col-xl-12 { grid-column: span 12 / span 12; }
+}

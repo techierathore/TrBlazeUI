@@ -58,4 +58,22 @@ public interface IPortalService
     /// </summary>
     /// <returns>Dictionary of portal IDs to their render fragments.</returns>
     public IReadOnlyDictionary<string, RenderFragment> GetPortals();
+
+    /// <summary>
+    /// Gets whether at least one PortalHost is currently attached and able to render portals.
+    /// When false, floating content falls back to rendering inline at its declaration site.
+    /// </summary>
+    public bool HasHost { get; }
+
+    /// <summary>
+    /// Attaches a PortalHost to the service.
+    /// Called by PortalHost when it initializes.
+    /// </summary>
+    public void AttachHost();
+
+    /// <summary>
+    /// Detaches a PortalHost from the service.
+    /// Called by PortalHost when it is disposed.
+    /// </summary>
+    public void DetachHost();
 }

@@ -24,6 +24,7 @@
     protected override void OnInitialized()
     {
         PortalService.OnPortalsChanged += HandlePortalsChanged;
+        PortalService.AttachHost();
     }
 
     /// <summary>
@@ -70,6 +71,7 @@
     public async ValueTask DisposeAsync()
     {
         PortalService.OnPortalsChanged -= HandlePortalsChanged;
+        PortalService.DetachHost();
 
         if (objPortalModule != null)
         {
