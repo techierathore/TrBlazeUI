@@ -80,6 +80,16 @@ public partial class Alert : ComponentBase
     public bool AccentBorder { get; set; } = false;
 
     /// <summary>
+    /// Gets or sets additional HTML attributes to splat onto the alert root element.
+    /// </summary>
+    /// <remarks>
+    /// Captures unmatched attributes (e.g. <c>data-testid</c>, <c>id</c>, arbitrary <c>data-*</c>)
+    /// and forwards them to the rendered root, like a well-behaved Blazor component (TR-002).
+    /// </remarks>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
     /// Gets the computed CSS classes for the alert element.
     /// </summary>
     private string CssClass => ClassNames.cn(

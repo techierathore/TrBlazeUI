@@ -1,11 +1,5 @@
 # TrBlazeUI — Business Requirements
 
-> Stable IDs: every requirement has a BRD-{N} ID. IDs are append-only across revisions.
-
-> **Depth mandate.** This is a HUMAN document, read as rendered HTML by the product owner. It is NOT the coding checklist (`docs/TrBlazeUI-Checklist.md`). One-line entries belong ONLY in §10's ledger. §9 Feature catalog is the heart of the doc. This BRD is an information-preserving superset of the harvested source docs (`TrBlazeUI-Doc.md`, the modernization plan, the toolbar plan, the two consumer issue reports, README, THEMING).
-
-> **Mermaid mandate.** Every diagram follows `.tfcore/templates/v4custom/html-render-shell.md §5.5` — every label double-quoted; no `end` node ids.
-
 ## Table of Contents
 
 1. [Executive summary](#executive-summary)

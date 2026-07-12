@@ -77,9 +77,22 @@
     /// <summary>
     /// Toggles the checked state and notifies listeners.
     /// </summary>
+    /// <remarks>
+    /// In controlled mode (a <see cref="CheckedChanged"/> consumer is attached) the internal
+    /// state is NOT flipped optimistically — the bound <see cref="Checked"/> prop drives the
+    /// visual position. This keeps a gated/intercepted toggle (e.g. one held behind a
+    /// confirmation dialog) from visually diverging from the C# source of truth (TR-009).
+    /// Uncontrolled use (no consumer) still toggles locally so the headless primitive stays usable.
+    /// </remarks>
     private async Task ToggleCheckedAsync()
     {
-        Checked = !Checked;
-        await CheckedChanged.InvokeAsync(Checked);
+        var newValue = !Checked;
+
+        if (!CheckedChanged.HasDelegate)
+        {
+            Checked = newValue;
+        }
+
+        await CheckedChanged.InvokeAsync(newValue);
     }
 }

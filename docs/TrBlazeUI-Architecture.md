@@ -3,10 +3,6 @@
 **Last updated:** 2026-06-30
 **Status:** Current (brownfield)
 
-> **Depth mandate:** this is a HUMAN document, read as rendered HTML. Module rows in §4 with non-trivial behavior get a prose paragraph beneath the table, and every significant runtime flow beyond §3's primary path gets its own diagram. Source-doc architecture content (from `TrBlazeUI-Doc.md`, the modernization plan, and the consumer issue reports) is carried forward, not summarized away.
-
-> **Mermaid mandate.** Every diagram follows the authoring rules in `.tfcore/templates/v4custom/html-render-shell.md §5.5` — every node/edge/subgraph label is double-quoted; no `end` node ids.
-
 ## Table of Contents
 
 1. [Tech stack](#tech-stack)

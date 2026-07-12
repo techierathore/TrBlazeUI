@@ -9,7 +9,7 @@
 @using TrBlazeUI.Components.Pagination
 
 <CascadingValue Value="this" IsFixed="true">
-    <div class="@ContainerCssClass">
+    <div class="@ContainerCssClass" @attributes="AdditionalAttributes">
         @if (ShowToolbar)
         {
             <DataTableToolbar TData="TData"

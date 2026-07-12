@@ -115,24 +115,24 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout no-toc">
   <main>
     <h1>TrBlazeUI — Status</h1>
-    <div class="subtitle">Fix-issues — AstroLyfe consumer feedback resolved (REQ-UI-014 Verified); awaiting UAT</div>
+    <div class="subtitle">Fix-issues — TrStudio feedback Verified (REQ-UI-015); awaiting publish (&gt; 1.0.7)</div>
 
     <!-- YAML frontmatter rendered as a styled metadata block (not a literal --- rule) -->
     <div class="meta">
       <dl>
         <dt>project</dt><dd>TrBlazeUI</dd>
         <dt>stack</dt><dd>.NET 10 / Blazor (Server·WASM·Auto) / Tailwind CSS v4 / shadcn-compatible</dd>
-        <dt>last_updated</dt><dd>2026-07-02</dd>
-        <dt>current_phase</dt><dd>Fix-issues — AstroLyfe consumer feedback resolved (REQ-UI-014 Verified); awaiting UAT</dd>
+        <dt>last_updated</dt><dd>2026-07-12</dd>
+        <dt>current_phase</dt><dd>Fix-issues — TrStudio feedback Verified (REQ-UI-015); awaiting publish (&gt; 1.0.7)</dd>
         <dt>last_verified_build</dt><dd>PASS</dd>
-        <dt>last_verified_date</dt><dd>2026-07-02</dd>
+        <dt>last_verified_date</dt><dd>2026-07-12</dd>
       </dl>
     </div>
 
     <!-- NEXT COMMAND TO RUN CTA -->
     <div class="cta">
       <div class="cta-label">Next command to run</div>
-      <pre><code>Manual UAT per docs/TrBlazeUI-UsageGuide.md smoke checklist (now incl. /components/grid), then publish the next package versions (&gt; 1.0.6) so AstroLyfe can pick up the fixes.</code></pre>
+      <pre><code>Publish the next package versions (&gt; 1.0.7) for Components / Primitives / Icons.Lucide so TrStudio can consume the clean packages (owner: manual bump + push).</code></pre>
     </div>
 
     <div class="toc-inline">
@@ -150,15 +150,14 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
     </div>
 
     <h2 id="where-i-am">Where I am<a class="anchor-link" href="#where-i-am">#</a></h2>
-    <p>AstroLyfe consumer-feedback pass complete. All 9 issues in <code>docs/AstroLyfe-TrBlazeUI-Feedback.md</code> (2 blockers, 6 majors, 1 minor) are fixed <strong>library-side</strong> under REQ-UI-014: the Select keyboard trap (blanket <code>preventDefault</code> on the trigger) is removed; floating content now renders inline with a console warning when no <code>&lt;PortalHost /&gt;</code> is attached (the TR-002 “popup never materializes” blocker); <code>SelectValue</code> resolves its accessible text synchronously with a raw-value fallback; <code>DropdownMenuTrigger AsChild</code> is demo’d/documented (slotted <code>Button</code> becomes the trigger — no nested buttons); all three icon packages default to <code>aria-hidden</code> and render an empty logged placeholder for unknown names instead of the ⚠️ triangle; <code>trblazeui.css</code> ships a zero-scroll-footprint <code>.sr-only</code>; <code>Input</code> gained a real <code>Label</code> parameter; and new <code>Grid</code>/<code>GridItem</code> components (12-col responsive, FluentUI-style <code>Xs/Sm/Md/Lg/Xl</code> + <code>Spacing</code>) shipped with CSS, demo page (<code>/components/grid</code>), and a FluentUI migration cheatsheet in the UsageGuide. Strict Release build is clean (0/0) and an 18-check headless-Chromium runtime smoke passed, including a dedicated no-PortalHost build of the demo and a 390px horizontal-overflow check. All 27 checklist requirements are now Verified / Done.</p>
+    <p>TrStudio consumer-feedback pass complete. All 11 issues in <code>docs/TrStudio-TrBlazeUI-Feedback.md</code> (1 blocker, 3 major, 6 minor, 1 nice-to-have) are resolved <strong>library-side</strong> under REQ-UI-015 and self-smoked. Code: <code>DataTable</code>, <code>Alert</code>, <code>Components.Checkbox</code>, <code>Components.Switch</code> now splat <code>CaptureUnmatchedValues</code> (TR-001/002/008; <code>Badge</code>/<code>FieldError</code> already did — TR-004); <code>Switch</code> honors its controlled <code>Checked</code> prop instead of flipping optimistically (TR-009); <code>DataTable</code> root is <code>min-w-0</code> so it self-contains at ≤400px (TR-010); <code>FileUpload</code> gained an <code>OnFilesSelected</code> alias of <code>FilesChanged</code> (TR-007); and the <strong>TR-011 blocker</strong> is fixed by removing <code>AddRazorSupportForMvc</code> from Components + Primitives (no MVC/.cshtml in either), so the packed nuspecs no longer carry a <code>Microsoft.AspNetCore.App</code> FrameworkReference → MAUI Mac Catalyst consumers escape NETSDK1082. Docs: <code>TrBlazeUI-AI-Reference.md</code> corrected for the Button/Alert inline-icon pattern (TR-003), the flat <code>Empty</code> API (TR-005), the composite <code>Pagination</code> API + namespace (TR-006), and <code>FileUpload</code> (TR-007). Verified three ways: strict Release build <strong>0/0</strong>; pack + nuspec assertion <strong>0 <code>frameworkReferences</code></strong> across all three packages; <strong>14/14</strong> headless-Chromium runtime smoke (splat render-truth, gated-vs-uncontrolled Switch, 390px <code>scrollWidth==390</code>, desktop + mobile visual pass). <strong>Formally verified 2026-07-12</strong> (<code>*verify ui</code>): ledger <code>docs/.last-verify.json</code> written; REQ-UI-015 = <code>Verified</code> in the checklist under all three gates (acceptance + §4a render-truth + §4b visual-truth).</p>
 
     <h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2>
-    <pre><code>Manual UAT per docs/TrBlazeUI-UsageGuide.md smoke checklist (now incl. /components/grid), then publish the next package versions (&gt; 1.0.6) so AstroLyfe can pick up the fixes.</code></pre>
-    <p>The demo app has no auth/DB — walk the sidebar, exercise each component family, confirm dark-mode + render-mode parity. (Optional: <code>*productguide TrBlazeUI</code> for an end-user manual.)</p>
+    <pre><code>Publish the next package versions (&gt; 1.0.7) for Components / Primitives / Icons.Lucide so TrStudio can consume the clean packages (owner: manual bump + push).</code></pre>
 
     <h2 id="open-requirements">Open requirements<a class="anchor-link" href="#open-requirements">#</a></h2>
     <ul>
-      <li>None — all 27 requirements Verified / Done (REQ-UI-014 added and Verified this phase).</li>
+      <li>None — REQ-UI-015 Verified this run; all 28 requirements are Verified / Done.</li>
     </ul>
 
     <h2 id="known-blockers">Known blockers<a class="anchor-link" href="#known-blockers">#</a></h2>
@@ -177,12 +176,13 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <tr><td>2026-06-30</td><td>Handoff</td><td>Ship-ready — all REQs terminal; docs finalized &amp; rendered</td><td><code>docs/TrBlazeUI-Checklist.md#requirements-status</code></td></tr>
         <tr><td>2026-06-30</td><td>Runtime smoke (Playwright, key screens)</td><td>PASS — Home/DataTable/Chart/Toolbar/Icons render with data + visual OK</td><td><code>docs/screenshots/TrBlazeUI/</code></td></tr>
         <tr><td>2026-07-02</td><td>Fix-issues (REQ-UI-014, AstroLyfe TR-001…TR-009)</td><td>PASS — Release 0/0; 18/18 runtime checks (Tab order, popup w/ &amp; w/o PortalHost, AsChild, Input Label, Grid responsive, icon fallback/aria, 390px overflow)</td><td><code>docs/TrBlazeUI-Checklist.md#requirements-status</code></td></tr>
+        <tr><td>2026-07-12</td><td>Verify ui (REQ-UI-015, TrStudio TR-001…TR-011)</td><td>PASS → Verified — Release 0/0; pack nuspec 0 frameworkReferences ×3; 14/14 headless-Chromium (§4a splat render-truth + table data, gated/uncontrolled Switch, 390px scrollWidth==390; §4b visual desktop+390px). Ledger docs/.last-verify.json; spec tests/verify/ui-trstudio.spec.js</td><td><code>docs/TrBlazeUI-Checklist.md#requirements-status</code></td></tr>
       </tbody>
     </table>
 
     <h2 id="library-feedback-summary">Library feedback summary<a class="anchor-link" href="#library-feedback-summary">#</a></h2>
     <ul>
-      <li>TrBlazeUI: 0 major, 0 minor open — AstroLyfe report (<code>docs/AstroLyfe-TrBlazeUI-Feedback.md</code>): all 9 issues resolved 2026-07-02 with per-issue resolution notes; earlier consumer reports (<code>docs/TrBlazeUI-Issues-Report-1.md</code>, <code>docs/trblazeui-issues-report-2.md</code>) remain resolved</li>
+      <li>TrBlazeUI: 0 major, 0 minor open — TrStudio report (<code>docs/TrStudio-TrBlazeUI-Feedback.md</code>): all 11 issues (incl. the TR-011 Mac Catalyst blocker) resolved library-side 2026-07-12 (REQ-UI-015) with per-issue resolution notes; AstroLyfe report (<code>docs/AstroLyfe-TrBlazeUI-Feedback.md</code>): all 9 issues resolved 2026-07-02; earlier consumer reports (<code>docs/TrBlazeUI-Issues-Report-1.md</code>, <code>docs/trblazeui-issues-report-2.md</code>) remain resolved</li>
       <li>TechieRag: 0 major, 0 minor — n/a (not a dependency)</li>
     </ul>
 

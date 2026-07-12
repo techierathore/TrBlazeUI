@@ -4,7 +4,11 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <!-- NOTE (TR-011): AddRazorSupportForMvc is deliberately NOT set. Headless Blazor
+         primitives (.razor only) must stay consumable from MAUI Blazor Hybrid heads on every
+         TFM; enabling MVC Razor support pulls a build-time dependency on the
+         Microsoft.AspNetCore.App shared framework (unsatisfiable on Mac Catalyst/iOS/Android ->
+         NETSDK1082). Microsoft.AspNetCore.Components.Web (below) covers everything used. -->
 
     <!-- NuGet Package Configuration -->
     <PackageId>TrBlazeUI.Primitives</PackageId>

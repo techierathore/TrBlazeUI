@@ -148,6 +148,18 @@
     public EventCallback<IReadOnlyList<FileUploadItem>> FilesChanged { get; set; }
 
     /// <summary>
+    /// Callback when files are selected. Alias of <see cref="FilesChanged"/>.
+    /// </summary>
+    /// <remarks>
+    /// Kept for compatibility with the AI-reference examples that use <c>OnFilesSelected</c>
+    /// (TR-007). Fires with the current file list whenever the selection changes, in tandem
+    /// with <see cref="FilesChanged"/>. Prefer <see cref="FilesChanged"/> / <see cref="Files"/>
+    /// for new code.
+    /// </remarks>
+    [Parameter]
+    public EventCallback<IReadOnlyList<FileUploadItem>> OnFilesSelected { get; set; }
+
+    /// <summary>
     /// Whether multiple files can be selected.
     /// </summary>
     [Parameter]
@@ -316,8 +328,18 @@
                 objFiles.Clear();
             }
             objFiles.AddRange(filesToAdd);
-            await FilesChanged.InvokeAsync(objFiles);
+            await NotifyFilesChangedAsync();
         }
+    }
+
+    /// <summary>
+    /// Raises <see cref="FilesChanged"/> and its <see cref="OnFilesSelected"/> alias (TR-007)
+    /// with the current file list.
+    /// </summary>
+    private async Task NotifyFilesChangedAsync()
+    {
+        await FilesChanged.InvokeAsync(objFiles);
+        await OnFilesSelected.InvokeAsync(objFiles);
     }
 
     private FileValidationError? ValidateFile(IBrowserFile file)
@@ -363,7 +385,7 @@
     private async Task RemoveFile(FileUploadItem file)
     {
         objFiles.Remove(file);
-        await FilesChanged.InvokeAsync(objFiles);
+        await NotifyFilesChangedAsync();
     }
 
     private void TriggerFileInput()

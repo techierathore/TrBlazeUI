@@ -136,6 +136,16 @@ public partial class Checkbox : ComponentBase
     public Expression<Func<bool>>? CheckedExpression { get; set; }
 
     /// <summary>
+    /// Gets or sets additional HTML attributes to splat onto the checkbox element.
+    /// </summary>
+    /// <remarks>
+    /// Captures unmatched attributes (e.g. <c>data-testid</c>, arbitrary <c>data-*</c>) and
+    /// forwards them to the underlying checkbox, like a well-behaved Blazor component (TR-008).
+    /// </remarks>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
     /// Gets whether the checkbox is in an invalid state (for validation).
     /// </summary>
     private bool IsInvalid
