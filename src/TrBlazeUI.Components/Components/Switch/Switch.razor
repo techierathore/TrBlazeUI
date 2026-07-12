@@ -8,7 +8,8 @@
                  aria-label="@AriaLabel"
                  aria-required="@(CheckedExpression != null ? "true" : null)"
                  aria-invalid="@(IsInvalid ? "true" : null)"
-                 class="@CssClass">
+                 class="@CssClass"
+                 @attributes="AdditionalAttributes">
     <span data-state="@(Checked ? "checked" : "unchecked")" class="@ThumbCssClass">
     </span>
 </TrBlazeUI.Primitives.Switch.Switch>

@@ -50,3 +50,16 @@ DEV-TASKS.md
 .reviews
 /CLAUDE.md
 /WORKFLOW.html
+
+# TechieFlow framework — deployed copies, never commit (managed by scaffold/update-framework.sh)
+/opencode.jsonc
+/.tf-scaffold-note.txt
+
+# TechieFlow agent artifacts — machine-generated test harness & logs, never commit (managed by scaffold/update-framework.sh)
+/package.json
+/package-lock.json
+test-results/
+playwright-report/
+.verify/
+logs/
+/docs/.last-verify.json

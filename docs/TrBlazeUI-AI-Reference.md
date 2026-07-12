@@ -508,10 +508,33 @@ Sub-components: `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `Ca
 
 ### Pagination
 
+`Pagination` lives in the `TrBlazeUI.Components.Pagination` namespace, which is **not** in the
+global `_Imports` — add `@using TrBlazeUI.Components.Pagination`. It is a **composite** (there is
+no top-level `CurrentPage` / `TotalPages` / `OnPageChanged` API): compose `PaginationContent` +
+`PaginationItem` + `PaginationPrevious` / `PaginationLink` / `PaginationNext` and drive the current
+page yourself, or pass a `PaginationState` via the `State` parameter for automatic wiring. (Most
+tables get pagination for free through `<DataTable>`, which embeds this internally.)
+
 ```razor
-<Pagination CurrentPage="@currentPage"
-            TotalPages="@totalPages"
-            OnPageChanged="HandlePageChange" />
+@using TrBlazeUI.Components.Pagination
+
+<Pagination>
+    <PaginationContent>
+        <PaginationItem>
+            <PaginationPrevious OnClick="@(() => GoToPage(currentPage - 1))" Disabled="@(currentPage <= 1)" />
+        </PaginationItem>
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            var page = i;
+            <PaginationItem>
+                <PaginationLink IsActive="@(currentPage == page)" OnClick="@(() => GoToPage(page))">@page</PaginationLink>
+            </PaginationItem>
+        }
+        <PaginationItem>
+            <PaginationNext OnClick="@(() => GoToPage(currentPage + 1))" Disabled="@(currentPage >= totalPages)" />
+        </PaginationItem>
+    </PaginationContent>
+</Pagination>
 ```
 
 ### NavigationMenu
@@ -584,9 +607,12 @@ Sub-components: `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `Ca
     <LucideIcon Name="settings" Size="16" />
 </Button>
 
-<!-- With icon -->
+<!-- With icon: place the icon inline as the FIRST child (the button is inline-flex
+     with gap-2, so icon + label are spaced automatically). Do NOT use a <Button.Icon>
+     slot together with loose label text — mixing an explicit child-content fragment with
+     implicit content is a Razor compile error (RZ10012). -->
 <Button>
-    <Button.Icon><LucideIcon Name="mail" Size="16" /></Button.Icon>
+    <LucideIcon Name="mail" Size="16" />
     Send Email
 </Button>
 
@@ -911,8 +937,17 @@ Sub-components: `FieldLabel`, `FieldContent`, `FieldDescription`, `FieldError`, 
 
 ### FileUpload
 
+The shipped API is `Files` (`IReadOnlyList<FileUploadItem>?`) + `FilesChanged`
+(`EventCallback<IReadOnlyList<FileUploadItem>>`). `OnFilesSelected` is a back-compat **alias** of
+`FilesChanged` (both fire together) — prefer `FilesChanged` / `Files` for new code.
+
 ```razor
-<FileUpload OnFilesSelected="HandleFiles" Accept=".pdf,.doc" Multiple="true" />
+<FileUpload Files="@files" FilesChanged="HandleFiles" Accept=".pdf,.doc" Multiple="true" />
+
+@code {
+    private IReadOnlyList<FileUploadItem>? files;
+    private void HandleFiles(IReadOnlyList<FileUploadItem> selected) => files = selected;
+}
 ```
 
 ### MultiSelect
@@ -1088,12 +1123,20 @@ Sub-components: `AvatarImage` (Source, Alt), `AvatarFallback`
 
 ### Empty
 
+`Empty` ships a **flat** API — `Title` / `Description` strings, an `Icon` render fragment, a `Size`
+(`EmptySize.Small` / `Default` / `Large`), and `ChildContent` for actions. There is **no**
+`EmptyIcon` / `EmptyTitle` / `EmptyDescription` / `EmptyAction` sub-component family. When you
+supply both an `Icon` fragment and action content, name **both** fragments explicitly (`Icon` +
+`ChildContent`) — mixing an explicit fragment with loose child content is a Razor compile error.
+
 ```razor
-<Empty>
-    <EmptyIcon><LucideIcon Name="inbox" Size="48" /></EmptyIcon>
-    <EmptyTitle>No results found</EmptyTitle>
-    <EmptyDescription>Try adjusting your search criteria.</EmptyDescription>
-    <EmptyAction><Button>Create New</Button></EmptyAction>
+<Empty Title="No results found"
+       Description="Try adjusting your search criteria."
+       Size="EmptySize.Default">
+    <Icon><LucideIcon Name="inbox" Size="48" /></Icon>
+    <ChildContent>
+        <Button>Create New</Button>
+    </ChildContent>
 </Empty>
 ```
 
@@ -1133,8 +1176,12 @@ Sub-components: `AlertTitle`, `AlertDescription`
     <AlertDescription>You can add components to your app.</AlertDescription>
 </Alert>
 
+<!-- With an icon: place the icon inline as the FIRST child. Alert's CSS positions the first
+     child <svg> automatically. Do NOT use an <Alert.Icon> slot alongside loose AlertTitle/
+     AlertDescription content — mixing an explicit fragment with implicit child content is a
+     Razor compile error (RZ10012). -->
 <Alert Variant="AlertVariant.Danger" AccentBorder="true">
-    <Alert.Icon><LucideIcon Name="alert-circle" Size="16" /></Alert.Icon>
+    <LucideIcon Name="alert-circle" Size="16" />
     <AlertTitle>Error</AlertTitle>
     <AlertDescription>Something went wrong.</AlertDescription>
 </Alert>

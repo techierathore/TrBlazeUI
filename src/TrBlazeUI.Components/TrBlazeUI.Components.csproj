@@ -4,7 +4,12 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <!-- NOTE (TR-011): AddRazorSupportForMvc is deliberately NOT set. This is a Blazor
+         component library (.razor only, no MVC/.cshtml). Enabling MVC Razor support pulls a
+         build-time dependency on the Microsoft.AspNetCore.App shared framework, which is
+         unsatisfiable on MAUI Mac Catalyst/iOS/Android (no ASP.NET Core runtime pack ->
+         NETSDK1082). Everything the components use lives in the Microsoft.AspNetCore.Components.Web
+         PackageReference below. -->
 
     <!-- NuGet Package Configuration -->
     <PackageId>TrBlazeUI.Components</PackageId>

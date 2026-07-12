@@ -144,10 +144,6 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
       </ol>
     </div>
 
-    <blockquote><strong>Depth mandate:</strong> this is a HUMAN document, read as rendered HTML. Module rows in §4 with non-trivial behavior get a prose paragraph beneath the table, and every significant runtime flow beyond §3's primary path gets its own diagram. Source-doc architecture content (from <code>TrBlazeUI-Doc.md</code>, the modernization plan, and the consumer issue reports) is carried forward, not summarized away.</blockquote>
-
-    <blockquote><strong>Mermaid mandate.</strong> Every diagram follows the authoring rules in <code>.tfcore/templates/v4custom/html-render-shell.md §5.5</code> — every node/edge/subgraph label is double-quoted; no <code>end</code> node ids.</blockquote>
-
     <h2 id="tech-stack">1. Tech stack<a class="anchor-link" href="#tech-stack">#</a></h2>
 
     <p>TrBlazeUI is a <strong>Blazor UI component library</strong> (not an application) — a renamed fork of the open-source <em>Blazor Blueprint</em> project (original author Mathew Taylor), distributed as NuGet packages and licensed Apache 2.0. It is styled with Tailwind CSS v4 and follows the shadcn/ui design system. There is <strong>no database, no server backend, no authentication, and no AI/RAG layer</strong> — the only runtime artifacts are the library assemblies and three demo host applications.</p>

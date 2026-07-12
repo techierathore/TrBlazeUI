@@ -220,6 +220,16 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     public string? Class { get; set; }
 
     /// <summary>
+    /// Gets or sets additional HTML attributes to splat onto the table's root container.
+    /// </summary>
+    /// <remarks>
+    /// Captures unmatched attributes (e.g. <c>data-testid</c>, <c>id</c>, arbitrary <c>data-*</c>)
+    /// and forwards them to the rendered root, like a well-behaved Blazor component (TR-001).
+    /// </remarks>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
     /// Gets or sets the ARIA label for the table.
     /// </summary>
     [Parameter]
@@ -263,7 +273,10 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// Gets the computed CSS classes for the container.
     /// </summary>
     private string ContainerCssClass => ClassNames.cn(
-        "w-full space-y-4",
+        // min-w-0 lets the table's own root shrink inside a narrow (<=400px) flex/grid parent
+        // so only the inner overflow-auto region scrolls horizontally instead of the page body
+        // gaining residual overflow (TR-010). The pagination footer already wraps (flex-wrap).
+        "w-full min-w-0 space-y-4",
         Class
     );
 

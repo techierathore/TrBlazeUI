@@ -149,6 +149,16 @@ public partial class Switch : ComponentBase
     public Expression<Func<bool>>? CheckedExpression { get; set; }
 
     /// <summary>
+    /// Gets or sets additional HTML attributes to splat onto the switch element.
+    /// </summary>
+    /// <remarks>
+    /// Captures unmatched attributes (e.g. <c>data-testid</c>, arbitrary <c>data-*</c>) and
+    /// forwards them to the underlying switch, like a well-behaved Blazor component (TR-008).
+    /// </remarks>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
     /// Gets whether the switch is in an invalid state (for validation).
     /// </summary>
     private bool IsInvalid
@@ -234,8 +244,17 @@ public partial class Switch : ComponentBase
     /// </summary>
     private async Task HandleCheckedChanged(bool value)
     {
-        Checked = value;
-        await CheckedChanged.InvokeAsync(Checked);
+        // Only hold local state when uncontrolled (no bound CheckedChanged consumer). In
+        // controlled mode the bound Checked prop is the source of truth, so we do NOT flip
+        // internal state optimistically — if the consumer intercepts the change and leaves
+        // Checked unchanged (e.g. a confirmation gate), the switch re-renders back to the
+        // prop-driven position instead of diverging (TR-009).
+        if (!CheckedChanged.HasDelegate)
+        {
+            Checked = value;
+        }
+
+        await CheckedChanged.InvokeAsync(value);
 
         // Notify EditContext of field change for validation
         if (objEditContext != null && CheckedExpression != null && objFieldIdentifier.FieldName != null)
