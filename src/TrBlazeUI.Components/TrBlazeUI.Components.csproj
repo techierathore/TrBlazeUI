@@ -31,7 +31,13 @@
 
   <ItemGroup>
     <PackageReference Include="Blazor-ApexCharts" Version="6.1.0" />
-    <PackageReference Include="HtmlSanitizer" Version="9.0.892" />
+    <!-- HtmlSanitizer 9.1.949-beta is deliberately used over the latest STABLE (9.0.892):
+         the stable line hard-pins AngleSharp [0.17.1], which carries CVE-2026-54570
+         (GHSA-pgww-w46g-26qg) — a mutated-XSS bypass that defeats DOM-based HTML sanitizers,
+         i.e. exactly this library's XSS protection in RichTextEditor/MarkdownEditor (REQ-NFR-003).
+         The fix (AngleSharp >= 1.5.0) is only available via HtmlSanitizer's 9.1.x pre-release line,
+         which this beta pulls (AngleSharp 1.5.1). Revert to a stable 9.1.x once released (REQ-FN-009). -->
+    <PackageReference Include="HtmlSanitizer" Version="9.1.949-beta" />
     <PackageReference Include="Markdig" Version="0.45.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.3" />
   </ItemGroup>

@@ -112,27 +112,42 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </head>
 <body>
 <button id="themeToggle" class="theme-toggle" title="Toggle light / dark">☾ Dark</button>
-<div class="layout no-toc">
+<div class="layout">
+  <nav class="side">
+    <h1>TrBlazeUI — Status</h1>
+    <div class="sub">Last rendered: 2026-07-18</div>
+    <div class="group">Contents</div>
+    <ol>
+      <li><a href="#where-i-am">Where I am</a></li>
+      <li><a href="#next-command-to-run">Next command to run</a></li>
+      <li><a href="#open-requirements">Open requirements</a></li>
+      <li><a href="#known-blockers">Known blockers</a></li>
+      <li><a href="#verification-log">Verification log</a></li>
+      <li><a href="#library-feedback-summary">Library feedback summary</a></li>
+      <li><a href="#standards-compliance-last-verifier-check">Standards compliance (last verifier check)</a></li>
+      <li><a href="#deferred-future">Deferred / future</a></li>
+    </ol>
+  </nav>
   <main>
     <h1>TrBlazeUI — Status</h1>
-    <div class="subtitle">Fix-issues — TrStudio feedback Verified (REQ-UI-015); awaiting publish (&gt; 1.0.7)</div>
+    <div class="subtitle">Fix-issues complete — REQ-FN-009 fixed &amp; verified; Release build green</div>
 
     <!-- YAML frontmatter rendered as a styled metadata block (not a literal --- rule) -->
     <div class="meta">
       <dl>
         <dt>project</dt><dd>TrBlazeUI</dd>
         <dt>stack</dt><dd>.NET 10 / Blazor (Server·WASM·Auto) / Tailwind CSS v4 / shadcn-compatible</dd>
-        <dt>last_updated</dt><dd>2026-07-12</dd>
-        <dt>current_phase</dt><dd>Fix-issues — TrStudio feedback Verified (REQ-UI-015); awaiting publish (&gt; 1.0.7)</dd>
-        <dt>last_verified_build</dt><dd>PASS</dd>
-        <dt>last_verified_date</dt><dd>2026-07-12</dd>
+        <dt>last_updated</dt><dd>2026-07-18</dd>
+        <dt>current_phase</dt><dd>Fix-issues complete — REQ-FN-009 fixed &amp; verified; Release build green</dd>
+        <dt>last_verified_build</dt><dd>PASS (Release 0/0; NU1902 cleared, AngleSharp 1.5.1)</dd>
+        <dt>last_verified_date</dt><dd>2026-07-18</dd>
       </dl>
     </div>
 
     <!-- NEXT COMMAND TO RUN CTA -->
     <div class="cta">
       <div class="cta-label">Next command to run</div>
-      <pre><code>Publish the next package versions (&gt; 1.0.7) for Components / Primitives / Icons.Lucide so TrStudio can consume the clean packages (owner: manual bump + push).</code></pre>
+      <pre><code>Publish the next package versions (&gt; 1.0.7) for Components / Primitives / Icons.Lucide (owner: manual bump + push). NOTE: Components now depends on HtmlSanitizer 9.1.949-beta (pre-release) — confirm that is acceptable for the published package, or hold the Components bump until HtmlSanitizer 9.1.x reaches stable.</code></pre>
     </div>
 
     <div class="toc-inline">
@@ -150,19 +165,19 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
     </div>
 
     <h2 id="where-i-am">Where I am<a class="anchor-link" href="#where-i-am">#</a></h2>
-    <p>TrStudio consumer-feedback pass complete. All 11 issues in <code>docs/TrStudio-TrBlazeUI-Feedback.md</code> (1 blocker, 3 major, 6 minor, 1 nice-to-have) are resolved <strong>library-side</strong> under REQ-UI-015 and self-smoked. Code: <code>DataTable</code>, <code>Alert</code>, <code>Components.Checkbox</code>, <code>Components.Switch</code> now splat <code>CaptureUnmatchedValues</code> (TR-001/002/008; <code>Badge</code>/<code>FieldError</code> already did — TR-004); <code>Switch</code> honors its controlled <code>Checked</code> prop instead of flipping optimistically (TR-009); <code>DataTable</code> root is <code>min-w-0</code> so it self-contains at ≤400px (TR-010); <code>FileUpload</code> gained an <code>OnFilesSelected</code> alias of <code>FilesChanged</code> (TR-007); and the <strong>TR-011 blocker</strong> is fixed by removing <code>AddRazorSupportForMvc</code> from Components + Primitives (no MVC/.cshtml in either), so the packed nuspecs no longer carry a <code>Microsoft.AspNetCore.App</code> FrameworkReference → MAUI Mac Catalyst consumers escape NETSDK1082. Docs: <code>TrBlazeUI-AI-Reference.md</code> corrected for the Button/Alert inline-icon pattern (TR-003), the flat <code>Empty</code> API (TR-005), the composite <code>Pagination</code> API + namespace (TR-006), and <code>FileUpload</code> (TR-007). Verified three ways: strict Release build <strong>0/0</strong>; pack + nuspec assertion <strong>0 <code>frameworkReferences</code></strong> across all three packages; <strong>14/14</strong> headless-Chromium runtime smoke (splat render-truth, gated-vs-uncontrolled Switch, 390px <code>scrollWidth==390</code>, desktop + mobile visual pass). <strong>Formally verified 2026-07-12</strong> (<code>*verify ui</code>): ledger <code>docs/.last-verify.json</code> written; REQ-UI-015 = <code>Verified</code> in the checklist under all three gates (acceptance + §4a render-truth + §4b visual-truth).</p>
+    <p>Ran <code>*fix-issues</code> against the TechieRag report <code>docs/trblazeui-issues-report.md</code>. The report's own 5 issues were already resolved (confirmed in the prior triage — no code needed). The real open work was <strong>REQ-FN-009</strong>, the NU1902 build blocker surfaced by the build gate. Root cause: <code>HtmlSanitizer 9.0.892</code> (latest stable) hard-pins <code>AngleSharp [0.17.1]</code>, which carries <strong>CVE-2026-54570 (GHSA-pgww-w46g-26qg)</strong> — a mutated-XSS bypass that defeats DOM-based HTML sanitizers, i.e. this library's own XSS protection (<code>RichTextEditor</code>/<code>MarkdownEditor</code>, REQ-NFR-003). No <em>stable</em> HtmlSanitizer ships the patched <code>AngleSharp ≥ 1.5.0</code>, so a scoped audit-suppression would have meant knowingly shipping the exploitable hole. <strong>Owner chose to upgrade to <code>HtmlSanitizer 9.1.949-beta</code></strong> (the only line pulling patched AngleSharp — resolves 1.5.1), accepting the pre-release dependency over shipping a suppressed vulnerability. Verified: full-solution Release build <strong>0/0</strong> (0× NU1902), AngleSharp resolves 1.5.1 in the shipped graph, and a runtime sanitize smoke on the shipped package PASSED — benign markup preserved, classic XSS + the CVE-2026-54570 mXSS payload both neutralized. REQ-FN-009, REQ-NFR-005, REQ-NFR-003 now <code>Verified</code> (ledger <code>docs/.last-verify.json</code>). Only <code>src/TrBlazeUI.Components/TrBlazeUI.Components.csproj</code> changed (one PackageReference + a rationale comment).</p>
 
     <h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2>
-    <pre><code>Publish the next package versions (&gt; 1.0.7) for Components / Primitives / Icons.Lucide so TrStudio can consume the clean packages (owner: manual bump + push).</code></pre>
+    <pre><code>Publish the next package versions (&gt; 1.0.7) for Components / Primitives / Icons.Lucide (owner: manual bump + push). NOTE: Components now depends on HtmlSanitizer 9.1.949-beta (pre-release) — confirm that is acceptable for the published package, or hold the Components bump until HtmlSanitizer 9.1.x reaches stable.</code></pre>
 
     <h2 id="open-requirements">Open requirements<a class="anchor-link" href="#open-requirements">#</a></h2>
     <ul>
-      <li>None — REQ-UI-015 Verified this run; all 28 requirements are Verified / Done.</li>
+      <li>None — REQ-FN-009 fixed &amp; Verified this run; REQ-NFR-005 re-verified; all requirements Verified / Done.</li>
     </ul>
 
     <h2 id="known-blockers">Known blockers<a class="anchor-link" href="#known-blockers">#</a></h2>
     <ul>
-      <li>None.</li>
+      <li>None. (The Release build is green again.)</li>
     </ul>
 
     <h2 id="verification-log">Verification log<a class="anchor-link" href="#verification-log">#</a></h2>
@@ -171,37 +186,39 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <tr><th>Date</th><th>Phase</th><th>Result</th><th>Status table</th></tr>
       </thead>
       <tbody>
-        <tr><td>2026-06-30</td><td>Discovery (day-1 build probe)</td><td>FAIL — 5 IDE0031 (Sidebar)</td><td><code>docs/TrBlazeUI-Checklist.md#requirements-status</code></td></tr>
-        <tr><td>2026-06-30</td><td>Build (REQ-NFR-005, REQ-FN-003)</td><td>PASS — Release 0/0; both REQs Verified</td><td><code>docs/TrBlazeUI-Checklist.md#requirements-status</code></td></tr>
-        <tr><td>2026-06-30</td><td>Handoff</td><td>Ship-ready — all REQs terminal; docs finalized &amp; rendered</td><td><code>docs/TrBlazeUI-Checklist.md#requirements-status</code></td></tr>
-        <tr><td>2026-06-30</td><td>Runtime smoke (Playwright, key screens)</td><td>PASS — Home/DataTable/Chart/Toolbar/Icons render with data + visual OK</td><td><code>docs/screenshots/TrBlazeUI/</code></td></tr>
-        <tr><td>2026-07-02</td><td>Fix-issues (REQ-UI-014, AstroLyfe TR-001…TR-009)</td><td>PASS — Release 0/0; 18/18 runtime checks (Tab order, popup w/ &amp; w/o PortalHost, AsChild, Input Label, Grid responsive, icon fallback/aria, 390px overflow)</td><td><code>docs/TrBlazeUI-Checklist.md#requirements-status</code></td></tr>
-        <tr><td>2026-07-12</td><td>Verify ui (REQ-UI-015, TrStudio TR-001…TR-011)</td><td>PASS → Verified — Release 0/0; pack nuspec 0 frameworkReferences ×3; 14/14 headless-Chromium (§4a splat render-truth + table data, gated/uncontrolled Switch, 390px scrollWidth==390; §4b visual desktop+390px). Ledger docs/.last-verify.json; spec tests/verify/ui-trstudio.spec.js</td><td><code>docs/TrBlazeUI-Checklist.md#requirements-status</code></td></tr>
+        <tr><td>2026-06-30</td><td>Discovery (day-1 build probe)</td><td>FAIL — 5 IDE0031 (Sidebar)</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+        <tr><td>2026-06-30</td><td>Build (REQ-NFR-005, REQ-FN-003)</td><td>PASS — Release 0/0; both REQs Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+        <tr><td>2026-06-30</td><td>Handoff</td><td>Ship-ready — all REQs terminal</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+        <tr><td>2026-07-02</td><td>Fix-issues (REQ-UI-014, AstroLyfe)</td><td>PASS — Release 0/0; 18/18 runtime checks</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+        <tr><td>2026-07-12</td><td>Verify ui (REQ-UI-015, TrStudio)</td><td>PASS → Verified — Release 0/0; 14/14 headless-Chromium</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+        <tr><td>2026-07-18</td><td>Triage (TechieRag report, analyze-only)</td><td>5 reported issues reconciled (fixes hold); build gate FAILED — NU1902 AngleSharp → REQ-NFR-005 demoted, REQ-FN-009 logged</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+        <tr><td>2026-07-18</td><td>Fix-issues + verify (REQ-FN-009)</td><td>PASS → Verified — HtmlSanitizer→9.1.949-beta (AngleSharp 1.5.1); Release 0/0, NU1902 cleared; sanitize smoke neutralizes CVE-2026-54570 mXSS. Ledger docs/.last-verify.json</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
       </tbody>
     </table>
 
     <h2 id="library-feedback-summary">Library feedback summary<a class="anchor-link" href="#library-feedback-summary">#</a></h2>
     <ul>
-      <li>TrBlazeUI: 0 major, 0 minor open — TrStudio report (<code>docs/TrStudio-TrBlazeUI-Feedback.md</code>): all 11 issues (incl. the TR-011 Mac Catalyst blocker) resolved library-side 2026-07-12 (REQ-UI-015) with per-issue resolution notes; AstroLyfe report (<code>docs/AstroLyfe-TrBlazeUI-Feedback.md</code>): all 9 issues resolved 2026-07-02; earlier consumer reports (<code>docs/TrBlazeUI-Issues-Report-1.md</code>, <code>docs/trblazeui-issues-report-2.md</code>) remain resolved</li>
-      <li>TechieRag: 0 major, 0 minor — n/a (not a dependency)</li>
+      <li>TrBlazeUI: TechieRag report (<code>docs/trblazeui-issues-report.md</code>) — all 5 reported issues confirmed resolved 2026-07-18; the separate NU1902 supply-chain blocker (AngleSharp mXSS via HtmlSanitizer) fixed same day under REQ-FN-009 by moving to HtmlSanitizer 9.1.949-beta. TrStudio: all 11 resolved 2026-07-12 (REQ-UI-015); AstroLyfe: all 9 resolved 2026-07-02; earlier reports remain resolved.</li>
+      <li>TechieRag: 0 issues open.</li>
     </ul>
 
     <h2 id="standards-compliance-last-verifier-check">Standards compliance (last verifier check)<a class="anchor-link" href="#standards-compliance-last-verifier-check">#</a></h2>
     <ul>
-      <li>Underscore fields: clean (obj-prefix convention; new code follows it)</li>
+      <li>Underscore fields: clean (obj-prefix convention)</li>
       <li>Test method underscores: not separately run (no test project in solution)</li>
       <li>Mis-prefixed fields: clean (statics PascalCase per Coding Standards §Fields)</li>
-      <li>XML docs: 100% on public members (CS1591 build-enforced; all new components/params documented)</li>
-      <li>IDE0031: downgraded to <code>suggestion</code> for event-accessor null guards (CS0131 makes the <code>?.</code> fix illegal) — justified in <code>.editorconfig</code></li>
-      <li>CA1848: icon warning paths use cached <code>LoggerMessage.Define</code> delegates</li>
+      <li>XML docs: 100% on public members (CS1591 build-enforced)</li>
+      <li>IDE0031: downgraded to <code>suggestion</code> for event-accessor null guards (CS0131) — justified in <code>.editorconfig</code></li>
+      <li>NU1902: cleared 2026-07-18 (AngleSharp 1.5.1 via HtmlSanitizer 9.1.949-beta)</li>
     </ul>
 
     <h2 id="deferred-future">Deferred / future<a class="anchor-link" href="#deferred-future">#</a></h2>
     <ul>
-      <li>Optional migration of consumer workaround components back to standard TrBlazeUI components (all enabling fixes shipped; AstroLyfe can now drop its <code>.sr-only</code> override and icon-name remaps).</li>
-      <li>Compile-time icon-name analyzer / source generator so wrong icon ids fail the build (TR-009 stretch suggestion).</li>
-      <li>Same inline-fallback treatment for <code>DialogPortal</code>/<code>SheetPortal</code> when no PortalHost is attached (FloatingPortal-based components are covered).</li>
-      <li>Consider an automated UI test project (Playwright) for the demo app to back future verification (the fix-issues smoke scripts are a ready seed).</li>
+      <li><strong>Move HtmlSanitizer off the pre-release <code>9.1.949-beta</code> to a stable 9.1.x once released</strong> (tracked with REQ-FN-009 / REQ-NFR-003) — the beta is only in use because no stable HtmlSanitizer yet ships the patched AngleSharp ≥ 1.5.0.</li>
+      <li>Optional migration of consumer workaround components back to standard TrBlazeUI components.</li>
+      <li>Compile-time icon-name analyzer / source generator so wrong icon ids fail the build.</li>
+      <li>Same inline-fallback treatment for <code>DialogPortal</code>/<code>SheetPortal</code> when no PortalHost is attached.</li>
+      <li>Consider an automated UI test project (Playwright) for the demo app to back future verification.</li>
     </ul>
   </main>
 </div>
