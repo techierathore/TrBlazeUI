@@ -91,17 +91,28 @@ jobs:
           if (Test-Path ./nupkgs) { Remove-Item ./nupkgs -Recurse -Force }
           New-Item -ItemType Directory -Path ./nupkgs | Out-Null
 
+          # NoWarn is applied per project, NOT as a blanket -p:NoWarn: an MSBuild global
+          # property overrides project-level <NoWarn>, which would silently strip e.g.
+          # Primitives' CA1716 suppression and fail that pack instead.
+          #
+          # Components needs NU5104 ("a stable release should not have a prerelease
+          # dependency"): its HtmlSanitizer 9.1.949-beta pin is a deliberate security choice
+          # (CVE-2026-54570 / REQ-NFR-003), so the warning is expected rather than a defect.
+          # Only stable versions trip it - CI builds are always -ci.N prerelease. Drop this
+          # once a stable HtmlSanitizer 9.1.x ships (REQ-FN-009).
           $projects = @(
-            "src/TrBlazeUI.Primitives/TrBlazeUI.Primitives.csproj",
-            "src/TrBlazeUI.Components/TrBlazeUI.Components.csproj",
-            "src/TrBlazeUI.Icons.Lucide/TrBlazeUI.Icons.Lucide.csproj",
-            "src/TrBlazeUI.Icons.Heroicons/TrBlazeUI.Icons.Heroicons.csproj",
-            "src/TrBlazeUI.Icons.Feather/TrBlazeUI.Icons.Feather.csproj"
+            @{ Path = "src/TrBlazeUI.Primitives/TrBlazeUI.Primitives.csproj" },
+            @{ Path = "src/TrBlazeUI.Components/TrBlazeUI.Components.csproj"; NoWarn = "NU5104" },
+            @{ Path = "src/TrBlazeUI.Icons.Lucide/TrBlazeUI.Icons.Lucide.csproj" },
+            @{ Path = "src/TrBlazeUI.Icons.Heroicons/TrBlazeUI.Icons.Heroicons.csproj" },
+            @{ Path = "src/TrBlazeUI.Icons.Feather/TrBlazeUI.Icons.Feather.csproj" }
           )
           foreach ($project in $projects) {
-            Write-Host "Packing $project..."
-            dotnet pack $project -c Release --no-restore -o ./nupkgs -p:CI=true -p:Version=${{ steps.version.outputs.PACKAGE_VERSION }}
-            if ($LASTEXITCODE -ne 0) { throw "dotnet pack failed for $project with exit code $LASTEXITCODE" }
+            Write-Host "Packing $($project.Path)..."
+            $extraArgs = @()
+            if ($project.NoWarn) { $extraArgs += "-p:NoWarn=$($project.NoWarn)" }
+            dotnet pack $project.Path -c Release --no-restore -o ./nupkgs -p:CI=true -p:Version=${{ steps.version.outputs.PACKAGE_VERSION }} @extraArgs
+            if ($LASTEXITCODE -ne 0) { throw "dotnet pack failed for $($project.Path) with exit code $LASTEXITCODE" }
           }
 
       - name: List generated packages
