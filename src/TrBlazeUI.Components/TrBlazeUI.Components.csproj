@@ -23,6 +23,14 @@
     <Authors>TrBlazeUI Contributors</Authors>
     <Copyright>Copyright (c) 2025-present TrBlazeUI Contributors</Copyright>
 
+    <!-- NU5104 ("stable release should not have a prerelease dependency") is suppressed because
+         the HtmlSanitizer 9.1.949-beta reference below is a deliberate security choice, not an
+         oversight — see the rationale on that PackageReference (CVE-2026-54570 / REQ-NFR-003).
+         Without this, packing any STABLE version fails under TreatWarningsAsErrors, which breaks
+         release publishes while CI builds (always -ci.N prerelease) pass. Remove together with
+         the beta pin once a stable HtmlSanitizer 9.1.x ships (REQ-FN-009). -->
+    <NoWarn>$(NoWarn);NU5104</NoWarn>
+
   </PropertyGroup>
 
   <ItemGroup>

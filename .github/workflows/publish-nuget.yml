@@ -36,10 +36,18 @@ jobs:
         id: version
         shell: pwsh
         run: |
+          $source = "Directory.Build.props"
           if ("${{ github.event_name }}" -eq "release") {
             $tag = "${{ github.event.release.tag_name }}"
+            $source = "release tag '$tag'"
             # Strip optional 'v' prefix
             $ver = $tag -replace '^v', ''
+            # Tags are sometimes cut with only MAJOR.MINOR (e.g. '1.10'). NuGet requires
+            # three parts, so normalise rather than failing the release.
+            if ($ver -match '^\d+\.\d+$') {
+              Write-Host "Tag '$tag' has only two version parts; normalising to '$ver.0'"
+              $ver = "$ver.0"
+            }
             Write-Host "Release tag: $tag -> version: $ver"
           } else {
             # Read base version from Directory.Build.props
@@ -51,7 +59,7 @@ jobs:
 
           # Validate semver format (with optional pre-release)
           if ($ver -notmatch '^\d+\.\d+\.\d+(-[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*)?$') {
-            throw "Invalid semver version: $ver"
+            throw "Invalid semver version '$ver' (from $source). Expected MAJOR.MINOR.PATCH with an optional pre-release suffix, e.g. 1.10.0 or v1.10.0-beta.1"
           }
 
           Write-Host "PACKAGE_VERSION=$ver"
@@ -77,6 +85,12 @@ jobs:
       - name: Pack NuGet packages
         shell: pwsh
         run: |
+          # Pack into a clean directory. The repo tracks stale .nupkg artifacts under
+          # ./nupkgs, and the verify/publish steps glob whatever is there - without this
+          # the checked-out packages get verified and pushed alongside the fresh ones.
+          if (Test-Path ./nupkgs) { Remove-Item ./nupkgs -Recurse -Force }
+          New-Item -ItemType Directory -Path ./nupkgs | Out-Null
+
           $projects = @(
             "src/TrBlazeUI.Primitives/TrBlazeUI.Primitives.csproj",
             "src/TrBlazeUI.Components/TrBlazeUI.Components.csproj",

@@ -13,6 +13,11 @@ TestResults/
 .dotnet/
 packages/
 
+# Build output of `dotnet pack` — generated per build, never commit.
+# Tracked .nupkg files here get picked up by the publish workflow's verify/push steps.
+nupkgs/
+*.nupkg
+
 # Blazor
 **/wwwroot/css/app.css*
 
