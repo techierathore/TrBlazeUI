@@ -174,7 +174,7 @@
             }
         </div>
 
-        @if (ShowPagination && !IsLoading && objProcessedData.Any())
+        @if (ShouldShowPagination())
         {
             <Pagination State="@objTableState.Pagination"
                         PageSizes="@PageSizes"

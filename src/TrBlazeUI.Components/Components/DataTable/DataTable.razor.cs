@@ -152,14 +152,15 @@ public partial class DataTable<TData> : ComponentBase where TData : class
 
     /// <summary>
     /// Gets or sets whether to show the toolbar with global search and column visibility.
-    /// Default is true.
+    /// Default is false — the toolbar is opt-in so a bare table renders as just a table.
     /// </summary>
     [Parameter]
-    public bool ShowToolbar { get; set; } = true;
+    public bool ShowToolbar { get; set; }
 
     /// <summary>
-    /// Gets or sets whether to show pagination controls.
-    /// Default is true.
+    /// Gets or sets whether pagination controls are allowed to render.
+    /// Default is true, but the pagination bar auto-suppresses when every filtered row
+    /// fits on a single page; set to false to suppress it unconditionally.
     /// </summary>
     [Parameter]
     public bool ShowPagination { get; set; } = true;
@@ -534,6 +535,16 @@ public partial class DataTable<TData> : ComponentBase where TData : class
             await SelectedItemsChanged.InvokeAsync(selectedItems.ToList().AsReadOnly());
         }
     }
+
+    /// <summary>
+    /// Determines whether the pagination bar should render.
+    /// Requires <see cref="ShowPagination"/>, a non-loading table, and more filtered rows
+    /// than fit on a single page — a grid whose rows fit one page shows no pagination chrome.
+    /// </summary>
+    private bool ShouldShowPagination() =>
+        ShowPagination
+        && !IsLoading
+        && objTableState.Pagination.TotalItems > objTableState.Pagination.PageSize;
 
     /// <summary>
     /// Determines whether to show the select-all dropdown prompt.

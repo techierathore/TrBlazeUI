@@ -72,21 +72,23 @@ This document captures, for the product owner, what TrBlazeUI delivers today (th
 
 <!-- Feature-level snapshot. Live per-REQ status: PROJECT-STATUS.md + docs/TrBlazeUI-Checklist.md. -->
 
-**Snapshot as of 2026-06-30.** Live, per-requirement status: see `PROJECT-STATUS.md` and the **Requirements Status** table in `docs/TrBlazeUI-Checklist.md`. Status is derived from the migrated modernization/toolbar plans (both fully delivered) and a static scan of the as-built codebase.
+**Snapshot as of 2026-07-21 (handoff).** Live, per-requirement status: see `PROJECT-STATUS.md` and the **Requirements Status** table in `docs/TrBlazeUI-Checklist.md`. Status is derived from the migrated modernization/toolbar plans (both fully delivered), a static scan of the as-built codebase, and the runtime verification runs logged in PROJECT-STATUS.
+
+**All features are `Done`; every REQ in the checklist is terminal.** Since the 2026-06-30 snapshot, three consumer-feedback cycles landed and were runtime-verified: REQ-UI-014 (AstroLyfe TR-001…009), REQ-UI-015 (TrStudio TR-001…011, incl. the Mac Catalyst packaging blocker), REQ-FN-009 (AngleSharp/CVE-2026-54570 supply-chain fix) and REQ-UI-016 (AstroLyfe TR-010/011/012 — DataTable default chrome, Dialog viewport clamp, popover token fallbacks). F-A11Y moves 90 → 100: axe-driven consumer findings (keyboard trap, accessible names, `nested-interactive`, `svg-img-alt`, `.sr-only` scroll footprint) were all resolved and verified, though still not covered by an independent third-party audit.
 
 | Feature (F-code) | Phase | Status | % | Notes |
 |------------------|-------|--------|---|-------|
 | F-PRIM: Headless primitives | Pre-existing | Done | 100 | 16 primitives + portal/focus/keyboard/positioning services |
 | F-FORM: Form components | Pre-existing | Done | 100 | ~28 form components incl. pickers, OTP, masked, multiselect |
 | F-LAYOUT: Layout & navigation | Pre-existing | Done | 100 | Sidebar (22 parts), nav menu, tabs, breadcrumb, pagination, resizable |
-| F-OVERLAY: Overlay & feedback | Pre-existing | Done | 100 | Dialog, Sheet, Drawer, Popover, Toast, Tooltip, Command, menus |
-| F-DATA: Data & content | Pre-existing | Done | 100 | DataTable, MarkdownEditor, RichTextEditor |
+| F-OVERLAY: Overlay & feedback | Pre-existing | Done | 100 | Dialog, Sheet, Drawer, Popover, Toast, Tooltip, Command, menus. 2.0.0: Dialog clamped to viewport, popover token fallbacks (REQ-UI-016) |
+| F-DATA: Data & content | Pre-existing | Done | 100 | DataTable, MarkdownEditor, RichTextEditor. 2.0.0: DataTable toolbar now opt-in, pagination auto-hides (REQ-UI-016) |
 | F-DISPLAY: Display components | Pre-existing | Done | 100 | Avatar, Badge, Alert, Progress, Skeleton, Spinner, Typography, etc. |
 | F-TOOLBAR: Toolbar | Pre-existing | Done | 100 | Toolbar + Group/Button/ToggleButton/Separator (per toolbar plan) |
 | F-CHART: Charts | Pre-existing | Done | 100 | 6 chart types via Blazor-ApexCharts |
 | F-ICONS: Icon libraries | Pre-existing | Done | 100 | Lucide / Heroicons / Feather (3,200+ icons) |
 | F-THEME: Theming & dark mode | Pre-existing | Done | 100 | CSS variables, OKLCH, shadcn/tweakcn compatible, `.dark` toggle |
-| F-A11Y: Accessibility | Pre-existing | Done | 90 | WCAG 2.1 AA patterns library-wide; not independently audited |
+| F-A11Y: Accessibility | Pre-existing | Done | 100 | WCAG 2.1 AA patterns library-wide; consumer axe findings resolved + verified (REQ-UI-014/016); not independently audited |
 | F-DEMO: Demo applications | Pre-existing | Done | 100 | 90+ pages across Server / WASM / Auto |
 | F-DIST: Packaging & distribution | Pre-existing | Done | 100 | MinVer, 5 packages, GitHub Actions → GitHub Packages |
 | F-AI: AI agent skills | Pre-existing | Done | 100 | Claude Code + OpenCode skills + AI reference doc |
@@ -454,6 +456,6 @@ Claude Code (`/trblazeui`) and OpenCode agent skills (distributable copies in `d
 ---
 Last updated: 2026-06-30
 Highest BRD ID: BRD-53
-Sources harvested: docs/TrBlazeUI-Doc.md, docs/TrBlazeUI-Update-plan.md, docs/toolbarplan.md, docs/TrBlazeUI-Issues-Report-1.md, docs/trblazeui-issues-report-2.md, README.md, THEMING.md
+Sources harvested: docs/TrBlazeUI-Doc.md, docs/TrBlazeUI-Update-plan.md, docs/toolbarplan.md, docs/OldDocs/TrBlazeUI-Issues-Report-1.md, docs/OldDocs/trblazeui-issues-report-2.md, README.md, THEMING.md
 Custom instructions applied: none
 Drafted from reverse-doc — review and edit. New BRDs may be added (append-only); do not renumber.

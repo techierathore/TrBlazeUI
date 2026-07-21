@@ -95,9 +95,11 @@ The demo app exposes the whole library through a sidebar navigation. Walk these 
 
 ## Test (automated)
 ```bash
-dotnet test
+cmd.exe /c "dotnet build TrBlazeUI.sln -c Release -p:CI=true"
+NODE_PATH=<path-to-any-repo-with-playwright>/node_modules node tests/verify/ui-ui016.spec.js
 ```
-> No unit/Playwright test projects are checked into the solution today; verification is the demo-app walkthrough above. (Add a test project + `npx playwright test` if/when automated UI tests are introduced.)
+> No unit-test project is checked into the solution. Runtime verification is the plain-Playwright specs under `tests/verify/` (`ui-ui016.spec.js`, `ui-trstudio.spec.js`), each run against a booted demo with `SMOKE_URL` pointing at it. This repo intentionally ships no `node_modules` — resolve Playwright via `NODE_PATH` from another repo that has it. Boot the demo with an explicit `--urls` argument (`launchSettings.json` otherwise binds `localhost` only, which WSL cannot reach):
+> `cmd.exe /c "dotnet run -c Release --no-build --project demos/TrBlazeUI.Demo.Server/TrBlazeUI.Demo.Server.csproj --urls http://0.0.0.0:5213"`
 
 ## Smoke checklist (quick capability pass)
 - [ ] Demo host boots and the home page renders **styled** (sidebar, not bullet links) — confirms CSS path
@@ -107,8 +109,19 @@ dotnet test
 - [ ] Open `/charts/bar` — chart renders with theme colors
 - [ ] Open `/icons` — switch icon library, icons render
 - [ ] Toggle dark mode — components restyle without breakage
+- [ ] Open `/components/datatable` — the Basic Table shows **no search box** (toolbar is opt-in as of 2.0.0) and paginates only because it has 500 rows
+- [ ] Open a tall Dialog — its header is visible at the top of the viewport and long content scrolls inside the dialog
 
-## Consumer integration notes (added 2026-07-02, AstroLyfe feedback pass — REQ-UI-014)
+## Consumer integration notes
+
+### Added 2026-07-21 (AstroLyfe UAT feedback pass — REQ-UI-016, ships in 2.0.0)
+
+- **⚠ `DataTable.ShowToolbar` now defaults to `false`.** The search box + Columns button are opt-in — add `ShowToolbar="true"` where you want them. This changes the rendered output of every `DataTable` that did not set it explicitly.
+- **DataTable pagination auto-hides.** The bar renders only when `TotalItems > PageSize`; a grid whose rows fit one page shows no pagination chrome. `ShowPagination="false"` still suppresses it unconditionally. Consumer-side guards like `ShowPagination="@(List?.Count > PageSize)"` are now redundant but harmless.
+- **Dialogs are clamped to the viewport.** `DialogContent`/`AlertDialogContent` carry `max-h-[calc(100vh-2rem)] overflow-y-auto`, so a tall dialog can no longer render its header above `y=0`. If you shipped a CSS override to work around this, you can remove it. `Sheet`/`Drawer` are unaffected.
+- **Theme tokens have library defaults.** `trblazeui.css` now ships `--popover`, `--background`, `--border`, … (light + `.dark`) at zero specificity via `:where()` inside `@layer base`. Popovers and Select listboxes stay opaque and legible even if your app defines no token set; if it does define them, yours still win.
+
+### Added 2026-07-02 (AstroLyfe feedback pass — REQ-UI-014)
 
 - **PortalHost:** add `<PortalHost />` (namespace `TrBlazeUI.Primitives.Services`) at the end of your root layout, inside the interactive render root. Overlay content (Select, Popover, DropdownMenu, Tooltip, …) renders through it for correct stacking. If it's missing, the library now **falls back to rendering popups inline** (fully functional, JS-positioned) and logs a one-time console warning — but the host is still the recommended setup.
 - **Interactive triggers in DropdownMenu:** never slot a `Button` (or any interactive element) inside a plain `DropdownMenuTrigger` — that nests buttons. Use `AsChild="true"` so the slotted `Button` becomes the trigger itself (see `/components/dropdown-menu` → "Button As Trigger").
@@ -117,5 +130,7 @@ dotnet test
 - **FluentUI migration cheatsheet:** FluentUI/Blazorise `xs`/`sm`/`md`/`lg`/`Spacing` attributes are **inert on plain HTML elements** — they silently collapse layouts. Rewrite them either as TrBlazeUI `<Grid Spacing="3"><GridItem Xs="12" Sm="6">…</GridItem></Grid>` (12-column, breakpoints 640/768/1024/1280px, demo at `/components/grid`) or as Tailwind `grid grid-cols-12 gap-*` + `col-span-* sm:col-span-*` classes.
 
 ## Known limitations
-- **NativeSelect inside MAUI Blazor Hybrid overlays** — native `<select>` popup is clipped in WebView2 `position: fixed` overlays (platform limitation). Use `<Select>` instead inside dialogs/sheets. See `docs/TrBlazeUI-Issues-Report-1.md` (Issue #2).
+- **NativeSelect inside MAUI Blazor Hybrid overlays** — native `<select>` popup is clipped in WebView2 `position: fixed` overlays (platform limitation). Use `<Select>` instead inside dialogs/sheets. See `docs/OldDocs/TrBlazeUI-Issues-Report-1.md` (Issue #2).
+- **`HtmlSanitizer 9.1.949-beta` is a pre-release dependency** of `TrBlazeUI.Components`. It is the only line pulling `AngleSharp >= 1.5.0`, which patches CVE-2026-54570 (mXSS bypass defeating DOM sanitizers — the protection `RichTextEditor`/`MarkdownEditor` depend on). Revisit when `HtmlSanitizer 9.1.x` reaches stable.
+- **Consumer feedback is all resolved in source but not all published.** AstroLyfe's 3 latest issues (TR-010/011/012) ship in 2.0.0, which is not yet released; their other 9 shipped in 1.0.7. See `docs/AstroLyfe-TrBlazeUI-Feedback.md`.
 - _(Resolved 2026-06-30: the strict Release build is clean 0/0, and XML-doc coverage is 100% with CS1591 build-enforced — previously-listed limitations cleared.)_

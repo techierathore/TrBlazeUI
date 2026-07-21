@@ -1,0 +1,105 @@
+@page "/verify-ui016"
+@using TrBlazeUI.Components.DataTable
+@using TrBlazeUI.Components.Dialog
+@using TrBlazeUI.Components.Card
+
+@* REQ-UI-016 verification harness — AstroLyfe UAT-2/3 feedback TR-010/011/012.
+   Not a documentation demo: every block here exists so the headless spec
+   (tests/verify/ui-ui016.spec.js) can assert one acceptance criterion. *@
+
+<PageTitle>Verify REQ-UI-016 - TrBlazeUI</PageTitle>
+
+<div class="p-6 space-y-8" data-testid="verify-heading">
+    <h1 class="text-2xl font-bold">REQ-UI-016 verification harness</h1>
+
+    @* TR-010 — a bare DataTable whose rows fit one page must render NO toolbar and NO pagination bar. *@
+    <section class="space-y-2" data-testid="tr010-bare">
+        <h2 class="text-lg font-semibold">TR-010 · bare table, 3 rows (PageSize 5)</h2>
+        <DataTable TData="Row" Data="@objSmallRows" InitialPageSize="5">
+            <Columns>
+                <DataTableColumn TData="Row" TValue="int" Property="@(r => r.Id)" Header="ID" />
+                <DataTableColumn TData="Row" TValue="string" Property="@(r => r.Name)" Header="Name" />
+            </Columns>
+        </DataTable>
+    </section>
+
+    @* TR-010 — more rows than fit a page: the pagination bar must still render. *@
+    <section class="space-y-2" data-testid="tr010-paged">
+        <h2 class="text-lg font-semibold">TR-010 · 12 rows (PageSize 5)</h2>
+        <DataTable TData="Row" Data="@objManyRows" InitialPageSize="5">
+            <Columns>
+                <DataTableColumn TData="Row" TValue="int" Property="@(r => r.Id)" Header="ID" />
+                <DataTableColumn TData="Row" TValue="string" Property="@(r => r.Name)" Header="Name" />
+            </Columns>
+        </DataTable>
+    </section>
+
+    @* TR-010 — the toolbar is opt-in and must still work when asked for. *@
+    <section class="space-y-2" data-testid="tr010-optin">
+        <h2 class="text-lg font-semibold">TR-010 · toolbar opted in</h2>
+        <DataTable TData="Row" Data="@objSmallRows" ShowToolbar="true" InitialPageSize="5">
+            <Columns>
+                <DataTableColumn TData="Row" TValue="int" Property="@(r => r.Id)" Header="ID" />
+                <DataTableColumn TData="Row" TValue="string" Property="@(r => r.Name)" Header="Name" />
+            </Columns>
+        </DataTable>
+    </section>
+
+    @* TR-011 — a dialog far taller than any test viewport must stay clamped on screen. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-011 · very tall dialog</h2>
+        <Button data-testid="tr011-open" OnClick="@(() => objIsTallDialogOpen = true)">Open tall dialog</Button>
+        <Dialog Modal="true" @bind-Open="objIsTallDialogOpen">
+            <DialogContent data-testid="tr011-content">
+                <DialogHeader>
+                    <DialogTitle data-testid="tr011-title">Tall dialog header</DialogTitle>
+                </DialogHeader>
+                @for (var vIndex = 1; vIndex <= 30; vIndex++)
+                {
+                    <div class="py-3 border-b">Row @vIndex of a deliberately over-tall dialog body</div>
+                }
+            </DialogContent>
+        </Dialog>
+    </section>
+
+    @* TR-012 — a Select whose open listbox must stay opaque even with host tokens stripped. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-012 · select popover opacity</h2>
+        <div class="w-64">
+            <Select @bind-Value="objFruit" TValue="string">
+                <SelectTrigger data-testid="tr012-trigger">
+                    <SelectValue Placeholder="Pick a fruit" />
+                </SelectTrigger>
+                <SelectContent TValue="string">
+                    <SelectItem Value="@("apple")" Text="Apple" TValue="string">Apple</SelectItem>
+                    <SelectItem Value="@("banana")" Text="Banana" TValue="string">Banana</SelectItem>
+                    <SelectItem Value="@("cherry")" Text="Cherry" TValue="string">Cherry</SelectItem>
+                </SelectContent>
+            </Select>
+        </div>
+    </section>
+</div>
+
+@code {
+    /// <summary>
+    /// Row shape backing the DataTable verification blocks.
+    /// </summary>
+    private sealed class Row
+    {
+        /// <summary>Gets or sets the row identifier.</summary>
+        public int Id { get; set; }
+
+        /// <summary>Gets or sets the row display name.</summary>
+        public string Name { get; set; } = string.Empty;
+    }
+
+    private readonly List<Row> objSmallRows =
+        Enumerable.Range(1, 3).Select(i => new Row { Id = i, Name = $"Small row {i}" }).ToList();
+
+    private readonly List<Row> objManyRows =
+        Enumerable.Range(1, 12).Select(i => new Row { Id = i, Name = $"Paged row {i}" }).ToList();
+
+    private bool objIsTallDialogOpen;
+
+    private string? objFruit;
+}

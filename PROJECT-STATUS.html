@@ -99,15 +99,6 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 .diagram.fs .mermaid{height:calc(100vh - 40px);display:flex;align-items:center;justify-content:center}
 
 @media(max-width:900px){.layout{grid-template-columns:1fr}nav.side{position:static;height:auto}}
-
-/* --- additions: frontmatter metadata block + next-command CTA --- */
-.meta{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 16px;margin:14px 0 22px;font-size:13px}
-.meta dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0}
-.meta dt{color:var(--muted);font-family:var(--mono);font-size:12px;white-space:nowrap}
-.meta dd{margin:0;color:var(--ink)}
-.cta{background:var(--cta-bg);border:1px solid var(--accent);border-radius:10px;padding:14px 18px;margin:18px 0 26px}
-.cta .cta-label{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--accent);font-weight:700;margin-bottom:8px}
-.cta pre{margin:0;background:var(--code-bg)}
 </style>
 </head>
 <body>
@@ -115,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Status</h1>
-    <div class="sub">Last rendered: 2026-07-18</div>
+    <div class="sub">Last updated: 2026-07-21 · Phase: Handoff</div>
     <div class="group">Contents</div>
     <ol>
       <li><a href="#where-i-am">Where I am</a></li>
@@ -130,25 +121,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Status</h1>
-    <div class="subtitle">Fix-issues complete — REQ-FN-009 fixed &amp; verified; Release build green</div>
-
-    <!-- YAML frontmatter rendered as a styled metadata block (not a literal --- rule) -->
-    <div class="meta">
-      <dl>
-        <dt>project</dt><dd>TrBlazeUI</dd>
-        <dt>stack</dt><dd>.NET 10 / Blazor (Server·WASM·Auto) / Tailwind CSS v4 / shadcn-compatible</dd>
-        <dt>last_updated</dt><dd>2026-07-18</dd>
-        <dt>current_phase</dt><dd>Fix-issues complete — REQ-FN-009 fixed &amp; verified; Release build green</dd>
-        <dt>last_verified_build</dt><dd>PASS (Release 0/0; NU1902 cleared, AngleSharp 1.5.1)</dd>
-        <dt>last_verified_date</dt><dd>2026-07-18</dd>
-      </dl>
-    </div>
-
-    <!-- NEXT COMMAND TO RUN CTA -->
-    <div class="cta">
-      <div class="cta-label">Next command to run</div>
-      <pre><code>Publish the next package versions (&gt; 1.0.7) for Components / Primitives / Icons.Lucide (owner: manual bump + push). NOTE: Components now depends on HtmlSanitizer 9.1.949-beta (pre-release) — confirm that is acceptable for the published package, or hold the Components bump until HtmlSanitizer 9.1.x reaches stable.</code></pre>
-    </div>
+    <div class="subtitle">Project: TrBlazeUI · Stack: .NET 10 / Blazor (Server·WASM·Auto) / Tailwind CSS v4 / shadcn-compatible · Last updated: 2026-07-21 · Current phase: Handoff · Last verified build: PASS (Release 0/0, 2026-07-21 fix-issues run) · Last verified: 2026-07-21</div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -165,19 +138,37 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
     </div>
 
     <h2 id="where-i-am">Where I am<a class="anchor-link" href="#where-i-am">#</a></h2>
-    <p>Ran <code>*fix-issues</code> against the TechieRag report <code>docs/trblazeui-issues-report.md</code>. The report's own 5 issues were already resolved (confirmed in the prior triage — no code needed). The real open work was <strong>REQ-FN-009</strong>, the NU1902 build blocker surfaced by the build gate. Root cause: <code>HtmlSanitizer 9.0.892</code> (latest stable) hard-pins <code>AngleSharp [0.17.1]</code>, which carries <strong>CVE-2026-54570 (GHSA-pgww-w46g-26qg)</strong> — a mutated-XSS bypass that defeats DOM-based HTML sanitizers, i.e. this library's own XSS protection (<code>RichTextEditor</code>/<code>MarkdownEditor</code>, REQ-NFR-003). No <em>stable</em> HtmlSanitizer ships the patched <code>AngleSharp ≥ 1.5.0</code>, so a scoped audit-suppression would have meant knowingly shipping the exploitable hole. <strong>Owner chose to upgrade to <code>HtmlSanitizer 9.1.949-beta</code></strong> (the only line pulling patched AngleSharp — resolves 1.5.1), accepting the pre-release dependency over shipping a suppressed vulnerability. Verified: full-solution Release build <strong>0/0</strong> (0× NU1902), AngleSharp resolves 1.5.1 in the shipped graph, and a runtime sanitize smoke on the shipped package PASSED — benign markup preserved, classic XSS + the CVE-2026-54570 mXSS payload both neutralized. REQ-FN-009, REQ-NFR-005, REQ-NFR-003 now <code>Verified</code> (ledger <code>docs/.last-verify.json</code>). Only <code>src/TrBlazeUI.Components/TrBlazeUI.Components.csproj</code> changed (one PackageReference + a rationale comment).</p>
+    <p><strong>Handoff.</strong> All REQ-* are <code>Verified</code>/<code>Done</code>/<code>N/A</code>; awaiting owner UAT per <code>docs/TrBlazeUI-UsageGuide.md</code>. Release <strong>2.0.0</strong> is staged in source with notes written (<code>CHANGELOG.md</code>) — it is a major bump because <code>DataTable.ShowToolbar</code> flips its default, changing rendered output for existing consumers. Publishing is owner-manual (git/gh are agent-blocked).</p>
+
+    <p>Docs reconciled this run: the two Feb-2026 raw consumer reports (fully resolved, against <code>beta.0.8</code>) moved to <code>docs/OldDocs/</code>, and every stale citation of the deleted <code>docs/trblazeui-issues-report.md</code> repointed. <code>docs/</code> now carries exactly one feedback file per consumer.</p>
+
+    <p><em>(This run, 2026-07-21)</em> Ran <code>*fix-issues</code> against AstroLyfe's feedback and <strong>closed REQ-UI-016</strong> — the last open requirement. All three UAT-2/3 defects were fixed library-side (no app-side workarounds) and verified live: Release build <strong>0/0</strong>, headless-Chromium <strong>21/21</strong> (<code>tests/verify/ui-ui016.spec.js</code> on the new <code>/verify-ui016</code> harness), ledger <code>docs/.last-verify.json</code>.</p>
+
+    <ul>
+      <li><strong>TR-010</strong> — <code>DataTable.ShowToolbar</code> now defaults <code>false</code> (opt-in), and pagination renders only when <code>TotalItems &gt; PageSize</code> (new <code>ShouldShowPagination()</code>, replacing <code>objProcessedData.Any()</code>). ⚠ The default flip is a <strong>behavioural breaking change</strong> for consumers relying on an implicit toolbar — call it out in the release notes.</li>
+      <li><strong>TR-011</strong> — <code>DialogContent</code>/<code>AlertDialogContent</code> gained <code>max-h-[calc(100vh-2rem)] overflow-y-auto</code>. Clamping <em>height</em> (not overriding <code>transform</code>/<code>translate</code>) means a −50% Y offset can never push the top above <code>y=0</code>, so the fix is immune to the <code>transform</code>-vs-<code>translate</code> mechanism split that made AstroLyfe's app-side override version-fragile. Tall dialog now <code>top=16px</code> at 1366×720, 1280×600 and 390×844 (was −245 / −305).</li>
+      <li><strong>TR-012</strong> — the library now ships default design tokens (<code>--popover</code> et al., light + <code>.dark</code>) in <code>@layer base</code> wrapped in <code>:where()</code> (zero specificity). Verified both directions: opaque legible listbox with all host sheets disabled, <strong>and</strong> a themed host's own tokens still win — a floor, not a ceiling.</li>
+    </ul>
+
+    <p>Also regenerated <code>wwwroot/trblazeui.css</code> (Tailwind v4.1.18) and re-swept <code>/components/datatable</code>, <code>/dialog</code>, <code>/select</code>, <code>/alert-dialog</code> for regressions — none. TR-001…TR-009 remain fixed since 1.0.7 (unchanged this run); TR-013 stays retracted. AstroLyfe's feedback file now carries per-issue resolution notes and is <strong>0 open</strong>.</p>
+
+    <p><em>(Previous run, 2026-07-21)</em> Ran <code>*triage-issues</code> (analyze-only) against AstroLyfe's re-consolidated feedback (<code>docs/AstroLyfe-TrBlazeUI-Feedback.md</code>, 2026-07-21). The file lists 12 issues and reads as all-open; it is not. <strong>Nine of them (TR-001…TR-009) are stale</strong> — AstroLyfe's repro environment is still TrBlazeUI <strong>1.0.6</strong>, but those were fixed 2026-07-02 under REQ-UI-014 and shipped in <strong>1.0.7</strong>; the resolution notes were dropped when their file was re-consolidated. All nine were re-verified live today against current source and still hold (Tab/Shift+Tab escape a closed SelectTrigger — identity-checked, not role-checked, which caught a false positive on the first probe; listbox + 5 options materialize; accessible name present at first render; 0 <code>role="img"</code>-without-label across 25 svgs; <code>AsChild</code>, hardened <code>.sr-only</code>, <code>Input.Label</code>, <code>Grid</code>/<code>GridItem</code>, <code>data-trblazeui-missing-icon</code> all present). REQ-UI-014 held at <code>Verified</code> — <strong>the action there is to publish/upgrade, not to re-fix.</strong> <strong>Three are genuinely new and all reproduced</strong> on the library's own demo → logged as <strong>REQ-UI-016 (Planned)</strong>: TR-010 (DataTable ships toolbar + pagination by default, pagination guard is <code>Any()</code> not <code>&gt; PageSize</code>), TR-011 (tall <code>DialogContent</code> at top=−245px/−305px, <code>max-height:none</code>, <code>overflow-y:visible</code> — header off-screen and unclickable), TR-012 (<code>bg-popover</code> → <code>var(--popover)</code> with no library-side token definition, so a host that omits it gets a transparent listbox). TR-013 was retracted by the reporter (app-side culture bug). Release build 0/0. <strong>Nothing in <code>src/</code> or <code>tests/</code> was modified</strong> — fixing was not requested.</p>
+
+    <p><em>(Previous run, 2026-07-18)</em> Ran <code>*fix-issues</code> against the TechieRag report (now archived at <code>docs/OldDocs/trblazeui-issues-report-2.md</code>). The report's own 5 issues were already resolved (confirmed in the prior triage — no code needed). The real open work was <strong>REQ-FN-009</strong>, the NU1902 build blocker surfaced by the build gate. Root cause: <code>HtmlSanitizer 9.0.892</code> (latest stable) hard-pins <code>AngleSharp [0.17.1]</code>, which carries <strong>CVE-2026-54570 (GHSA-pgww-w46g-26qg)</strong> — a mutated-XSS bypass that defeats DOM-based HTML sanitizers, i.e. this library's own XSS protection (<code>RichTextEditor</code>/<code>MarkdownEditor</code>, REQ-NFR-003). No <em>stable</em> HtmlSanitizer ships the patched <code>AngleSharp ≥ 1.5.0</code>, so a scoped audit-suppression would have meant knowingly shipping the exploitable hole. <strong>Owner chose to upgrade to <code>HtmlSanitizer 9.1.949-beta</code></strong> (the only line pulling patched AngleSharp — resolves 1.5.1), accepting the pre-release dependency over shipping a suppressed vulnerability. Verified: full-solution Release build <strong>0/0</strong> (0× NU1902), AngleSharp resolves 1.5.1 in the shipped graph, and a runtime sanitize smoke on the shipped package PASSED — benign markup preserved, classic XSS + the CVE-2026-54570 mXSS payload both neutralized. REQ-FN-009, REQ-NFR-005, REQ-NFR-003 now <code>Verified</code> (ledger <code>docs/.last-verify.json</code>). Only <code>src/TrBlazeUI.Components/TrBlazeUI.Components.csproj</code> changed (one PackageReference + a rationale comment).</p>
 
     <h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2>
-    <pre><code>Publish the next package versions (&gt; 1.0.7) for Components / Primitives / Icons.Lucide (owner: manual bump + push). NOTE: Components now depends on HtmlSanitizer 9.1.949-beta (pre-release) — confirm that is acceptable for the published package, or hold the Components bump until HtmlSanitizer 9.1.x reaches stable.</code></pre>
+<pre><code>Manual UAT per docs/TrBlazeUI-UsageGuide.md smoke checklist.
+</code></pre>
+    <p>Then (owner-manual, because agents cannot run git/gh or publish): commit the working tree, create the GitHub Release tagged <strong><code>2.0.0</code></strong>, and paste the <code>## [2.0.0]</code> section of <code>CHANGELOG.md</code> as the release body — the notes are written, nothing to draft. The workflow builds and publishes all five packages. Then tell AstroLyfe to upgrade off 1.0.6; that single upgrade closes all 12 issues in their feedback file. NOTE: Components depends on HtmlSanitizer 9.1.949-beta (pre-release) — confirm that is acceptable, or hold the Components bump until HtmlSanitizer 9.1.x reaches stable.</p>
 
     <h2 id="open-requirements">Open requirements<a class="anchor-link" href="#open-requirements">#</a></h2>
     <ul>
-      <li>None — REQ-FN-009 fixed &amp; Verified this run; REQ-NFR-005 re-verified; all requirements Verified / Done.</li>
+      <li>None — every REQ in the checklist Requirements Status table is terminal (<code>Verified</code> / <code>Done</code> / <code>N/A</code>). REQ-UI-016 closed 2026-07-21.</li>
     </ul>
 
     <h2 id="known-blockers">Known blockers<a class="anchor-link" href="#known-blockers">#</a></h2>
     <ul>
-      <li>None. (The Release build is green again.)</li>
+      <li>None for the build (Release 0/0) and none in the library. <strong>Consumer-facing (owner action, not a code defect):</strong> AstroLyfe is still on TrBlazeUI <strong>1.0.6</strong>, so their UAT rounds keep re-surfacing issues already fixed in 1.0.7 and now in the unpublished &gt; 1.0.7. Publishing + their upgrade closes all 12. The prior warning about their <code>transform</code>-based TR-011 override is <strong>resolved</strong> — the library fix clamps height rather than the centering property, so their override neither breaks nor is needed.</li>
     </ul>
 
     <h2 id="verification-log">Verification log<a class="anchor-link" href="#verification-log">#</a></h2>
@@ -186,19 +177,74 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <tr><th>Date</th><th>Phase</th><th>Result</th><th>Status table</th></tr>
       </thead>
       <tbody>
-        <tr><td>2026-06-30</td><td>Discovery (day-1 build probe)</td><td>FAIL — 5 IDE0031 (Sidebar)</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-        <tr><td>2026-06-30</td><td>Build (REQ-NFR-005, REQ-FN-003)</td><td>PASS — Release 0/0; both REQs Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-        <tr><td>2026-06-30</td><td>Handoff</td><td>Ship-ready — all REQs terminal</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-        <tr><td>2026-07-02</td><td>Fix-issues (REQ-UI-014, AstroLyfe)</td><td>PASS — Release 0/0; 18/18 runtime checks</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-        <tr><td>2026-07-12</td><td>Verify ui (REQ-UI-015, TrStudio)</td><td>PASS → Verified — Release 0/0; 14/14 headless-Chromium</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-        <tr><td>2026-07-18</td><td>Triage (TechieRag report, analyze-only)</td><td>5 reported issues reconciled (fixes hold); build gate FAILED — NU1902 AngleSharp → REQ-NFR-005 demoted, REQ-FN-009 logged</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-        <tr><td>2026-07-18</td><td>Fix-issues + verify (REQ-FN-009)</td><td>PASS → Verified — HtmlSanitizer→9.1.949-beta (AngleSharp 1.5.1); Release 0/0, NU1902 cleared; sanitize smoke neutralizes CVE-2026-54570 mXSS. Ledger docs/.last-verify.json</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+        <tr>
+          <td>2026-06-30</td>
+          <td>Discovery (day-1 build probe)</td>
+          <td>FAIL — 5 IDE0031 (Sidebar)</td>
+          <td>docs/TrBlazeUI-Checklist.md#requirements-status</td>
+        </tr>
+        <tr>
+          <td>2026-06-30</td>
+          <td>Build (REQ-NFR-005, REQ-FN-003)</td>
+          <td>PASS — Release 0/0; both REQs Verified</td>
+          <td>docs/TrBlazeUI-Checklist.md#requirements-status</td>
+        </tr>
+        <tr>
+          <td>2026-06-30</td>
+          <td>Handoff</td>
+          <td>Ship-ready — all REQs terminal</td>
+          <td>docs/TrBlazeUI-Checklist.md#requirements-status</td>
+        </tr>
+        <tr>
+          <td>2026-07-02</td>
+          <td>Fix-issues (REQ-UI-014, AstroLyfe)</td>
+          <td>PASS — Release 0/0; 18/18 runtime checks</td>
+          <td>docs/TrBlazeUI-Checklist.md#requirements-status</td>
+        </tr>
+        <tr>
+          <td>2026-07-12</td>
+          <td>Verify ui (REQ-UI-015, TrStudio)</td>
+          <td>PASS → Verified — Release 0/0; 14/14 headless-Chromium</td>
+          <td>docs/TrBlazeUI-Checklist.md#requirements-status</td>
+        </tr>
+        <tr>
+          <td>2026-07-18</td>
+          <td>Triage (TechieRag report, analyze-only)</td>
+          <td>5 reported issues reconciled (fixes hold); build gate FAILED — NU1902 AngleSharp → REQ-NFR-005 demoted, REQ-FN-009 logged</td>
+          <td>docs/TrBlazeUI-Checklist.md#requirements-status</td>
+        </tr>
+        <tr>
+          <td>2026-07-18</td>
+          <td>Fix-issues + verify (REQ-FN-009)</td>
+          <td>PASS → Verified — HtmlSanitizer→9.1.949-beta (AngleSharp 1.5.1); Release 0/0, NU1902 cleared; sanitize smoke neutralizes CVE-2026-54570 mXSS. Ledger docs/.last-verify.json</td>
+          <td>docs/TrBlazeUI-Checklist.md#requirements-status</td>
+        </tr>
+        <tr>
+          <td>2026-07-21</td>
+          <td>Handoff (post-REQ-UI-016)</td>
+          <td><strong>READY FOR UAT</strong> — all REQs terminal; 2.0.0 staged with CHANGELOG release notes; UsageGuide + BRD §4 + DevGuide refreshed; legacy consumer reports archived to docs/OldDocs and stale citations repointed</td>
+          <td>docs/TrBlazeUI-Checklist.md#requirements-status</td>
+        </tr>
+        <tr>
+          <td>2026-07-21</td>
+          <td>Fix-issues + verify (REQ-UI-016, AstroLyfe TR-010/011/012)</td>
+          <td>PASS → Verified — Release 0/0; headless-Chromium <strong>21/21</strong> (<code>tests/verify/ui-ui016.spec.js</code> on <code>/verify-ui016</code>) incl. §4a render gate + §4b visual truth @1366/1280/390. DataTable toolbar opt-in + row-count pagination guard; Dialog/AlertDialog clamped (top −245/−305 → +16px); library-shipped <code>:where()</code> token fallbacks make popovers opaque without host tokens. No regression on 4 demo pages. Ledger docs/.last-verify.json</td>
+          <td>docs/TrBlazeUI-Checklist.md#requirements-status</td>
+        </tr>
+        <tr>
+          <td>2026-07-21</td>
+          <td>Triage (AstroLyfe UAT-2/3, analyze-only)</td>
+          <td>Release 0/0. TR-010/011/012 REPRO → <strong>REQ-UI-016 logged Planned</strong>; TR-013 retracted by reporter. TR-001…TR-009 re-verified live as still-fixed → reconciled as stale 1.0.6 observations, REQ-UI-014 held at Verified (no demotion). No code changed</td>
+          <td>docs/TrBlazeUI-Checklist.md#requirements-status</td>
+        </tr>
       </tbody>
     </table>
 
     <h2 id="library-feedback-summary">Library feedback summary<a class="anchor-link" href="#library-feedback-summary">#</a></h2>
     <ul>
-      <li>TrBlazeUI: TechieRag report (<code>docs/trblazeui-issues-report.md</code>) — all 5 reported issues confirmed resolved 2026-07-18; the separate NU1902 supply-chain blocker (AngleSharp mXSS via HtmlSanitizer) fixed same day under REQ-FN-009 by moving to HtmlSanitizer 9.1.949-beta. TrStudio: all 11 resolved 2026-07-12 (REQ-UI-015); AstroLyfe: all 9 resolved 2026-07-02; earlier reports remain resolved.</li>
+      <li><strong>Feedback files are one-per-consumer and live in <code>docs/</code>:</strong> <code>AstroLyfe-TrBlazeUI-Feedback.md</code>, <code>TrStudio-TrBlazeUI-Feedback.md</code>, <code>TechieRag-TrBlazeUI-Feedback.md</code>. <em>(Reconciled 2026-07-21: PROJECT-STATUS previously cited <code>docs/trblazeui-issues-report.md</code>, a path that no longer exists. The two Feb-2026 raw reports it referred to — the TechieRag Web Sample App report and the AppStudio IDE report, both against <code>beta.0.8</code> and both fully resolved — are archived unmodified at <code>docs/OldDocs/trblazeui-issues-report-2.md</code> and <code>docs/OldDocs/TrBlazeUI-Issues-Report-1.md</code>.)</em></li>
+      <li>TechieRag: 0 open — all issues resolved (canonical file <code>docs/TechieRag-TrBlazeUI-Feedback.md</code>, consolidated 2026-07-02). The separate NU1902 supply-chain blocker (AngleSharp mXSS via HtmlSanitizer) was fixed 2026-07-18 under REQ-FN-009 by moving to HtmlSanitizer 9.1.949-beta. TrStudio: all 11 resolved 2026-07-12 (REQ-UI-015).</li>
+      <li><strong>AstroLyfe: 0 open.</strong> TR-010/011/012 fixed + verified 2026-07-21 (REQ-UI-016, ships &gt; 1.0.7); TR-001…TR-009 fixed 2026-07-02, shipped in 1.0.7; TR-013 retracted. All 12 now carry per-issue resolution notes in <code>docs/AstroLyfe-TrBlazeUI-Feedback.md</code>. Remaining gap is distribution only: publish, then AstroLyfe upgrades off 1.0.6.</li>
       <li>TechieRag: 0 issues open.</li>
     </ul>
 
