@@ -125,7 +125,7 @@
                 Search across all columns and toggle column visibility.
             </p>
         </div>
-        <DataTable TData="Person" Data="@people" InitialPageSize="10">
+        <DataTable TData="Person" Data="@people" ShowToolbar="true" InitialPageSize="10">
             <Columns>
                 <DataTableColumn TData="Person" TValue="int" Property="@(p => p.Id)" Header="ID" Sortable />
                 <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" Sortable />
@@ -206,7 +206,7 @@
                 Add custom action buttons to the toolbar.
             </p>
         </div>
-        <DataTable TData="Person" Data="@people" InitialPageSize="5">
+        <DataTable TData="Person" Data="@people" ShowToolbar="true" InitialPageSize="5">
             <ToolbarActions>
                 <Button Variant="ButtonVariant.Default" Size="ButtonSize.Small" OnClick="@AddNewPerson">
                     Add Person
@@ -311,14 +311,14 @@
                     <div>
                         <code class="bg-muted px-1 rounded text-sm">ShowToolbar</code>
                         <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> bool</p>
-                        <p class="text-sm text-muted-foreground"><strong>Default:</strong> true</p>
-                        <p class="text-sm text-muted-foreground">Whether to show the toolbar with global search and column visibility.</p>
+                        <p class="text-sm text-muted-foreground"><strong>Default:</strong> false</p>
+                        <p class="text-sm text-muted-foreground">Opt in to the toolbar with global search and column visibility. A bare table renders as just a table.</p>
                     </div>
                     <div>
                         <code class="bg-muted px-1 rounded text-sm">ShowPagination</code>
                         <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> bool</p>
                         <p class="text-sm text-muted-foreground"><strong>Default:</strong> true</p>
-                        <p class="text-sm text-muted-foreground">Whether to show pagination controls.</p>
+                        <p class="text-sm text-muted-foreground">Allows pagination controls to render. The bar auto-suppresses when all rows fit on one page; set false to suppress it unconditionally.</p>
                     </div>
                     <div>
                         <code class="bg-muted px-1 rounded text-sm">IsLoading</code>

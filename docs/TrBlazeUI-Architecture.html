@@ -106,9 +106,10 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Architecture</h1>
-    <div class="sub">Last rendered: 2026-06-30</div>
+    <div class="sub">Status: Current (brownfield) · Last updated 2026-06-30</div>
     <div class="group">Contents</div>
     <ol>
+      <li><a href="#table-of-contents">Table of Contents</a></li>
       <li><a href="#tech-stack">1. Tech stack</a></li>
       <li><a href="#component-map">2. Component map</a></li>
       <li><a href="#data-flow-primary-path">3. Data flow — primary path</a></li>
@@ -124,7 +125,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Architecture</h1>
-    <div class="subtitle">Last updated: 2026-06-30 · Status: Current (brownfield)</div>
+    <div class="subtitle"><strong>Last updated:</strong> 2026-06-30 · <strong>Status:</strong> Current (brownfield)</div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -143,6 +144,20 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#sources-harvested">Sources harvested</a></li>
       </ol>
     </div>
+
+    <h2 id="table-of-contents">Table of Contents<a class="anchor-link" href="#table-of-contents">#</a></h2>
+    <ol>
+      <li><a href="#tech-stack">Tech stack</a></li>
+      <li><a href="#component-map">Component map</a></li>
+      <li><a href="#data-flow-primary-path">Data flow — primary path</a></li>
+      <li><a href="#module-responsibilities">Module responsibilities</a></li>
+      <li><a href="#cross-cutting-concerns">Cross-cutting concerns</a></li>
+      <li><a href="#deployment-architecture">Deployment architecture</a></li>
+      <li><a href="#architectural-decisions-adr-style-log">Architectural decisions (ADR-style log)</a></li>
+      <li><a href="#target-architecture">Target architecture</a></li>
+      <li><a href="#open-questions-risks">Open questions / risks</a></li>
+      <li><a href="#sources-harvested">Sources harvested</a></li>
+    </ol>
 
     <h2 id="tech-stack">1. Tech stack<a class="anchor-link" href="#tech-stack">#</a></h2>
 
@@ -233,16 +248,16 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   participant Portal as "PortalService"
   participant Host as "PortalHost (sibling in layout)"
   participant JS as "portal.js (JS interop)"
-  U->>Trig: "click"
-  Trig->>Ctx: "set Open = true"
-  Ctx->>Portal: "register portal content"
-  Portal->>Host: "OnPortalsChanged event"
-  Host->>JS: "appendChild moves DOM to portal root"
-  JS-->>U: "overlay rendered, focus trapped"
-  U->>Ctx: "interact inside dialog (toggle, select)"
-  Ctx->>Portal: "RefreshPortal(id)"
-  Portal->>Host: "OnPortalsChanged → InvokeAsync(StateHasChanged)"
-  Host-->>U: "portal content re-renders (fix for Issue #1)"</pre>
+  U->>Trig: click
+  Trig->>Ctx: set Open = true
+  Ctx->>Portal: register portal content
+  Portal->>Host: OnPortalsChanged event
+  Host->>JS: appendChild moves DOM to portal root
+  JS-->>U: overlay rendered, focus trapped
+  U->>Ctx: interact inside dialog (toggle, select)
+  Ctx->>Portal: RefreshPortal(id)
+  Portal->>Host: OnPortalsChanged → InvokeAsync(StateHasChanged)
+  Host-->>U: portal content re-renders (fix for Issue #1)</pre>
     </div>
 
     <h2 id="module-responsibilities">4. Module responsibilities<a class="anchor-link" href="#module-responsibilities">#</a></h2>
@@ -378,7 +393,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
       <li><code>docs/TrBlazeUI-Doc.md</code> — overview, solution structure, tech-stack tables, project tree, service registration.</li>
       <li><code>docs/TrBlazeUI-Update-plan.md</code> — modernization work streams (.NET 10 upgrade, CI/CD, AI reference, skills), completion statuses.</li>
       <li><code>docs/toolbarplan.md</code> — Toolbar component design (now implemented).</li>
-      <li><code>docs/TrBlazeUI-Issues-Report-1.md</code>, <code>docs/trblazeui-issues-report-2.md</code> — consumer-reported bugs (portal refresh, attribute splatting, CSS path) and their fixes.</li>
+      <li><code>docs/OldDocs/TrBlazeUI-Issues-Report-1.md</code>, <code>docs/OldDocs/trblazeui-issues-report-2.md</code> — consumer-reported bugs (portal refresh, attribute splatting, CSS path) and their fixes.</li>
       <li><code>README.md</code>, <code>THEMING.md</code> — theming, installation, render-mode, AI-skill, and migration content.</li>
       <li><code>docs/Coding-Standards.md</code> — naming/field conventions baseline.</li>
     </ul>

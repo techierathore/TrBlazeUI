@@ -1,7 +1,7 @@
 # TrBlazeUI — Developer Guide (as-built screen map)
 
-**Last updated:** 2026-06-30
-**Verification status:** ✅ **RUNTIME-VERIFIED (key screens sampled, 2026-06-30).** The Blazor Server demo was booted and driven with headless Chromium (Playwright); a representative set of screens — Home, DataTable, Bar Chart, Toolbar, Icons — render correctly with real data and pass the visual check (screenshots in `docs/screenshots/TrBlazeUI/`). The remaining ~80 component/primitive demo pages were not each individually driven; run `*verify ui` / `*devguide TrBlazeUI --update` for exhaustive per-screen confirmation.
+**Last updated:** 2026-07-21
+**Verification status:** ✅ **RUNTIME-VERIFIED (key screens sampled; DataTable / Dialog / Select / AlertDialog re-confirmed 2026-07-21).** The Blazor Server demo was booted and driven with headless Chromium (Playwright). Home, DataTable, Bar Chart, Toolbar and Icons were verified 2026-06-30 (screenshots in `docs/screenshots/TrBlazeUI/`). On **2026-07-21**, after the REQ-UI-016 fixes, `/components/datatable`, `/components/dialog`, `/components/select` and `/components/alert-dialog` were re-driven — all render their data, look right, and produce no console errors or horizontal overflow at 1366px and 390px (`tests/verify/ui-ui016.spec.js`, 21/21). `datatable.png` was recaptured because the toolbar default changed. The remaining ~80 component/primitive demo pages were not each individually driven; run `*verify ui` / `*devguide TrBlazeUI --update` for exhaustive per-screen confirmation.
 
 > **What this document is.** The screen-by-screen, as-built map a developer uses to chase a bug or catch AI-hallucinated code. TrBlazeUI is a **component library with a demo application** and has **no database, no API, no stored procedures, and no auth** — so the usual *page → service → data-access → proc* lineage collapses to **demo page → demo-shared composition → library component → primitive → JS interop / service**. There is exactly one role: the **anonymous demo visitor**.
 
@@ -59,9 +59,9 @@ Each demo page lives under `demos/TrBlazeUI.Demo.Shared/Pages/` and composes one
 | Components index | `/components` | `Pages/Components/Index.razor` | grid of 73 component links | — |
 | Button | `/components/button` | `Pages/Components/ButtonDemo.razor` | `Button`, `ButtonIcon` | no primitive; pure styled |
 | Sidebar | `/components/sidebar` | `Pages/Components/SidebarDemo.razor` | `Sidebar` (22 parts) → `CollapsibleStateService` + `sidebar.js` | ⚠ source trips REQ-NFR-005 (IDE0031) |
-| Dialog | `/components/dialog` | `Pages/Components/DialogDemo.razor` | `Dialog` → Dialog primitive → `PortalHost` + `portal.js`/`focus-trap.js` | reactive portal refresh |
+| Dialog | `/components/dialog` | `Pages/Components/DialogDemo.razor` | `Dialog` → Dialog primitive → `PortalHost` + `portal.js`/`focus-trap.js` | reactive portal refresh; **2.0.0**: `DialogContent`/`AlertDialogContent` clamped to `max-h-[calc(100vh-2rem)] overflow-y-auto` so a tall dialog can't render above the viewport. renders ✓ + looks-right ✓ (runtime-confirmed 2026-07-21) |
 | Select | `/components/select` | `Pages/Components/SelectDemo.razor` | `Select` → Select primitive → `positioning.js`/`select.js` | custom dropdown (overlay-safe) |
-| DataTable | `/components/datatable` | `Pages/Components/DataTableDemo.razor` | `DataTable` → `MockDataService` | sort/filter/paginate/select; runtime-verified (47 rows, real data) |
+| DataTable | `/components/datatable` | `Pages/Components/DataTableDemo.razor` | `DataTable` → `MockDataService` | sort/filter/paginate/select; **2.0.0**: `ShowToolbar` defaults `false` (opt-in), pagination gated on `ShouldShowPagination()` = `TotalItems > PageSize`. renders ✓ + looks-right ✓ (runtime-confirmed 2026-07-21, 40 rows real data) |
 | Toolbar | `/components/toolbar` | `Pages/Components/ToolbarDemo.razor` | `Toolbar`/`ToolbarGroup`/`ToolbarButton`/`ToolbarToggleButton`/`ToolbarSeparator` | composes Button/DropdownMenu |
 | RichTextEditor | `/components/rich-text-editor` | `Pages/Components/RichTextEditorDemo.razor` | `RichTextEditor` → `quill-interop.js` + HtmlSanitizer | sanitized HTML output |
 | MarkdownEditor | `/components/markdown-editor` | `Pages/Components/MarkdownEditorDemo.razor` | `MarkdownEditor` → Markdig + `markdown-editor.js` | live preview |
@@ -89,8 +89,10 @@ A reader chasing a bug starts at the demo page, drops into the styled component 
 
 - **Sidebar Release build error (REQ-NFR-005)** — _Resolved 2026-06-30._ The IDE0031 hits were event-accessor null guards where `?.` is illegal (CS0131); fixed via a justified one-rule `.editorconfig` downgrade. Release build is clean (0/0).
 - **XML-doc coverage (REQ-FN-003)** — _Resolved 2026-06-30._ Now 100% on public members; CS1591 suppression removed and build-enforced.
-- **NativeSelect in MAUI Hybrid overlays** — platform limitation (WebView2); use `<Select>` inside overlays (`docs/TrBlazeUI-Issues-Report-1.md` #2). Not a library defect.
+- **NativeSelect in MAUI Hybrid overlays** — platform limitation (WebView2); use `<Select>` inside overlays (`docs/OldDocs/TrBlazeUI-Issues-Report-1.md` #2). Not a library defect.
 - **Doc fix (found at runtime 2026-06-30):** the DataTable demo route is `/components/datatable` (no hyphen), not `/components/data-table` as earlier drafts stated — corrected above and in the UsageGuide.
+- **DataTable default chrome / Dialog off-viewport / transparent popover (REQ-UI-016)** — _Resolved 2026-07-21._ AstroLyfe UAT findings TR-010/011/012: `ShowToolbar` now defaults `false` and pagination auto-hides for a single page; `DialogContent`/`AlertDialogContent` clamped to the viewport (`top` was −245/−305px, now +16px); library now ships zero-specificity `:where()` theme-token fallbacks so popovers stay opaque without host tokens. Verified 21/21 headless — `tests/verify/ui-ui016.spec.js`.
+- **⚠ Breaking for consumers (2.0.0):** `DataTable.ShowToolbar` default flipped `true` → `false`. Any grid relying on the implicit toolbar must now pass `ShowToolbar="true"`.
 - Status is reflected in `docs/TrBlazeUI-Checklist.md` (all REQs terminal). Key screens are runtime-verified with screenshots in `docs/screenshots/TrBlazeUI/`; run `*devguide TrBlazeUI --update` for exhaustive per-screen confirmation across all ~80 demo pages.
 
 ## 6. Runtime screenshots (sampled, 2026-06-30)

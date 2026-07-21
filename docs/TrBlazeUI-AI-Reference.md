@@ -1030,8 +1030,8 @@ Sub-components: `AvatarImage` (Source, Alt), `AvatarFallback`
 | TData | type param | - | Data item type (class) |
 | Data | IEnumerable<TData> | required | Data source |
 | SelectionMode | DataTableSelectionMode | None | None, Single, Multiple |
-| ShowToolbar | bool | true | Show search/column visibility |
-| ShowPagination | bool | true | Show pagination |
+| ShowToolbar | bool | false | Opt in to the search / column-visibility toolbar |
+| ShowPagination | bool | true | Allow pagination; the bar auto-hides when all rows fit one page |
 | IsLoading | bool | false | Loading state |
 | InitialPageSize | int | 5 | Initial rows per page |
 | PageSizes | int[] | [5,10,20,50,100] | Page size options |

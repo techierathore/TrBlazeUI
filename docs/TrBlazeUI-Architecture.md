@@ -195,7 +195,7 @@ No structural change is in flight. The library is feature-complete for its curre
 - `docs/TrBlazeUI-Doc.md` — overview, solution structure, tech-stack tables, project tree, service registration.
 - `docs/TrBlazeUI-Update-plan.md` — modernization work streams (.NET 10 upgrade, CI/CD, AI reference, skills), completion statuses.
 - `docs/toolbarplan.md` — Toolbar component design (now implemented).
-- `docs/TrBlazeUI-Issues-Report-1.md`, `docs/trblazeui-issues-report-2.md` — consumer-reported bugs (portal refresh, attribute splatting, CSS path) and their fixes.
+- `docs/OldDocs/TrBlazeUI-Issues-Report-1.md`, `docs/OldDocs/trblazeui-issues-report-2.md` — consumer-reported bugs (portal refresh, attribute splatting, CSS path) and their fixes.
 - `README.md`, `THEMING.md` — theming, installation, render-mode, AI-skill, and migration content.
 - `docs/Coding-Standards.md` — naming/field conventions baseline.
 
