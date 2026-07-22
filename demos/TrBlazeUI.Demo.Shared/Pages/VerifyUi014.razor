@@ -1,0 +1,71 @@
+@page "/verify-ui014"
+@using TrBlazeUI.Components.Select
+
+@* REQ-UI-014 verification harness — AstroLyfe feedback TR-003 (SelectTrigger accessible name).
+   Not a documentation demo: every block exists so the headless spec
+   (tests/verify/ui-ui014.spec.js) can assert one acceptance criterion.
+   A `<button role="combobox">` is NOT a name-from-content role, so descendant value/
+   placeholder text can never supply an accessible name on its own (axe button-name,
+   critical). The fix emits a default aria-labelledby → the SelectValue span, and exposes
+   an AriaLabel param that must take precedence when set. *@
+
+<PageTitle>Verify REQ-UI-014 - TrBlazeUI</PageTitle>
+
+<div class="p-6 space-y-8" data-testid="verify-heading">
+    <h1 class="text-2xl font-bold">REQ-UI-014 verification harness</h1>
+
+    @* TR-003 · a Select with a value already bound must expose that value as its accessible name. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-003 · pre-selected value</h2>
+        <div class="w-64">
+            <Select @bind-Value="objRole" TValue="string">
+                <SelectTrigger data-testid="tr003-valued">
+                    <SelectValue Placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent TValue="string">
+                    <SelectItem Value="@("Patreon")" Text="Patreon (Seeker)" TValue="string">Patreon (Seeker)</SelectItem>
+                    <SelectItem Value="@("Astrologer")" Text="Astrologer" TValue="string">Astrologer</SelectItem>
+                    <SelectItem Value="@("Numerologist")" Text="Numerologist" TValue="string">Numerologist</SelectItem>
+                </SelectContent>
+            </Select>
+        </div>
+    </section>
+
+    @* TR-003 · a Select with only a placeholder must still have a (placeholder-derived) accessible name. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-003 · placeholder only</h2>
+        <div class="w-64">
+            <Select @bind-Value="objEmpty" TValue="string">
+                <SelectTrigger data-testid="tr003-placeholder">
+                    <SelectValue Placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent TValue="string">
+                    <SelectItem Value="@("Patreon")" Text="Patreon (Seeker)" TValue="string">Patreon (Seeker)</SelectItem>
+                    <SelectItem Value="@("Astrologer")" Text="Astrologer" TValue="string">Astrologer</SelectItem>
+                </SelectContent>
+            </Select>
+        </div>
+    </section>
+
+    @* TR-003 · an explicit AriaLabel must win over the default value-derived name. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-003 · explicit AriaLabel overrides</h2>
+        <div class="w-64">
+            <Select @bind-Value="objRole2" TValue="string">
+                <SelectTrigger data-testid="tr003-arialabel" AriaLabel="Choose your role">
+                    <SelectValue Placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent TValue="string">
+                    <SelectItem Value="@("Patreon")" Text="Patreon (Seeker)" TValue="string">Patreon (Seeker)</SelectItem>
+                    <SelectItem Value="@("Astrologer")" Text="Astrologer" TValue="string">Astrologer</SelectItem>
+                </SelectContent>
+            </Select>
+        </div>
+    </section>
+</div>
+
+@code {
+    private string? objRole = "Patreon";
+    private string? objEmpty;
+    private string? objRole2 = "Astrologer";
+}

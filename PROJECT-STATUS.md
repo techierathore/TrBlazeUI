@@ -1,18 +1,21 @@
 ---
 project: TrBlazeUI
 stack: .NET 10 / Blazor (Server·WASM·Auto) / Tailwind CSS v4 / shadcn-compatible
-last_updated: 2026-07-21
-current_phase: Handoff
-last_verified_build: PASS (Release 0/0, 2026-07-21 fix-issues run)
-last_verified_date: 2026-07-21
+last_updated: 2026-07-22
+current_phase: Handoff (ready for UAT — 0 open requirements)
+last_verified_build: PASS (Release 0/0, 2026-07-22 fix-issues run)
+last_verified_date: 2026-07-22
 ---
 
 # TrBlazeUI — Status
 
 ## Where I am
-**Handoff.** All REQ-* are `Verified`/`Done`/`N/A`; awaiting owner UAT per `docs/TrBlazeUI-UsageGuide.md`. Release **2.0.0** is staged in source with notes written (`CHANGELOG.md`) — it is a major bump because `DataTable.ShowToolbar` flips its default, changing rendered output for existing consumers. Publishing is owner-manual (git/gh are agent-blocked).
+**Handoff-ready — 0 open requirements; TR-003 fixed + TR-014 hardened.** A `*fix-issues` run against AstroLyfe's post-upgrade feedback (`docs/AstroLyfe-TrBlazeUI-Feedback.md`) fixed **REQ-UI-014 / TR-003** and, at the owner's request, defensively hardened **TR-014** (dialog centering) under REQ-UI-016 — both re-verified live (Release build **0/0**; headless-Chromium ui014 8/8 + ui016 23/23).
 
-Docs reconciled this run: the two Feb-2026 raw consumer reports (fully resolved, against `beta.0.8`) moved to `docs/OldDocs/`, and every stale citation of the deleted `docs/trblazeui-issues-report.md` repointed. `docs/` now carries exactly one feedback file per consumer.
+- **TR-003 — FIXED + VERIFIED → REQ-UI-014 `Needs re-verify` → `Verified` (100%).** The primitive `SelectTrigger` now emits a default `aria-labelledby` pointing at the already-rendered `SelectValue` span (`GetDefaultLabelledBy()` → `SelectContext.ValueId`), giving the `role="combobox"` trigger a non-empty accessible name from first render; it defers when the author splats a **non-empty** `aria-label`/`aria-labelledby` (a null-valued forwarded key does not count — the first-cut bug, caught live and fixed). The styled `SelectTrigger` gains an `AriaLabel` param (emits `aria-label`, overrides the default per ARIA precedence). Verified on the new `/verify-ui014` harness (`tests/verify/ui-ui014.spec.js`, **8/8**): **axe `button-name` = 0 violations**, names present for valued ("Patreon") + placeholder-only ("Select a role") triggers, `AriaLabel` override wins with no default `aria-labelledby`. Files: `src/TrBlazeUI.Primitives/Primitives/Select/SelectTrigger.razor`, `src/TrBlazeUI.Components/Components/Select/SelectTrigger.razor`. Ledger `docs/.last-verify.json`.
+- **TR-014 — DEFENSIVELY HARDENED + VERIFIED (owner-requested) → REQ-UI-016 stays `Verified`.** Although the double-offset could not be reproduced on current source (settled `transform:none` + single `translate`), the owner asked to harden anyway. `DialogContent`/`AlertDialogContent` now center with **auto margins** (`fixed inset-0 z-50 m-auto grid h-fit … max-h-[calc(100vh-2rem)]`) instead of translate/transform offsets. Auto margins are never negative, so the top can never go above `y=0` no matter how many stray −50% offsets stack — the TR-014 class of clipping is structurally impossible now. Slide animations (built around the old −50% base) dropped for zoom+fade; Sheet/Drawer untouched; `trblazeui.css` regenerated (`m-auto`/`h-fit` added, `translate-x/y-[-50%]`/`slide-*` pruned). Verified 23/23 (`ui-ui016.spec.js`): settled `transform:none` **and** `translate:none`, `top=16px` @1366×720/1280×600/390×844; AlertDialog centers on-screen (`top=269`); Sheet still edge-anchored.
+
+Docs reconciled 2026-07-21: the two Feb-2026 raw consumer reports (fully resolved, against `beta.0.8`) moved to `docs/OldDocs/`, and every stale citation of the deleted `docs/trblazeui-issues-report.md` repointed. `docs/` carries exactly one feedback file per consumer.
 
 *(This run, 2026-07-21)* Ran `*fix-issues` against AstroLyfe's feedback and **closed REQ-UI-016** — the last open requirement. All three UAT-2/3 defects were fixed library-side (no app-side workarounds) and verified live: Release build **0/0**, headless-Chromium **21/21** (`tests/verify/ui-ui016.spec.js` on the new `/verify-ui016` harness), ledger `docs/.last-verify.json`.
 
@@ -30,13 +33,18 @@ Also regenerated `wwwroot/trblazeui.css` (Tailwind v4.1.18) and re-swept `/compo
 ```
 Manual UAT per docs/TrBlazeUI-UsageGuide.md smoke checklist.
 ```
-Then (owner-manual, because agents cannot run git/gh or publish): commit the working tree, create the GitHub Release tagged **`2.0.0`**, and paste the `## [2.0.0]` section of `CHANGELOG.md` as the release body — the notes are written, nothing to draft. The workflow builds and publishes all five packages. Then tell AstroLyfe to upgrade off 1.0.6; that single upgrade closes all 12 issues in their feedback file. NOTE: Components depends on HtmlSanitizer 9.1.949-beta (pre-release) — confirm that is acceptable, or hold the Components bump until HtmlSanitizer 9.1.x reaches stable.
+All requirements are terminal — TR-003 is fixed + verified. Handoff ran 2026-07-22: UsageGuide + DevGuide refreshed for the TR-003 fix, feedback files consolidated, HTMLs re-rendered.
+
+Publishing (owner-manual): commit the working tree, create the GitHub Release tagged **`2.0.1`** (a patch over the staged 2.0.0 — the TR-003 accessible-name fix), paste the CHANGELOG section as the body; the workflow publishes all five packages. NOTE: Components depends on HtmlSanitizer 9.1.949-beta (pre-release) — confirm acceptable or hold that bump.
+
+**Owner answer still nice-to-have (non-blocking, no longer gating anything):** which build did AstroLyfe's 2026-07-22 "2.0.0" upgrade resolve to? TR-014's doubled offset cannot come from current library CSS; the auto-margin hardening now makes the dialog immune regardless, so this only closes the root-cause loop.
 
 ## Open requirements
-- None — every REQ in the checklist Requirements Status table is terminal (`Verified` / `Done` / `N/A`). REQ-UI-016 closed 2026-07-21.
+- **None — all requirements terminal (`Verified`).** REQ-UI-014 / TR-003 was fixed + verified 2026-07-22 (see above); the other 8 of TR-001…TR-009 remain confirmed fixed.
 
 ## Known blockers
-- None for the build (Release 0/0) and none in the library. **Consumer-facing (owner action, not a code defect):** AstroLyfe is still on TrBlazeUI **1.0.6**, so their UAT rounds keep re-surfacing issues already fixed in 1.0.7 and now in the unpublished > 1.0.7. Publishing + their upgrade closes all 12. The prior warning about their `transform`-based TR-011 override is **resolved** — the library fix clamps height rather than the centering property, so their override neither breaks nor is needed.
+- **None.** Release 0/0; 0 open requirements. TR-003 fixed + verified; TR-014 defensively hardened + verified.
+- ℹ️ **Owner question (now moot for the fix, still nice to know):** AstroLyfe reported TR-014 against a **published "2.0.0"** that per this file was never published — the doubled `transform`+`translate` offset they measured cannot originate from current library CSS, so it pointed to a different/older build or a host sheet contributing a `transform` translate. The auto-margin hardening makes this irrelevant (no offset of any kind now), but confirming their build would still close the root-cause loop.
 
 ## Verification log
 | Date | Phase | Result | Status table |
@@ -51,12 +59,16 @@ Then (owner-manual, because agents cannot run git/gh or publish): commit the wor
 | 2026-07-21 | Handoff (post-REQ-UI-016) | **READY FOR UAT** — all REQs terminal; 2.0.0 staged with CHANGELOG release notes; UsageGuide + BRD §4 + DevGuide refreshed; legacy consumer reports archived to docs/OldDocs and stale citations repointed | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-07-21 | Fix-issues + verify (REQ-UI-016, AstroLyfe TR-010/011/012) | PASS → Verified — Release 0/0; headless-Chromium **21/21** (`tests/verify/ui-ui016.spec.js` on `/verify-ui016`) incl. §4a render gate + §4b visual truth @1366/1280/390. DataTable toolbar opt-in + row-count pagination guard; Dialog/AlertDialog clamped (top −245/−305 → +16px); library-shipped `:where()` token fallbacks make popovers opaque without host tokens. No regression on 4 demo pages. Ledger docs/.last-verify.json | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-07-21 | Triage (AstroLyfe UAT-2/3, analyze-only) | Release 0/0. TR-010/011/012 REPRO → **REQ-UI-016 logged Planned**; TR-013 retracted by reporter. TR-001…TR-009 re-verified live as still-fixed → reconciled as stale 1.0.6 observations, REQ-UI-014 held at Verified (no demotion). No code changed | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-07-22 | Triage (AstroLyfe post-2.0.0-upgrade, analyze-only — NOT a verify pass) | Release 0/0. AstroLyfe upgraded 1.0.6→2.0.0 + live re-verified: 11/13 fixed. **TR-003 REPRO** (SelectTrigger `role=combobox`, no accessible name) → **REQ-UI-014 demoted Verified→Needs re-verify (90%)**; corrects the 2026-07-21 "stale" call. **TR-014 could-not-reproduce** (settled `transform:none`, single `translate -50%`; 294/598/688px dialogs at top +213/+61/+16) → REQ-UI-016 held Verified + owner question. No code changed | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-07-22 | Fix-issues + verify (REQ-UI-014, AstroLyfe TR-003) | PASS → **Verified** — Release 0/0; headless-Chromium **8/8** (`tests/verify/ui-ui014.spec.js` on new `/verify-ui014`) incl. axe `button-name`=0. SelectTrigger emits default `aria-labelledby`→SelectValue span + new `AriaLabel` param (defers to non-empty splatted names). TR-014 re-checked → still could-not-reproduce (dialog `transform:none`+single `translate`, top=16px; ui-ui016 21/21). Ledger docs/.last-verify.json | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-07-22 | Handoff (post-TR-003 fix) | **READY FOR UAT** — all REQs terminal (0 open). UsageGuide + DevGuide refreshed for the TR-003 fix (Select accessible name / `AriaLabel`); AstroLyfe feedback consolidated (0 blocking, TR-014 non-blocking); BRD §4 rolled up; BRD/Architecture/PROJECT-STATUS/UsageGuide/DevGuide HTML re-rendered. 2.0.1 pending owner-manual publish | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-07-22 | Fix-issues + verify (REQ-UI-016, TR-014 hardening — owner-requested) | PASS → **Verified** (held) — Release 0/0; headless-Chromium **23/23** (`ui-ui016.spec.js`, new `tr014-no-offset` checks). `DialogContent`/`AlertDialogContent` switched to auto-margin centering (`inset-0 m-auto h-fit`) — settled `transform:none` & `translate:none`, `top=16px` @1366/1280/390; AlertDialog centers (`top=269`), Sheet edge-anchored untouched. `trblazeui.css` regenerated (v4.1.18). Ledger docs/.last-verify.json | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 - **Feedback files are one-per-consumer and live in `docs/`:** `AstroLyfe-TrBlazeUI-Feedback.md`, `TrStudio-TrBlazeUI-Feedback.md`, `TechieRag-TrBlazeUI-Feedback.md`. *(Reconciled 2026-07-21: PROJECT-STATUS previously cited `docs/trblazeui-issues-report.md`, a path that no longer exists. The two Feb-2026 raw reports it referred to — the TechieRag Web Sample App report and the AppStudio IDE report, both against `beta.0.8` and both fully resolved — are archived unmodified at `docs/OldDocs/trblazeui-issues-report-2.md` and `docs/OldDocs/TrBlazeUI-Issues-Report-1.md`.)*
 - TechieRag: 0 open — all issues resolved (canonical file `docs/TechieRag-TrBlazeUI-Feedback.md`, consolidated 2026-07-02). The separate NU1902 supply-chain blocker (AngleSharp mXSS via HtmlSanitizer) was fixed 2026-07-18 under REQ-FN-009 by moving to HtmlSanitizer 9.1.949-beta. TrStudio: all 11 resolved 2026-07-12 (REQ-UI-015).
-- **AstroLyfe: 0 open.** TR-010/011/012 fixed + verified 2026-07-21 (REQ-UI-016, ships > 1.0.7); TR-001…TR-009 fixed 2026-07-02, shipped in 1.0.7; TR-013 retracted. All 12 now carry per-issue resolution notes in `docs/AstroLyfe-TrBlazeUI-Feedback.md`. Remaining gap is distribution only: publish, then AstroLyfe upgrades off 1.0.6.
-- TechieRag: 0 issues open.
+- **AstroLyfe: 0 open.** After AstroLyfe's 1.0.6→2.0.0 upgrade + live re-verification (`docs/AstroLyfe-TrBlazeUI-Feedback.md`, 2026-07-22): all 13 addressed. **TR-003 (SelectTrigger accessible name) FIXED + verified 2026-07-22** (REQ-UI-014 → `Verified`; `aria-labelledby`→SelectValue span + `AriaLabel` param; axe `button-name`=0 on `/verify-ui014`). **TR-014 (Dialog double-offset) DEFENSIVELY HARDENED + verified** (REQ-UI-016; auto-margin centering — settled `transform:none` & `translate:none`, `top=16px`). TR-010/011/012 fixed 2026-07-21 (REQ-UI-016); the rest fixed 2026-07-02 (1.0.7); TR-013 retracted.
+- TechieRag: 0 issues open. TrStudio: 0 open (all 11 resolved 2026-07-12).
 
 ## Standards compliance (last verifier check)
 - Underscore fields: clean (obj-prefix convention)

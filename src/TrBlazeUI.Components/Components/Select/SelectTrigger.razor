@@ -5,6 +5,7 @@
 @* Styled SelectTrigger wrapper around SelectTrigger primitive *@
 <TrBlazeUI.Primitives.Select.SelectTrigger TValue="TValue"
                                                class="@CssClass"
+                                               aria-label="@AriaLabel"
                                                @attributes="AdditionalAttributes">
     @ChildContent
     <svg class="ms-2 h-4 w-4 opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -24,6 +25,15 @@
     /// </summary>
     [Parameter]
     public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets an explicit accessible name for the trigger. When set it is emitted
+    /// as <c>aria-label</c> and describes the control's purpose (e.g. "Role"), which is
+    /// preferable to the default (the combobox labelled by its current value). Leave null
+    /// to fall back to the built-in <c>aria-labelledby</c> → SelectValue behaviour.
+    /// </summary>
+    [Parameter]
+    public string? AriaLabel { get; set; }
 
     /// <summary>
     /// Gets or sets the content to be rendered inside the trigger button.

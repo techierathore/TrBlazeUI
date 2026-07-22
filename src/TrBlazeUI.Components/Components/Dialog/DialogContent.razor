@@ -88,17 +88,23 @@
     /// Uses the cn() utility for intelligent class merging and Tailwind conflict resolution.
     /// </summary>
     private string GetClassNames() => ClassNames.cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%]",
-        // Clamp inside the visual viewport: with a -50% Y offset a box no taller than
-        // (viewport - 2 x gutter) can never push its top above y=0, so the header stays
-        // reachable at any viewport height; taller content scrolls inside the dialog.
+        // TR-014 hardening: center the dialog with AUTO MARGINS inside a full-viewport fixed
+        // box (`inset-0 m-auto`) with an intrinsic height (`h-fit`) — NOT translate/transform
+        // offsets. Auto margins are never negative, so combined with the max-height cap below
+        // the top can never sit above y=0 no matter how many stray -50% transform/translate
+        // offsets a consumer stylesheet (or a future refactor) contributes. This removes the
+        // whole class of clipping bug AstroLyfe reported (transform + translate stacking),
+        // rather than relying on there being exactly one offset for the height cap to absorb.
+        "fixed inset-0 z-50 m-auto grid h-fit w-full max-w-lg",
+        // Clamp inside the visual viewport so a tall dialog scrolls internally instead of
+        // overflowing; with auto-margin centering the top stays >= gutter at any height.
         "max-h-[calc(100vh-2rem)] overflow-y-auto",
         "gap-4 border bg-background p-6 shadow-lg duration-200",
+        // Enter/exit is zoom + fade only (no slide) — the slide utilities were built around
+        // the old -50% translate base and are unnecessary for an auto-margin-centered box.
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-        "data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]",
-        "data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
         "sm:rounded-lg",
         Class
     );
