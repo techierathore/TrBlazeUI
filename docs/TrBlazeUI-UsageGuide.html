@@ -174,6 +174,7 @@ ul.task-list input[type="checkbox"]{margin-top:4px;flex:0 0 auto;accent-color:va
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a>
           <ul>
+            <li><a href="#added-2026-07-22-astrolyfe-post-upgrade-feedback-req-ui-014-tr-003-ships-in-2-0-1">Added 2026-07-22 (AstroLyfe post-upgrade feedback — REQ-UI-014 / TR-003, ships in 2.0.1)</a></li>
             <li><a href="#added-2026-07-21-astrolyfe-uat-feedback-pass-req-ui-016-ships-in-2-0-0">Added 2026-07-21 (AstroLyfe UAT feedback pass — REQ-UI-016, ships in 2.0.0)</a></li>
             <li><a href="#added-2026-07-02-astrolyfe-feedback-pass-req-ui-014">Added 2026-07-02 (AstroLyfe feedback pass — REQ-UI-014)</a></li>
           </ul>
@@ -326,9 +327,17 @@ NODE_PATH=&lt;path-to-any-repo-with-playwright&gt;/node_modules node tests/verif
       <li><input type="checkbox" disabled><span>Toggle dark mode — components restyle without breakage</span></li>
       <li><input type="checkbox" disabled><span>Open <code>/components/datatable</code> — the Basic Table shows <strong>no search box</strong> (toolbar is opt-in as of 2.0.0) and paginates only because it has 500 rows</span></li>
       <li><input type="checkbox" disabled><span>Open a tall Dialog — its header is visible at the top of the viewport and long content scrolls inside the dialog</span></li>
+      <li><input type="checkbox" disabled><span>Open <code>/components/select</code> — the trigger has an accessible name (axe reports 0 <code>button-name</code> violations; a value or the placeholder is announced)</span></li>
     </ul>
 
     <h2 id="consumer-integration-notes">Consumer integration notes<a class="anchor-link" href="#consumer-integration-notes">#</a></h2>
+
+    <h3 id="added-2026-07-22-astrolyfe-post-upgrade-feedback-req-ui-014-tr-003-ships-in-2-0-1">Added 2026-07-22 (AstroLyfe post-upgrade feedback — REQ-UI-014 / TR-003, ships in 2.0.1)<a class="anchor-link" href="#added-2026-07-22-astrolyfe-post-upgrade-feedback-req-ui-014-tr-003-ships-in-2-0-1">#</a></h3>
+    <ul>
+      <li><strong>Select triggers now carry an accessible name by default.</strong> <code>SelectTrigger</code> (a <code>&lt;button role="combobox"&gt;</code>) emits <code>aria-labelledby</code> pointing at the <code>SelectValue</code> span, so screen readers and axe (<code>button-name</code>) see a non-empty name from first render — no per-Select workaround needed. If you previously splatted <code>aria-label="…"</code> onto every <code>&lt;SelectTrigger&gt;</code> to satisfy accessibility, you can <strong>remove it</strong> on upgrade.</li>
+      <li><strong>New <code>AriaLabel</code> parameter on <code>SelectTrigger</code></strong> for a descriptive purpose-name (e.g. <code>&lt;SelectTrigger AriaLabel="Role"&gt;</code>), which overrides the default value-derived name. Splatting your own <code>aria-label</code>/<code>aria-labelledby</code> also still wins — the library only supplies the default when you provide no name.</li>
+      <li><strong>Dialog centering is now offset-free (TR-014 hardening).</strong> <code>DialogContent</code>/<code>AlertDialogContent</code> center with auto margins (<code>inset-0 m-auto h-fit</code>) instead of <code>translate-x/y-[-50%]</code>, so a tall dialog can never clip above the viewport no matter what <code>transform</code>/<code>translate</code> your app CSS contributes. <strong>If you shipped a <code>translate:none</code>/<code>transform</code> dialog override, remove it</strong> — its <code>[class~="left-[50%]"][class~="top-[50%]"]</code> selector no longer matches (those tokens are gone). <code>Sheet</code>/<code>Drawer</code> positioning is unchanged.</li>
+    </ul>
 
     <h3 id="added-2026-07-21-astrolyfe-uat-feedback-pass-req-ui-016-ships-in-2-0-0">Added 2026-07-21 (AstroLyfe UAT feedback pass — REQ-UI-016, ships in 2.0.0)<a class="anchor-link" href="#added-2026-07-21-astrolyfe-uat-feedback-pass-req-ui-016-ships-in-2-0-0">#</a></h3>
     <ul>
@@ -351,7 +360,7 @@ NODE_PATH=&lt;path-to-any-repo-with-playwright&gt;/node_modules node tests/verif
     <ul>
       <li><strong>NativeSelect inside MAUI Blazor Hybrid overlays</strong> — native <code>&lt;select&gt;</code> popup is clipped in WebView2 <code>position: fixed</code> overlays (platform limitation). Use <code>&lt;Select&gt;</code> instead inside dialogs/sheets. See <code>docs/OldDocs/TrBlazeUI-Issues-Report-1.md</code> (Issue #2).</li>
       <li><strong><code>HtmlSanitizer 9.1.949-beta</code> is a pre-release dependency</strong> of <code>TrBlazeUI.Components</code>. It is the only line pulling <code>AngleSharp &gt;= 1.5.0</code>, which patches CVE-2026-54570 (mXSS bypass defeating DOM sanitizers — the protection <code>RichTextEditor</code>/<code>MarkdownEditor</code> depend on). Revisit when <code>HtmlSanitizer 9.1.x</code> reaches stable.</li>
-      <li><strong>Consumer feedback is all resolved in source but not all published.</strong> AstroLyfe's 3 latest issues (TR-010/011/012) ship in 2.0.0, which is not yet released; their other 9 shipped in 1.0.7. See <code>docs/AstroLyfe-TrBlazeUI-Feedback.md</code>.</li>
+      <li><strong>Consumer feedback is all resolved in source but not all published.</strong> AstroLyfe's TR-003 (Select accessible name) + TR-014 (Dialog centering, defensively hardened) ship in 2.0.1; TR-010/011/012 in 2.0.0; their other 8 shipped in 1.0.7 — none of 2.0.0/2.0.1 is released yet (owner-manual). See <code>docs/AstroLyfe-TrBlazeUI-Feedback.md</code>.</li>
       <li><em>(Resolved 2026-06-30: the strict Release build is clean 0/0, and XML-doc coverage is 100% with CS1591 build-enforced — previously-listed limitations cleared.)</em></li>
     </ul>
   </main>

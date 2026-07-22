@@ -11,6 +11,7 @@
             aria-expanded="@objContext.IsOpen.ToString().ToLower()"
             aria-controls="@objContext.ContentId"
             aria-haspopup="listbox"
+            aria-labelledby="@GetDefaultLabelledBy()"
             aria-disabled="@objContext.Disabled.ToString().ToLower()"
             disabled="@objContext.Disabled"
             data-state="@(objContext.IsOpen ? "open" : "closed")"
@@ -38,6 +39,42 @@
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Resolves the default <c>aria-labelledby</c> target for the trigger.
+    /// <para>
+    /// The trigger renders <c>role="combobox"</c>, which is NOT a name-from-content
+    /// ARIA role, so descendant text (the selected value / placeholder) can never
+    /// supply an accessible name on its own — axe reports <c>button-name</c> (critical).
+    /// By default we therefore point the combobox at the <see cref="SelectContext{TValue}.ValueId"/>
+    /// span rendered by SelectValue, giving the trigger an accessible name equal to the
+    /// current value from the very first render.
+    /// </para>
+    /// <para>
+    /// When the consumer supplies their own accessible name via attribute splatting
+    /// (<c>aria-label</c> or <c>aria-labelledby</c>) we return <c>null</c> so the
+    /// attribute is omitted and their value wins — a combobox's <c>aria-labelledby</c>
+    /// takes precedence over a splatted <c>aria-label</c>, so emitting ours
+    /// unconditionally would silently override an author-supplied label.
+    /// </para>
+    /// </summary>
+    private string? GetDefaultLabelledBy()
+    {
+        // A splatted attribute that resolves to null/empty (e.g. a styled wrapper forwarding
+        // an unset AriaLabel) is NOT an author-supplied name — Blazor still captures the key,
+        // so a bare ContainsKey check would wrongly suppress our default. Require a real value.
+        if (HasNonEmptyAttribute("aria-label") || HasNonEmptyAttribute("aria-labelledby"))
+        {
+            return null;
+        }
+
+        return objContext?.ValueId;
+    }
+
+    private bool HasNonEmptyAttribute(string aKey)
+        => AdditionalAttributes != null &&
+           AdditionalAttributes.TryGetValue(aKey, out var vValue) &&
+           !string.IsNullOrEmpty(vValue?.ToString());
 
     private void HandleClick()
     {

@@ -111,8 +111,15 @@ NODE_PATH=<path-to-any-repo-with-playwright>/node_modules node tests/verify/ui-u
 - [ ] Toggle dark mode — components restyle without breakage
 - [ ] Open `/components/datatable` — the Basic Table shows **no search box** (toolbar is opt-in as of 2.0.0) and paginates only because it has 500 rows
 - [ ] Open a tall Dialog — its header is visible at the top of the viewport and long content scrolls inside the dialog
+- [ ] Open `/components/select` — the trigger has an accessible name (axe reports 0 `button-name` violations; a value or the placeholder is announced)
 
 ## Consumer integration notes
+
+### Added 2026-07-22 (AstroLyfe post-upgrade feedback — REQ-UI-014 / TR-003, ships in 2.0.1)
+
+- **Select triggers now carry an accessible name by default.** `SelectTrigger` (a `<button role="combobox">`) emits `aria-labelledby` pointing at the `SelectValue` span, so screen readers and axe (`button-name`) see a non-empty name from first render — no per-Select workaround needed. If you previously splatted `aria-label="…"` onto every `<SelectTrigger>` to satisfy accessibility, you can **remove it** on upgrade.
+- **New `AriaLabel` parameter on `SelectTrigger`** for a descriptive purpose-name (e.g. `<SelectTrigger AriaLabel="Role">`), which overrides the default value-derived name. Splatting your own `aria-label`/`aria-labelledby` also still wins — the library only supplies the default when you provide no name.
+- **Dialog centering is now offset-free (TR-014 hardening).** `DialogContent`/`AlertDialogContent` center with auto margins (`inset-0 m-auto h-fit`) instead of `translate-x/y-[-50%]`, so a tall dialog can never clip above the viewport no matter what `transform`/`translate` your app CSS contributes. **If you shipped a `translate:none`/`transform` dialog override, remove it** — its `[class~="left-[50%]"][class~="top-[50%]"]` selector no longer matches (those tokens are gone). `Sheet`/`Drawer` positioning is unchanged.
 
 ### Added 2026-07-21 (AstroLyfe UAT feedback pass — REQ-UI-016, ships in 2.0.0)
 
@@ -132,5 +139,5 @@ NODE_PATH=<path-to-any-repo-with-playwright>/node_modules node tests/verify/ui-u
 ## Known limitations
 - **NativeSelect inside MAUI Blazor Hybrid overlays** — native `<select>` popup is clipped in WebView2 `position: fixed` overlays (platform limitation). Use `<Select>` instead inside dialogs/sheets. See `docs/OldDocs/TrBlazeUI-Issues-Report-1.md` (Issue #2).
 - **`HtmlSanitizer 9.1.949-beta` is a pre-release dependency** of `TrBlazeUI.Components`. It is the only line pulling `AngleSharp >= 1.5.0`, which patches CVE-2026-54570 (mXSS bypass defeating DOM sanitizers — the protection `RichTextEditor`/`MarkdownEditor` depend on). Revisit when `HtmlSanitizer 9.1.x` reaches stable.
-- **Consumer feedback is all resolved in source but not all published.** AstroLyfe's 3 latest issues (TR-010/011/012) ship in 2.0.0, which is not yet released; their other 9 shipped in 1.0.7. See `docs/AstroLyfe-TrBlazeUI-Feedback.md`.
+- **Consumer feedback is all resolved in source but not all published.** AstroLyfe's TR-003 (Select accessible name) + TR-014 (Dialog centering, defensively hardened) ship in 2.0.1; TR-010/011/012 in 2.0.0; their other 8 shipped in 1.0.7 — none of 2.0.0/2.0.1 is released yet (owner-manual). See `docs/AstroLyfe-TrBlazeUI-Feedback.md`.
 - _(Resolved 2026-06-30: the strict Release build is clean 0/0, and XML-doc coverage is 100% with CS1591 build-enforced — previously-listed limitations cleared.)_

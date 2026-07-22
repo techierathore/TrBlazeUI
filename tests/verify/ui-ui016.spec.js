@@ -31,6 +31,8 @@ async function measureDialog(page, width, height) {
       titleTop: title ? title.getBoundingClientRect().top : null,
       maxHeight: cs.maxHeight,
       overflowY: cs.overflowY,
+      transform: cs.transform,
+      translate: cs.translate,
     };
   });
   await page.keyboard.press('Escape');
@@ -83,6 +85,11 @@ async function measureDialog(page, width, height) {
       `max-height=${box.maxHeight} overflow-y=${box.overflowY}`);
     check(`tr011-bottom-onscreen-${w}x${h}`, box.bottom <= h + 1,
       `dialog bottom=${Math.round(box.bottom)}px vs viewport ${h}`);
+    // TR-014 hardening: the dialog is centered by auto margins, NOT translate/transform, so a
+    // settled dialog carries NO offset on either property — no double-offset can ever stack.
+    const noTx = box.transform === 'none' && (box.translate === 'none' || box.translate === '');
+    check(`tr014-no-offset-${w}x${h}`, noTx,
+      `transform=${box.transform} translate=${box.translate} (both must be none — auto-margin centering)`);
   }
   await page.setViewportSize({ width: 1366, height: 720 });
 
