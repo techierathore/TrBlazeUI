@@ -15,6 +15,16 @@
          2.0.0: DataTable.ShowToolbar default flipped true -> false (breaking); see CHANGELOG.md. -->
     <Version>2.0.0</Version>
 
+    <!-- SourceLink. The .NET 8+ SDK bundles Microsoft.SourceLink.GitHub, so no PackageReference
+         is needed - only these switches. PublishRepositoryUrl keeps the repo URL in the built
+         .nupkg so debuggers can resolve sources; EmbedUntrackedSources covers generated files
+         (e.g. Razor-generated .cs) that are not in the repo.
+         ContinuousIntegrationBuild normalises embedded source paths for deterministic builds; it
+         is CI-only because it also strips local paths that make local debugging convenient. -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+
     <!-- Build Configuration -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -26,4 +36,11 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
   </PropertyGroup>
+
+  <!-- Apache-2.0 section 4(d): the NOTICE file must travel with every redistribution, so it is
+       packed into the root of all five packages rather than living only in the repo. Applies to
+       packable projects only - the demo apps are never packed. -->
+  <ItemGroup Condition="'$(IsPackable)' != 'false'">
+    <None Include="$(MSBuildThisFileDirectory)NOTICE" Pack="true" PackagePath="" Visible="false" />
+  </ItemGroup>
 </Project>

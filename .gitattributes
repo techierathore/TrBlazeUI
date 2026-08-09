@@ -24,3 +24,6 @@
 *.woff2 binary
 *.ttf binary
 *.eot binary
+
+# TechieFlow telemetry — append-only logs; keep BOTH sides on merge (managed by scaffold/update-framework.sh)
+docs/metrics/*.jsonl merge=union

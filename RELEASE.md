@@ -59,7 +59,12 @@ After a release, bump the version in `Directory.Build.props` for the next develo
 
 ## GitHub Actions Workflow
 
-**File:** `.github/workflows/publish-nuget.yml`
+**File:** `.github/workflows/publish-github-packages.yml`
+
+> Renamed from `publish-nuget.yml` on 2026-08-09. Contents and triggers are unchanged — the
+> `publish-nuget.yml` name now belongs to the separate, manually dispatched **NuGet.org** publish
+> workflow. This document covers the **GitHub Packages** feed only; for public releases to
+> NuGet.org see [NUGET-PUBLISHING.md](NUGET-PUBLISHING.md).
 
 The workflow runs on:
 - **Push to master** → CI pre-release packages

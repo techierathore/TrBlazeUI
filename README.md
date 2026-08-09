@@ -14,6 +14,19 @@ Beautiful, accessible UI components for Blazor. Inspired by [shadcn/ui](https://
   <strong>Primitives</strong>
 </p>
 
+<!-- NuGet.org badges. These render as "package not found" until the first successful
+     publish-nuget.yml run completes and nuget.org finishes indexing (~15 min). -->
+<p align="center">
+  <a href="https://www.nuget.org/packages/TrBlazeUI.Components/"><img src="https://img.shields.io/nuget/v/TrBlazeUI.Components?label=TrBlazeUI.Components&logo=nuget" alt="TrBlazeUI.Components on NuGet" /></a>
+  <a href="https://www.nuget.org/packages/TrBlazeUI.Primitives/"><img src="https://img.shields.io/nuget/v/TrBlazeUI.Primitives?label=TrBlazeUI.Primitives&logo=nuget" alt="TrBlazeUI.Primitives on NuGet" /></a>
+  <br />
+  <a href="https://www.nuget.org/packages/TrBlazeUI.Icons.Lucide/"><img src="https://img.shields.io/nuget/v/TrBlazeUI.Icons.Lucide?label=Icons.Lucide&logo=nuget" alt="TrBlazeUI.Icons.Lucide on NuGet" /></a>
+  <a href="https://www.nuget.org/packages/TrBlazeUI.Icons.Heroicons/"><img src="https://img.shields.io/nuget/v/TrBlazeUI.Icons.Heroicons?label=Icons.Heroicons&logo=nuget" alt="TrBlazeUI.Icons.Heroicons on NuGet" /></a>
+  <a href="https://www.nuget.org/packages/TrBlazeUI.Icons.Feather/"><img src="https://img.shields.io/nuget/v/TrBlazeUI.Icons.Feather?label=Icons.Feather&logo=nuget" alt="TrBlazeUI.Icons.Feather on NuGet" /></a>
+  <br />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="Apache-2.0" /></a>
+</p>
+
 ## Overview
 
 TrBlazeUI brings the elegant design system of shadcn/ui to Blazor applications. Build modern, responsive interfaces with **65+ styled components** and **15 headless primitives** that work across all Blazor hosting models—Server, WebAssembly, and Hybrid.
@@ -31,7 +44,31 @@ Blazor developers lack a modern, system-first UI library equivalent to shadcn/ui
 
 ### Installation
 
-TrBlazeUI packages are hosted on **GitHub Packages** under the `techierathore` organization.
+TrBlazeUI is published to **NuGet.org**. No token, no custom feed, no configuration:
+
+```bash
+# Styled components with shadcn/ui design (pulls in Primitives + Icons.Lucide automatically)
+dotnet add package TrBlazeUI.Components
+
+# Or install individually:
+dotnet add package TrBlazeUI.Primitives          # Headless primitives for custom styling
+
+# Icon libraries (choose one or more)
+dotnet add package TrBlazeUI.Icons.Lucide        # 1,665 icons - stroke-based, consistent
+dotnet add package TrBlazeUI.Icons.Heroicons     # 1,288 icons - 4 variants (outline, solid, mini, micro)
+dotnet add package TrBlazeUI.Icons.Feather       # 286 icons - minimalist, stroke-based
+```
+
+That is the whole installation. Continue to [Quick Start](#quick-start).
+
+<details>
+<summary><strong>Alternative: GitHub Packages feed (legacy)</strong> — for existing consumers already wired to the private feed</summary>
+
+The same packages are also published to **GitHub Packages** under the `techierathore` organization,
+at the same version numbers. This was the original distribution channel and continues to be
+published on every push to `main`. New projects should prefer NuGet.org above — it needs no
+authentication. Use this path only if you are already configured for it, or if you need the
+`-ci.N` prerelease builds, which are published only to GitHub Packages.
 
 #### Step 1: Create a GitHub Personal Access Token (PAT)
 
@@ -107,6 +144,8 @@ For GitHub Actions workflows that need to restore TrBlazeUI packages:
 ```
 
 > **Note:** `GITHUB_TOKEN` is automatically available in GitHub Actions and has `read:packages` permission for packages in the same organization.
+
+</details>
 
 ### Quick Start
 

@@ -1,158 +1,259 @@
-name: Build and Publish NuGet Packages
+name: Publish to NuGet.org
+
+# On-demand public release to nuget.org via NuGet Trusted Publishing (OIDC).
+# No API key is stored anywhere: the trusted publishing policy on nuget.org is bound to this
+# repository AND this workflow file path (.github/workflows/publish-nuget.yml). Renaming or
+# moving this file invalidates the policy until it is updated on nuget.org.
+#
+# The private GitHub Packages feed is published by publish-github-packages.yml and is entirely
+# independent of this workflow. See NUGET-PUBLISHING.md for the full procedure.
 
 on:
-  push:
-    branches:
-      - main
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref (branch, tag or SHA) to build and publish'
+        required: true
+        default: 'main'
+      dry_run:
+        description: 'Build, pack and inspect only - do NOT push to nuget.org'
+        type: boolean
+        required: true
+        default: true
 
 env:
   DOTNET_VERSION: '10.0.x'
-  NUGET_SOURCE: 'https://nuget.pkg.github.com/techierathore/index.json'
+  NUGET_ORG_SOURCE: 'https://api.nuget.org/v3/index.json'
 
 jobs:
-  build-and-publish:
+  publish:
     runs-on: windows-latest
     permissions:
+      # id-token: write is what makes Trusted Publishing possible - it lets the job mint the
+      # short-lived OIDC token that NuGet/login exchanges for a temporary API key.
+      id-token: write
       contents: read
-      packages: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          fetch-depth: 0  # Full history for version context
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0  # Full history so SourceLink records an accurate commit
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Verify .NET SDK
-        run: dotnet --version
+      - name: Report inputs
+        shell: pwsh
+        run: |
+          Write-Host "ref      : ${{ inputs.ref }}"
+          Write-Host "dry_run  : ${{ inputs.dry_run }}"
+          Write-Host "sha      : ${{ github.sha }}"
+          dotnet --version
 
-      - name: Determine package version
+      - name: Resolve shared package version
         id: version
         shell: pwsh
         run: |
-          $source = "Directory.Build.props"
-          if ("${{ github.event_name }}" -eq "release") {
-            $tag = "${{ github.event.release.tag_name }}"
-            $source = "release tag '$tag'"
-            # Strip optional 'v' prefix
-            $ver = $tag -replace '^v', ''
-            # Tags are sometimes cut with only MAJOR.MINOR (e.g. '1.10'). NuGet requires
-            # three parts, so normalise rather than failing the release.
-            if ($ver -match '^\d+\.\d+$') {
-              Write-Host "Tag '$tag' has only two version parts; normalising to '$ver.0'"
-              $ver = "$ver.0"
-            }
-            Write-Host "Release tag: $tag -> version: $ver"
-          } else {
-            # Read base version from Directory.Build.props
-            [xml]$props = Get-Content "Directory.Build.props"
-            $base = $props.Project.PropertyGroup.Version
-            $ver = "$base-ci.${{ github.run_number }}"
-            Write-Host "CI build: base=$base -> version: $ver"
+          # Single source of truth: Directory.Build.props. This workflow deliberately does NOT
+          # synthesise or override a version - a public release ships exactly the version that is
+          # committed, and all five packages share it.
+          [xml]$props = Get-Content "Directory.Build.props"
+          $ver = ($props.Project.PropertyGroup.Version | Where-Object { $_ }) -as [string]
+          if ([string]::IsNullOrWhiteSpace($ver)) {
+            throw "Could not read <Version> from Directory.Build.props"
           }
-
-          # Validate semver format (with optional pre-release)
+          $ver = $ver.Trim()
           if ($ver -notmatch '^\d+\.\d+\.\d+(-[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*)?$') {
-            throw "Invalid semver version '$ver' (from $source). Expected MAJOR.MINOR.PATCH with an optional pre-release suffix, e.g. 1.10.0 or v1.10.0-beta.1"
+            throw "Invalid semver version '$ver' in Directory.Build.props"
           }
-
-          Write-Host "PACKAGE_VERSION=$ver"
+          Write-Host "Publishing version: $ver"
           echo "PACKAGE_VERSION=$ver" >> $env:GITHUB_OUTPUT
-
-      - name: Add GitHub Packages source
-        shell: pwsh
-        run: |
-          # 'remove source' exits 1 when the source is absent. Under GitHub's pwsh
-          # ($ErrorActionPreference='stop' + PS 7.4 PSNativeCommandUseErrorActionPreference)
-          # that non-zero exit aborts the step, so opt out around the tolerated call.
-          $PSNativeCommandUseErrorActionPreference = $false
-          dotnet nuget remove source TrBlazeUI 2>&1 | Out-Null
-          dotnet nuget add source ${{ env.NUGET_SOURCE }} --name TrBlazeUI --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
-          if ($LASTEXITCODE -ne 0) { throw "dotnet nuget add source failed with exit code $LASTEXITCODE" }
 
       - name: Restore dependencies
         run: dotnet restore TrBlazeUI.sln
 
       - name: Build solution
-        run: dotnet build TrBlazeUI.sln -c Release --no-restore -p:CI=true -p:Version=${{ steps.version.outputs.PACKAGE_VERSION }}
+        run: dotnet build TrBlazeUI.sln -c Release --no-restore -p:CI=true
 
-      - name: Pack NuGet packages
+      - name: Run tests
         shell: pwsh
         run: |
-          # Pack into a clean directory. The repo tracks stale .nupkg artifacts under
-          # ./nupkgs, and the verify/publish steps glob whatever is there - without this
-          # the checked-out packages get verified and pushed alongside the fresh ones.
+          # The repo currently has no test projects. Rather than hard-coding a no-op, discover
+          # them: the step starts running real tests automatically once any are added.
+          $testProjects = Get-ChildItem -Path tests -Recurse -Filter *.csproj -ErrorAction SilentlyContinue
+          if (-not $testProjects -or $testProjects.Count -eq 0) {
+            Write-Host "No test projects found under tests/ - skipping."
+            exit 0
+          }
+          foreach ($proj in $testProjects) {
+            Write-Host "Testing $($proj.FullName)..."
+            dotnet test $proj.FullName -c Release --no-build
+            if ($LASTEXITCODE -ne 0) { throw "Tests failed for $($proj.Name)" }
+          }
+
+      - name: Pack all five packages
+        shell: pwsh
+        run: |
           if (Test-Path ./nupkgs) { Remove-Item ./nupkgs -Recurse -Force }
           New-Item -ItemType Directory -Path ./nupkgs | Out-Null
 
-          # NoWarn is applied per project, NOT as a blanket -p:NoWarn: an MSBuild global
-          # property overrides project-level <NoWarn>, which would silently strip e.g.
-          # Primitives' CA1716 suppression and fail that pack instead.
+          # NoWarn is applied per project, NOT as a blanket -p:NoWarn: an MSBuild global property
+          # overrides project-level <NoWarn>, which would silently strip Primitives' CA1716
+          # suppression and fail that pack instead.
           #
-          # Components needs NU5104 ("a stable release should not have a prerelease
-          # dependency"): its HtmlSanitizer 9.1.949-beta pin is a deliberate security choice
-          # (CVE-2026-54570 / REQ-NFR-003), so the warning is expected rather than a defect.
-          # Only stable versions trip it - CI builds are always -ci.N prerelease. Drop this
-          # once a stable HtmlSanitizer 9.1.x ships (REQ-FN-009).
+          # Components needs NU5104 ("a stable release should not have a prerelease dependency"):
+          # its HtmlSanitizer 9.1.949-beta pin is a deliberate security choice (CVE-2026-54570 /
+          # REQ-NFR-003). Public stable releases always trip this. Drop once stable 9.1.x ships.
           $projects = @(
             @{ Path = "src/TrBlazeUI.Primitives/TrBlazeUI.Primitives.csproj" },
-            @{ Path = "src/TrBlazeUI.Components/TrBlazeUI.Components.csproj"; NoWarn = "NU5104" },
             @{ Path = "src/TrBlazeUI.Icons.Lucide/TrBlazeUI.Icons.Lucide.csproj" },
             @{ Path = "src/TrBlazeUI.Icons.Heroicons/TrBlazeUI.Icons.Heroicons.csproj" },
-            @{ Path = "src/TrBlazeUI.Icons.Feather/TrBlazeUI.Icons.Feather.csproj" }
+            @{ Path = "src/TrBlazeUI.Icons.Feather/TrBlazeUI.Icons.Feather.csproj" },
+            @{ Path = "src/TrBlazeUI.Components/TrBlazeUI.Components.csproj"; NoWarn = "NU5104" }
           )
           foreach ($project in $projects) {
             Write-Host "Packing $($project.Path)..."
             $extraArgs = @()
             if ($project.NoWarn) { $extraArgs += "-p:NoWarn=$($project.NoWarn)" }
-            dotnet pack $project.Path -c Release --no-restore -o ./nupkgs -p:CI=true -p:Version=${{ steps.version.outputs.PACKAGE_VERSION }} @extraArgs
+            dotnet pack $project.Path -c Release --no-restore -o ./nupkgs -p:CI=true @extraArgs
             if ($LASTEXITCODE -ne 0) { throw "dotnet pack failed for $($project.Path) with exit code $LASTEXITCODE" }
           }
 
-      - name: List generated packages
+      - name: List .nupkg contents
         shell: pwsh
         run: |
-          $packages = Get-ChildItem ./nupkgs -Filter *.nupkg -ErrorAction SilentlyContinue
-          if (-not $packages -or $packages.Count -eq 0) {
-            throw "No .nupkg files found in ./nupkgs - pack step likely failed"
+          # Full content listing in the job log. Public versions can be unlisted but never
+          # deleted, so this is the last human-reviewable checkpoint before anything is pushed.
+          $packages = Get-ChildItem ./nupkgs -Filter *.nupkg | Sort-Object Name
+          if ($packages.Count -ne 5) {
+            throw "Expected 5 packages, found $($packages.Count)"
           }
-          Write-Host "Generated $($packages.Count) packages:"
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
           foreach ($pkg in $packages) {
-            Write-Host "  $($pkg.Name) ($($pkg.Length) bytes)"
+            Write-Host ""
+            Write-Host "=============================================================="
+            Write-Host "$($pkg.Name)  ($([math]::Round($pkg.Length / 1KB)) KB)"
+            Write-Host "=============================================================="
+            $zip = [System.IO.Compression.ZipFile]::OpenRead($pkg.FullName)
+            try {
+              foreach ($entry in ($zip.Entries | Sort-Object FullName)) {
+                Write-Host ("  {0,10}  {1}" -f $entry.Length, $entry.FullName)
+              }
+            } finally {
+              $zip.Dispose()
+            }
           }
 
-      - name: Verify package versions
+      - name: Verify packaged assets
         shell: pwsh
         run: |
           $expectedVersion = "${{ steps.version.outputs.PACKAGE_VERSION }}"
-          $packages = Get-ChildItem ./nupkgs -Filter *.nupkg
-          $mismatched = @()
-          foreach ($pkg in $packages) {
-            if ($pkg.Name -notlike "*$expectedVersion*") {
-              $mismatched += $pkg.Name
-            }
-          }
-          if ($mismatched.Count -gt 0) {
-            Write-Host "ERROR: Package version mismatch! Expected version: $expectedVersion"
-            foreach ($m in $mismatched) {
-              Write-Host "  Mismatched: $m"
-            }
-            throw "Package version verification failed"
-          }
-          Write-Host "All $($packages.Count) packages contain expected version: $expectedVersion"
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-      - name: Publish to GitHub Packages
+          # A styled-component package that ships without its stylesheet is unrecoverable in
+          # public - it can only be unlisted, never replaced. Gate the push on the CSS, the
+          # NOTICE (Apache-2.0 section 4(d)) and the readme actually being inside the archives.
+          $required = @{
+            'TrBlazeUI.Components'      = @('staticwebassets/trblazeui.css', 'NOTICE', 'README.md')
+            'TrBlazeUI.Primitives'      = @('NOTICE', 'README.md')
+            'TrBlazeUI.Icons.Lucide'    = @('NOTICE', 'README.md')
+            'TrBlazeUI.Icons.Heroicons' = @('NOTICE', 'README.md')
+            'TrBlazeUI.Icons.Feather'   = @('NOTICE', 'README.md')
+          }
+
+          $failures = @()
+          foreach ($id in $required.Keys) {
+            $path = "./nupkgs/$id.$expectedVersion.nupkg"
+            if (-not (Test-Path $path)) {
+              $failures += "$id : expected package $id.$expectedVersion.nupkg not found (version mismatch?)"
+              continue
+            }
+            $zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path $path))
+            try {
+              $entries = $zip.Entries | ForEach-Object { $_.FullName }
+              foreach ($needed in $required[$id]) {
+                $match = $entries | Where-Object { $_ -eq $needed }
+                if (-not $match) {
+                  $failures += "$id : MISSING '$needed'"
+                } else {
+                  Write-Host "$id : OK '$needed'"
+                }
+              }
+              # A doubled separator (e.g. 'buildTransitive//x.targets') silently breaks NuGet's
+              # convention-based imports; it has shipped before, so fail rather than warn.
+              foreach ($entry in $entries) {
+                if ($entry -match '//') { $failures += "$id : malformed entry path '$entry'" }
+              }
+            } finally {
+              $zip.Dispose()
+            }
+          }
+
+          if ($failures.Count -gt 0) {
+            Write-Host ""
+            Write-Host "Package verification FAILED:"
+            $failures | ForEach-Object { Write-Host "  $_" }
+            throw "Refusing to publish - see failures above"
+          }
+          Write-Host ""
+          Write-Host "All five packages verified at version $expectedVersion."
+
+      - name: Dry run complete
+        if: ${{ inputs.dry_run }}
         shell: pwsh
         run: |
-          $packages = Get-ChildItem ./nupkgs -Filter *.nupkg
-          foreach ($pkg in $packages) {
-            Write-Host "Pushing $($pkg.Name)..."
-            dotnet nuget push $pkg.FullName --source TrBlazeUI --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
-            if ($LASTEXITCODE -ne 0) { throw "Failed to push $($pkg.Name) with exit code $LASTEXITCODE" }
+          Write-Host "dry_run = true - packages were built and verified but NOT pushed."
+          Write-Host "Re-run this workflow with dry_run = false to publish to nuget.org."
+
+      # ---------------------------------------------------------------------------------------
+      # Everything below this line is skipped when dry_run = true.
+      # ---------------------------------------------------------------------------------------
+
+      - name: NuGet login (Trusted Publishing / OIDC)
+        id: login
+        if: ${{ !inputs.dry_run }}
+        uses: NuGet/login@v1
+        with:
+          # secrets.NUGET_USER is the nuget.org profile name that owns the trusted publishing
+          # policy - it is an identity, not a credential. The temporary API key this returns is
+          # valid for roughly one hour, which comfortably covers all five pushes below, so this
+          # runs immediately before the push step rather than earlier in the job.
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push packages to nuget.org
+        if: ${{ !inputs.dry_run }}
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.PACKAGE_VERSION }}"
+
+          # Dependency order matters on a public feed. nuget.org runs asynchronous validation
+          # after a push, and a package cannot restore publicly until its dependencies have
+          # validated. Components depends on BOTH Primitives and Icons.Lucide, so it goes last.
+          # --skip-duplicate makes the whole sequence safely re-runnable: if a later push loses a
+          # validation race, re-running the workflow no-ops the packages that already landed.
+          $pushOrder = @(
+            'TrBlazeUI.Primitives',
+            'TrBlazeUI.Icons.Lucide',
+            'TrBlazeUI.Icons.Heroicons',
+            'TrBlazeUI.Icons.Feather',
+            'TrBlazeUI.Components'
+          )
+
+          foreach ($id in $pushOrder) {
+            $pkg = "./nupkgs/$id.$version.nupkg"
+            Write-Host ""
+            Write-Host "Pushing $id $version..."
+            dotnet nuget push $pkg `
+              --api-key ${{ steps.login.outputs.NUGET_API_KEY }} `
+              --source ${{ env.NUGET_ORG_SOURCE }} `
+              --skip-duplicate
+            if ($LASTEXITCODE -ne 0) { throw "Failed to push $id with exit code $LASTEXITCODE" }
           }
+
+          Write-Host ""
+          Write-Host "All five packages pushed at version $version."
+          Write-Host "nuget.org validation and indexing typically completes within 15 minutes."
