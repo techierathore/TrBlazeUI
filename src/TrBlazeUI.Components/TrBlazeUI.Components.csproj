@@ -48,20 +48,27 @@
     <ProjectReference Include="..\TrBlazeUI.Primitives\TrBlazeUI.Primitives.csproj" />
   </ItemGroup>
 
+  <!-- $(Version) - not a literal - so this path honours the single shared version in
+       Directory.Build.props (and any -p:Version= override) instead of drifting behind it. -->
   <ItemGroup Condition="'$(UsePackageReferences)' == 'true'">
-    <PackageReference Include="TrBlazeUI.Icons.Lucide" Version="2.0.0" />
-    <PackageReference Include="TrBlazeUI.Primitives" Version="2.0.0" />
+    <PackageReference Include="TrBlazeUI.Icons.Lucide" Version="$(Version)" />
+    <PackageReference Include="TrBlazeUI.Primitives" Version="$(Version)" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
+    <!-- PackagePath values below deliberately use forward slashes with NO trailing separator.
+         A trailing '\' (e.g. "buildTransitive\") packs as 'buildTransitive//Foo.targets' on
+         macOS/Linux - a doubled separator that NuGet does not normalise, so consumers never
+         auto-import the targets and pack emits NU5129. Windows happened to normalise it, which
+         is why CI never caught this. Separator-independent form keeps local and CI packs identical. -->
     <!-- Pack AI reference doc for consuming projects -->
-    <None Include="..\..\docs\TrBlazeUI-AI-Reference.md" Pack="true" PackagePath="docs\" />
+    <None Include="..\..\docs\TrBlazeUI-AI-Reference.md" Pack="true" PackagePath="docs" />
     <!-- Pack AI skill files for consuming projects -->
-    <None Include="..\..\docs\skills\claude-code-trblazeui.md" Pack="true" PackagePath="skills\" />
-    <None Include="..\..\docs\skills\opencode-trblazeui.md" Pack="true" PackagePath="skills\" />
+    <None Include="..\..\docs\skills\claude-code-trblazeui.md" Pack="true" PackagePath="skills" />
+    <None Include="..\..\docs\skills\opencode-trblazeui.md" Pack="true" PackagePath="skills" />
     <!-- Pack buildTransitive targets to auto-extract docs and deploy skills -->
-    <None Include="build\TrBlazeUI.Components.targets" Pack="true" PackagePath="buildTransitive\" />
+    <None Include="build\TrBlazeUI.Components.targets" Pack="true" PackagePath="buildTransitive" />
   </ItemGroup>
 
   <!-- Build Tailwind CSS before packing (only on Windows, with local dev check) -->
