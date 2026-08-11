@@ -1,17 +1,69 @@
 @namespace TrBlazeUI.Components.Breadcrumb
 
-<nav aria-label="breadcrumb" class="@CssClass">
-    <ol class="flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5">
-        @ChildContent
+<nav aria-label="breadcrumb" class="@CssClass" @attributes="AdditionalAttributes">
+    <ol class="@ListCssClass" @attributes="objListAttributes">
+        <CascadingValue Value="@this" IsFixed="true">
+            @ChildContent
+        </CascadingValue>
     </ol>
 </nav>
 
 @code {
+    private Dictionary<string, object>? objListAttributes;
+
     [Parameter]
     public string? Class { get; set; }
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
+    /// <summary>
+    /// Gets or sets additional CSS classes applied to the <c>&lt;ol&gt;</c>.
+    /// </summary>
+    [Parameter]
+    public string? ListClass { get; set; }
+
     private string CssClass => Class ?? string.Empty;
+
+    private string ListCssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5",
+        ListClass
+    );
+
+    /// <summary>
+    /// Applies attributes supplied on an optional child BreadcrumbList to the list element.
+    /// </summary>
+    /// <remarks>
+    /// The <c>&lt;ol&gt;</c> belongs to Breadcrumb (BreadcrumbList is optional), so a
+    /// <c>data-testid</c> put on BreadcrumbList is forwarded here rather than dropped.
+    /// </remarks>
+    /// <param name="aAttributes">The attributes captured by the child BreadcrumbList.</param>
+    internal void ApplyListAttributes(Dictionary<string, object>? aAttributes)
+    {
+        if (AttributesEqual(objListAttributes, aAttributes))
+        {
+            return;
+        }
+
+        objListAttributes = aAttributes;
+        StateHasChanged();
+    }
+
+    private static bool AttributesEqual(Dictionary<string, object>? aLeft, Dictionary<string, object>? aRight)
+    {
+        if (aLeft is null || aRight is null)
+        {
+            return aLeft is null && aRight is null;
+        }
+
+        return aLeft.Count == aRight.Count
+            && aLeft.All(pair => aRight.TryGetValue(pair.Key, out var vValue) && Equals(pair.Value, vValue));
+    }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

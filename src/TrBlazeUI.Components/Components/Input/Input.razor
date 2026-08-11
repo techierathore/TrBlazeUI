@@ -4,11 +4,14 @@
 {
     <label for="@EffectiveId" class="mb-2 block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">@Label</label>
 }
+@* value/@key come from TextValueSync, not straight from Value: on a Blazor Server circuit the
+   echo of the user's own typing must never be written back into the DOM. See TextValueSync. *@
 <input
+    @key="objValueSync.RenderKey"
     id="@EffectiveId"
     type="@HtmlType"
     class="@CssClass"
-    value="@Value"
+    value="@objValueSync.RenderedValue"
     placeholder="@Placeholder"
     disabled="@Disabled"
     required="@Required"

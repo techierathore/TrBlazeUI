@@ -20,7 +20,8 @@
          role="dialog"
          aria-modal="true"
          tabindex="-1"
-         @onkeydown="HandleKeyDown">
+         @onkeydown="HandleKeyDown"
+         @attributes="AdditionalAttributes">
         @if (ShowHandle)
         {
             <div class="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted"></div>
@@ -30,6 +31,13 @@
 }
 
 @code {
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
     [CascadingParameter]
     public Drawer? Context { get; set; }
 

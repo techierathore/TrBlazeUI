@@ -1,0 +1,118 @@
+@page "/components/centered-panel"
+@using TrBlazeUI.Components.CenteredPanel
+@using TrBlazeUI.Components.Card
+@using TrBlazeUI.Components.Button
+@using TrBlazeUI.Components.Input
+@using TrBlazeUI.Components.Field
+@using TrBlazeUI.Icons.Lucide.Components
+
+<PageTitle>Centered Panel Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Centered Panel</h1>
+        <p class="text-xl text-muted-foreground">
+            A vertically and horizontally centred single-panel page — sign-in, email verification,
+            "check your inbox", 404.
+        </p>
+    </div>
+
+    <div class="rounded-lg border border-alert-info bg-alert-info-bg p-4 text-sm text-alert-info-foreground">
+        The examples below are boxed inside the demo page, so they carry
+        <code>Class="min-h-0 py-6"</code> to cancel the full-height default. On a real page you would
+        drop that and let the panel fill the viewport.
+    </div>
+
+    <!-- Sign in -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">A sign-in card at the default medium width.</p>
+        </div>
+        <div class="rounded-lg border bg-muted/20">
+            <CenteredPanel Class="min-h-0 py-6">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Sign in</CardTitle>
+                        <CardDescription>Enter your email to continue.</CardDescription>
+                    </CardHeader>
+                    <CardContent Class="space-y-3">
+                        <Field>
+                            <FieldLabel For="cp-email">Email</FieldLabel>
+                            <FieldContent>
+                                <Input Id="cp-email" Type="InputType.Email" Placeholder="you@example.com" />
+                            </FieldContent>
+                        </Field>
+                        <Button Class="w-full">Continue</Button>
+                    </CardContent>
+                </Card>
+            </CenteredPanel>
+        </div>
+    </div>
+
+    <!-- Widths -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Widths</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>Small</code> (24rem), <code>Medium</code> (28rem, default) and
+                <code>Large</code> (42rem).
+            </p>
+        </div>
+        <div class="space-y-3">
+            @foreach (var vWidth in new[] { CenteredPanelWidth.Small, CenteredPanelWidth.Medium, CenteredPanelWidth.Large })
+            {
+                <div class="rounded-lg border bg-muted/20">
+                    <CenteredPanel Class="min-h-0 py-4" Width="vWidth">
+                        <Card><CardContent Class="p-4 text-center text-sm">@vWidth</CardContent></Card>
+                    </CenteredPanel>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Confirmation -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Confirmation state</h2>
+            <p class="text-sm text-muted-foreground">
+                The same shell with a success icon, using the <code>--success</code> token added in
+                2.1.0.
+            </p>
+        </div>
+        <div class="rounded-lg border bg-muted/20">
+            <CenteredPanel Class="min-h-0 py-6">
+                <Card>
+                    <CardContent Class="space-y-3 p-6 text-center">
+                        <span class="text-success"><LucideIcon Name="circle-check" Size="40" /></span>
+                        <h2 class="text-2xl font-bold tracking-tight">Email verified</h2>
+                        <p class="text-sm text-muted-foreground">
+                            Your address is confirmed. You can close this tab.
+                        </p>
+                        <Button Variant="ButtonVariant.Outline" Href="/">Back to the site</Button>
+                    </CardContent>
+                </Card>
+            </CenteredPanel>
+        </div>
+    </div>
+
+    <!-- Usage -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Usage</h2>
+        <pre class="overflow-x-auto rounded-lg border bg-muted/30 p-4 text-sm"><code>@objUsage</code></pre>
+    </div>
+</div>
+
+@code {
+    private const string objUsage = """
+        @* Login.razor - route directive omitted here so it is not mistaken for a real route *@
+        @using TrBlazeUI.Components.CenteredPanel
+
+        <CenteredPanel Width="CenteredPanelWidth.Medium">
+            <Card>
+                <CardHeader><CardTitle>Sign in</CardTitle></CardHeader>
+                <CardContent>...</CardContent>
+            </Card>
+        </CenteredPanel>
+        """;
+}

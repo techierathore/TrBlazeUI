@@ -6,7 +6,7 @@
     Individual Toast component - displays a single toast notification.
 *@
 
-<div class="@CssClass" role="alert">
+<div class="@CssClass" role="alert" @attributes="AdditionalAttributes">
     <div class="grid gap-1">
         @if (!string.IsNullOrEmpty(Data.Title))
         {
@@ -95,4 +95,11 @@
             ? "text-red-300 hover:text-red-50 focus:ring-red-400 focus:ring-offset-red-600"
             : "text-foreground/50 hover:text-foreground focus:ring-ring"
     );
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

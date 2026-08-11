@@ -138,9 +138,34 @@
             }
         </div>
     </section>
+    <div class="space-y-4 rounded-lg border border-alert-success bg-alert-success-bg p-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold text-alert-success-foreground">First-paint display text (fixed in 2.1.0)</h2>
+            <p class="text-sm text-alert-success-foreground">Items register their Value/Text pair with the context even while the listbox is closed, so the trigger shows the item's Text on the very first paint. Before 2.1.0 it showed the raw bound value until the popover had been opened once — a category picker read "0" instead of "-- Select Category --".</p>
+        </div>
+        <div class="max-w-sm space-y-2">
+            <Select TValue="string" @bind-Value="objCategoryId">
+                <SelectTrigger TValue="string">
+                    <SelectValue TValue="string" Placeholder="Pick a category" />
+                </SelectTrigger>
+                <SelectContent TValue="string">
+                    <SelectItem TValue="string" Value="@("0")" Text="-- Select Category --">-- Select Category --</SelectItem>
+                    <SelectItem TValue="string" Value="@("1")" Text="Engineering">Engineering</SelectItem>
+                    <SelectItem TValue="string" Value="@("2")" Text="Design">Design</SelectItem>
+                </SelectContent>
+            </Select>
+            <p class="text-sm text-alert-success-foreground">
+                Bound value is <code>@objCategoryId</code>; the trigger reads the item text without
+                the popover ever having been opened.
+            </p>
+        </div>
+    </div>
+
 </div>
 
 @code {
+    private string? objCategoryId = "0";
+
     private string? selectedFruit;
     private string? selectedAnimal;
     private string? selectedCountry;

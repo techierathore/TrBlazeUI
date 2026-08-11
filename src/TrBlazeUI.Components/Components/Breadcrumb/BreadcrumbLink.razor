@@ -2,18 +2,25 @@
 
 @if (string.IsNullOrEmpty(Href))
 {
-    <span class="@CssClass">
+    <span class="@CssClass" @attributes="AdditionalAttributes">
         @ChildContent
     </span>
 }
 else
 {
-    <a href="@Href" class="@CssClass">
+    <a href="@Href" class="@CssClass" @attributes="AdditionalAttributes">
         @ChildContent
     </a>
 }
 
 @code {
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
     [Parameter]
     public string? Href { get; set; }
 

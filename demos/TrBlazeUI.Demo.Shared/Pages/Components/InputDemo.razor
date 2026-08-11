@@ -320,8 +320,50 @@
             </div>
         </div>
     </div>
+    <div class="space-y-4 rounded-lg border border-alert-success bg-alert-success-bg p-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold text-alert-success-foreground">Blazor Server text entry and accessible names (fixed in 2.1.0)</h2>
+            <p class="text-sm text-alert-success-foreground">Input keeps the DOM value and the server echo separate, so fast typing, pasted text and text injected by assistive technology is never dropped or reordered by a slow circuit. AriaLabel is also now documented — a placeholder is a hint, not an accessible name.</p>
+        </div>
+        <div class="max-w-md space-y-6">
+            <div class="space-y-2">
+                <p class="text-sm font-medium">Type as fast as you can</p>
+                <p class="text-sm text-muted-foreground">
+                    Paste a long string, or type at speed. The field and the bound value stay in
+                    step, on a Server circuit as well as WASM.
+                </p>
+                <Input @bind-Value="objFastTyped" Placeholder="cg-subscribe@example.test" />
+                <p class="break-all text-sm text-muted-foreground">Bound value: <code>@objFastTyped</code></p>
+            </div>
+
+            <div class="space-y-2">
+                <p class="text-sm font-medium">DebounceMilliseconds</p>
+                <p class="text-sm text-muted-foreground">
+                    Optional, and for traffic rather than correctness: it delays
+                    <code>ValueChanged</code> without ever debouncing the DOM value. Useful for a
+                    search box on a Server circuit.
+                </p>
+                <Input @bind-Value="objDebounced" DebounceMilliseconds="300" Placeholder="Search..." />
+                <p class="text-sm text-muted-foreground">
+                    Bound value (updates 300&nbsp;ms after you stop): <code>@objDebounced</code>
+                </p>
+            </div>
+
+            <div class="space-y-2">
+                <p class="text-sm font-medium">AriaLabel for a field with no visible label</p>
+                <p class="text-sm text-muted-foreground">
+                    A read-only field that is never empty cannot rely on a placeholder for its name.
+                </p>
+                <Input Value="https://example.com/rss.xml" AriaLabel="RSS feed URL" readonly />
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @code {
+    private string? objFastTyped;
+    private string? objDebounced;
+
     private string? boundValue = "";
 }

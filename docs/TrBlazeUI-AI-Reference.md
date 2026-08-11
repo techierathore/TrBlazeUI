@@ -35,6 +35,34 @@ These rules are non-negotiable. Violating them produces broken or inconsistent U
 9. **NEVER use `onclick` handlers on raw HTML** — Use `<Button OnClick="HandleClick">`
 10. **NEVER use JavaScript `alert()` or `console.log()`** for user feedback — Use `ToastService`
 
+### Guarantees you can rely on
+
+- **Every public component accepts arbitrary HTML attributes.** All 344 public component types in
+  `TrBlazeUI.Components` and all 59 in `TrBlazeUI.Primitives` declare
+  `[Parameter(CaptureUnmatchedValues = true)]`, so `id`, `style`, `data-*`, `aria-*`, `tabindex`
+  and event handlers (`@onkeydown`, `@onfocus`, …) can be passed to any component without it
+  throwing. Re-verify with `dotnet run --project tools/splat-audit -- <bin dir>`.
+  **Two documented exceptions, which accept the attributes and do not render them** because they
+  own no element of their own — they only supply a cascading context: the context roots
+  (`Dialog`, `Sheet`, `Popover`, `HoverCard`, `DropdownMenu`, `ContextMenu`, `Drawer`,
+  `TooltipProvider`, `ResponsiveNavProvider`, `PortalHost`) and the configuration-only
+  `DataTableColumn`. Put the hook on the part that renders the visible element
+  (`DialogContent`, `SheetContent`, …). `BreadcrumbList` is a special case: it has no element
+  either, but it forwards its attributes onto the `<ol>` that `Breadcrumb` renders.
+
+- **Tailwind utilities work in application markup.** `trblazeui.css` ships the standard Tailwind
+  scale (spacing, sizing, grid, flex, typography, colour tokens) with the `sm:`/`md:`/`lg:`/`xl:`/
+  `2xl:` responsive variants, not just the utilities the library's own components happen to use.
+  The one thing a pre-built bundle can never generate is an **arbitrary value** — `min-w-[720px]`,
+  `w-[37px]`, `text-[13px]` will silently do nothing. Use the scale (`min-w-3xl`, `w-9`,
+  `text-sm`), or a component parameter where one exists (for example `DataTable.MinWidth`).
+
+- **Theming is an ordinary CSS override.** The library declares its own tokens through
+  zero-specificity `:where(:root)` / `:where(.dark)` selectors, so an application `theme.css` using
+  plain `:root` / `.dark` rules always wins — no `!important`, no layer juggling. The shipped
+  defaults are validated as a full contrast matrix (every foreground token against every surface
+  token, not just `--background`); re-check your own palette with `tools/token-contrast.py`.
+
 ### Common Anti-Patterns (DO NOT copy these)
 
 ```razor
@@ -108,9 +136,28 @@ builder.Services.AddScoped<ToastService>();  // Required for Toast notifications
 
 ### _Imports.razor
 
+> **Namespace rules — read before you copy this block.**
+> - `PortalHost` lives in `TrBlazeUI.Primitives.Services`, **not** in `TrBlazeUI.Primitives`. So do
+>   the positioning enums `PopoverSide` / `PopoverAlign` / `PositioningStrategy` that
+>   `DropdownMenuContent.Align`, `TooltipContent.Side` and friends take. That sub-namespace is in
+>   the block below; without it `<PortalHost />` and `Align="PopoverAlign.Start"` do not compile.
+> - `SheetSide` lives in `TrBlazeUI.Primitives.Sheet`. **Do not import that namespace** — it ships a
+>   primitive `Sheet`/`SheetContent` that would shadow the styled `TrBlazeUI.Components.Sheet`
+>   family (CS0104). Fully qualify the enum instead:
+>   `<SheetContent Side="TrBlazeUI.Primitives.Sheet.SheetSide.Right">`.
+> - The same trap applies to every `TrBlazeUI.Primitives.*` sub-namespace whose type names are
+>   shared with the styled layer: `Checkbox`, `Label`, `Switch`, `Select`, `RadioGroup`,
+>   `Collapsible`, `Accordion`, `DropdownMenu`, `Tabs`, `Tooltip`, `Dialog`, `Popover`, `HoverCard`.
+>   **Safe set: `TrBlazeUI.Components.*` plus `TrBlazeUI.Primitives` and
+>   `TrBlazeUI.Primitives.Services`. Never the other `Primitives.*` sub-namespaces.**
+> - `@using ApexCharts` is required by the chart family (see §8) — the charts are a
+>   Blazor-ApexCharts wrapper and the series types come from that package.
+
 ```razor
 @using TrBlazeUI.Components
 @using TrBlazeUI.Primitives
+@using TrBlazeUI.Primitives.Services
+@using ApexCharts
 @using TrBlazeUI.Components.Button
 @using TrBlazeUI.Components.Card
 @using TrBlazeUI.Components.Checkbox
@@ -147,6 +194,19 @@ builder.Services.AddScoped<ToastService>();  // Required for Toast notifications
 @using TrBlazeUI.Components.Popover
 @using TrBlazeUI.Components.HoverCard
 @using TrBlazeUI.Components.AlertDialog
+@using TrBlazeUI.Components.Item
+@using TrBlazeUI.Components.Typography
+@using TrBlazeUI.Components.NavigationMenu
+@using TrBlazeUI.Components.Rating
+@using TrBlazeUI.Components.Prose
+@using TrBlazeUI.Components.Stat
+@using TrBlazeUI.Components.Timeline
+@using TrBlazeUI.Components.Stepper
+@using TrBlazeUI.Components.CenteredPanel
+@using TrBlazeUI.Components.AnchorNav
+@using TrBlazeUI.Components.CodeBlock
+@using TrBlazeUI.Components.PasswordStrength
+@using TrBlazeUI.Components.SortableList
 @using TrBlazeUI.Icons.Lucide.Components
 @using TrBlazeUI.Icons.Lucide.Data
 ```
@@ -636,6 +696,8 @@ tables get pagination for free through `<DataTable>`, which embeds this internal
 | Id | string? | null | Element ID (for label association) |
 | AriaInvalid | bool? | null | Invalid state |
 | AriaDescribedBy | string? | null | ID of describing element |
+| AriaLabel | string? | null | Accessible name. **`Placeholder` is a hint, not a name** — it disappears once the field has content. Any field with no visible `<Label For=...>` needs this. |
+| DebounceMilliseconds | int | 0 | Delay before `ValueChanged` fires. 0 raises it per keystroke; 150–300 ms cuts the round trips on a Blazor **Server** circuit. The DOM value is never debounced. |
 | Class | string? | null | Additional CSS classes |
 
 ```razor
@@ -655,11 +717,18 @@ tables get pagination for free through `<DataTable>`, which embeds this internal
 | MaxLength | int? | null | Character limit |
 | Disabled | bool | false | Disabled state |
 | Required | bool | false | Required field |
+| AriaLabel | string? | null | Accessible name (see the note under `Input`) |
+| DebounceMilliseconds | int | 0 | Delay before `ValueChanged` fires |
 | Class | string? | null | Additional CSS classes |
 
 ```razor
 <Textarea @bind-Value="description" Placeholder="Enter description" MaxLength="500" />
 ```
+
+> **Blazor Server note.** `Input` and `Textarea` keep the DOM value and the server echo separate, so
+> fast typing, pasted text and text injected by assistive technology (voice input, switch/AAC
+> devices, password managers) is never dropped or reordered by a slow circuit. You do not need to
+> debounce for correctness — `DebounceMilliseconds` only reduces traffic.
 
 ### Label
 
@@ -973,8 +1042,30 @@ The shipped API is `Files` (`IReadOnlyList<FileUploadItem>?`) + `FilesChanged`
 
 ### Rating
 
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| Value / ValueChanged | double | 0 | Current rating (two-way: `@bind-Value`) |
+| Max | int | 5 | Number of icons |
+| AllowHalf / AllowClear | bool | false / true | Half steps; clicking the current value clears it |
+| ReadOnly | bool | false | Renders as a **value**, not a control: `role="img"` + `aria-label`, no radio semantics, no tab stop |
+| Disabled | bool | false | `aria-disabled` on the group, options disabled |
+| Focusable | bool | true | Set `false` to keep a purely decorative rating out of the tab order |
+| Icon / IconTemplate | RatingIcon / RenderFragment | Star | Icon shape or a custom template |
+| ActiveColor / InactiveColor | string? | null | Icon colours |
+| Size | RatingSize | Default | Small, Default, Large |
+| AriaLabel | string? | null | Accessible name of the group (or of the read-only value) |
+
+Each option renders as a real `<button role="radio">` with a roving `tabindex` and a literal
+`aria-checked="true"/"false"`, so the control is keyboard operable and screen readers report the
+selection. Use `ReadOnly` for display-only ratings — do not wrap an interactive one in
+`aria-hidden`.
+
 ```razor
-<Rating @bind-Value="rating" Max="5" />
+@* interactive *@
+<Rating @bind-Value="rating" Max="5" AriaLabel="Rate this article" />
+
+@* display only *@
+<Rating Value="4" Max="5" ReadOnly="true" Size="RatingSize.Small" />
 ```
 
 ### Toggle
@@ -1036,7 +1127,21 @@ Sub-components: `AvatarImage` (Source, Alt), `AvatarFallback`
 | InitialPageSize | int | 5 | Initial rows per page |
 | PageSizes | int[] | [5,10,20,50,100] | Page size options |
 | SelectedItems | IReadOnlyCollection<TData> | [] | Two-way: @bind-SelectedItems |
+| MinWidth | string? | null | CSS length, e.g. `"720px"`. Set it on wide tables: the grid's wrapper scrolls horizontally, but a `w-full` table with no minimum just shrinks and the right-hand columns are squeezed away with no scrollbar. |
 | Class | string? | null | Additional CSS classes |
+
+> **Mutating a row in place.** The grid skips re-rendering while its `Data` reference is unchanged,
+> which is what keeps a large table cheap. If you set a property on a bound item rather than
+> replacing the collection (`comment.Status = "Approved"`), the cell keeps showing the old value and
+> a page-level `StateHasChanged()` cannot fix it. Either reassign `Data`, or capture the grid with
+> `@ref` and call `Refresh()`:
+>
+> ```razor
+> <DataTable TData="CommentViewModel" Data="@objComments" @ref="objGrid"> ... </DataTable>
+>
+> comment.Status = "Approved";
+> objGrid?.Refresh();
+> ```
 
 ```razor
 <DataTable TData="Person" Data="@people" SelectionMode="DataTableSelectionMode.Multiple">
@@ -1107,6 +1212,16 @@ Sub-components: `AvatarImage` (Source, Alt), `AvatarFallback`
 ```
 
 ### Typography
+
+Every Typography component takes a `Size` (`TypographySize.Xs` … `Xl6`, default `Default`). Use it
+rather than passing a font-size utility through `Class`: `Size` **replaces** the component's own
+size classes — including the responsive step `TypographyH1` carries (`text-4xl lg:text-5xl`) —
+whereas a class passed through `Class` lands on the same element with the same specificity, so which
+one wins is decided by the order Tailwind happens to emit them in.
+
+```razor
+<TypographyH1 Size="TypographySize.Xl2">Card heading</TypographyH1>
+```
 
 ```razor
 <TypographyH1>Heading 1</TypographyH1>
@@ -1586,17 +1701,127 @@ Sub-components: `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`
 </Carousel>
 ```
 
-### Chart (ApexCharts wrapper)
+### Chart (Blazor-ApexCharts wrapper)
 
-Chart types: `AreaChart`, `BarChart`, `LineChart`, `PieChart`, `RadarChart`, `RadialChart`
+Chart types: `AreaChart`, `BarChart`, `LineChart`, `PieChart`, `RadarChart`, `RadialChart`.
+
+The chart family wraps **Blazor-ApexCharts**, so `@using ApexCharts` is required (it is in the §1
+import block). The chart component itself takes `Items`, `Config`, `Height`, `Width`, `ShowLegend`,
+`LegendPosition`, `ShowDataLabels`, `ShowTooltip`, `Title`, `EnableAnimations` and `ChildContent` —
+there is **no `XValue`/`YValue` on the chart**. The series come from nested `ApexPointSeries`
+children, which is where `XValue`/`YValue` live. `ChartContainer` is optional.
 
 ```razor
-<ChartContainer Class="h-[300px]">
-    <BarChart TItem="SalesData"
-              Items="@salesData"
-              XValue="@(d => d.Month)"
-              YValue="@(d => d.Revenue)" />
-</ChartContainer>
+@using ApexCharts
+
+<BarChart TItem="SalesData" Items="@salesData" Height="280px" ShowLegend="false">
+    <ApexPointSeries TItem="SalesData"
+                     Items="@salesData"
+                     Name="Revenue"
+                     SeriesType="SeriesType.Bar"
+                     XValue="@(d => d.Month)"
+                     YValue="@(d => (decimal?)d.Revenue)" />
+</BarChart>
+```
+
+Series colours pick up `--chart-1` … `--chart-5`, which the library now ships defaults for in both
+light and dark mode; override them in your own `theme.css` to brand the charts.
+
+### Prose (rendered HTML you did not author)
+
+Use `Prose` for Markdown output, a CMS body or any opaque HTML blob. It gives tables, `<pre>`
+blocks, images and iframes their own overflow context, so a wide table scrolls inside itself
+instead of pushing the whole page sideways at 390 px (WCAG 1.4.10 Reflow).
+
+```razor
+<Prose>@((MarkupString)renderedHtml)</Prose>
+<Prose ConstrainWidth="false">@((MarkupString)previewHtml)</Prose>
+```
+
+### CodeBlock
+
+Monochrome code block with an optional language label and a copy button. It deliberately bundles no
+syntax highlighter; pass pre-highlighted markup through `Html` if you have one.
+
+```razor
+<CodeBlock Language="csharp" Code="@snippet" />
+```
+
+### StatTile / StatGroup
+
+A row of headline statistics — a large value over a small caption — so value/caption sizing does not
+drift between pages.
+
+```razor
+<StatGroup Columns="4">
+    <StatTile Value="20+" Label="Years of experience" />
+    <StatTile Value="1,284" Label="Posts" Trend="+12% vs last month" TrendDirection="StatTrend.Up" />
+</StatGroup>
+```
+
+### Timeline
+
+```razor
+<Timeline>
+    <TimelineItem Meta="2022 - now" Title="Senior Engineer" Subtitle="Acme" Current="true" />
+    <TimelineItem Meta="2019 - 2022" Title="Engineer" Subtitle="Acme" />
+</Timeline>
+```
+
+### Stepper
+
+Numbered steps for a multi-part flow or a series index. The current step carries
+`aria-current="step"`, so it is not signalled by colour alone.
+
+```razor
+<Stepper Current="2">
+    <StepperItem Title="Draft" />
+    <StepperItem Title="Review" Description="Editor sign-off" />
+    <StepperItem Title="Publish" />
+</Stepper>
+```
+
+### AnchorNav (in-page navigation with scrollspy)
+
+```razor
+<AnchorNav Sections="@objSections" @bind-ActiveId="objActiveSection" TopOffset="80" />
+
+@code {
+    private readonly List<AnchorNavSection> objSections =
+    [
+        new("summary", "Summary"),
+        new("experience", "Experience"),
+    ];
+    private string? objActiveSection;
+}
+```
+
+### SortableList
+
+Reorderable list driven by real buttons rather than drag-and-drop, so it works with a keyboard, a
+screen reader and a touch screen, and every move is announced.
+
+```razor
+<SortableList TItem="SeriesPart" @bind-Items="objParts" ItemLabel="@(p => p.Title)">
+    <ItemTemplate Context="part">@part.Title</ItemTemplate>
+</SortableList>
+```
+
+### PasswordStrength
+
+```razor
+<Input Type="InputType.Password" @bind-Value="objPassword" />
+<PasswordStrength Value="@objPassword" />
+```
+
+### CenteredPanel
+
+A vertically centred single-panel page — sign-in, email verification, 404.
+
+```razor
+<CenteredPanel Width="CenteredPanelWidth.Medium">
+    <Card>...</Card>
+</CenteredPanel>
 ```
 
 ### MarkdownEditor
@@ -1700,10 +1925,11 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
                 <CardTitle>Overview</CardTitle>
             </CardHeader>
             <CardContent>
-                <ChartContainer Class="h-[300px]">
-                    <BarChart TItem="MonthlyData" Items="@monthlyData"
-                              XValue="@(d => d.Month)" YValue="@(d => d.Value)" />
-                </ChartContainer>
+                <BarChart TItem="MonthlyData" Items="@monthlyData" Height="300px" ShowLegend="false">
+                    <ApexPointSeries TItem="MonthlyData" Items="@monthlyData" Name="Value"
+                                     SeriesType="SeriesType.Bar"
+                                     XValue="@(d => d.Month)" YValue="@(d => (decimal?)d.Value)" />
+                </BarChart>
             </CardContent>
         </Card>
         <Card Class="col-span-3">

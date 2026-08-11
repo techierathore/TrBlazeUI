@@ -1,0 +1,110 @@
+@page "/components/code-block"
+@using TrBlazeUI.Components.CodeBlock
+
+<PageTitle>Code Block Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Code Block</h1>
+        <p class="text-xl text-muted-foreground">
+            A monochrome code block with an optional language label and a copy button.
+        </p>
+    </div>
+
+    <div class="rounded-lg border border-alert-warning bg-alert-warning-bg p-4 text-sm text-alert-warning-foreground">
+        <strong>No highlighter is bundled, by design.</strong> Shipping one would drag a large JS
+        dependency into every consumer. Pass pre-highlighted markup through <code>Html</code> if your
+        application already has a highlighter; otherwise the plain-text form below is safe by
+        construction — the code is rendered as text, never as markup.
+    </div>
+
+    <!-- Basic -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                The copy button writes <code>Code</code> to the clipboard and announces the result
+                through a live region.
+            </p>
+        </div>
+        <CodeBlock Language="csharp" Code="@objCsharp" />
+    </div>
+
+    <!-- Without chrome -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Without the header</h2>
+            <p class="text-sm text-muted-foreground">
+                Omit <code>Language</code> and set <code>ShowCopyButton="false"</code> for a bare
+                block.
+            </p>
+        </div>
+        <CodeBlock Code="dotnet add package TrBlazeUI.Components" ShowCopyButton="false" />
+    </div>
+
+    <!-- Long lines -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Long lines scroll inside the block</h2>
+            <p class="text-sm text-muted-foreground">
+                The block owns its own horizontal scroll, so a long line never pushes the page
+                sideways.
+            </p>
+        </div>
+        <CodeBlock Language="bash" Code="@objLongLine" />
+    </div>
+
+    <!-- Pre-highlighted -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Pre-highlighted markup</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>Html</code> is rendered as-is — only pass markup you produced or have
+                sanitised. <code>Code</code> is still what the copy button writes.
+            </p>
+        </div>
+        <CodeBlock Language="razor" Code="@objRazorPlain" Html="@objRazorHighlighted" />
+    </div>
+
+    <!-- Usage -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Usage</h2>
+        <pre class="overflow-x-auto rounded-lg border bg-muted/30 p-4 text-sm"><code>@objUsage</code></pre>
+    </div>
+</div>
+
+@code {
+    private const string objCsharp = """
+        public partial class Card : ComponentBase
+        {
+            [Parameter]
+            public RenderFragment? ChildContent { get; set; }
+
+            [Parameter(CaptureUnmatchedValues = true)]
+            public Dictionary<string, object>? AdditionalAttributes { get; set; }
+        }
+        """;
+
+    private const string objLongLine =
+        "cmd.exe /c \"dotnet build TrBlazeUI.sln -c Release -p:CI=true\" && dotnet run --project demos/TrBlazeUI.Demo.Server/TrBlazeUI.Demo.Server.csproj --urls http://0.0.0.0:5183";
+
+    private const string objRazorPlain = "<Button Variant=\"ButtonVariant.Outline\">Save</Button>";
+
+    private readonly MarkupString objRazorHighlighted = new(
+        "<span class=\"text-muted-foreground\">&lt;</span><span class=\"text-primary\">Button</span> " +
+        "<span class=\"text-alert-info\">Variant</span>=<span class=\"text-alert-success\">\"ButtonVariant.Outline\"</span>" +
+        "<span class=\"text-muted-foreground\">&gt;</span>Save<span class=\"text-muted-foreground\">&lt;/</span>" +
+        "<span class=\"text-primary\">Button</span><span class=\"text-muted-foreground\">&gt;</span>");
+
+    private const string objUsage = """
+        @using TrBlazeUI.Components.CodeBlock
+
+        <CodeBlock Language="csharp" Code="@snippet" />
+
+        @* No header, no copy button *@
+        <CodeBlock Code="@snippet" ShowCopyButton="false" />
+
+        @* Your own highlighter's output; Code still drives the copy button *@
+        <CodeBlock Language="razor" Code="@plain" Html="@highlighted" />
+        """;
+}

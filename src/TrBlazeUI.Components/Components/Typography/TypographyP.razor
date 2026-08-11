@@ -1,6 +1,6 @@
 @namespace TrBlazeUI.Components.Typography
 
-<p class="@CssClass">@ChildContent</p>
+<p class="@CssClass" @attributes="AdditionalAttributes">@ChildContent</p>
 
 @code {
     [Parameter]
@@ -9,8 +9,27 @@
     [Parameter]
     public string? Class { get; set; }
 
+    /// <summary>
+    /// Gets or sets the rendered font size.
+    /// </summary>
+    /// <remarks>
+    /// This REPLACES the component's default size classes rather than competing with them, so a
+    /// smaller size works as reliably as a larger one. Leave at
+    /// <see cref="TypographySize.Default"/> to keep the shadcn/ui type scale.
+    /// </remarks>
+    [Parameter]
+    public TypographySize Size { get; set; } = TypographySize.Default;
+
     private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
         "leading-7 [&:not(:first-child)]:mt-6",
+        TypographySizes.ToClass(Size, null),
         Class
     );
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

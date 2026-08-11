@@ -60,6 +60,18 @@ public interface IPortalService
     public IReadOnlyDictionary<string, RenderFragment> GetPortals();
 
     /// <summary>
+    /// Gets all registered portals in the order they were opened, oldest first.
+    /// </summary>
+    /// <remarks>
+    /// DOM order is what decides which of two overlays with the same z-index paints on top, so a
+    /// dialog opened from inside another dialog must land LATER in the portal host. Rendering from
+    /// an unordered dictionary made that a coin toss - the nested dialog was visible but not
+    /// clickable whenever it happened to be enumerated first.
+    /// </remarks>
+    /// <returns>Portal IDs and their render fragments, in registration order.</returns>
+    public IReadOnlyList<KeyValuePair<string, RenderFragment>> GetOrderedPortals();
+
+    /// <summary>
     /// Gets whether at least one PortalHost is currently attached and able to render portals.
     /// When false, floating content falls back to rendering inline at its declaration site.
     /// </summary>

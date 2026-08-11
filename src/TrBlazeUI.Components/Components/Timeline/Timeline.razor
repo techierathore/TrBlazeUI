@@ -1,0 +1,34 @@
+@namespace TrBlazeUI.Components.Timeline
+
+@* An ordered list of dated entries - experience, release history, an audit trail.
+   Semantics come from a real <ol>/<li>, not from an ARIA claim. *@
+
+<ol class="@CssClass" @attributes="AdditionalAttributes">
+    @ChildContent
+</ol>
+
+@code {
+    /// <summary>
+    /// Gets or sets the TimelineItem children.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "relative ms-3 list-none border-s border-border",
+        Class
+    );
+}

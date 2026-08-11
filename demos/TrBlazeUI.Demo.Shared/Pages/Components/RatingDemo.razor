@@ -193,9 +193,50 @@
             </div>
         </div>
     </div>
+    <div class="space-y-4 rounded-lg border border-alert-success bg-alert-success-bg p-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold text-alert-success-foreground">Accessibility (fixed in 2.1.0)</h2>
+            <p class="text-sm text-alert-success-foreground">Each star is a real &lt;button role=&quot;radio&quot;&gt; with a roving tabindex and a literal aria-checked, so the control is keyboard operable and screen readers report the selection. Before 2.1.0 the stars were non-focusable spans with an empty aria-checked.</p>
+        </div>
+        <div class="space-y-6">
+            <div class="space-y-2">
+                <p class="text-sm font-medium">Keyboard operable</p>
+                <p class="text-sm text-muted-foreground">
+                    Tab into the control, then use ArrowLeft/ArrowRight, Home/End or the number keys.
+                </p>
+                <Rating @bind-Value="objA11yValue" Max="5" AriaLabel="Rate this article" />
+                <p class="text-sm text-muted-foreground">Value: <strong>@objA11yValue</strong></p>
+            </div>
+
+            <div class="space-y-2">
+                <p class="text-sm font-medium">ReadOnly is a value, not a control</p>
+                <p class="text-sm text-muted-foreground">
+                    <code>ReadOnly</code> renders <code>role="img"</code> with an
+                    <code>aria-label</code> and no radio semantics, and takes no tab stop — so a
+                    display-only rating never needs wrapping in <code>aria-hidden</code>.
+                </p>
+                <Rating Value="4" Max="5" ReadOnly="true" Size="RatingSize.Small" />
+            </div>
+
+            <div class="space-y-2">
+                <p class="text-sm font-medium">Focusable="false" for decoration</p>
+                <p class="text-sm text-muted-foreground">
+                    When a rating is purely decorative and the value is exposed some other way, this
+                    keeps it out of the tab order without JavaScript.
+                </p>
+                <div aria-hidden="true">
+                    <Rating Value="3" Max="5" Focusable="false" />
+                </div>
+                <span class="text-sm text-muted-foreground">Rated 3 out of 5 from 12 ratings</span>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @code {
+    private double objA11yValue = 3;
+
     private double objStarValue = 0;
     private double objHeartValue = 0;
     private double objCircleValue = 0;

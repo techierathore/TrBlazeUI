@@ -2,17 +2,20 @@
 @implements IDisposable
 
 @* TabsContent primitive - content panel for a tab *@
-@if (objIsActive || ForceMount)
-{
-    <div id="@objContentId"
-         role="tabpanel"
-         aria-labelledby="@objTriggerId"
-         tabindex="0"
-         hidden="@(!objIsActive)"
-         @attributes="AdditionalAttributes">
+@* The panel element stays in the DOM at all times and is hidden when inactive, so the
+   trigger's aria-controls always names an element that exists. ChildContent is only rendered
+   when the tab is active (or ForceMount is set), so inactive panels stay cheap. *@
+<div id="@objContentId"
+     role="tabpanel"
+     aria-labelledby="@objTriggerId"
+     tabindex="@(objIsActive ? 0 : -1)"
+     hidden="@(!objIsActive)"
+     @attributes="AdditionalAttributes">
+    @if (objIsActive || ForceMount)
+    {
         @ChildContent
-    </div>
-}
+    }
+</div>
 
 @code {
     private string objContentId => Context.GetContentId(Value);
@@ -61,10 +64,14 @@
 
         // Subscribe to context changes to update active state
         Context.OnStateChanged += StateHasChanged;
+
+        // Let triggers know a real panel exists for this value (drives aria-controls).
+        Context.RegisterPanel(Value);
     }
 
     public void Dispose()
     {
+        Context.UnregisterPanel(Value);
         Context.OnStateChanged -= StateHasChanged;
     }
 }

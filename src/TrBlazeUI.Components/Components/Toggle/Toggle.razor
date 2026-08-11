@@ -1,7 +1,7 @@
 @namespace TrBlazeUI.Components.Toggle
 
 <button type="button"
-        aria-pressed="@IsPressed"
+        aria-pressed="@(IsPressed ? "true" : "false")"
         data-state="@(IsPressed ? "on" : "off")"
         disabled="@Disabled"
         class="@CssClass"

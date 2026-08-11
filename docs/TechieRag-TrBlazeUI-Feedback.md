@@ -2,6 +2,7 @@
 
 ## Summary (filled by /flow-master on consolidation)
 - 0 blockers, 0 major, 0 open minor, 0 open nice-to-haves — **ALL RESOLVED**
+- Last consolidated: **2026-08-11** (`*handoff-phase` — re-confirmed 0 open; no disposition changed since 2026-07-02. The separate NU1902 / AngleSharp supply-chain blocker they surfaced closed 2026-07-18 under REQ-FN-009.)
 - Last consolidated: 2026-07-02 — **all 4 issues resolved by the TrBlazeUI team** (`[REQ-UI-015]`): TR-003/TR-004 fixed in the library (SidebarInset `min-w-0`; DataTable `relative overflow-auto` wrapper + wrapping pagination), TR-001 addressed with docs (README/UsageGuide/skills now state the interactive-render-tree requirement) plus a runtime inline fallback + console warning for Select/Popover/DropdownMenu when no interactive PortalHost is attached, TR-002 fixed in the integration-skill scaffolding notes. Release build 0/0; runtime-verified headless at 390px (shell capped at viewport, table scrolls internally, pagination wraps). Your app-side workarounds (`main { min-width:0 }`, DataTable wrapper divs) can be dropped after picking up the next package version.
 - Previous: 0 blockers, 0 major, 2 open minor (TR-003, TR-004 — both worked around app-side 2026-07-02; TR-001 resolved), 1 nice-to-have · consolidated 2026-07-01 (TR-003/TR-004 appended 2026-07-02 by verifier)
 

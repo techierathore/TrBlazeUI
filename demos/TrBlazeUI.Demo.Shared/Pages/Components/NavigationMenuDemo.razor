@@ -381,4 +381,17 @@
             </div>
         </div>
     </div>
+    <div class="space-y-4 rounded-lg border border-alert-success bg-alert-success-bg p-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold text-alert-success-foreground">Keyboard reachability (fixed in 2.1.0)</h2>
+            <p class="text-sm text-alert-success-foreground">Top-level NavigationMenuLink now renders an ordinary link — no role="menuitem", no negative tabindex — so every entry is reachable with Tab. Before 2.1.0 the roving-tabindex menubar pattern was half-implemented and none of the links could be reached at all.</p>
+        </div>
+        <p class="text-sm text-alert-success-foreground">
+            Tab through the navigation above: each link takes focus in turn. The menuitem role and
+            the negative tabindex are still applied to links inside a
+            <code>NavigationMenuContent</code> popup, which is a real <code>role="menu"</code> — the
+            two cases are no longer conflated.
+        </p>
+    </div>
+
 </div>

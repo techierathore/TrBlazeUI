@@ -1,4 +1,14 @@
 @namespace TrBlazeUI.Components.Item
 @using TrBlazeUI.Components.Separator
 
-<Separator Class="@CssClass" />
+@* Inside an ItemGroup (role="list") a separator is not a listitem, so it is removed from the
+   accessibility tree rather than breaking the list/listitem ownership. *@
+<Separator Class="@CssClass" role="@(objIsInItemGroup ? "none" : null)" @attributes="AdditionalAttributes"/>
+
+@code {
+    /// <summary>
+    /// True when this separator is rendered inside an ItemGroup, which declares role="list".
+    /// </summary>
+    [CascadingParameter(Name = "ItemGroupIsList")]
+    private bool objIsInItemGroup { get; set; }
+}

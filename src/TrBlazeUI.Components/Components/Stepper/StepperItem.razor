@@ -1,0 +1,80 @@
+@namespace TrBlazeUI.Components.Stepper
+
+<li class="@CssClass" aria-current="@(objIsCurrent ? "step" : null)" @attributes="AdditionalAttributes">
+    <span class="@MarkerCssClass" aria-hidden="true">@objNumber</span>
+    <span class="min-w-0">
+        <span class="block text-sm font-medium">@Title</span>
+        @if (!string.IsNullOrWhiteSpace(Description))
+        {
+            <span class="block text-xs text-muted-foreground">@Description</span>
+        }
+        @if (objIsCurrent)
+        {
+            <span class="sr-only">(current step)</span>
+        }
+        @ChildContent
+    </span>
+</li>
+
+@code {
+    [CascadingParameter]
+    private Stepper? objStepper { get; set; }
+
+    /// <summary>
+    /// The active step number, cascaded by value so a change re-renders this item.
+    /// </summary>
+    [CascadingParameter(Name = "StepperCurrent")]
+    private int objCurrentStep { get; set; }
+
+    private int objNumber;
+
+    private bool objIsCurrent => objCurrentStep == objNumber;
+
+    /// <summary>
+    /// Gets or sets the step label.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// Gets or sets an optional supporting line under the label.
+    /// </summary>
+    [Parameter]
+    public string? Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets extra content rendered under the label.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <inheritdoc />
+    protected override void OnInitialized() => objNumber = objStepper?.NextIndex() ?? 1;
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "flex items-start gap-3",
+        Class
+    );
+
+    private string MarkerCssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-sm font-semibold",
+        objCurrentStep > objNumber
+            ? "border-primary bg-primary text-primary-foreground"
+            : objIsCurrent
+                ? "border-primary text-primary"
+                : "border-border text-muted-foreground"
+    );
+}

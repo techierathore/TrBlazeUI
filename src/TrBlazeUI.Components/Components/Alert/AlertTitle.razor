@@ -1,7 +1,7 @@
 @namespace TrBlazeUI.Components.Alert
 @using TrBlazeUI.Components.Utilities
 
-<h5 class="@CssClass">@ChildContent</h5>
+<h5 class="@CssClass" @attributes="AdditionalAttributes">@ChildContent</h5>
 
 @code {
     /// <summary>
@@ -23,4 +23,11 @@
         "mb-1 font-medium leading-none tracking-tight",
         Class
     );
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

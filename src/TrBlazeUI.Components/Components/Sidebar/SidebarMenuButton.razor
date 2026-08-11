@@ -111,7 +111,7 @@ else
                      data-active="@IsActive"
                      data-state="@(CollapsibleContext?.Open ?? false ? "open" : "closed")"
                      aria-current="@(IsActive ? "page" : null)"
-                     aria-expanded="@(CollapsibleContext?.Open ?? false)"
+                     aria-expanded="@((CollapsibleContext?.Open ?? false) ? "true" : "false")"
                      Match="@Match"
                      ActiveClass="data-[active=true]:bg-sidebar-accent"
                      @attributes="AdditionalAttributes">
@@ -125,7 +125,7 @@ else
                     data-active="@IsActive"
                     data-state="@(CollapsibleContext?.Open ?? false ? "open" : "closed")"
                     aria-current="@(IsActive ? "page" : null)"
-                    aria-expanded="@(CollapsibleContext?.Open ?? false)"
+                    aria-expanded="@((CollapsibleContext?.Open ?? false) ? "true" : "false")"
                     @onclick="HandleClick"
                     @attributes="AdditionalAttributes">
                 @ChildContent

@@ -99,270 +99,148 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 .diagram.fs .mermaid{height:calc(100vh - 40px);display:flex;align-items:center;justify-content:center}
 
 @media(max-width:900px){.layout{grid-template-columns:1fr}nav.side{position:static;height:auto}}
-
-/* markdown task-list checkboxes rendered as real (disabled) checkboxes */
-ul.task-list{list-style:none;padding-left:4px}
-ul.task-list li{display:flex;align-items:flex-start;gap:8px;margin:5px 0}
-ul.task-list input[type="checkbox"]{margin-top:4px;flex:0 0 auto;accent-color:var(--accent)}
 </style>
 </head>
 <body>
-<button id="themeToggle" class="theme-toggle" title="Toggle light / dark">☾ Dark</button>
+<button id="themeToggle" class="theme-toggle" title="Toggle light / dark">&#9790; Dark</button>
 <div class="layout">
   <nav class="side">
-    <h1>TrBlazeUI — Usage Guide</h1>
-    <div class="sub">Test Users · Test Plan · Setup</div>
+    <h1>TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)</h1>
+    <div class="sub">Last rendered: 2026-08-11</div>
     <div class="group">Contents</div>
     <ol>
-      <li><a href="#test-users-canonical-use-these-for-all-smoke-verify-uat">Test users (canonical)</a></li>
+      <li><a href="#test-users-canonical-use-these-for-all-smoke-verify-uat">Test users (canonical — use THESE for all smoke / verify / UAT)</a></li>
       <li><a href="#how-to-test-screen-by-screen-menu-by-menu">How to test — screen by screen / menu by menu</a></li>
       <li class="h3"><a href="#home">Home (<code>/</code>)</a></li>
       <li class="h3"><a href="#architecture-architecture">Architecture (<code>/architecture</code>)</a></li>
       <li class="h3"><a href="#getting-started-getting-started">Getting Started (<code>/getting-started</code>)</a></li>
       <li class="h3"><a href="#components-index-components">Components index (<code>/components</code>)</a></li>
-      <li class="h3"><a href="#forms-e-g-components-button-components-input-components-select-components-date-picker">Forms</a></li>
-      <li class="h3"><a href="#layout-navigation-sidebar-components-sidebar-navigationmenu-tabs-pagination">Layout &amp; navigation</a></li>
-      <li class="h3"><a href="#overlays-feedback-dialog-sheet-drawer-popover-toast-command">Overlays &amp; feedback</a></li>
-      <li class="h3"><a href="#data-content-components-datatable-markdowneditor-richtexteditor">Data &amp; content</a></li>
+      <li class="h3"><a href="#forms-e-g-components-button-components-input-components-select-components-date-picker">Forms (e.g. <code>/components/button</code>, <code>/components/input</code>, <code>/components/select</code>, <code>/components/date-picker</code>)</a></li>
+      <li class="h3"><a href="#layout-navigation-sidebar-components-sidebar-navigationmenu-tabs-pagination">Layout &amp; navigation (Sidebar, <code>/components/sidebar</code>, NavigationMenu, Tabs, Pagination)</a></li>
+      <li class="h3"><a href="#overlays-feedback-dialog-sheet-drawer-popover-toast-command">Overlays &amp; feedback (Dialog, Sheet, Drawer, Popover, Toast, Command)</a></li>
+      <li class="h3"><a href="#data-content-components-datatable-markdowneditor-richtexteditor">Data &amp; content (<code>/components/datatable</code>, MarkdownEditor, RichTextEditor)</a></li>
+      <li class="h3"><a href="#what-s-new-2-1-0-release-page-whats-new">What's new — 2.1.0 release page (<code>/whats-new</code>)</a></li>
+      <li class="h3"><a href="#new-components-2-1-0-9-pages">New components — 2.1.0 (9 pages)</a></li>
+      <li class="h3"><a href="#fix-demonstrations-existing-pages">2.1.0 fix demonstrations (existing pages)</a></li>
       <li class="h3"><a href="#toolbar-components-toolbar">Toolbar (<code>/components/toolbar</code>)</a></li>
-      <li class="h3"><a href="#charts-charts-area-bar-line-pie-radar-radial">Charts</a></li>
+      <li class="h3"><a href="#charts-charts-area-bar-line-pie-radar-radial">Charts (<code>/charts/area</code>, <code>/bar</code>, <code>/line</code>, <code>/pie</code>, <code>/radar</code>, <code>/radial</code>)</a></li>
       <li class="h3"><a href="#icons-icons">Icons (<code>/icons</code>)</a></li>
-      <li class="h3"><a href="#theming-dark-mode-any-page">Theming &amp; dark mode</a></li>
+      <li class="h3"><a href="#theming-dark-mode-any-page">Theming &amp; dark mode (any page)</a></li>
       <li class="h3"><a href="#render-mode-parity">Render-mode parity</a></li>
       <li><a href="#prerequisites">Prerequisites</a></li>
-      <li><a href="#setup-deployment-steps-runbook-one-command-per-line-in-order">Setup / Deployment steps (runbook)</a></li>
+      <li><a href="#setup-deployment-steps-runbook-one-command-per-line-in-order">Setup / Deployment steps (runbook — one command per line, in order)</a></li>
       <li><a href="#test-automated">Test (automated)</a></li>
       <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
       <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
-      <li class="h3"><a href="#added-2026-07-21-astrolyfe-uat-feedback-pass-req-ui-016-ships-in-2-0-0">Added 2026-07-21 (REQ-UI-016)</a></li>
-      <li class="h3"><a href="#added-2026-07-02-astrolyfe-feedback-pass-req-ui-014">Added 2026-07-02 (REQ-UI-014)</a></li>
+      <li class="h3"><a href="#added-2026-08-11-techieblog-feedback-pass-req-ui-017-ships-in-2-1-0">Added 2026-08-11 (TechieBlog feedback pass — REQ-UI-017, ships in 2.1.0)</a></li>
+      <li class="h3"><a href="#added-2026-07-22-astrolyfe-post-upgrade-feedback-req-ui-014-tr-003-ships-in-2-0-1">Added 2026-07-22 (AstroLyfe post-upgrade feedback — REQ-UI-014 / TR-003, ships in 2.0.1)</a></li>
+      <li class="h3"><a href="#added-2026-07-21-astrolyfe-uat-feedback-pass-req-ui-016-ships-in-2-0-0">Added 2026-07-21 (AstroLyfe UAT feedback pass — REQ-UI-016, ships in 2.0.0)</a></li>
+      <li class="h3"><a href="#added-2026-07-02-astrolyfe-feedback-pass-req-ui-014">Added 2026-07-02 (AstroLyfe feedback pass — REQ-UI-014)</a></li>
       <li><a href="#known-limitations">Known limitations</a></li>
     </ol>
   </nav>
   <main>
     <h1>TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)</h1>
-    <div class="subtitle">How to test and run TrBlazeUI — the same walkthrough for agent smoke tests, verification, and human UAT.</div>
-
-    <blockquote>
-      <p>The single source for <strong>how to test and run</strong> this app. Every agent (flow-master self-smoke, the verifier) <strong>and</strong> the human UAT use the SAME walkthrough listed here. TrBlazeUI is a <strong>component library with a demo application</strong> — it has <strong>no authentication and no user accounts</strong>, so the test-user table below is N/A; testing means walking the demo app's pages and exercising each component.</p>
-    </blockquote>
-
     <div class="toc-inline">
       <div>Contents</div>
       <ol>
         <li><a href="#test-users-canonical-use-these-for-all-smoke-verify-uat">Test users (canonical — use THESE for all smoke / verify / UAT)</a></li>
-        <li><a href="#how-to-test-screen-by-screen-menu-by-menu">How to test — screen by screen / menu by menu</a>
-          <ul>
-            <li><a href="#home">Home (<code>/</code>)</a></li>
-            <li><a href="#architecture-architecture">Architecture (<code>/architecture</code>)</a></li>
-            <li><a href="#getting-started-getting-started">Getting Started (<code>/getting-started</code>)</a></li>
-            <li><a href="#components-index-components">Components index (<code>/components</code>)</a></li>
-            <li><a href="#forms-e-g-components-button-components-input-components-select-components-date-picker">Forms</a></li>
-            <li><a href="#layout-navigation-sidebar-components-sidebar-navigationmenu-tabs-pagination">Layout &amp; navigation</a></li>
-            <li><a href="#overlays-feedback-dialog-sheet-drawer-popover-toast-command">Overlays &amp; feedback</a></li>
-            <li><a href="#data-content-components-datatable-markdowneditor-richtexteditor">Data &amp; content</a></li>
-            <li><a href="#toolbar-components-toolbar">Toolbar (<code>/components/toolbar</code>)</a></li>
-            <li><a href="#charts-charts-area-bar-line-pie-radar-radial">Charts</a></li>
-            <li><a href="#icons-icons">Icons (<code>/icons</code>)</a></li>
-            <li><a href="#theming-dark-mode-any-page">Theming &amp; dark mode (any page)</a></li>
-            <li><a href="#render-mode-parity">Render-mode parity</a></li>
-          </ul>
-        </li>
+        <li><a href="#how-to-test-screen-by-screen-menu-by-menu">How to test — screen by screen / menu by menu</a></li>
+        <li class="h3"><a href="#home">Home (<code>/</code>)</a></li>
+        <li class="h3"><a href="#architecture-architecture">Architecture (<code>/architecture</code>)</a></li>
+        <li class="h3"><a href="#getting-started-getting-started">Getting Started (<code>/getting-started</code>)</a></li>
+        <li class="h3"><a href="#components-index-components">Components index (<code>/components</code>)</a></li>
+        <li class="h3"><a href="#forms-e-g-components-button-components-input-components-select-components-date-picker">Forms (e.g. <code>/components/button</code>, <code>/components/input</code>, <code>/components/select</code>, <code>/components/date-picker</code>)</a></li>
+        <li class="h3"><a href="#layout-navigation-sidebar-components-sidebar-navigationmenu-tabs-pagination">Layout &amp; navigation (Sidebar, <code>/components/sidebar</code>, NavigationMenu, Tabs, Pagination)</a></li>
+        <li class="h3"><a href="#overlays-feedback-dialog-sheet-drawer-popover-toast-command">Overlays &amp; feedback (Dialog, Sheet, Drawer, Popover, Toast, Command)</a></li>
+        <li class="h3"><a href="#data-content-components-datatable-markdowneditor-richtexteditor">Data &amp; content (<code>/components/datatable</code>, MarkdownEditor, RichTextEditor)</a></li>
+        <li class="h3"><a href="#what-s-new-2-1-0-release-page-whats-new">What's new — 2.1.0 release page (<code>/whats-new</code>)</a></li>
+        <li class="h3"><a href="#new-components-2-1-0-9-pages">New components — 2.1.0 (9 pages)</a></li>
+        <li class="h3"><a href="#fix-demonstrations-existing-pages">2.1.0 fix demonstrations (existing pages)</a></li>
+        <li class="h3"><a href="#toolbar-components-toolbar">Toolbar (<code>/components/toolbar</code>)</a></li>
+        <li class="h3"><a href="#charts-charts-area-bar-line-pie-radar-radial">Charts (<code>/charts/area</code>, <code>/bar</code>, <code>/line</code>, <code>/pie</code>, <code>/radar</code>, <code>/radial</code>)</a></li>
+        <li class="h3"><a href="#icons-icons">Icons (<code>/icons</code>)</a></li>
+        <li class="h3"><a href="#theming-dark-mode-any-page">Theming &amp; dark mode (any page)</a></li>
+        <li class="h3"><a href="#render-mode-parity">Render-mode parity</a></li>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#setup-deployment-steps-runbook-one-command-per-line-in-order">Setup / Deployment steps (runbook — one command per line, in order)</a></li>
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
-        <li><a href="#consumer-integration-notes">Consumer integration notes</a>
-          <ul>
-            <li><a href="#added-2026-07-22-astrolyfe-post-upgrade-feedback-req-ui-014-tr-003-ships-in-2-0-1">Added 2026-07-22 (AstroLyfe post-upgrade feedback — REQ-UI-014 / TR-003, ships in 2.0.1)</a></li>
-            <li><a href="#added-2026-07-21-astrolyfe-uat-feedback-pass-req-ui-016-ships-in-2-0-0">Added 2026-07-21 (AstroLyfe UAT feedback pass — REQ-UI-016, ships in 2.0.0)</a></li>
-            <li><a href="#added-2026-07-02-astrolyfe-feedback-pass-req-ui-014">Added 2026-07-02 (AstroLyfe feedback pass — REQ-UI-014)</a></li>
-          </ul>
-        </li>
+        <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
+        <li class="h3"><a href="#added-2026-08-11-techieblog-feedback-pass-req-ui-017-ships-in-2-1-0">Added 2026-08-11 (TechieBlog feedback pass — REQ-UI-017, ships in 2.1.0)</a></li>
+        <li class="h3"><a href="#added-2026-07-22-astrolyfe-post-upgrade-feedback-req-ui-014-tr-003-ships-in-2-0-1">Added 2026-07-22 (AstroLyfe post-upgrade feedback — REQ-UI-014 / TR-003, ships in 2.0.1)</a></li>
+        <li class="h3"><a href="#added-2026-07-21-astrolyfe-uat-feedback-pass-req-ui-016-ships-in-2-0-0">Added 2026-07-21 (AstroLyfe UAT feedback pass — REQ-UI-016, ships in 2.0.0)</a></li>
+        <li class="h3"><a href="#added-2026-07-02-astrolyfe-feedback-pass-req-ui-014">Added 2026-07-02 (AstroLyfe feedback pass — REQ-UI-014)</a></li>
         <li><a href="#known-limitations">Known limitations</a></li>
       </ol>
     </div>
 
-    <h2 id="test-users-canonical-use-these-for-all-smoke-verify-uat">Test users (canonical — use THESE for all smoke / verify / UAT)<a class="anchor-link" href="#test-users-canonical-use-these-for-all-smoke-verify-uat">#</a></h2>
-
-    <p><strong>Not applicable — TrBlazeUI has no login, no database, and no user accounts.</strong> The demo apps (Server/WASM/Auto) are open and require no credentials. No accounts are created or needed.</p>
-
-    <table>
-      <thead>
-        <tr><th>#</th><th>Username / Email</th><th>Password</th><th>Role / Permission</th><th>Created?</th><th>Notes</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>—</td><td>(none)</td><td>(none)</td><td>Anonymous demo visitor</td><td>N/A</td><td>No auth anywhere in the product; open the demo URL and browse</td></tr>
-      </tbody>
-    </table>
-
-    <h2 id="how-to-test-screen-by-screen-menu-by-menu">How to test — screen by screen / menu by menu<a class="anchor-link" href="#how-to-test-screen-by-screen-menu-by-menu">#</a></h2>
-
-    <p>The demo app exposes the whole library through a sidebar navigation. Walk these sections in order; no login is required for any of them.</p>
-
-    <h3 id="home">Home (<code>/</code>)<a class="anchor-link" href="#home">#</a></h3>
-    <ul>
-      <li><strong>Log in as:</strong> n/a (anonymous)</li>
-      <li><strong>Steps:</strong> 1) Run a demo host → 2) open the root URL → 3) read the landing/overview.</li>
-      <li><strong>Expected:</strong> landing page renders styled (sidebar visible, not bullet-point links — confirms <code>trblazeui.css</code> loaded correctly).</li>
-      <li><strong>Covers:</strong> BRD-37, REQ-NFR-002</li>
-    </ul>
-
-    <h3 id="architecture-architecture">Architecture (<code>/architecture</code>)<a class="anchor-link" href="#architecture-architecture">#</a></h3>
-    <ul>
-      <li><strong>Steps:</strong> open from sidebar.</li>
-      <li><strong>Expected:</strong> architecture overview page renders.</li>
-      <li><strong>Covers:</strong> F-DEMO / BRD-40</li>
-    </ul>
-
-    <h3 id="getting-started-getting-started">Getting Started (<code>/getting-started</code>)<a class="anchor-link" href="#getting-started-getting-started">#</a></h3>
-    <ul>
-      <li><strong>Steps:</strong> open from sidebar.</li>
-      <li><strong>Expected:</strong> quick-start guide renders with setup snippets.</li>
-      <li><strong>Covers:</strong> BRD-40</li>
-    </ul>
-
-    <h3 id="components-index-components">Components index (<code>/components</code>)<a class="anchor-link" href="#components-index-components">#</a></h3>
-    <ul>
-      <li><strong>Steps:</strong> open <code>/components</code> → click into each component demo.</li>
-      <li><strong>Expected:</strong> ~69 component demo cards link to working demo pages; each renders interactive examples.</li>
-      <li><strong>Covers:</strong> REQ-UI-002, REQ-UI-003, REQ-UI-004, REQ-UI-005, REQ-UI-006</li>
-    </ul>
-
-    <h3 id="forms-e-g-components-button-components-input-components-select-components-date-picker">Forms (e.g. <code>/components/button</code>, <code>/components/input</code>, <code>/components/select</code>, <code>/components/date-picker</code>)<a class="anchor-link" href="#forms-e-g-components-button-components-input-components-select-components-date-picker">#</a></h3>
-    <ul>
-      <li><strong>Steps:</strong> type into Input/Textarea; toggle Checkbox/Switch; open Select/Combobox/MultiSelect; pick a date; adjust Slider/Rating.</li>
-      <li><strong>Expected:</strong> two-way binding updates shown state; dropdowns open; pickers select values.</li>
-      <li><strong>Covers:</strong> BRD-4…BRD-12 (REQ-UI-002)</li>
-    </ul>
-
-    <h3 id="layout-navigation-sidebar-components-sidebar-navigationmenu-tabs-pagination">Layout &amp; navigation (Sidebar, <code>/components/sidebar</code>, NavigationMenu, Tabs, Pagination)<a class="anchor-link" href="#layout-navigation-sidebar-components-sidebar-navigationmenu-tabs-pagination">#</a></h3>
-    <ul>
-      <li><strong>Steps:</strong> collapse/expand the Sidebar (and Ctrl/Cmd+B); reload to confirm persistence; open a horizontal NavigationMenu dropdown; switch Tabs; page through Pagination.</li>
-      <li><strong>Expected:</strong> sidebar collapse persists across reload; nav dropdown does not clip; tabs/pagination work.</li>
-      <li><strong>Covers:</strong> BRD-13…BRD-18 (REQ-UI-003)</li>
-    </ul>
-
-    <h3 id="overlays-feedback-dialog-sheet-drawer-popover-toast-command">Overlays &amp; feedback (Dialog, Sheet, Drawer, Popover, Toast, Command)<a class="anchor-link" href="#overlays-feedback-dialog-sheet-drawer-popover-toast-command">#</a></h3>
-    <ul>
-      <li><strong>Steps:</strong> open a Dialog; interact with controls <em>inside</em> it (toggle/select); open a Sheet/Drawer; trigger a Toast; open the Command palette and filter.</li>
-      <li><strong>Expected:</strong> overlays open with focus trap; <strong>internal state changes re-render</strong> (reactive-portal fix); Toasts appear; Command filters.</li>
-      <li><strong>Covers:</strong> BRD-19…BRD-24 (REQ-UI-004)</li>
-    </ul>
-
-    <h3 id="data-content-components-datatable-markdowneditor-richtexteditor">Data &amp; content (<code>/components/datatable</code>, MarkdownEditor, RichTextEditor)<a class="anchor-link" href="#data-content-components-datatable-markdowneditor-richtexteditor">#</a></h3>
-    <ul>
-      <li><strong>Steps:</strong> sort/filter/paginate/select rows in DataTable; edit markdown and view preview; type in RichTextEditor.</li>
-      <li><strong>Expected:</strong> DataTable operations work; editors render/preview; rich-text HTML is sanitized.</li>
-      <li><strong>Covers:</strong> BRD-25…BRD-27 (REQ-UI-005)</li>
-    </ul>
-
-    <h3 id="toolbar-components-toolbar">Toolbar (<code>/components/toolbar</code>)<a class="anchor-link" href="#toolbar-components-toolbar">#</a></h3>
-    <ul>
-      <li><strong>Steps:</strong> click ToolbarButtons; toggle ToolbarToggleButtons (Bold/Italic); try Default/Compact/Dense and vertical orientation; open a toolbar dropdown.</li>
-      <li><strong>Expected:</strong> buttons fire actions; toggles reflect pressed state (<code>aria-pressed</code>); variants/orientation render; IDE/editor examples work.</li>
-      <li><strong>Covers:</strong> BRD-30, BRD-31 (REQ-UI-007)</li>
-    </ul>
-
-    <h3 id="charts-charts-area-bar-line-pie-radar-radial">Charts (<code>/charts/area</code>, <code>/bar</code>, <code>/line</code>, <code>/pie</code>, <code>/radar</code>, <code>/radial</code>)<a class="anchor-link" href="#charts-charts-area-bar-line-pie-radar-radial">#</a></h3>
-    <ul>
-      <li><strong>Steps:</strong> open each chart demo.</li>
-      <li><strong>Expected:</strong> each of the 6 chart types renders with theme colors.</li>
-      <li><strong>Covers:</strong> BRD-32 (REQ-UI-008)</li>
-    </ul>
-
-    <h3 id="icons-icons">Icons (<code>/icons</code>)<a class="anchor-link" href="#icons-icons">#</a></h3>
-    <ul>
-      <li><strong>Steps:</strong> open the icon browser; switch between Lucide / Heroicons / Feather; search.</li>
-      <li><strong>Expected:</strong> icon grids render; typed names resolve; Heroicons shows 4 variants.</li>
-      <li><strong>Covers:</strong> BRD-33, BRD-34 (REQ-UI-009)</li>
-    </ul>
-
-    <h3 id="theming-dark-mode-any-page">Theming &amp; dark mode (any page)<a class="anchor-link" href="#theming-dark-mode-any-page">#</a></h3>
-    <ul>
-      <li><strong>Steps:</strong> toggle the theme (adds/removes <code>.dark</code> on <code>&lt;html&gt;</code>); switch demo theme if available.</li>
-      <li><strong>Expected:</strong> all components restyle; dark mode applies; no contrast breakage.</li>
-      <li><strong>Covers:</strong> BRD-35, BRD-36 (REQ-UI-010)</li>
-    </ul>
-
-    <h3 id="render-mode-parity">Render-mode parity<a class="anchor-link" href="#render-mode-parity">#</a></h3>
-    <ul>
-      <li><strong>Steps:</strong> repeat a few of the above in Server (5183/7172), WASM (5184/7173), and Auto (5185/7174).</li>
-      <li><strong>Expected:</strong> identical component behavior across all three hosts.</li>
-      <li><strong>Covers:</strong> REQ-NFR-004 (BRD-40), REQ-UI-011</li>
-    </ul>
-
-    <h2 id="prerequisites">Prerequisites<a class="anchor-link" href="#prerequisites">#</a></h2>
-    <ul>
-      <li>.NET 10 SDK (Windows side; reference machine builds via Windows dotnet from WSL)</li>
-      <li>A web browser (Chrome/Edge/Firefox/Safari)</li>
-      <li>Node.js / PowerShell — ONLY if regenerating icon data (not needed to run/test)</li>
-    </ul>
-
-    <h2 id="setup-deployment-steps-runbook-one-command-per-line-in-order">Setup / Deployment steps (runbook — one command per line, in order)<a class="anchor-link" href="#setup-deployment-steps-runbook-one-command-per-line-in-order">#</a></h2>
-    <ol>
-      <li><code>git clone &lt;repo&gt; TrBlazeUI &amp;&amp; cd TrBlazeUI</code></li>
-      <li><code>dotnet restore TrBlazeUI.sln</code></li>
-      <li><code>cmd.exe /c "dotnet build TrBlazeUI.sln -c Release -p:CI=true"</code>  <em>(WSL rung #4; <code>-p:CI=true</code> skips Tailwind, uses committed CSS)</em></li>
-      <li><code>./scripts/run-demo.sh server</code>  <em>(or <code>wasm</code> / <code>auto</code>; or <code>dotnet run --project demos/TrBlazeUI.Demo.Server</code>)</em></li>
-      <li>Open <code>http://localhost:5183</code> (Server) — no login; browse the sidebar to exercise every component.</li>
-    </ol>
-
-    <h2 id="test-automated">Test (automated)<a class="anchor-link" href="#test-automated">#</a></h2>
-<pre><code class="language-bash">cmd.exe /c "dotnet build TrBlazeUI.sln -c Release -p:CI=true"
-NODE_PATH=&lt;path-to-any-repo-with-playwright&gt;/node_modules node tests/verify/ui-ui016.spec.js</code></pre>
-    <blockquote>
-      <p>No unit-test project is checked into the solution. Runtime verification is the plain-Playwright specs under <code>tests/verify/</code> (<code>ui-ui016.spec.js</code>, <code>ui-trstudio.spec.js</code>), each run against a booted demo with <code>SMOKE_URL</code> pointing at it. This repo intentionally ships no <code>node_modules</code> — resolve Playwright via <code>NODE_PATH</code> from another repo that has it. Boot the demo with an explicit <code>--urls</code> argument (<code>launchSettings.json</code> otherwise binds <code>localhost</code> only, which WSL cannot reach):</p>
-      <p><code>cmd.exe /c "dotnet run -c Release --no-build --project demos/TrBlazeUI.Demo.Server/TrBlazeUI.Demo.Server.csproj --urls http://0.0.0.0:5213"</code></p>
-    </blockquote>
-
-    <h2 id="smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)<a class="anchor-link" href="#smoke-checklist-quick-capability-pass">#</a></h2>
-    <ul class="task-list">
-      <li><input type="checkbox" disabled><span>Demo host boots and the home page renders <strong>styled</strong> (sidebar, not bullet links) — confirms CSS path</span></li>
-      <li><input type="checkbox" disabled><span>Open a few component demos (Button, Input, Select) — they render and bind</span></li>
-      <li><input type="checkbox" disabled><span>Open a Dialog and change a control inside it — content re-renders (portal fix)</span></li>
-      <li><input type="checkbox" disabled><span>Open <code>/components/toolbar</code> — toggle a button, confirm pressed state</span></li>
-      <li><input type="checkbox" disabled><span>Open <code>/charts/bar</code> — chart renders with theme colors</span></li>
-      <li><input type="checkbox" disabled><span>Open <code>/icons</code> — switch icon library, icons render</span></li>
-      <li><input type="checkbox" disabled><span>Toggle dark mode — components restyle without breakage</span></li>
-      <li><input type="checkbox" disabled><span>Open <code>/components/datatable</code> — the Basic Table shows <strong>no search box</strong> (toolbar is opt-in as of 2.0.0) and paginates only because it has 500 rows</span></li>
-      <li><input type="checkbox" disabled><span>Open a tall Dialog — its header is visible at the top of the viewport and long content scrolls inside the dialog</span></li>
-      <li><input type="checkbox" disabled><span>Open <code>/components/select</code> — the trigger has an accessible name (axe reports 0 <code>button-name</code> violations; a value or the placeholder is announced)</span></li>
-    </ul>
-
-    <h2 id="consumer-integration-notes">Consumer integration notes<a class="anchor-link" href="#consumer-integration-notes">#</a></h2>
-
-    <h3 id="added-2026-07-22-astrolyfe-post-upgrade-feedback-req-ui-014-tr-003-ships-in-2-0-1">Added 2026-07-22 (AstroLyfe post-upgrade feedback — REQ-UI-014 / TR-003, ships in 2.0.1)<a class="anchor-link" href="#added-2026-07-22-astrolyfe-post-upgrade-feedback-req-ui-014-tr-003-ships-in-2-0-1">#</a></h3>
-    <ul>
-      <li><strong>Select triggers now carry an accessible name by default.</strong> <code>SelectTrigger</code> (a <code>&lt;button role="combobox"&gt;</code>) emits <code>aria-labelledby</code> pointing at the <code>SelectValue</code> span, so screen readers and axe (<code>button-name</code>) see a non-empty name from first render — no per-Select workaround needed. If you previously splatted <code>aria-label="…"</code> onto every <code>&lt;SelectTrigger&gt;</code> to satisfy accessibility, you can <strong>remove it</strong> on upgrade.</li>
-      <li><strong>New <code>AriaLabel</code> parameter on <code>SelectTrigger</code></strong> for a descriptive purpose-name (e.g. <code>&lt;SelectTrigger AriaLabel="Role"&gt;</code>), which overrides the default value-derived name. Splatting your own <code>aria-label</code>/<code>aria-labelledby</code> also still wins — the library only supplies the default when you provide no name.</li>
-      <li><strong>Dialog centering is now offset-free (TR-014 hardening).</strong> <code>DialogContent</code>/<code>AlertDialogContent</code> center with auto margins (<code>inset-0 m-auto h-fit</code>) instead of <code>translate-x/y-[-50%]</code>, so a tall dialog can never clip above the viewport no matter what <code>transform</code>/<code>translate</code> your app CSS contributes. <strong>If you shipped a <code>translate:none</code>/<code>transform</code> dialog override, remove it</strong> — its <code>[class~="left-[50%]"][class~="top-[50%]"]</code> selector no longer matches (those tokens are gone). <code>Sheet</code>/<code>Drawer</code> positioning is unchanged.</li>
-    </ul>
-
-    <h3 id="added-2026-07-21-astrolyfe-uat-feedback-pass-req-ui-016-ships-in-2-0-0">Added 2026-07-21 (AstroLyfe UAT feedback pass — REQ-UI-016, ships in 2.0.0)<a class="anchor-link" href="#added-2026-07-21-astrolyfe-uat-feedback-pass-req-ui-016-ships-in-2-0-0">#</a></h3>
-    <ul>
-      <li><strong>⚠ <code>DataTable.ShowToolbar</code> now defaults to <code>false</code>.</strong> The search box + Columns button are opt-in — add <code>ShowToolbar="true"</code> where you want them. This changes the rendered output of every <code>DataTable</code> that did not set it explicitly.</li>
-      <li><strong>DataTable pagination auto-hides.</strong> The bar renders only when <code>TotalItems &gt; PageSize</code>; a grid whose rows fit one page shows no pagination chrome. <code>ShowPagination="false"</code> still suppresses it unconditionally. Consumer-side guards like <code>ShowPagination="@(List?.Count &gt; PageSize)"</code> are now redundant but harmless.</li>
-      <li><strong>Dialogs are clamped to the viewport.</strong> <code>DialogContent</code>/<code>AlertDialogContent</code> carry <code>max-h-[calc(100vh-2rem)] overflow-y-auto</code>, so a tall dialog can no longer render its header above <code>y=0</code>. If you shipped a CSS override to work around this, you can remove it. <code>Sheet</code>/<code>Drawer</code> are unaffected.</li>
-      <li><strong>Theme tokens have library defaults.</strong> <code>trblazeui.css</code> now ships <code>--popover</code>, <code>--background</code>, <code>--border</code>, … (light + <code>.dark</code>) at zero specificity via <code>:where()</code> inside <code>@layer base</code>. Popovers and Select listboxes stay opaque and legible even if your app defines no token set; if it does define them, yours still win.</li>
-    </ul>
-
-    <h3 id="added-2026-07-02-astrolyfe-feedback-pass-req-ui-014">Added 2026-07-02 (AstroLyfe feedback pass — REQ-UI-014)<a class="anchor-link" href="#added-2026-07-02-astrolyfe-feedback-pass-req-ui-014">#</a></h3>
-    <ul>
-      <li><strong>PortalHost:</strong> add <code>&lt;PortalHost /&gt;</code> (namespace <code>TrBlazeUI.Primitives.Services</code>) at the end of your root layout, inside the interactive render root. Overlay content (Select, Popover, DropdownMenu, Tooltip, …) renders through it for correct stacking. If it's missing, the library now <strong>falls back to rendering popups inline</strong> (fully functional, JS-positioned) and logs a one-time console warning — but the host is still the recommended setup.</li>
-      <li><strong>Interactive triggers in DropdownMenu:</strong> never slot a <code>Button</code> (or any interactive element) inside a plain <code>DropdownMenuTrigger</code> — that nests buttons. Use <code>AsChild="true"</code> so the slotted <code>Button</code> becomes the trigger itself (see <code>/components/dropdown-menu</code> → "Button As Trigger").</li>
-      <li><strong>Input labels:</strong> <code>&lt;Input Label="Full Name" …&gt;</code> renders a visible, <code>for</code>/<code>id</code>-associated <code>&lt;label&gt;</code>.</li>
-      <li><strong>Icons &amp; screen readers:</strong> icons are decorative by default (<code>aria-hidden="true"</code>). Pass <code>AriaLabel="…"</code> to expose <code>role="img"</code> + accessible name. Unknown icon names render an empty placeholder (<code>data-trblazeui-missing-icon="&lt;name&gt;"</code>) and log a one-time warning — grep the DOM or logs for stragglers after migrations.</li>
-      <li><strong>FluentUI migration cheatsheet:</strong> FluentUI/Blazorise <code>xs</code>/<code>sm</code>/<code>md</code>/<code>lg</code>/<code>Spacing</code> attributes are <strong>inert on plain HTML elements</strong> — they silently collapse layouts. Rewrite them either as TrBlazeUI <code>&lt;Grid Spacing="3"&gt;&lt;GridItem Xs="12" Sm="6"&gt;…&lt;/GridItem&gt;&lt;/Grid&gt;</code> (12-column, breakpoints 640/768/1024/1280px, demo at <code>/components/grid</code>) or as Tailwind <code>grid grid-cols-12 gap-*</code> + <code>col-span-* sm:col-span-*</code> classes.</li>
-    </ul>
-
-    <h2 id="known-limitations">Known limitations<a class="anchor-link" href="#known-limitations">#</a></h2>
-    <ul>
-      <li><strong>NativeSelect inside MAUI Blazor Hybrid overlays</strong> — native <code>&lt;select&gt;</code> popup is clipped in WebView2 <code>position: fixed</code> overlays (platform limitation). Use <code>&lt;Select&gt;</code> instead inside dialogs/sheets. See <code>docs/OldDocs/TrBlazeUI-Issues-Report-1.md</code> (Issue #2).</li>
-      <li><strong><code>HtmlSanitizer 9.1.949-beta</code> is a pre-release dependency</strong> of <code>TrBlazeUI.Components</code>. It is the only line pulling <code>AngleSharp &gt;= 1.5.0</code>, which patches CVE-2026-54570 (mXSS bypass defeating DOM sanitizers — the protection <code>RichTextEditor</code>/<code>MarkdownEditor</code> depend on). Revisit when <code>HtmlSanitizer 9.1.x</code> reaches stable.</li>
-      <li><strong>Consumer feedback is all resolved in source but not all published.</strong> AstroLyfe's TR-003 (Select accessible name) + TR-014 (Dialog centering, defensively hardened) ship in 2.0.1; TR-010/011/012 in 2.0.0; their other 8 shipped in 1.0.7 — none of 2.0.0/2.0.1 is released yet (owner-manual). See <code>docs/AstroLyfe-TrBlazeUI-Feedback.md</code>.</li>
-      <li><em>(Resolved 2026-06-30: the strict Release build is clean 0/0, and XML-doc coverage is 100% with CS1591 build-enforced — previously-listed limitations cleared.)</em></li>
-    </ul>
+<blockquote><p>The single source for <strong>how to test and run</strong> this app. Every agent (flow-master self-smoke, the verifier) <strong>and</strong> the human UAT use the SAME walkthrough listed here. TrBlazeUI is a <strong>component library with a demo application</strong> — it has <strong>no authentication and no user accounts</strong>, so the test-user table below is N/A; testing means walking the demo app's pages and exercising each component.</p></blockquote>
+<h2 id="test-users-canonical-use-these-for-all-smoke-verify-uat">Test users (canonical — use THESE for all smoke / verify / UAT)<a class="anchor-link" href="#test-users-canonical-use-these-for-all-smoke-verify-uat">#</a></h2>
+<p><strong>Not applicable — TrBlazeUI has no login, no database, and no user accounts.</strong> The demo apps (Server/WASM/Auto) are open and require no credentials. No accounts are created or needed.</p>
+<table>
+<thead><tr><th>#</th><th>Username / Email</th><th>Password</th><th>Role / Permission</th><th>Created?</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>—</td><td>(none)</td><td>(none)</td><td>Anonymous demo visitor</td><td>N/A</td><td>No auth anywhere in the product; open the demo URL and browse</td></tr>
+</tbody></table>
+<h2 id="how-to-test-screen-by-screen-menu-by-menu">How to test — screen by screen / menu by menu<a class="anchor-link" href="#how-to-test-screen-by-screen-menu-by-menu">#</a></h2>
+<p>The demo app exposes the whole library through a sidebar navigation. Walk these sections in order; no login is required for any of them.</p>
+<h3 id="home">Home (<code>/</code>)<a class="anchor-link" href="#home">#</a></h3>
+<ul><li><strong>Log in as:</strong> n/a (anonymous)</li><li><strong>Steps:</strong> 1) Run a demo host → 2) open the root URL → 3) read the landing/overview.</li><li><strong>Expected:</strong> landing page renders styled (sidebar visible, not bullet-point links — confirms <code>trblazeui.css</code> loaded correctly).</li><li><strong>Covers:</strong> BRD-37, REQ-NFR-002</li></ul>
+<h3 id="architecture-architecture">Architecture (<code>/architecture</code>)<a class="anchor-link" href="#architecture-architecture">#</a></h3>
+<ul><li><strong>Steps:</strong> open from sidebar.</li><li><strong>Expected:</strong> architecture overview page renders.</li><li><strong>Covers:</strong> F-DEMO / BRD-40</li></ul>
+<h3 id="getting-started-getting-started">Getting Started (<code>/getting-started</code>)<a class="anchor-link" href="#getting-started-getting-started">#</a></h3>
+<ul><li><strong>Steps:</strong> open from sidebar.</li><li><strong>Expected:</strong> quick-start guide renders with setup snippets.</li><li><strong>Covers:</strong> BRD-40</li></ul>
+<h3 id="components-index-components">Components index (<code>/components</code>)<a class="anchor-link" href="#components-index-components">#</a></h3>
+<ul><li><strong>Steps:</strong> open <code>/components</code> → click into each component demo.</li><li><strong>Expected:</strong> 79 component demo cards link to working demo pages (117 demo pages in total across components, primitives, charts, icons and top-level); each renders interactive examples.</li><li><strong>Covers:</strong> REQ-UI-002, REQ-UI-003, REQ-UI-004, REQ-UI-005, REQ-UI-006</li></ul>
+<h3 id="forms-e-g-components-button-components-input-components-select-components-date-picker">Forms (e.g. <code>/components/button</code>, <code>/components/input</code>, <code>/components/select</code>, <code>/components/date-picker</code>)<a class="anchor-link" href="#forms-e-g-components-button-components-input-components-select-components-date-picker">#</a></h3>
+<ul><li><strong>Steps:</strong> type into Input/Textarea; toggle Checkbox/Switch; open Select/Combobox/MultiSelect; pick a date; adjust Slider/Rating.</li><li><strong>Expected:</strong> two-way binding updates shown state; dropdowns open; pickers select values.</li><li><strong>Covers:</strong> BRD-4…BRD-12 (REQ-UI-002)</li></ul>
+<h3 id="layout-navigation-sidebar-components-sidebar-navigationmenu-tabs-pagination">Layout &amp; navigation (Sidebar, <code>/components/sidebar</code>, NavigationMenu, Tabs, Pagination)<a class="anchor-link" href="#layout-navigation-sidebar-components-sidebar-navigationmenu-tabs-pagination">#</a></h3>
+<ul><li><strong>Steps:</strong> collapse/expand the Sidebar (and Ctrl/Cmd+B); reload to confirm persistence; open a horizontal NavigationMenu dropdown; switch Tabs; page through Pagination.</li><li><strong>Expected:</strong> sidebar collapse persists across reload; nav dropdown does not clip; tabs/pagination work.</li><li><strong>Covers:</strong> BRD-13…BRD-18 (REQ-UI-003)</li></ul>
+<h3 id="overlays-feedback-dialog-sheet-drawer-popover-toast-command">Overlays &amp; feedback (Dialog, Sheet, Drawer, Popover, Toast, Command)<a class="anchor-link" href="#overlays-feedback-dialog-sheet-drawer-popover-toast-command">#</a></h3>
+<ul><li><strong>Steps:</strong> open a Dialog; interact with controls <em>inside</em> it (toggle/select); open a Sheet/Drawer; trigger a Toast; open the Command palette and filter.</li><li><strong>Expected:</strong> overlays open with focus trap; <strong>internal state changes re-render</strong> (reactive-portal fix); Toasts appear; Command filters.</li><li><strong>Covers:</strong> BRD-19…BRD-24 (REQ-UI-004)</li></ul>
+<h3 id="data-content-components-datatable-markdowneditor-richtexteditor">Data &amp; content (<code>/components/datatable</code>, MarkdownEditor, RichTextEditor)<a class="anchor-link" href="#data-content-components-datatable-markdowneditor-richtexteditor">#</a></h3>
+<ul><li><strong>Steps:</strong> sort/filter/paginate/select rows in DataTable; edit markdown and view preview; type in RichTextEditor.</li><li><strong>Expected:</strong> DataTable operations work; editors render/preview; rich-text HTML is sanitized.</li><li><strong>Covers:</strong> BRD-25…BRD-27 (REQ-UI-005)</li></ul>
+<h3 id="what-s-new-2-1-0-release-page-whats-new">What's new — 2.1.0 release page (<code>/whats-new</code>)<a class="anchor-link" href="#what-s-new-2-1-0-release-page-whats-new">#</a></h3>
+<ul><li><strong>Steps:</strong> open <code>/whats-new</code>; run the splatting, utility-scale and retuned-token examples on the page.</li><li><strong>Expected:</strong> every 2.1.0 change has a live, runnable example; no console errors.</li><li><strong>Covers:</strong> REQ-UI-017</li></ul>
+<h3 id="new-components-2-1-0-9-pages">New components — 2.1.0 (9 pages)<a class="anchor-link" href="#new-components-2-1-0-9-pages">#</a></h3>
+<ul><li><strong>Steps:</strong> open each of <code>/components/prose</code>, <code>/components/stat</code>, <code>/components/timeline</code>, <code>/components/stepper</code>, <code>/components/anchor-nav</code>, <code>/components/sortable-list</code>, <code>/components/password-strength</code>, <code>/components/code-block</code>, <code>/components/centered-panel</code>; reach each one from the sidebar <strong>and</strong> the command palette.</li><li><strong>Expected:</strong> each page renders its examples; <code>AnchorNav</code> scrollspy tracks the active section; <code>Stepper</code> moves <code>aria-current=&quot;step&quot;</code> as the step changes; <code>SortableList</code> reorders with its buttons (keyboard-operable); <code>CodeBlock</code>'s copy button works, and reports "Press Ctrl+C" rather than failing silently on a plain-HTTP origin; <code>Prose</code> keeps a wide table scrolling inside itself at 390px with no page overflow.</li><li><strong>Covers:</strong> REQ-UI-017</li></ul>
+<h3 id="fix-demonstrations-existing-pages">2.1.0 fix demonstrations (existing pages)<a class="anchor-link" href="#fix-demonstrations-existing-pages">#</a></h3>
+<ul><li><strong>Steps:</strong> <code>/components/rating</code> — arrow-key through the stars, then check the <code>ReadOnly</code> and <code>Focusable=&quot;false&quot;</code> examples. <code>/components/tabs</code> — switch tabs. <code>/components/select</code> — load the page and read the trigger before opening it. <code>/components/input</code> + <code>/components/textarea</code> — type fast (Server host), and try the <code>DebounceMilliseconds</code> example. <code>/components/navigation-menu</code> — Tab through the top-level links. <code>/components/item</code> — inspect the list. <code>/components/typography</code> — the <code>Size</code> examples. <code>/components/datatable</code> — <code>Refresh()</code> after an in-place edit, and the <code>MinWidth</code> example. <code>/components/dialog</code> — the <strong>stacked dialogs as siblings</strong> example.</li><li><strong>Expected:</strong> Rating options are focusable <code>&lt;button role=&quot;radio&quot;&gt;</code> with <code>aria-checked=&quot;true&quot;/&quot;false&quot;</code>; exactly one tab reports <code>aria-selected=&quot;true&quot;</code> and its <code>aria-controls</code> resolves; Select shows the selected item's text on first paint; fast typing yields exactly the typed string with nothing dropped or reordered; NavigationMenu links are Tab reachable; <code>Item</code> announces as a list; <code>Typography Size</code> overrides the baked-in size; <code>Refresh()</code> repaints edited rows and <code>MinWidth</code> scrolls instead of clipping; the second dialog opens on top and is clickable.</li><li><strong>Covers:</strong> REQ-UI-017, REQ-NFR-001</li></ul>
+<h3 id="toolbar-components-toolbar">Toolbar (<code>/components/toolbar</code>)<a class="anchor-link" href="#toolbar-components-toolbar">#</a></h3>
+<ul><li><strong>Steps:</strong> click ToolbarButtons; toggle ToolbarToggleButtons (Bold/Italic); try Default/Compact/Dense and vertical orientation; open a toolbar dropdown.</li><li><strong>Expected:</strong> buttons fire actions; toggles reflect pressed state (<code>aria-pressed</code>); variants/orientation render; IDE/editor examples work.</li><li><strong>Covers:</strong> BRD-30, BRD-31 (REQ-UI-007)</li></ul>
+<h3 id="charts-charts-area-bar-line-pie-radar-radial">Charts (<code>/charts/area</code>, <code>/bar</code>, <code>/line</code>, <code>/pie</code>, <code>/radar</code>, <code>/radial</code>)<a class="anchor-link" href="#charts-charts-area-bar-line-pie-radar-radial">#</a></h3>
+<ul><li><strong>Steps:</strong> open each chart demo.</li><li><strong>Expected:</strong> each of the 6 chart types renders with theme colors.</li><li><strong>Covers:</strong> BRD-32 (REQ-UI-008)</li></ul>
+<h3 id="icons-icons">Icons (<code>/icons</code>)<a class="anchor-link" href="#icons-icons">#</a></h3>
+<ul><li><strong>Steps:</strong> open the icon browser; switch between Lucide / Heroicons / Feather; search.</li><li><strong>Expected:</strong> icon grids render; typed names resolve; Heroicons shows 4 variants.</li><li><strong>Covers:</strong> BRD-33, BRD-34 (REQ-UI-009)</li></ul>
+<h3 id="theming-dark-mode-any-page">Theming &amp; dark mode (any page)<a class="anchor-link" href="#theming-dark-mode-any-page">#</a></h3>
+<ul><li><strong>Steps:</strong> toggle the theme (adds/removes <code>.dark</code> on <code>&lt;html&gt;</code>); switch demo theme if available.</li><li><strong>Expected:</strong> all components restyle; dark mode applies; no contrast breakage.</li><li><strong>Covers:</strong> BRD-35, BRD-36 (REQ-UI-010)</li></ul>
+<h3 id="render-mode-parity">Render-mode parity<a class="anchor-link" href="#render-mode-parity">#</a></h3>
+<ul><li><strong>Steps:</strong> repeat a few of the above in Server (5183/7172), WASM (5184/7173), and Auto (5185/7174).</li><li><strong>Expected:</strong> identical component behavior across all three hosts.</li><li><strong>Covers:</strong> REQ-NFR-004 (BRD-40), REQ-UI-011</li></ul>
+<h2 id="prerequisites">Prerequisites<a class="anchor-link" href="#prerequisites">#</a></h2>
+<ul><li>.NET 10 SDK (Windows side; reference machine builds via Windows dotnet from WSL)</li><li>A web browser (Chrome/Edge/Firefox/Safari)</li><li>Node.js — ONLY for the automated runtime specs (<code>tests/verify/*.spec.js</code>); resolve Playwright via <code>NODE_PATH</code>, this repo ships no <code>node_modules</code></li><li>Python 3 — ONLY for <code>tools/token-contrast.py</code> (the palette contrast gate)</li><li>PowerShell — ONLY if regenerating icon data (not needed to run/test)</li></ul>
+<h2 id="setup-deployment-steps-runbook-one-command-per-line-in-order">Setup / Deployment steps (runbook — one command per line, in order)<a class="anchor-link" href="#setup-deployment-steps-runbook-one-command-per-line-in-order">#</a></h2>
+<ol><li><code>git clone &lt;repo&gt; TrBlazeUI &amp;&amp; cd TrBlazeUI</code></li><li><code>dotnet restore TrBlazeUI.sln</code></li><li><code>cmd.exe /c &quot;dotnet build TrBlazeUI.sln -c Release -p:CI=true&quot;</code>  <em>(WSL rung #4; <code>-p:CI=true</code> skips Tailwind, uses committed CSS)</em></li><li><code>./scripts/run-demo.sh server</code>  <em>(or <code>wasm</code> / <code>auto</code>; or <code>dotnet run --project demos/TrBlazeUI.Demo.Server</code>)</em></li><li>Open <code>http://localhost:5183</code> (Server) — no login; browse the sidebar to exercise every component.</li></ol>
+<h2 id="test-automated">Test (automated)<a class="anchor-link" href="#test-automated">#</a></h2>
+<pre><code class="language-bash">cmd.exe /c &quot;dotnet build TrBlazeUI.sln -c Release -p:CI=true&quot;
+NODE_PATH=&lt;path-to-any-repo-with-playwright&gt;/node_modules node tests/verify/ui-techieblog.spec.js
+python3 tools/token-contrast.py
+dotnet run --project tools/splat-audit</code></pre>
+<blockquote><p>No unit-test project is checked into the solution. Runtime verification is the plain-Playwright specs under <code>tests/verify/</code> — <code>ui-techieblog.spec.js</code> (65 checks, the 2.1.0 gate), <code>ui-demo-2-1-0.spec.js</code> (15, demo coverage), <code>ui-ui016.spec.js</code> (23), <code>ui-ui014.spec.js</code> (8), <code>ui-trstudio.spec.js</code> (14) — each run against a booted demo with <code>SMOKE_URL</code> pointing at it. <code>tools/token-contrast.py</code> must report 0 failing pairings and <code>tools/splat-audit</code> 344/344 + 59/59. This repo intentionally ships no <code>node_modules</code> — resolve Playwright via <code>NODE_PATH</code> from another repo that has it. Boot the demo with an explicit <code>--urls</code> argument (<code>launchSettings.json</code> otherwise binds <code>localhost</code> only, which WSL cannot reach):
+<code>cmd.exe /c &quot;dotnet run -c Release --no-build --project demos/TrBlazeUI.Demo.Server/TrBlazeUI.Demo.Server.csproj --urls http://0.0.0.0:5213&quot;</code></p></blockquote>
+<h2 id="smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)<a class="anchor-link" href="#smoke-checklist-quick-capability-pass">#</a></h2>
+<ul><li>[ ] Demo host boots and the home page renders <strong>styled</strong> (sidebar, not bullet links) — confirms CSS path</li><li>[ ] Open a few component demos (Button, Input, Select) — they render and bind</li><li>[ ] Open a Dialog and change a control inside it — content re-renders (portal fix)</li><li>[ ] Open <code>/components/toolbar</code> — toggle a button, confirm pressed state</li><li>[ ] Open <code>/charts/bar</code> — chart renders with theme colors</li><li>[ ] Open <code>/icons</code> — switch icon library, icons render</li><li>[ ] Toggle dark mode — components restyle without breakage</li><li>[ ] Open <code>/components/datatable</code> — the Basic Table shows <strong>no search box</strong> (toolbar is opt-in as of 2.0.0) and paginates only because it has 500 rows</li><li>[ ] Open a tall Dialog — its header is visible at the top of the viewport and long content scrolls inside the dialog</li><li>[ ] Open <code>/components/select</code> — the trigger has an accessible name (axe reports 0 <code>button-name</code> violations) and shows the selected item's text <strong>before</strong> the listbox is first opened</li><li>[ ] Open <code>/whats-new</code> and the 9 new component pages from the sidebar — each renders its examples</li><li>[ ] Open <code>/components/rating</code> — arrow-key through the stars; the selection follows the keyboard</li><li>[ ] Type a long string fast into <code>/components/input</code> on the <strong>Server</strong> host — no characters are dropped or reordered</li></ul>
+<h2 id="consumer-integration-notes">Consumer integration notes<a class="anchor-link" href="#consumer-integration-notes">#</a></h2>
+<h3 id="added-2026-08-11-techieblog-feedback-pass-req-ui-017-ships-in-2-1-0">Added 2026-08-11 (TechieBlog feedback pass — REQ-UI-017, ships in 2.1.0)<a class="anchor-link" href="#added-2026-08-11-techieblog-feedback-pass-req-ui-017-ships-in-2-1-0">#</a></h3>
+<ul><li><strong>⚠ Design tokens retuned for contrast.</strong> Light <code>--input</code>/<code>--ring</code> move from <code>oklch(0.922)</code>/<code>oklch(0.708)</code> to <code>oklch(0.66)</code> (form-control borders were <strong>1.26:1</strong>, below the 3:1 WCAG 1.4.11 floor; now <strong>3.11:1</strong>); dark <code>--input</code> → <code>oklch(0.55)</code>, dark <code>--accent</code> → <code>oklch(0.30)</code>, dark <code>--destructive-foreground</code> → near-black. Apps that override these tokens are unaffected — the library declares its own at zero specificity. Re-check any custom palette with <code>tools/token-contrast.py</code>.</li><li><strong>⚠ <code>Rating</code> markup changed.</strong> Options are <code>&lt;button role=&quot;radio&quot;&gt;</code>, not <code>&lt;span role=&quot;radio&quot;&gt;</code>; a <code>ReadOnly</code> rating is <code>role=&quot;img&quot;</code> with no radio semantics. CSS or test selectors matching <code>span[role=radio]</code> need updating. New <code>Focusable</code> parameter removes the tab stop for a decorative rating.</li><li><strong>⚠ <code>TabsContent</code> always renders its panel element</strong> (hidden when inactive; child content still renders only for the active tab). This is what makes each trigger's <code>aria-controls</code> resolve.</li><li><strong>⚠ <code>trblazeui.css</code> is now ~906 KB minified / ~97 KB gzipped</strong> (was ~88 KB) because it ships the standard Tailwind utility scale with <code>sm:</code>/<code>md:</code>/<code>lg:</code>/<code>xl:</code>/<code>2xl:</code> variants. Utilities like <code>max-w-7xl</code>, <code>gap-6</code>, <code>min-w-3xl</code>, <code>top-1</code>, <code>w-36</code> and <code>lg:grid-cols-3</code> now resolve — previously they silently did nothing. Arbitrary values (<code>min-w-[720px]</code>) still cannot be pre-generated; use the scale or <code>DataTable.MinWidth</code>.</li><li><strong>Attribute splatting is now catalog-wide</strong> — 344/344 public components in <code>TrBlazeUI.Components</code> and 59/59 in <code>TrBlazeUI.Primitives</code> (measured by <code>tools/splat-audit</code>). Wrapper elements added purely to carry a <code>data-testid</code> can be deleted. Components with no element of their own (context roots, the config-only <code>DataTableColumn</code>) accept the attributes without rendering them — that exception list is in the AI reference.</li><li><strong><code>Input</code>/<code>Textarea</code> no longer lose keystrokes on a Blazor Server circuit</strong>, and gain optional <code>DebounceMilliseconds</code>. Raw <code>&lt;textarea&gt;</code> workarounds can be removed.</li><li><strong><code>SelectValue</code> shows the selected item's <code>Text</code> on first paint</strong>, before the listbox has ever opened.</li><li><strong>New components:</strong> <code>Prose</code>, <code>StatTile</code>/<code>StatGroup</code>, <code>Timeline</code>, <code>Stepper</code>, <code>AnchorNav</code>, <code>SortableList</code>, <code>PasswordStrength</code>, <code>CodeBlock</code>, <code>CenteredPanel</code> — each with a demo page. Also <code>Typography.Size</code>, <code>DataTable.Refresh()</code>, <code>DataTable.MinWidth</code>, and library defaults for <code>--success</code>/<code>--alert-*</code>/<code>--chart-1…5</code>/<code>--sidebar*</code>.</li><li><strong>Accessibility corrections</strong> to <code>Rating</code>, <code>Tabs</code>, <code>NavigationMenu</code>, <code>MarkdownEditor</code> and <code>Item</code>/<code>ItemGroup</code>; consumer-side <code>MutationObserver</code> ARIA patches for these can be deleted.</li></ul>
+<h3 id="added-2026-07-22-astrolyfe-post-upgrade-feedback-req-ui-014-tr-003-ships-in-2-0-1">Added 2026-07-22 (AstroLyfe post-upgrade feedback — REQ-UI-014 / TR-003, ships in 2.0.1)<a class="anchor-link" href="#added-2026-07-22-astrolyfe-post-upgrade-feedback-req-ui-014-tr-003-ships-in-2-0-1">#</a></h3>
+<ul><li><strong>Select triggers now carry an accessible name by default.</strong> <code>SelectTrigger</code> (a <code>&lt;button role=&quot;combobox&quot;&gt;</code>) emits <code>aria-labelledby</code> pointing at the <code>SelectValue</code> span, so screen readers and axe (<code>button-name</code>) see a non-empty name from first render — no per-Select workaround needed. If you previously splatted <code>aria-label=&quot;…&quot;</code> onto every <code>&lt;SelectTrigger&gt;</code> to satisfy accessibility, you can <strong>remove it</strong> on upgrade.</li><li><strong>New <code>AriaLabel</code> parameter on <code>SelectTrigger</code></strong> for a descriptive purpose-name (e.g. <code>&lt;SelectTrigger AriaLabel=&quot;Role&quot;&gt;</code>), which overrides the default value-derived name. Splatting your own <code>aria-label</code>/<code>aria-labelledby</code> also still wins — the library only supplies the default when you provide no name.</li><li><strong>Dialog centering is now offset-free (TR-014 hardening).</strong> <code>DialogContent</code>/<code>AlertDialogContent</code> center with auto margins (<code>inset-0 m-auto h-fit</code>) instead of <code>translate-x/y-[-50%]</code>, so a tall dialog can never clip above the viewport no matter what <code>transform</code>/<code>translate</code> your app CSS contributes. <strong>If you shipped a <code>translate:none</code>/<code>transform</code> dialog override, remove it</strong> — its <code>[class~=&quot;left-[50%]&quot;][class~=&quot;top-[50%]&quot;]</code> selector no longer matches (those tokens are gone). <code>Sheet</code>/<code>Drawer</code> positioning is unchanged.</li></ul>
+<h3 id="added-2026-07-21-astrolyfe-uat-feedback-pass-req-ui-016-ships-in-2-0-0">Added 2026-07-21 (AstroLyfe UAT feedback pass — REQ-UI-016, ships in 2.0.0)<a class="anchor-link" href="#added-2026-07-21-astrolyfe-uat-feedback-pass-req-ui-016-ships-in-2-0-0">#</a></h3>
+<ul><li><strong>⚠ <code>DataTable.ShowToolbar</code> now defaults to <code>false</code>.</strong> The search box + Columns button are opt-in — add <code>ShowToolbar=&quot;true&quot;</code> where you want them. This changes the rendered output of every <code>DataTable</code> that did not set it explicitly.</li><li><strong>DataTable pagination auto-hides.</strong> The bar renders only when <code>TotalItems &gt; PageSize</code>; a grid whose rows fit one page shows no pagination chrome. <code>ShowPagination=&quot;false&quot;</code> still suppresses it unconditionally. Consumer-side guards like <code>ShowPagination=&quot;@(List?.Count &gt; PageSize)&quot;</code> are now redundant but harmless.</li><li><strong>Dialogs are clamped to the viewport.</strong> <code>DialogContent</code>/<code>AlertDialogContent</code> carry <code>max-h-[calc(100vh-2rem)] overflow-y-auto</code>, so a tall dialog can no longer render its header above <code>y=0</code>. If you shipped a CSS override to work around this, you can remove it. <code>Sheet</code>/<code>Drawer</code> are unaffected.</li><li><strong>Theme tokens have library defaults.</strong> <code>trblazeui.css</code> now ships <code>--popover</code>, <code>--background</code>, <code>--border</code>, … (light + <code>.dark</code>) at zero specificity via <code>:where()</code> inside <code>@layer base</code>. Popovers and Select listboxes stay opaque and legible even if your app defines no token set; if it does define them, yours still win.</li></ul>
+<h3 id="added-2026-07-02-astrolyfe-feedback-pass-req-ui-014">Added 2026-07-02 (AstroLyfe feedback pass — REQ-UI-014)<a class="anchor-link" href="#added-2026-07-02-astrolyfe-feedback-pass-req-ui-014">#</a></h3>
+<ul><li><strong>PortalHost:</strong> add <code>&lt;PortalHost /&gt;</code> (namespace <code>TrBlazeUI.Primitives.Services</code>) at the end of your root layout, inside the interactive render root. Overlay content (Select, Popover, DropdownMenu, Tooltip, …) renders through it for correct stacking. If it's missing, the library now <strong>falls back to rendering popups inline</strong> (fully functional, JS-positioned) and logs a one-time console warning — but the host is still the recommended setup.</li><li><strong>Interactive triggers in DropdownMenu:</strong> never slot a <code>Button</code> (or any interactive element) inside a plain <code>DropdownMenuTrigger</code> — that nests buttons. Use <code>AsChild=&quot;true&quot;</code> so the slotted <code>Button</code> becomes the trigger itself (see <code>/components/dropdown-menu</code> → "Button As Trigger").</li><li><strong>Input labels:</strong> <code>&lt;Input Label=&quot;Full Name&quot; …&gt;</code> renders a visible, <code>for</code>/<code>id</code>-associated <code>&lt;label&gt;</code>.</li><li><strong>Icons &amp; screen readers:</strong> icons are decorative by default (<code>aria-hidden=&quot;true&quot;</code>). Pass <code>AriaLabel=&quot;…&quot;</code> to expose <code>role=&quot;img&quot;</code> + accessible name. Unknown icon names render an empty placeholder (<code>data-trblazeui-missing-icon=&quot;&lt;name&gt;&quot;</code>) and log a one-time warning — grep the DOM or logs for stragglers after migrations.</li><li><strong>FluentUI migration cheatsheet:</strong> FluentUI/Blazorise <code>xs</code>/<code>sm</code>/<code>md</code>/<code>lg</code>/<code>Spacing</code> attributes are <strong>inert on plain HTML elements</strong> — they silently collapse layouts. Rewrite them either as TrBlazeUI <code>&lt;Grid Spacing=&quot;3&quot;&gt;&lt;GridItem Xs=&quot;12&quot; Sm=&quot;6&quot;&gt;…&lt;/GridItem&gt;&lt;/Grid&gt;</code> (12-column, breakpoints 640/768/1024/1280px, demo at <code>/components/grid</code>) or as Tailwind <code>grid grid-cols-12 gap-*</code> + <code>col-span-* sm:col-span-*</code> classes.</li></ul>
+<h2 id="known-limitations">Known limitations<a class="anchor-link" href="#known-limitations">#</a></h2>
+<ul><li><strong>TR-066 (open) — a <code>Dialog</code> declared inside another <code>Dialog</code>'s <code>DialogContent</code> never opens.</strong> Pre-existing (reproduces against the 2.0.1 <code>PortalService</code> source), not a 2.1.0 regression. Workaround: compose stacked dialogs as <strong>siblings</strong>, each with its own <code>@bind-Open</code>, opening the second from a handler inside the first — the pattern shown on <code>/components/dialog</code>. Write-up in <code>docs/TechieBlog-TrBlazeUI-Feedback.md</code> (TR-066).</li><li><strong>REQ-NFR-001 accessibility is at 90% — no independent third-party audit</strong> has been run. The consumer-reported WCAG defects are fixed and verified live; the remaining 10% closes only on an external audit.</li><li><strong>Arbitrary Tailwind values are not pre-generated.</strong> The 2.1.0 bundle ships the standard utility scale, but <code>min-w-[720px]</code>-style arbitrary values still cannot be. Use the scale or the component parameter (e.g. <code>DataTable.MinWidth</code>).</li><li><strong>NativeSelect inside MAUI Blazor Hybrid overlays</strong> — native <code>&lt;select&gt;</code> popup is clipped in WebView2 <code>position: fixed</code> overlays (platform limitation). Use <code>&lt;Select&gt;</code> instead inside dialogs/sheets. See <code>docs/OldDocs/TrBlazeUI-Issues-Report-1.md</code> (Issue #2).</li><li><strong><code>HtmlSanitizer 9.1.949-beta</code> is a pre-release dependency</strong> of <code>TrBlazeUI.Components</code>. It is the only line pulling <code>AngleSharp &gt;= 1.5.0</code>, which patches CVE-2026-54570 (mXSS bypass defeating DOM sanitizers — the protection <code>RichTextEditor</code>/<code>MarkdownEditor</code> depend on). Revisit when <code>HtmlSanitizer 9.1.x</code> reaches stable.</li><li><strong>Consumer feedback is resolved in source but not published.</strong> TechieBlog's TR-001…TR-065 ship in <strong>2.1.0</strong> (all 65 fixed library-side); AstroLyfe's TR-003 + TR-014 in 2.0.1, TR-010/011/012 in 2.0.0, their other 8 in 1.0.7; TrStudio's 11 in 1.0.7. <strong>None of 2.0.0 / 2.0.1 / 2.1.0 is released</strong> — publishing is owner-manual (tag <code>2.1.0</code>, paste the CHANGELOG 2.1.0 section as the release body, and carry its "Behaviour changes to review before upgrading" list into the notes). Until then consumers keep their workarounds. See the per-consumer feedback files in <code>docs/</code>.</li><li><em>(Resolved 2026-06-30: the strict Release build is clean 0/0, and XML-doc coverage is 100% with CS1591 build-enforced — previously-listed limitations cleared.)</em></li></ul>
   </main>
 </div>
 
@@ -387,11 +265,7 @@ NODE_PATH=&lt;path-to-any-repo-with-playwright&gt;/node_modules node tests/verif
   });
 })();
 
-// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`:
-// mermaid reads the <pre>'s textContent as the diagram source, so a button
-// appended here glues "copy" onto the last line and breaks the parse
-// (flowcharts → "Syntax error"; sequence diagrams silently absorb it).
-// Mermaid blocks get copy/export from their own .diagram toolbar instead.
+// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`.
 document.querySelectorAll('pre:not(.mermaid)').forEach(pre => {
   const btn = document.createElement('button');
   btn.className = 'copy';
@@ -412,7 +286,6 @@ if (window.mermaid) {
   mermaid.initialize({ startOnLoad: true, theme: mermaidTheme, securityLevel: 'loose' });
 }
 
-// Mermaid toolbar wiring — run after mermaid renders
 function wireMermaidToolbars() {
   document.querySelectorAll('.diagram').forEach(dia => {
     if (dia.dataset.wired) return;
@@ -456,7 +329,6 @@ function wireMermaidToolbars() {
     };
     function escFs(e) { if (e.key === 'Escape') { dia.classList.remove('fs'); document.removeEventListener('keydown', escFs); } }
     dia.querySelector('[data-pop]').onclick = () => openInNewTab(svg);
-    // Ctrl+wheel zoom
     merm.addEventListener('wheel', (e) => {
       if (!e.ctrlKey) return;
       e.preventDefault();
@@ -521,10 +393,9 @@ function openInNewTab(svg) {
   w.document.close();
 }
 
-// Run wiring after mermaid finishes (it renders async)
 if (window.mermaid) {
   setTimeout(wireMermaidToolbars, 400);
-  setTimeout(wireMermaidToolbars, 1200);  // safety re-run for slow renders
+  setTimeout(wireMermaidToolbars, 1200);
 }
 </script>
 </body>

@@ -7,7 +7,7 @@
     Wraps the entire application or page layout to provide sidebar context.
 *@
 
-<TooltipProvider>
+<TooltipProvider @attributes="AdditionalAttributes">
     <CascadingValue Value="@Context" IsFixed="false">
         <div class="@($"flex w-full {HeightClass}")">
             @ChildContent

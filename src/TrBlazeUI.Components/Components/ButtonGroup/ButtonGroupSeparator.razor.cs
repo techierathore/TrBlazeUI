@@ -84,4 +84,11 @@ public partial class ButtonGroupSeparator : ComponentBase
     /// Uses the cn() utility for intelligent class merging and Tailwind conflict resolution.
     /// </remarks>
     private string? CssClass => Class;
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

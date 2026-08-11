@@ -27,6 +27,14 @@
         @RenderSelectListbox()
     </FloatingPortal>
 }
+else
+{
+    @* The items are still instantiated while the listbox is closed so each one can register its
+       Value/Text pair with the context - that is what lets SelectValue show the selected item's
+       text on FIRST paint instead of the raw bound value. A closed SelectItem renders no markup,
+       so this contributes nothing to the DOM. *@
+    @ChildContent
+}
 
 @code {
     [CascadingParameter]

@@ -8,6 +8,6 @@
     Disabled="@Disabled"
     AriaLabel="@AriaLabel"
     class="@CssClass"
-    aria-invalid="@(IsInvalid ? "true" : null)">
+    aria-invalid="@(IsInvalid ? "true" : null)" @attributes="AdditionalAttributes">
     @ChildContent
 </TrBlazeUI.Primitives.RadioGroup.RadioGroup>

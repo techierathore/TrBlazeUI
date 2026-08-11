@@ -1,7 +1,7 @@
 @namespace TrBlazeUI.Components.InputOTP
 @inject IJSRuntime JSRuntime
 
-<div class="@ContainerClass" @onpaste="HandlePaste">
+<div class="@ContainerClass" @onpaste="HandlePaste" @attributes="AdditionalAttributes">
     @for (int i = 0; i < Length; i++)
     {
         var index = i;
@@ -226,4 +226,11 @@
     );
 
     private string SeparatorClass => "flex items-center justify-center text-muted-foreground";
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

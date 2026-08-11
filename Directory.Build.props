@@ -12,8 +12,11 @@
     <RepositoryType>git</RepositoryType>
 
     <!-- Base version for local builds. CI/CD overrides via -p:Version= (see RELEASE.md).
-         2.0.0: DataTable.ShowToolbar default flipped true -> false (breaking); see CHANGELOG.md. -->
-    <Version>2.0.0</Version>
+         2.0.0: DataTable.ShowToolbar default flipped true -> false (breaking); see CHANGELOG.md.
+         2.1.0: TechieBlog feedback sweep - catalog-wide attribute splatting, accessibility
+         corrections (Rating/Tabs/NavigationMenu/Item), Blazor Server text-entry fix, full
+         Tailwind utility layer, retuned contrast tokens, 12 new components. See CHANGELOG.md. -->
+    <Version>2.1.0</Version>
 
     <!-- SourceLink. The .NET 8+ SDK bundles Microsoft.SourceLink.GitHub, so no PackageReference
          is needed - only these switches. PublishRepositoryUrl keeps the repo URL in the built

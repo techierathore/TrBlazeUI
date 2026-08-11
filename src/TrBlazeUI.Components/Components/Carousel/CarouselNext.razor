@@ -5,7 +5,7 @@
         class="@CssClass"
         disabled="@(!Context?.CanGoNext)"
         @onclick="HandleClick"
-        aria-label="Next slide">
+        aria-label="Next slide" @attributes="AdditionalAttributes">
     <LucideIcon Name="arrow-right" Class="h-4 w-4" />
     <span class="sr-only">Next slide</span>
 </button>
@@ -35,4 +35,11 @@
         PositionClass,
         Class
     );
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

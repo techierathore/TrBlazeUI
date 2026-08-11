@@ -1,0 +1,84 @@
+@namespace TrBlazeUI.Components.Timeline
+
+<li class="@CssClass" @attributes="AdditionalAttributes">
+    <span class="@MarkerCssClass" aria-hidden="true">@Marker</span>
+    @if (!string.IsNullOrWhiteSpace(Meta))
+    {
+        <div class="text-xs font-medium text-muted-foreground">@Meta</div>
+    }
+    @if (!string.IsNullOrWhiteSpace(Title))
+    {
+        <h3 class="text-base font-semibold tracking-tight">@Title</h3>
+    }
+    @if (!string.IsNullOrWhiteSpace(Subtitle))
+    {
+        <div class="text-sm text-muted-foreground">@Subtitle</div>
+    }
+    @if (ChildContent != null)
+    {
+        <div class="mt-2 text-sm">@ChildContent</div>
+    }
+</li>
+
+@code {
+    /// <summary>
+    /// Gets or sets the entry heading, for example a job title.
+    /// </summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// Gets or sets the line under the heading, for example an employer.
+    /// </summary>
+    [Parameter]
+    public string? Subtitle { get; set; }
+
+    /// <summary>
+    /// Gets or sets the small line above the heading, typically a date range.
+    /// </summary>
+    [Parameter]
+    public string? Meta { get; set; }
+
+    /// <summary>
+    /// Gets or sets content rendered in the marker dot, for example an icon or a number.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Marker { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether this entry is the current/active one, which fills the marker.
+    /// </summary>
+    [Parameter]
+    public bool Current { get; set; }
+
+    /// <summary>
+    /// Gets or sets the entry body.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "relative ms-6 pb-8 last:pb-0",
+        Class
+    );
+
+    private string MarkerCssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "absolute -start-9 flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-semibold",
+        Current
+            ? "border-primary bg-primary text-primary-foreground"
+            : "border-border bg-background text-muted-foreground"
+    );
+}

@@ -5,7 +5,7 @@
 
 <div @ref="objTrackRef"
      class="@CssClass"
-     tabindex="-1">
+     tabindex="-1" @attributes="AdditionalAttributes">
     @* Track background *@
     <div class="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
         @* Active range track *@
@@ -21,7 +21,7 @@
          aria-valuemin="@Min"
          aria-valuemax="@Max"
          aria-valuenow="@StartValue"
-         aria-disabled="@Disabled"
+         aria-disabled="@(Disabled ? "true" : "false")"
          tabindex="@(Disabled ? -1 : 0)"
          class="@StartThumbClass"
          style="left: @(StartPercentage)%;"
@@ -40,7 +40,7 @@
          aria-valuemin="@Min"
          aria-valuemax="@Max"
          aria-valuenow="@EndValue"
-         aria-disabled="@Disabled"
+         aria-disabled="@(Disabled ? "true" : "false")"
          tabindex="@(Disabled ? -1 : 0)"
          class="@EndThumbClass"
          style="left: @(EndPercentage)%;"
@@ -424,4 +424,11 @@
         }
         objDotNetRef?.Dispose();
     }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

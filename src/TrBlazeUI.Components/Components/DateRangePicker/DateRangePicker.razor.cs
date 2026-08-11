@@ -435,4 +435,11 @@ public partial class DateRangePicker : ComponentBase
             isToday && !isRangeStart && !isRangeEnd ? "bg-accent text-accent-foreground" : null
         );
     }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

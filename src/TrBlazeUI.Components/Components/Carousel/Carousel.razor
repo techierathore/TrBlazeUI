@@ -1,6 +1,6 @@
 @namespace TrBlazeUI.Components.Carousel
 
-<div class="@CssClass" role="region" aria-roledescription="carousel">
+<div class="@CssClass" role="region" aria-roledescription="carousel" @attributes="AdditionalAttributes">
     <CascadingValue Value="this" IsFixed="false">
         @ChildContent
     </CascadingValue>
@@ -72,4 +72,11 @@
         "relative",
         Class
     );
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

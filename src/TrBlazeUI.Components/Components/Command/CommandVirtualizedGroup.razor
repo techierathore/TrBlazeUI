@@ -9,7 +9,7 @@
      class="@CssClass"
      style="@(objHasVisibleItems ? null : "display: none")"
      role="group"
-     aria-labelledby="@(string.IsNullOrWhiteSpace(Heading) ? null : $"command-group-{objId}")">
+     aria-labelledby="@(string.IsNullOrWhiteSpace(Heading) ? null : $"command-group-{objId}")" @attributes="AdditionalAttributes">
     @if (!string.IsNullOrWhiteSpace(Heading))
     {
         <div id="@($"command-group-{objId}")"
@@ -76,6 +76,13 @@
 </div>
 
 @code {
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
     [CascadingParameter]
     public CommandContext? Context { get; set; }
 

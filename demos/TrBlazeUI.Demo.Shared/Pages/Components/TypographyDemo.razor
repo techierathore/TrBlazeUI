@@ -192,4 +192,22 @@
             <TypographyMuted>Last updated: January 2025</TypographyMuted>
         </div>
     </div>
+    <div class="space-y-4 rounded-lg border border-alert-success bg-alert-success-bg p-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold text-alert-success-foreground">The Size parameter (added in 2.1.0)</h2>
+            <p class="text-sm text-alert-success-foreground">Size replaces the component's own font-size classes, including the responsive step TypographyH1 carries (text-4xl lg:text-5xl). Passing a font-size utility through Class instead lands on the same element with the same specificity, so which one wins is decided by the order Tailwind happens to emit them in — which made smaller overrides silently fail.</p>
+        </div>
+        <div class="space-y-3">
+            <TypographyH1>Default H1</TypographyH1>
+            <TypographyH1 Size="TypographySize.Xl2">Size="TypographySize.Xl2"</TypographyH1>
+            <TypographyH1 Size="TypographySize.Lg">Size="TypographySize.Lg"</TypographyH1>
+            <TypographyH2 Size="TypographySize.Base">An H2 at Size="TypographySize.Base"</TypographyH2>
+        </div>
+        <p class="text-sm text-alert-success-foreground">
+            Sizes run <code>Xs</code>, <code>Sm</code>, <code>Base</code>, <code>Lg</code>,
+            <code>Xl</code>, <code>Xl2</code> … <code>Xl6</code>. Leave it at <code>Default</code> to
+            keep the shadcn/ui type scale.
+        </p>
+    </div>
+
 </div>

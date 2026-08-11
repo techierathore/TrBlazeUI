@@ -204,8 +204,52 @@
             </Tabs>
         </div>
     </div>
+    <div class="space-y-4 rounded-lg border border-alert-success bg-alert-success-bg p-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold text-alert-success-foreground">ARIA correctness (fixed in 2.1.0)</h2>
+            <p class="text-sm text-alert-success-foreground">Triggers now emit a literal aria-selected, and aria-controls is emitted only when a panel for that value actually exists. Inspect the markup with dev tools to see it.</p>
+        </div>
+        <div class="space-y-6">
+            <div class="space-y-2">
+                <p class="text-sm font-medium">With panels — aria-controls resolves</p>
+                <p class="text-sm text-muted-foreground">
+                    The panel element stays in the DOM (hidden) while inactive, so every trigger's
+                    <code>aria-controls</code> names an element that exists.
+                </p>
+                <Tabs DefaultValue="overview">
+                    <TabsList>
+                        <TabsTrigger Value="overview">Overview</TabsTrigger>
+                        <TabsTrigger Value="analytics">Analytics</TabsTrigger>
+                    </TabsList>
+                    <TabsContent Value="overview" Class="pt-3 text-sm">Overview panel.</TabsContent>
+                    <TabsContent Value="analytics" Class="pt-3 text-sm">Analytics panel.</TabsContent>
+                </Tabs>
+            </div>
+
+            <div class="space-y-2">
+                <p class="text-sm font-medium">Without panels — no dangling aria-controls</p>
+                <p class="text-sm text-muted-foreground">
+                    Driving <code>Tabs</code> through <code>Value</code>/<code>ValueChanged</code> and
+                    painting the result yourself is a supported pattern. There are no
+                    <code>TabsContent</code> children here, so the triggers emit no
+                    <code>aria-controls</code> at all rather than pointing at ids that do not exist.
+                </p>
+                <Tabs Value="@objFilter" ValueChanged="@(v => objFilter = v ?? "all")">
+                    <TabsList>
+                        <TabsTrigger Value="all">All</TabsTrigger>
+                        <TabsTrigger Value="published">Published</TabsTrigger>
+                        <TabsTrigger Value="draft">Draft</TabsTrigger>
+                    </TabsList>
+                </Tabs>
+                <p class="text-sm text-muted-foreground">Filter: <strong>@objFilter</strong></p>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @code {
+    private string objFilter = "all";
+
     private string? activeTab = "morning";
 }

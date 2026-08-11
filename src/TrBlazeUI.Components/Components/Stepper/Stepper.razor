@@ -1,0 +1,69 @@
+@namespace TrBlazeUI.Components.Stepper
+
+@* Numbered steps for a multi-part flow or a series index. The list is a real <ol>, and the
+   current step is announced with aria-current="step" rather than by colour alone. *@
+
+<nav aria-label="@(AriaLabel ?? "Progress")" @attributes="AdditionalAttributes">
+    <ol class="@CssClass">
+        <CascadingValue Value="@this" IsFixed="true">
+            @* Current cascades separately, by value: the fixed cascade above carries the component
+               reference (which never changes), so a change to Current would otherwise never reach
+               the items and the aria-current marker would stay where it first rendered. *@
+            <CascadingValue Name="StepperCurrent" Value="@Current">
+                @ChildContent
+            </CascadingValue>
+        </CascadingValue>
+    </ol>
+</nav>
+
+@code {
+    /// <summary>
+    /// Gets or sets the StepperItem children.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets the 1-based index of the current step.
+    /// </summary>
+    [Parameter]
+    public int Current { get; set; } = 1;
+
+    /// <summary>
+    /// Gets or sets the layout direction.
+    /// </summary>
+    [Parameter]
+    public StepperOrientation Orientation { get; set; } = StepperOrientation.Horizontal;
+
+    /// <summary>
+    /// Gets or sets the accessible name of the step list.
+    /// </summary>
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Hands out the next 1-based step number as each StepperItem initialises.
+    /// </summary>
+    internal int NextIndex() => ++objIndex;
+
+    private int objIndex;
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "flex list-none",
+        Orientation == StepperOrientation.Vertical ? "flex-col gap-4" : "flex-row flex-wrap gap-6",
+        Class
+    );
+}

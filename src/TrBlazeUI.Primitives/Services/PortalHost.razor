@@ -9,7 +9,9 @@
     // Track which portals are being rendered in this cycle
     objRenderedThisCycle.Clear();
 }
-@foreach (var portal in PortalService.GetPortals())
+@* Ordered by open time: two overlays with the same z-index are decided by DOM order, so the
+   most recently opened portal has to come last. *@
+@foreach (var portal in PortalService.GetOrderedPortals())
 {
     objRenderedThisCycle.Add(portal.Key);
     <div @key="portal.Key" data-portal-id="@portal.Key" class="trblazeui-portal" style="display: contents;">
@@ -18,6 +20,17 @@
 }
 
 @code {
+    /// <summary>
+    /// Gets or sets additional HTML attributes.
+    /// </summary>
+    /// <remarks>
+    /// PortalHost renders no element of its own - it emits one wrapper per registered portal - so
+    /// attributes are accepted (never throwing) but not emitted. Declared so the catalog-wide
+    /// splatting contract holds for every public component without exception.
+    /// </remarks>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
     private HashSet<string> objRenderedThisCycle = new();
     private IJSObjectReference? objPortalModule;
 

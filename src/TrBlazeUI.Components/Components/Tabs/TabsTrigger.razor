@@ -8,7 +8,7 @@
 
 <TrBlazeUI.Primitives.Tabs.TabsTrigger Value="@Value"
                                             Disabled="@Disabled"
-                                            class="@CssClass">
+                                            class="@CssClass" @attributes="AdditionalAttributes">
     @ChildContent
 </TrBlazeUI.Primitives.Tabs.TabsTrigger>
 
@@ -40,4 +40,11 @@
 
     private string CssClass =>
         $"inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm {Class}".Trim();
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

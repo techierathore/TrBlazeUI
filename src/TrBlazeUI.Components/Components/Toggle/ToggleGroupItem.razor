@@ -2,11 +2,11 @@
 @typeparam TValue
 
 <button type="button"
-        aria-pressed="@IsPressed"
+        aria-pressed="@(IsPressed ? "true" : "false")"
         data-state="@(IsPressed ? "on" : "off")"
         disabled="@(Disabled || Context?.Disabled == true)"
         class="@CssClass"
-        @onclick="HandleClick">
+        @onclick="HandleClick" @attributes="AdditionalAttributes">
     @ChildContent
 </button>
 
@@ -63,4 +63,11 @@
         SizeClasses,
         Class
     );
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

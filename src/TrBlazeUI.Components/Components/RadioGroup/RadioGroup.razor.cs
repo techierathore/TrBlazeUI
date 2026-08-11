@@ -174,4 +174,11 @@ public partial class RadioGroup<TValue> : ComponentBase
             fieldIdentifier = FieldIdentifier.Create(ValueExpression);
         }
     }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

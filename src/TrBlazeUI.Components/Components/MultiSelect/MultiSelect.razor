@@ -7,7 +7,7 @@
 @using TrBlazeUI.Primitives.Checkbox
 @using TrBlazeUI.Icons.Lucide.Components
 
-<div class="@ContainerClass">
+<div class="@ContainerClass" @attributes="AdditionalAttributes">
     <Popover Open="objIsOpen" OpenChanged="HandleOpenChanged">
         <PopoverTrigger role="combobox"
                         aria-expanded="@objIsOpen.ToString().ToLower()"

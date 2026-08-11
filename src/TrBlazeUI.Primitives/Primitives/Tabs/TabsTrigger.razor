@@ -5,8 +5,8 @@
 <button id="@objTriggerId"
         type="button"
         role="tab"
-        aria-selected="@objIsSelected"
-        aria-controls="@objContentId"
+        aria-selected="@(objIsSelected ? "true" : "false")"
+        aria-controls="@objControlsId"
         data-state="@(objIsSelected ? "active" : "inactive")"
         tabindex="@objTabIndex"
         disabled="@Disabled"
@@ -22,6 +22,9 @@
     private string objTriggerId => Context.GetTriggerId(Value);
     private string objContentId => Context.GetContentId(Value);
     private bool objIsSelected => Context.IsTabActive(Value);
+    // Only advertise aria-controls when a TabsContent panel for this value is actually in the DOM.
+    // Tabs driven through Value/ValueChanged render no panels, so a static id would always dangle.
+    private string? objControlsId => Context.HasPanel(Value) ? objContentId : null;
     private int objTabIndex => objIsSelected ? 0 : -1;
 
     /// <summary>
