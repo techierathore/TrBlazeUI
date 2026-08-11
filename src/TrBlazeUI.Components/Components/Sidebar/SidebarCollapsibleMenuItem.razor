@@ -14,7 +14,7 @@
 @if (Context != null && !Context.Open)
 {
     @* Collapsed mode: show as DropdownMenu flyout *@
-    <TrBlazeUI.Components.DropdownMenu.DropdownMenu>
+    <TrBlazeUI.Components.DropdownMenu.DropdownMenu @attributes="AdditionalAttributes">
         <TrBlazeUI.Components.DropdownMenu.DropdownMenuTrigger>
             <SidebarMenuButton Tooltip="@Label">
                 @Icon
@@ -37,7 +37,7 @@
 else
 {
     @* Expanded mode: show as Collapsible with sub-menu *@
-    <Collapsible Open="@Open" OpenChanged="@OpenChanged">
+    <Collapsible Open="@Open" OpenChanged="@OpenChanged" @attributes="AdditionalAttributes">
         <SidebarMenuButton Tooltip="@Label">
             @Icon
             <span>@Label</span>
@@ -63,6 +63,13 @@ else
 }
 
 @code {
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
     [CascadingParameter]
     private SidebarContext? Context { get; set; }
 

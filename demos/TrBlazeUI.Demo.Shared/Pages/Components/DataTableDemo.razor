@@ -380,9 +380,102 @@
             </div>
         </div>
     </div>
+    <div class="space-y-4 rounded-lg border border-alert-success bg-alert-success-bg p-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold text-alert-success-foreground">Refresh() and MinWidth (added in 2.1.0)</h2>
+            <p class="text-sm text-alert-success-foreground">The grid skips re-rendering while its Data reference is unchanged, which is what keeps a large table cheap — but it also meant an in-place edit to a bound item left the cell showing its original value, and a page-level StateHasChanged() could not fix it. Refresh() is the escape hatch. MinWidth stops a wide table shrinking to its container and clipping the right-hand columns instead of scrolling.</p>
+        </div>
+        <div class="space-y-6">
+            <div class="space-y-2">
+                <p class="text-sm font-medium">In-place edit + Refresh()</p>
+                <p class="text-sm text-muted-foreground">
+                    Approve a row: the handler sets <code>row.Status</code> on the bound item and
+                    calls <code>Refresh()</code> on the grid captured with <code>@@ref</code>.
+                </p>
+                <DataTable TData="ModerationRow" Data="@objModeration" @ref="objModerationGrid"
+                           ShowPagination="false">
+                    <Columns>
+                        <DataTableColumn TData="ModerationRow" TValue="string"
+                                         Property="@(r => r.Author)" Header="Author" />
+                        <DataTableColumn TData="ModerationRow" TValue="string"
+                                         Property="@(r => r.Status)" Header="Status">
+                            <CellTemplate Context="row">
+                                <Badge Variant="@(row.Status == "Approved" ? BadgeVariant.Default : BadgeVariant.Secondary)">
+                                    @row.Status
+                                </Badge>
+                            </CellTemplate>
+                        </DataTableColumn>
+                        <DataTableColumn TData="ModerationRow" TValue="string"
+                                         Property="@(r => r.Status)" Header="">
+                            <CellTemplate Context="row">
+                                <Button Size="ButtonSize.Small" Variant="ButtonVariant.Outline"
+                                        Disabled="@(row.Status == "Approved")"
+                                        OnClick="@(() => ApproveRow(row))">Approve</Button>
+                            </CellTemplate>
+                        </DataTableColumn>
+                    </Columns>
+                </DataTable>
+            </div>
+
+            <div class="space-y-2">
+                <p class="text-sm font-medium">MinWidth on a wide table</p>
+                <p class="text-sm text-muted-foreground">
+                    Narrow your browser: the table keeps its natural width and the wrapper scrolls,
+                    instead of squeezing the last columns away with no scrollbar.
+                </p>
+                <DataTable TData="ModerationRow" Data="@objModeration" MinWidth="720px"
+                           ShowPagination="false">
+                    <Columns>
+                        <DataTableColumn TData="ModerationRow" TValue="string" Property="@(r => r.Author)" Header="Author" />
+                        <DataTableColumn TData="ModerationRow" TValue="string" Property="@(r => r.Email)" Header="Email" />
+                        <DataTableColumn TData="ModerationRow" TValue="string" Property="@(r => r.Post)" Header="Post" />
+                        <DataTableColumn TData="ModerationRow" TValue="string" Property="@(r => r.Submitted)" Header="Submitted" />
+                        <DataTableColumn TData="ModerationRow" TValue="string" Property="@(r => r.Status)" Header="Status" />
+                    </Columns>
+                </DataTable>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @code {
+    private DataTable<ModerationRow>? objModerationGrid;
+
+    private readonly List<ModerationRow> objModeration =
+    [
+        new() { Author = "Ada", Email = "ada@example.com", Post = "Shipping a component library", Submitted = "2 hours ago", Status = "Pending" },
+        new() { Author = "Grace", Email = "grace@example.com", Post = "Theming with OKLCH", Submitted = "yesterday", Status = "Pending" },
+        new() { Author = "Alan", Email = "alan@example.com", Post = "Headless primitives", Submitted = "3 days ago", Status = "Approved" },
+    ];
+
+    /// <summary>A comment awaiting moderation, mutated in place by the Refresh() example.</summary>
+    public sealed class ModerationRow
+    {
+        /// <summary>Gets or sets the comment author.</summary>
+        public string Author { get; set; } = "";
+
+        /// <summary>Gets or sets the author's email address.</summary>
+        public string Email { get; set; } = "";
+
+        /// <summary>Gets or sets the post the comment belongs to.</summary>
+        public string Post { get; set; } = "";
+
+        /// <summary>Gets or sets when the comment was submitted.</summary>
+        public string Submitted { get; set; } = "";
+
+        /// <summary>Gets or sets the moderation status.</summary>
+        public string Status { get; set; } = "Pending";
+    }
+
+    private void ApproveRow(ModerationRow aRow)
+    {
+        // The item is mutated in place - the Data reference does not change, so the grid has to be
+        // told to repaint. Without Refresh() the Status cell would still read "Pending".
+        aRow.Status = "Approved";
+        objModerationGrid?.Refresh();
+    }
+
     private List<Person> people = new();
     private List<Person> emptyPeople = new();
     private IReadOnlyCollection<Person> selectedPeople = Array.Empty<Person>();

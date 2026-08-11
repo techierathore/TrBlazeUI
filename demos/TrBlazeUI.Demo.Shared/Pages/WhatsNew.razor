@@ -1,0 +1,298 @@
+@page "/whats-new"
+@using TrBlazeUI.Components.Card
+@using TrBlazeUI.Components.Badge
+@using TrBlazeUI.Components.Alert
+@using TrBlazeUI.Components.Button
+@using TrBlazeUI.Components.Input
+@using TrBlazeUI.Components.Label
+@using TrBlazeUI.Components.Rating
+@using TrBlazeUI.Components.Tabs
+@using TrBlazeUI.Components.Breadcrumb
+@using TrBlazeUI.Components.Typography
+@using TrBlazeUI.Components.Item
+@using TrBlazeUI.Components.Select
+
+<PageTitle>What's new in 2.1.0 - TrBlazeUI</PageTitle>
+
+<div class="space-y-10 max-w-4xl">
+    <div class="space-y-3">
+        <div class="flex items-center gap-3">
+            <h1 class="text-4xl font-bold tracking-tight">What's new</h1>
+            <Badge>2.1.0</Badge>
+        </div>
+        <p class="text-xl text-muted-foreground">
+            A consumer-feedback release. Everything below was reported by an application team
+            building against 2.0.1 and fixed in the library rather than worked around in the app.
+        </p>
+    </div>
+
+    @* ------------------------------------------------------------------ splatting *@
+    <section class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Every component accepts arbitrary attributes</h2>
+            <p class="text-sm text-muted-foreground">
+                Passing <code>data-testid</code> (or any <code>data-*</code>, <code>aria-*</code>,
+                <code>id</code>, <code>style</code> or event handler) to a component used to throw
+                <code>InvalidOperationException</code> for 132 of the 334 public types — and inside
+                the standard <code>ErrorBoundary</code> that took the whole page down while still
+                returning HTTP 200. Every public component now declares
+                <code>CaptureUnmatchedValues</code>: <strong>344/344</strong> in
+                <code>TrBlazeUI.Components</code> and <strong>59/59</strong> in
+                <code>TrBlazeUI.Primitives</code>, checked by reflection in
+                <code>tools/splat-audit</code> so it stays true.
+            </p>
+        </div>
+
+        <Card>
+            <CardContent Class="space-y-3 p-6">
+                <p class="text-sm text-muted-foreground">
+                    Every element below carries a <code>data-testid</code>. Inspect them with dev
+                    tools — before 2.1.0 this markup crashed on the first one.
+                </p>
+                <TypographyH4 data-testid="wn-heading" Size="TypographySize.Base">A heading</TypographyH4>
+                <Breadcrumb data-testid="wn-breadcrumb">
+                    <BreadcrumbList data-testid="wn-breadcrumb-list">
+                        <BreadcrumbItem data-testid="wn-breadcrumb-item">
+                            <BreadcrumbLink Href="/components" data-testid="wn-breadcrumb-link">Components</BreadcrumbLink>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+                <Label For="wn-input" data-testid="wn-label">A label</Label>
+                <Input Id="wn-input" data-testid="wn-input" Placeholder="An input" />
+                <Rating Value="4" Max="5" ReadOnly="true" data-testid="wn-rating" />
+                <Tabs DefaultValue="a" data-testid="wn-tabs">
+                    <TabsList data-testid="wn-tabs-list">
+                        <TabsTrigger Value="a" data-testid="wn-tab-a">One</TabsTrigger>
+                        <TabsTrigger Value="b" data-testid="wn-tab-b">Two</TabsTrigger>
+                    </TabsList>
+                    <TabsContent Value="a" Class="pt-2 text-sm" data-testid="wn-tab-panel-a">First panel.</TabsContent>
+                    <TabsContent Value="b" Class="pt-2 text-sm" data-testid="wn-tab-panel-b">Second panel.</TabsContent>
+                </Tabs>
+                <Alert data-testid="wn-alert">
+                    <AlertTitle data-testid="wn-alert-title">It works</AlertTitle>
+                    <AlertDescription data-testid="wn-alert-desc">
+                        Nothing on this page needs a wrapper div to hang a test hook off.
+                    </AlertDescription>
+                </Alert>
+            </CardContent>
+        </Card>
+
+        <div class="rounded-lg border border-alert-warning bg-alert-warning-bg p-4 text-sm text-alert-warning-foreground">
+            <strong>Two documented exceptions.</strong> Components that own no element of their own —
+            the cascading-context roots (<code>Dialog</code>, <code>Sheet</code>,
+            <code>Popover</code>, <code>HoverCard</code>, <code>DropdownMenu</code>,
+            <code>ContextMenu</code>, <code>Drawer</code>, <code>TooltipProvider</code>,
+            <code>ResponsiveNavProvider</code>, <code>PortalHost</code>) and the configuration-only
+            <code>DataTableColumn</code> — accept the attributes without throwing and do not render
+            them. Put the hook on the part that renders the visible element
+            (<code>DialogContent</code>, <code>SheetContent</code>, …).
+        </div>
+    </section>
+
+    @* ------------------------------------------------------------------ accessibility *@
+    <section class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Accessibility corrections</h2>
+            <p class="text-sm text-muted-foreground">
+                All of these were found by an axe + manual-keyboard audit of a real application.
+            </p>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2">
+            @foreach (var vFix in objA11yFixes)
+            {
+                <Card>
+                    <CardContent Class="space-y-2 p-5">
+                        <div class="flex items-center justify-between gap-2">
+                            <h3 class="font-semibold">@vFix.Component</h3>
+                            <a href="@vFix.Href" class="text-sm text-primary">Demo</a>
+                        </div>
+                        <p class="text-sm text-muted-foreground">@vFix.Summary</p>
+                    </CardContent>
+                </Card>
+            }
+        </div>
+    </section>
+
+    @* ------------------------------------------------------------------ utilities *@
+    <section class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">The stylesheet ships the whole utility scale</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>trblazeui.css</code> used to contain only the ~777 utilities the library's own
+                components happened to reference. Anything else an application wrote —
+                <code>max-w-7xl</code>, <code>gap-6</code>, <code>md:grid-cols-2</code>,
+                <code>min-w-*</code>, <code>top-1</code>, <code>w-36</code> — was simply absent and
+                did nothing, with no error, no warning and no visual hint. It now ships the standard
+                Tailwind scale with the responsive variants.
+            </p>
+        </div>
+        <Card>
+            <CardContent Class="space-y-3 p-6">
+                <p class="text-sm text-muted-foreground">
+                    Every class in this block was missing before 2.1.0:
+                </p>
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+                    @foreach (var vName in new[] { "grid-cols-1", "md:grid-cols-2", "lg:grid-cols-3" })
+                    {
+                        <div class="rounded-md border bg-muted/30 p-4 text-sm">@vName</div>
+                    }
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    @foreach (var vName in objUtilities)
+                    {
+                        <code class="rounded bg-muted px-2 py-1 text-xs">@vName</code>
+                    }
+                </div>
+                <p class="text-sm text-alert-warning-foreground">
+                    One limit remains, and it is inherent to a pre-built bundle: <strong>arbitrary
+                    values cannot be generated</strong>. <code>min-w-[720px]</code> or
+                    <code>text-[13px]</code> will still silently do nothing. Use the scale
+                    (<code>min-w-3xl</code>, <code>text-sm</code>) or a component parameter such as
+                    <code>DataTable.MinWidth</code>.
+                </p>
+            </CardContent>
+        </Card>
+    </section>
+
+    @* ------------------------------------------------------------------ tokens *@
+    <section class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Tokens validated as a contrast matrix</h2>
+            <p class="text-sm text-muted-foreground">
+                The shipped palette used to be tuned against <code>--background</code> alone, so
+                several defaults failed WCAG on the raised surfaces the same stylesheet defines.
+                Every foreground token is now checked against every surface token by
+                <code>tools/token-contrast.py</code>; 18 failing pairings were corrected.
+                <code>--input</code> in particular measured <strong>1.26:1</strong> — every text box
+                shipped with an effectively invisible boundary, against a 3:1 obligation
+                (WCAG 1.4.11).
+            </p>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2">
+            <Card>
+                <CardContent Class="space-y-2 p-5">
+                    <h3 class="font-semibold">Visible control boundaries</h3>
+                    <Input Placeholder="The border is now 3.11:1 on the page background" />
+                    <Input Placeholder="…and 4.6:1 in dark mode" />
+                </CardContent>
+            </Card>
+            <Card>
+                <CardContent Class="space-y-2 p-5">
+                    <h3 class="font-semibold">New <code>--success</code> token</h3>
+                    <p class="text-sm text-muted-foreground">
+                        With <code>bg-success</code> / <code>text-success</code> utilities, so a
+                        confirmation state no longer has to hard-code a green.
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <span class="rounded-md bg-success px-3 py-1 text-sm text-success-foreground">Subscribed</span>
+                        <span class="text-sm font-medium text-success">Verified</span>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+        <p class="text-sm text-muted-foreground">
+            The <code>--alert-*</code> families, <code>--chart-1…5</code> and the
+            <code>--sidebar*</code> set now have library defaults too — they previously resolved to
+            nothing unless the host defined them. Toggle dark mode to see both palettes.
+        </p>
+    </section>
+
+    @* ------------------------------------------------------------------ new components *@
+    <section class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">New components</h2>
+            <p class="text-sm text-muted-foreground">
+                Nine components filling the gaps the same report identified.
+            </p>
+        </div>
+        <ItemGroup>
+            @foreach (var vComponent in objNewComponents)
+            {
+                <Item>
+                    <ItemContent>
+                        <ItemTitle>@vComponent.Name</ItemTitle>
+                        <ItemDescription>@vComponent.Summary</ItemDescription>
+                    </ItemContent>
+                    <ItemActions>
+                        <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Small" Href="@vComponent.Href">
+                            View
+                        </Button>
+                    </ItemActions>
+                </Item>
+            }
+        </ItemGroup>
+    </section>
+
+    @* ------------------------------------------------------------------ upgrade notes *@
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Before you upgrade</h2>
+        <Alert Variant="AlertVariant.Warning">
+            <AlertTitle>Four things change under you</AlertTitle>
+            <AlertDescription>
+                <ol class="mt-2 list-decimal space-y-1 pl-5">
+                    <li>
+                        <strong>Design tokens moved.</strong> Light <code>--input</code>/<code>--ring</code>
+                        are materially darker, dark <code>--accent</code> darkens and dark
+                        <code>--destructive-foreground</code> becomes near-black. An application that
+                        overrides these tokens is unaffected — the library still declares its own
+                        through zero-specificity <code>:where()</code> selectors.
+                    </li>
+                    <li>
+                        <strong><code>Rating</code> markup changed.</strong> Options are
+                        <code>&lt;button role="radio"&gt;</code>, not <code>&lt;span&gt;</code>, and a
+                        <code>ReadOnly</code> rating is <code>role="img"</code> with no radio
+                        semantics. Update CSS or test selectors that matched <code>span[role=radio]</code>.
+                    </li>
+                    <li>
+                        <strong><code>TabsContent</code> always renders its panel element</strong>,
+                        hidden when inactive. Child content is still only rendered for the active tab.
+                    </li>
+                    <li>
+                        <strong>The stylesheet is larger</strong> — ~906&nbsp;KB minified,
+                        ~97&nbsp;KB gzipped, up from ~88&nbsp;KB, because it now carries the full
+                        utility scale.
+                    </li>
+                </ol>
+            </AlertDescription>
+        </Alert>
+    </section>
+</div>
+
+@code {
+    /// <summary>One accessibility fix, with a link to the demo that shows it.</summary>
+    private sealed record A11yFix(string Component, string Summary, string Href);
+
+    /// <summary>One newly added component.</summary>
+    private sealed record NewComponent(string Name, string Summary, string Href);
+
+    private readonly A11yFix[] objA11yFixes =
+    [
+        new("Rating", "Stars are real buttons with a roving tabindex and a literal aria-checked, so the control is keyboard operable and the selection is announced. ReadOnly is role=\"img\" with no tab stop.", "/components/rating"),
+        new("Tabs", "aria-selected is serialised as \"true\"/\"false\", and aria-controls is emitted only when a panel for that value exists.", "/components/tabs"),
+        new("MarkdownEditor", "The Write/Preview pair renders through TabsList, so it emits role=\"tablist\" and inherits arrow-key navigation.", "/components/markdown-editor"),
+        new("NavigationMenu", "Top-level links are ordinary links again — Tab reachable, with no orphan menuitem role.", "/components/navigation-menu"),
+        new("Item / ItemGroup", "Items emit role=\"listitem\" inside a group, so the list is no longer announced as empty.", "/components/item"),
+        new("Input / Textarea", "AriaLabel is documented, and fast or injected text is no longer dropped by a Blazor Server circuit.", "/components/input"),
+    ];
+
+    private readonly NewComponent[] objNewComponents =
+    [
+        new("Prose", "Container for rendered Markdown and other received HTML, with reflow-safe tables and pre blocks.", "/components/prose"),
+        new("Stat Tile / Stat Group", "Headline statistics with an optional trend and icon.", "/components/stat"),
+        new("Timeline", "Ordered list of dated entries, built on a real ol/li.", "/components/timeline"),
+        new("Stepper", "Numbered steps with aria-current=\"step\".", "/components/stepper"),
+        new("Anchor Nav", "Sticky in-page navigation with an IntersectionObserver scrollspy.", "/components/anchor-nav"),
+        new("Sortable List", "Reorderable list driven by accessible buttons rather than drag-and-drop.", "/components/sortable-list"),
+        new("Password Strength", "Live strength meter whose score is exposed as text, not colour alone.", "/components/password-strength"),
+        new("Code Block", "Code with a language label and a copy button; no bundled highlighter.", "/components/code-block"),
+        new("Centered Panel", "Vertically centred single-panel page shell for sign-in and confirmation screens.", "/components/centered-panel"),
+    ];
+
+    private readonly string[] objUtilities =
+    [
+        "max-w-7xl", "max-w-2xl", "gap-5", "gap-6", "gap-8", "py-8", "py-16", "mb-6", "mt-16",
+        "pt-3", "pb-24", "sm:px-6", "lg:flex-row", "lg:w-80", "space-y-3", "space-y-6", "divide-y",
+        "divide-border", "last:border-b-0", "backdrop-blur", "no-underline", "leading-relaxed",
+        "list-disc", "object-contain", "aspect-video", "min-w-3xl", "sm:basis-0", "top-1", "w-36",
+    ];
+}

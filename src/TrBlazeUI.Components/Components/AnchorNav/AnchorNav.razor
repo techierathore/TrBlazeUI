@@ -1,0 +1,166 @@
+@namespace TrBlazeUI.Components.AnchorNav
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+@* Sticky in-page section navigation with scrollspy. The active link is marked with
+   aria-current="location" as well as a colour, so the current position is not conveyed by
+   colour alone, and the links are ordinary anchors - Tab-reachable with no roving tabindex. *@
+
+<nav aria-label="@(AriaLabel ?? "On this page")" class="@CssClass" @attributes="AdditionalAttributes">
+    <ul class="@ListCssClass">
+        @foreach (var vSection in Sections)
+        {
+            <li>
+                <a href="@($"#{vSection.Id}")"
+                   class="@LinkCssClass(vSection.Id)"
+                   aria-current="@(IsActive(vSection.Id) ? "location" : null)">@vSection.Label</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+@code {
+    private readonly string objInstanceId = $"anchor-nav-{Guid.NewGuid():N}";
+    private DotNetObjectReference<AnchorNav>? objDotNetRef;
+    private IJSObjectReference? objModule;
+    private string? objActiveId;
+
+    /// <summary>
+    /// Gets or sets the sections to link to, in document order.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public IReadOnlyList<AnchorNavSection> Sections { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the id of the active section. Use with <c>@bind-ActiveId</c>.
+    /// </summary>
+    [Parameter]
+    public string? ActiveId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback raised when scrolling moves into a different section.
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> ActiveIdChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets the height, in pixels, of any sticky chrome above the content.
+    /// </summary>
+    [Parameter]
+    public int TopOffset { get; set; } = 80;
+
+    /// <summary>
+    /// Gets or sets the layout direction.
+    /// </summary>
+    [Parameter]
+    public AnchorNavOrientation Orientation { get; set; } = AnchorNavOrientation.Horizontal;
+
+    /// <summary>
+    /// Gets or sets the accessible name of the navigation.
+    /// </summary>
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Called from JavaScript when the section currently on screen changes.
+    /// </summary>
+    /// <param name="aSectionId">The id of the section now in view.</param>
+    [JSInvokable]
+    public async Task OnActiveSectionChanged(string aSectionId)
+    {
+        if (objActiveId == aSectionId)
+        {
+            return;
+        }
+
+        objActiveId = aSectionId;
+        StateHasChanged();
+
+        if (ActiveIdChanged.HasDelegate)
+        {
+            await ActiveIdChanged.InvokeAsync(aSectionId);
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet() => objActiveId ??= ActiveId ?? Sections.FirstOrDefault()?.Id;
+
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            objModule = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/TrBlazeUI.Components/js/anchor-nav.js");
+            objDotNetRef = DotNetObjectReference.Create(this);
+            await objModule.InvokeVoidAsync(
+                "observe", objInstanceId, Sections.Select(s => s.Id).ToArray(), objDotNetRef, TopOffset);
+        }
+        catch (JSDisconnectedException)
+        {
+            // Expected during circuit disconnect in Blazor Server.
+        }
+        catch (InvalidOperationException)
+        {
+            // JS interop is unavailable during prerendering.
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        if (objModule != null)
+        {
+            try
+            {
+                await objModule.InvokeVoidAsync("disconnect", objInstanceId);
+                await objModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Expected during circuit disconnect.
+            }
+        }
+
+        objDotNetRef?.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    private bool IsActive(string aId) => string.Equals(objActiveId, aId, StringComparison.Ordinal);
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "sticky top-0 z-10 bg-background/95 py-2 backdrop-blur",
+        Class
+    );
+
+    private string ListCssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "flex list-none gap-2",
+        Orientation == AnchorNavOrientation.Vertical ? "flex-col" : "flex-row flex-wrap"
+    );
+
+    private string LinkCssClass(string aId) => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "inline-flex items-center rounded-full border px-3 py-1 text-sm no-underline transition-colors",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        IsActive(aId)
+            ? "border-primary bg-primary text-primary-foreground"
+            : "border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+    );
+}

@@ -1,6 +1,6 @@
 @namespace TrBlazeUI.Components.CurrencyInput
 
-<div class="@ContainerClass">
+<div class="@ContainerClass" @attributes="AdditionalAttributes">
     @if (ShowSymbol && Currency.SymbolBefore)
     {
         <span class="@SymbolClass">@Currency.Symbol</span>

@@ -5,7 +5,7 @@
 @using TrBlazeUI.Icons.Lucide.Components
 @using TrBlazeUI.Primitives.Services
 
-<Popover @bind-Open="objIsOpen">
+<Popover @bind-Open="objIsOpen" @attributes="AdditionalAttributes">
     <PopoverTrigger AsChild="true">
         <Button Variant="ButtonVariant.Outline"
                 Class="@ButtonCssClass"

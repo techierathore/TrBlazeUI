@@ -6,7 +6,7 @@
 <TrBlazeUI.Primitives.Tooltip.TooltipContent class="@CssClass"
                                                   Side="@Side"
                                                   Align="@Align"
-                                                  Offset="@Offset">
+                                                  Offset="@Offset" @attributes="AdditionalAttributes">
     @ChildContent
 </TrBlazeUI.Primitives.Tooltip.TooltipContent>
 
@@ -96,4 +96,13 @@
             return string.IsNullOrWhiteSpace(Class) ? result : $"{result} {Class}";
         }
     }
+}
+
+@code {
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

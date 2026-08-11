@@ -6,17 +6,27 @@
     Navigation Menu Link - a navigation link within the menu.
 *@
 
+@* A link in the navigation bar itself is an ordinary link: it must be Tab-reachable and must
+   not claim a menuitem role (which would need a role="menubar" parent and roving focus that a
+   plain site nav does not implement). Only links rendered inside NavigationMenuContent - a real
+   role="menu" popup - take the menuitem role and the negative tabindex the menu pattern needs. *@
 <NavLink href="@Href"
          class="@CssClass"
          Match="@Match"
          ActiveClass="@ActiveCssClass"
-         role="menuitem"
-         tabindex="-1"
+         role="@(objIsInsideMenu ? "menuitem" : null)"
+         tabindex="@(objIsInsideMenu ? "-1" : null)"
          @attributes="AdditionalAttributes">
     @ChildContent
 </NavLink>
 
 @code {
+    /// <summary>
+    /// True when this link is rendered inside a NavigationMenuContent popup (role="menu").
+    /// </summary>
+    [CascadingParameter(Name = "NavigationMenuInMenu")]
+    private bool objIsInsideMenu { get; set; }
+
     /// <summary>
     /// The URL the link navigates to.
     /// </summary>

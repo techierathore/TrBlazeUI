@@ -1,0 +1,51 @@
+@namespace TrBlazeUI.Components.Prose
+
+@*
+    Prose renders HTML the developer RECEIVES rather than writes - Markdown output, a CMS body,
+    an email preview. TrBlazeUI ships Card/Separator/Typography for authored markup, but an opaque
+    HTML blob has no responsive story of its own: a three-column table or a <pre> block is wider
+    than a phone viewport and pushes the whole document sideways, which is a WCAG 1.4.10 (Reflow)
+    failure rather than a cosmetic one. The [data-slot="prose"] rules in trblazeui.css give
+    tables, pre blocks, images and iframes their own overflow context and cap their width.
+*@
+
+<div data-slot="prose" class="@CssClass" @attributes="AdditionalAttributes">
+    @ChildContent
+</div>
+
+@code {
+    /// <summary>
+    /// Gets or sets the rendered content, typically a <see cref="MarkupString"/>.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes to apply to the container.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets the maximum line length applied to the content.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <c>true</c>, which caps the text at a comfortable measure (<c>max-w-prose</c>).
+    /// Set to <c>false</c> for content that should fill its container, such as a preview pane.
+    /// </remarks>
+    [Parameter]
+    public bool ConstrainWidth { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "w-full text-foreground leading-relaxed",
+        ConstrainWidth ? "max-w-prose" : null,
+        Class
+    );
+}

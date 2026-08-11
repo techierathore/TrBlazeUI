@@ -361,4 +361,30 @@
             </ItemFooter>
         </Item>
     </div>
+    <div class="space-y-4 rounded-lg border border-alert-success bg-alert-success-bg p-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold text-alert-success-foreground">List semantics (fixed in 2.1.0)</h2>
+            <p class="text-sm text-alert-success-foreground">ItemGroup declares role="list", so each Item now emits role="listitem" and ItemSeparator leaves the accessibility tree. Before 2.1.0 a screen reader announced "list, 0 items".</p>
+        </div>
+        <ItemGroup>
+            <Item>
+                <ItemContent>
+                    <ItemTitle>Comment approved</ItemTitle>
+                    <ItemDescription>on "Shipping a component library" — 2 minutes ago</ItemDescription>
+                </ItemContent>
+            </Item>
+            <ItemSeparator />
+            <Item>
+                <ItemContent>
+                    <ItemTitle>Post published</ItemTitle>
+                    <ItemDescription>"Theming with OKLCH" — 1 hour ago</ItemDescription>
+                </ItemContent>
+            </Item>
+        </ItemGroup>
+        <p class="text-sm text-alert-success-foreground">
+            An explicit <code>role</code> you pass yourself still wins — the listitem role is only a
+            default for items inside a group.
+        </p>
+    </div>
+
 </div>

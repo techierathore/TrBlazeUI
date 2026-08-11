@@ -72,26 +72,26 @@ This document captures, for the product owner, what TrBlazeUI delivers today (th
 
 <!-- Feature-level snapshot. Live per-REQ status: PROJECT-STATUS.md + docs/TrBlazeUI-Checklist.md. -->
 
-**Snapshot as of 2026-07-21 (handoff).** Live, per-requirement status: see `PROJECT-STATUS.md` and the **Requirements Status** table in `docs/TrBlazeUI-Checklist.md`. Status is derived from the migrated modernization/toolbar plans (both fully delivered), a static scan of the as-built codebase, and the runtime verification runs logged in PROJECT-STATUS.
+**Snapshot as of 2026-08-11.** Live, per-requirement status: see `PROJECT-STATUS.md` and the **Requirements Status** table in `docs/TrBlazeUI-Checklist.md`. Status is derived from the migrated modernization/toolbar plans (both fully delivered), a static scan of the as-built codebase, and the runtime verification runs logged in PROJECT-STATUS.
 
-**All features are `Done`; every REQ in the checklist is terminal.** Since the 2026-06-30 snapshot, three consumer-feedback cycles landed and were runtime-verified: REQ-UI-014 (AstroLyfe TR-001…009), REQ-UI-015 (TrStudio TR-001…011, incl. the Mac Catalyst packaging blocker), REQ-FN-009 (AngleSharp/CVE-2026-54570 supply-chain fix) and REQ-UI-016 (AstroLyfe TR-010/011/012 — DataTable default chrome, Dialog viewport clamp, popover token fallbacks). F-A11Y moves 90 → 100: axe-driven consumer findings (keyboard trap, accessible names, `nested-interactive`, `svg-img-alt`, `.sr-only` scroll footprint) were all resolved and verified, though still not covered by an independent third-party audit. Most recent cycle (2026-07-22): AstroLyfe's post-2.0.0-upgrade re-verification reopened TR-003 (SelectTrigger accessible name) — fixed library-side under REQ-UI-014 (default `aria-labelledby` → SelectValue span + new `AriaLabel` param; axe `button-name` = 0) and re-verified; the sibling TR-014 (Dialog double-offset), though not reproducible on current source, was defensively hardened under REQ-UI-016 by switching `DialogContent`/`AlertDialogContent` to auto-margin centering (no translate/transform offset can clip the dialog).
+**All features are `Done`; every REQ in the checklist is terminal (23 `Done (pre-existing)` + 8 `Verified`).** Four consumer-feedback cycles have landed and been runtime-verified since the 2026-06-30 snapshot: REQ-UI-014 (AstroLyfe TR-001…009 and, after their 2.0.0 re-verification, TR-003), REQ-UI-015 (TrStudio TR-001…011 incl. the Mac Catalyst packaging blocker), REQ-FN-009 (AngleSharp / CVE-2026-54570 supply-chain fix), REQ-UI-016 (AstroLyfe TR-010/011/012 plus the TR-014 auto-margin hardening) and, most recently, **REQ-UI-017 — the TechieBlog cycle (TR-001…TR-065), released as 2.1.0**. That last cycle changed the most: attribute splatting became a measured guarantee across the whole catalog (344/344 styled + 59/59 primitive component types, checked by `tools/splat-audit`); Rating, Tabs, NavigationMenu, MarkdownEditor and Item had real WCAG defects corrected; `Input`/`Textarea` no longer lose keystrokes on a Blazor Server circuit; the shipped stylesheet gained the full Tailwind utility scale so consumer markup can actually be styled with utility classes; the token set is now validated as a contrast matrix by `tools/token-contrast.py` (18 failing pairings → 0, including `--input` at 1.26:1 against a 3:1 obligation); and nine components were added — `Prose`, `StatTile`/`StatGroup`, `Timeline`, `Stepper`, `AnchorNav`, `SortableList`, `PasswordStrength`, `CodeBlock`, `CenteredPanel` — each with its own demo page. F-A11Y holds at `Done` but is annotated: the consumer-reported defects are fixed and verified, an independent third-party audit still has not been run.
 
 | Feature (F-code) | Phase | Status | % | Notes |
 |------------------|-------|--------|---|-------|
 | F-PRIM: Headless primitives | Pre-existing | Done | 100 | 16 primitives + portal/focus/keyboard/positioning services |
-| F-FORM: Form components | Pre-existing | Done | 100 | ~28 form components incl. pickers, OTP, masked, multiselect |
-| F-LAYOUT: Layout & navigation | Pre-existing | Done | 100 | Sidebar (22 parts), nav menu, tabs, breadcrumb, pagination, resizable |
-| F-OVERLAY: Overlay & feedback | Pre-existing | Done | 100 | Dialog, Sheet, Drawer, Popover, Toast, Tooltip, Command, menus. 2.0.0: Dialog clamped to viewport, popover token fallbacks (REQ-UI-016) |
-| F-DATA: Data & content | Pre-existing | Done | 100 | DataTable, MarkdownEditor, RichTextEditor. 2.0.0: DataTable toolbar now opt-in, pagination auto-hides (REQ-UI-016) |
-| F-DISPLAY: Display components | Pre-existing | Done | 100 | Avatar, Badge, Alert, Progress, Skeleton, Spinner, Typography, etc. |
+| F-FORM: Form components | Pre-existing | Done | 100 | ~28 form components incl. pickers, OTP, masked, multiselect. 2.1.0: Blazor Server keystroke-loss fix on `Input`/`Textarea`, `SelectValue` first-paint text, new `PasswordStrength` (REQ-UI-017) |
+| F-LAYOUT: Layout & navigation | Pre-existing | Done | 100 | Sidebar (22 parts), nav menu, tabs, breadcrumb, pagination, resizable. 2.1.0: keyboard-reachable NavigationMenu, new `AnchorNav`, `Stepper`, `CenteredPanel` (REQ-UI-017) |
+| F-OVERLAY: Overlay & feedback | Pre-existing | Done | 100 | Dialog, Sheet, Drawer, Popover, Toast, Tooltip, Command, menus. 2.0.0: Dialog clamped to viewport, popover token fallbacks (REQ-UI-016). 2.1.0: portals render in open order so stacked dialogs are clickable (REQ-UI-017). Known: a Dialog nested inside another's DialogContent does not open — TR-066, pre-existing |
+| F-DATA: Data & content | Pre-existing | Done | 100 | DataTable, MarkdownEditor, RichTextEditor. 2.0.0: toolbar opt-in, pagination auto-hides (REQ-UI-016). 2.1.0: `DataTable.Refresh()` + `MinWidth`, `MarkdownEditor` tablist, new `Prose` / `CodeBlock` (REQ-UI-017) |
+| F-DISPLAY: Display components | Pre-existing | Done | 100 | Avatar, Badge, Alert, Progress, Skeleton, Spinner, Typography, etc. 2.1.0: `Typography.Size`, `Item` list semantics, new `StatTile`/`StatGroup`, `Timeline`, `SortableList` (REQ-UI-017) |
 | F-TOOLBAR: Toolbar | Pre-existing | Done | 100 | Toolbar + Group/Button/ToggleButton/Separator (per toolbar plan) |
 | F-CHART: Charts | Pre-existing | Done | 100 | 6 chart types via Blazor-ApexCharts |
 | F-ICONS: Icon libraries | Pre-existing | Done | 100 | Lucide / Heroicons / Feather (3,200+ icons) |
-| F-THEME: Theming & dark mode | Pre-existing | Done | 100 | CSS variables, OKLCH, shadcn/tweakcn compatible, `.dark` toggle |
-| F-A11Y: Accessibility | Pre-existing | Done | 100 | WCAG 2.1 AA patterns library-wide; consumer axe findings resolved + verified (REQ-UI-014/016); not independently audited |
-| F-DEMO: Demo applications | Pre-existing | Done | 100 | 90+ pages across Server / WASM / Auto |
+| F-THEME: Theming & dark mode | Pre-existing | Done | 100 | CSS variables, OKLCH, shadcn/tweakcn compatible, `.dark` toggle. 2.1.0: full Tailwind utility scale shipped, contrast-validated token matrix, new `--success` / `--alert-*` / `--chart-*` / `--sidebar*` defaults (REQ-UI-017) |
+| F-A11Y: Accessibility | Pre-existing | Done | 100 | WCAG 2.1 AA patterns library-wide; consumer axe findings resolved + verified (REQ-UI-014/016/017 — keyboard-operable Rating, literal ARIA state serialisation, list semantics, tablist parents); still not independently audited |
+| F-DEMO: Demo applications | Pre-existing | Done | 100 | 100+ pages across Server / WASM / Auto; 2.1.0 added 9 component pages plus a `/whats-new` release page, gated by `tests/verify/ui-demo-2-1-0.spec.js` |
 | F-DIST: Packaging & distribution | Pre-existing | Done | 100 | MinVer, 5 packages, GitHub Actions → GitHub Packages |
-| F-AI: AI agent skills | Pre-existing | Done | 100 | Claude Code + OpenCode skills + AI reference doc |
+| F-AI: AI agent skills | Pre-existing | Done | 100 | Claude Code + OpenCode skills + AI reference doc. 2.1.0: the false "all components splat" claim corrected in the reference and both personas, imports/chart API fixed (REQ-UI-017) |
 | (cross-cutting) XML documentation | Pre-existing | Done | 100 | All public members documented; CS1591 suppression removed (now build-enforced) |
 
 **Legend:** **Done** = shipped & working · **In progress** = actively being built · **Partial** = some sub-features done · **Planned** = not started. (Maps to checklist `Done (pre-existing)` / `In Progress` / `PARTIAL` / `Not Started`.)
@@ -400,7 +400,7 @@ Claude Code (`/trblazeui`) and OpenCode agent skills (distributable copies in `d
 
 ## 11. Non-functional requirements
 
-- **BRD-48** — Performance: pre-built minified CSS (~83 KB); components render identically across Server/WASM/Auto with no per-component JS bundle bloat.
+- **BRD-48** — Performance: pre-built minified CSS (~906 KB / ~97 KB gzipped as of 2.1.0, which ships the full Tailwind utility scale so consumer markup can be styled with utility classes); components render identically across Server/WASM/Auto with no per-component JS bundle bloat.
 - **BRD-49** — Security: RichTextEditor HTML output is sanitized via HtmlSanitizer; no credentials or secrets in the library; consumers keep PATs out of source control.
 - **BRD-50** — Accessibility: WCAG 2.1 AA baseline (keyboard, ARIA, focus, screen reader) for all interactive components.
 - **BRD-51** — Compatibility: 100% shadcn/ui + tweakcn theme compatibility; works on .NET 10 across all three Blazor render modes; usable from MAUI Blazor Hybrid (with the documented NativeSelect-in-overlay caveat).
@@ -409,7 +409,7 @@ Claude Code (`/trblazeui`) and OpenCode agent skills (distributable copies in `d
 
 | NFR area | Target |
 |----------|--------|
-| Pre-built CSS size | ~83 KB minified |
+| Pre-built CSS size | ~906 KB minified / ~97 KB gzipped (2.1.0; full utility scale) |
 | Render modes supported | Server, WebAssembly, Auto |
 | Accessibility | WCAG 2.1 AA |
 | Build warnings | 0 (warnings-as-errors) |

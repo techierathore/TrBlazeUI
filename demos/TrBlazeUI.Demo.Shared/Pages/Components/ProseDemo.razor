@@ -1,0 +1,117 @@
+@page "/components/prose"
+@using TrBlazeUI.Components.Prose
+
+<PageTitle>Prose Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Prose Component</h1>
+        <p class="text-xl text-muted-foreground">
+            A container for HTML you receive rather than author — Markdown output, a CMS body,
+            an email preview.
+        </p>
+    </div>
+
+    <div class="rounded-lg border border-alert-info bg-alert-info-bg p-4 text-sm">
+        <p class="font-semibold text-alert-info-foreground">Why it exists</p>
+        <p class="mt-1 text-alert-info-foreground">
+            TrBlazeUI ships Card, Separator and Typography for markup a developer writes, but an
+            opaque HTML blob has no responsive story of its own. A three-column table or a long
+            <code>&lt;pre&gt;</code> is wider than a phone viewport and pushes the whole document
+            sideways — a WCAG 1.4.10 (Reflow) failure, not a cosmetic one. Prose gives tables,
+            pre blocks, images and iframes their own overflow context.
+        </p>
+    </div>
+
+    <!-- Basic -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                Rendered Markdown dropped straight into Prose.
+            </p>
+        </div>
+        <div class="rounded-lg border p-6">
+            <Prose>
+                @((MarkupString)objArticleHtml)
+            </Prose>
+        </div>
+    </div>
+
+    <!-- Reflow -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Wide content scrolls itself</h2>
+            <p class="text-sm text-muted-foreground">
+                Narrow your browser (or open dev tools at 390px). The table below scrolls inside its
+                own box; the page never scrolls sideways.
+            </p>
+        </div>
+        <div class="rounded-lg border p-6">
+            <Prose ConstrainWidth="false">
+                @((MarkupString)objWideTableHtml)
+            </Prose>
+        </div>
+    </div>
+
+    <!-- ConstrainWidth -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">ConstrainWidth</h2>
+            <p class="text-sm text-muted-foreground">
+                Defaults to <code>true</code>, which caps the text at a comfortable measure
+                (<code>max-w-prose</code>). Set it to <code>false</code> for a preview pane that
+                should fill its container.
+            </p>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2">
+            <div class="rounded-lg border p-4">
+                <p class="mb-2 text-xs font-semibold text-muted-foreground">ConstrainWidth="true" (default)</p>
+                <Prose>@((MarkupString)objLoremHtml)</Prose>
+            </div>
+            <div class="rounded-lg border p-4">
+                <p class="mb-2 text-xs font-semibold text-muted-foreground">ConstrainWidth="false"</p>
+                <Prose ConstrainWidth="false">@((MarkupString)objLoremHtml)</Prose>
+            </div>
+        </div>
+    </div>
+
+    <!-- Usage -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Usage</h2>
+        <pre class="overflow-x-auto rounded-lg border bg-muted/30 p-4 text-sm"><code>@objUsage</code></pre>
+    </div>
+</div>
+
+@code {
+    private const string objArticleHtml = """
+        <h2>Shipping a Blazor component library</h2>
+        <p>Prose styles headings, lists, links, quotes and code that arrive as a
+        <code>MarkupString</code>, without you writing a single utility class.</p>
+        <ul><li>Headings and paragraphs</li><li>Ordered and unordered lists</li><li>Inline <code>code</code> and fenced blocks</li></ul>
+        <blockquote>Content you receive is not content you can style at the call site.</blockquote>
+        <pre><code>dotnet add package TrBlazeUI.Components</code></pre>
+        """;
+
+    private const string objWideTableHtml = """
+        <table>
+          <tr><th>Requirement</th><th>Owner</th><th>Status</th><th>Target release</th><th>Notes</th></tr>
+          <tr><td>Attribute splatting</td><td>Library</td><td>Done</td><td>2.1.0</td><td>344/344 components</td></tr>
+          <tr><td>Rating keyboard access</td><td>Library</td><td>Done</td><td>2.1.0</td><td>Buttons + roving tabindex</td></tr>
+          <tr><td>Utility layer</td><td>Library</td><td>Done</td><td>2.1.0</td><td>Full Tailwind scale</td></tr>
+        </table>
+        """;
+
+    private const string objLoremHtml =
+        "<p>The measure of a text is how many characters fit on a line. Around 65 is comfortable; " +
+        "much wider and the eye loses its place returning to the start of the next line.</p>";
+
+    private const string objUsage = """
+        @using TrBlazeUI.Components.Prose
+
+        <Prose>@((MarkupString)renderedMarkdown)</Prose>
+
+        @* Fill the container instead of capping the measure *@
+        <Prose ConstrainWidth="false">@((MarkupString)previewHtml)</Prose>
+        """;
+}

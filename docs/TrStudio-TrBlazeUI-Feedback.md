@@ -4,7 +4,7 @@
 - **1 blocker (TR-011)**, 3 major (TR-001, TR-002, TR-007), 6 minor (TR-003, TR-005, TR-006, TR-008, TR-009, TR-010), 1 nice-to-have (TR-004)
 - Theme: leaf components (`DataTable`, `Alert`, `Checkbox`, `Switch`) don't splat `CaptureUnmatchedValues`; several AI-reference APIs (`FileUpload.OnFilesSelected`, `Empty*` family, `Pagination`, Icon slot) diverge from the shipped 1.0.7 surface; `DataTable` also keeps a min-content wider than a ≤400px viewport (TR-010, cosmetic). All worked around; no build blocked — **except TR-011 (2026-07-12): the 1.0.7 packages' `Microsoft.AspNetCore.App` FrameworkReference makes the MAUI Mac Catalyst head unbuildable on a real Mac (NETSDK1082); no workaround shipped.**
 - Entries retain their append-only IDs; read TR-011 (blocker) then TR-001/002/007 (major) first.
-- Last consolidated: 2026-07-07 (TR-011 appended 2026-07-12)
+- Last consolidated: **2026-08-11** (`*handoff-phase` — re-confirmed **0 open**; all 11 remain resolved, no disposition changed since 2026-07-12) · previously 2026-07-07 (TR-011 appended 2026-07-12)
 
 ### ✅ Resolution status — ALL 11 RESOLVED library-side (2026-07-12, REQ-UI-015)
 Every issue is fixed in the library source (or corrected in the AI reference). Verified three ways:

@@ -110,4 +110,45 @@ public class TabsContext : PrimitiveContextWithEvents<TabsState>
     /// <param name="value">The tab value to check.</param>
     /// <returns>True if the tab is active, otherwise false.</returns>
     public bool IsTabActive(string value) => State.ActiveValue == value;
+
+    /// <summary>
+    /// Tab values that currently have a TabsContent panel in the render tree.
+    /// </summary>
+    /// <remarks>
+    /// A trigger may only advertise <c>aria-controls</c> when the panel it names actually exists.
+    /// Tabs driven purely through <c>Value</c>/<c>ValueChanged</c> render no panels at all, so
+    /// every trigger there must omit the attribute rather than dangle.
+    /// </remarks>
+    private readonly HashSet<string> objPanelValues = [];
+
+    /// <summary>
+    /// Registers a TabsContent panel so triggers can reference it from <c>aria-controls</c>.
+    /// </summary>
+    /// <param name="value">The tab value the panel belongs to.</param>
+    public void RegisterPanel(string value)
+    {
+        if (objPanelValues.Add(value))
+        {
+            NotifyStateChanged();
+        }
+    }
+
+    /// <summary>
+    /// Unregisters a TabsContent panel that has left the render tree.
+    /// </summary>
+    /// <param name="value">The tab value the panel belonged to.</param>
+    public void UnregisterPanel(string value)
+    {
+        if (objPanelValues.Remove(value))
+        {
+            NotifyStateChanged();
+        }
+    }
+
+    /// <summary>
+    /// Checks whether a TabsContent panel exists for the specified tab value.
+    /// </summary>
+    /// <param name="value">The tab value to check.</param>
+    /// <returns>True when a panel element is present in the DOM for that value.</returns>
+    public bool HasPanel(string value) => objPanelValues.Contains(value);
 }

@@ -7,7 +7,7 @@
 @using TrBlazeUI.Components.Checkbox
 @using TrBlazeUI.Primitives.Services
 
-<div class="flex items-center justify-between gap-2 py-4">
+<div class="flex items-center justify-between gap-2 py-4" @attributes="AdditionalAttributes">
     <div class="flex flex-1 items-center gap-2">
         <Input @bind-Value="@objSearchValue"
                @bind-Value:after="@HandleSearchChanged"
@@ -100,4 +100,11 @@
             await OnGlobalSearchChanged.InvokeAsync(objSearchValue);
         }
     }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

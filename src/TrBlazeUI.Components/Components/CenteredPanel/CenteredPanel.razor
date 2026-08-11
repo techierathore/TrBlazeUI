@@ -1,0 +1,61 @@
+@namespace TrBlazeUI.Components.CenteredPanel
+
+@*
+    A vertically and horizontally centred single-panel page: sign-in, email verification,
+    "check your inbox", 404. Without it every application re-writes the same inline flex wrapper.
+*@
+
+<div class="@CssClass" @attributes="AdditionalAttributes">
+    <div class="@PanelCssClass">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// Gets or sets the panel content, typically a single Card.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes applied to the full-height page wrapper.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes applied to the centred panel itself.
+    /// </summary>
+    [Parameter]
+    public string? PanelClass { get; set; }
+
+    /// <summary>
+    /// Gets or sets the maximum width of the panel.
+    /// </summary>
+    [Parameter]
+    public CenteredPanelWidth Width { get; set; } = CenteredPanelWidth.Medium;
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "flex min-h-screen w-full items-center justify-center bg-background px-4 py-8",
+        Class
+    );
+
+    private string PanelCssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "w-full",
+        Width switch
+        {
+            CenteredPanelWidth.Small => "max-w-sm",
+            CenteredPanelWidth.Large => "max-w-2xl",
+            _ => "max-w-md"
+        },
+        PanelClass
+    );
+}

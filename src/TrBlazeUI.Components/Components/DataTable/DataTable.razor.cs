@@ -129,6 +129,8 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     private IReadOnlyCollection<TData>? objLastSelectedItems;
     private int objPaginationVersion;
     private int objLastPaginationVersion;
+    private int objRefreshVersion;
+    private int objLastRefreshVersion;
 
     /// <summary>
     /// Gets or sets the data source for the table.
@@ -288,8 +290,26 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// visually-hidden spans, so a wide table can never widen the page (TechieRag TR-004).
     /// </summary>
     private static string TableContainerCssClass => ClassNames.cn(
-        "relative w-full overflow-auto rounded-md border"
+        "relative w-full overflow-x-auto rounded-md border"
     );
+
+    /// <summary>
+    /// Gets or sets a minimum width for the table, as a CSS length (for example <c>"720px"</c>).
+    /// </summary>
+    /// <remarks>
+    /// The grid's own wrapper already scrolls horizontally, but the table is <c>w-full</c>, so
+    /// without a minimum width it simply shrinks to its container and the right-hand columns are
+    /// squeezed away with no scrollbar. Set this on wide tables (five columns or more) so the
+    /// columns keep their natural width and the wrapper scrolls instead.
+    /// </remarks>
+    [Parameter]
+    public string? MinWidth { get; set; }
+
+    /// <summary>
+    /// Gets the inline style applied to the table element.
+    /// </summary>
+    private string? TableStyle =>
+        string.IsNullOrWhiteSpace(MinWidth) ? null : $"min-width:{MinWidth}";
 
     /// <summary>
     /// Gets the computed CSS classes for the table element.
@@ -739,11 +759,40 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     }
 
     /// <summary>
-    /// Determines whether the component should re-render based on tracked state changes.
-    /// This optimization reduces unnecessary render cycles for complex tables.
+    /// Repaints the grid, including every <c>CellTemplate</c>, without replacing <c>Data</c>.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The grid skips re-rendering while its <c>Data</c> reference is unchanged, which is what
+    /// makes a large table cheap. Mutating a bound item IN PLACE - for example setting
+    /// <c>row.Status = "Approved"</c> on the view model the grid is bound to - therefore leaves
+    /// the cell showing the value it was first painted with, and a <c>StateHasChanged()</c> on
+    /// the page cannot fix it because the decision is made inside the grid.
+    /// </para>
+    /// <para>
+    /// Either reassign <c>Data</c> to a new collection, or capture the grid with <c>@ref</c> and
+    /// call this method after an in-place edit:
+    /// </para>
+    /// <code>
+    /// &lt;DataTable TData="CommentViewModel" Data="@objComments" @ref="objGrid"&gt; ... &lt;/DataTable&gt;
+    ///
+    /// comment.Status = "Approved";
+    /// objGrid?.Refresh();
+    /// </code>
+    /// </remarks>
+    public void Refresh()
+    {
+        objRefreshVersion++;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Skips re-rendering when nothing the grid displays has changed.
+    /// </summary>
+    /// <returns>True when the grid must repaint.</returns>
     protected override bool ShouldRender()
     {
+        var refreshRequested = objLastRefreshVersion != objRefreshVersion;
         var dataChanged = !ReferenceEquals(objLastData, Data);
         var selectionModeChanged = objLastSelectionMode != SelectionMode;
         var loadingChanged = objLastIsLoading != IsLoading;
@@ -752,8 +801,9 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         var selectionChanged = objLastSelectionVersion != objSelectionVersion;
         var paginationChanged = objLastPaginationVersion != objPaginationVersion;
 
-        if (dataChanged || selectionModeChanged || loadingChanged || columnsChanged || searchChanged || selectionChanged || paginationChanged)
+        if (refreshRequested || dataChanged || selectionModeChanged || loadingChanged || columnsChanged || searchChanged || selectionChanged || paginationChanged)
         {
+            objLastRefreshVersion = objRefreshVersion;
             objLastData = Data;
             objLastSelectionMode = SelectionMode;
             objLastIsLoading = IsLoading;

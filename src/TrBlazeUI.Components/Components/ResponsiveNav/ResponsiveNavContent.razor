@@ -13,7 +13,7 @@
 @if (Context != null)
 {
     <TrBlazeUI.Components.Sheet.Sheet Open="@Context.OpenMobile" OpenChanged="@(EventCallback.Factory.Create<bool>(this, OnOpenChanged))" Side="@Side">
-        <TrBlazeUI.Components.Sheet.SheetContent Class="@ContentClass" ShowClose="@ShowClose">
+        <TrBlazeUI.Components.Sheet.SheetContent Class="@ContentClass" ShowClose="@ShowClose" @attributes="AdditionalAttributes">
             @if (Header != null)
             {
                 <div class="border-b pb-4 mb-4">
@@ -32,6 +32,13 @@
 }
 
 @code {
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
     [CascadingParameter]
     private ResponsiveNavContext? Context { get; set; }
 

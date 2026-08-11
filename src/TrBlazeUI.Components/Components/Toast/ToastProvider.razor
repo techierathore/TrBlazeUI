@@ -8,7 +8,7 @@
     Place this component once at the root of your application (e.g., in MainLayout).
 *@
 
-<div class="@ContainerCssClass">
+<div class="@ContainerCssClass" @attributes="AdditionalAttributes">
     @foreach (var toast in ToastService.Toasts)
     {
         <Toast Data="@toast" OnDismiss="@(() => HandleDismiss(toast.Id))" />
@@ -96,4 +96,11 @@
         objAutoCloseTimer?.Stop();
         objAutoCloseTimer?.Dispose();
     }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

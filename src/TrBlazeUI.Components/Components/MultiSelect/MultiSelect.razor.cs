@@ -13,6 +13,13 @@ namespace TrBlazeUI.Components.MultiSelect;
 /// <typeparam name="TItem">The type of items in the multiselect list.</typeparam>
 public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
 {
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
     [Inject]
     private IJSRuntime JSRuntime { get; set; } = default!;
 

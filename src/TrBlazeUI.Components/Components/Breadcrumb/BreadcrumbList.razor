@@ -1,11 +1,28 @@
 @namespace TrBlazeUI.Components.Breadcrumb
 
-@* BreadcrumbList is optional - items can be placed directly in Breadcrumb *@
+@* BreadcrumbList is optional - items can be placed directly in Breadcrumb, which owns the <ol>.
+   Attributes put here are forwarded onto that <ol> rather than dropped. *@
 <CascadingValue Value="this" IsFixed="true">
     @ChildContent
 </CascadingValue>
 
 @code {
+    [CascadingParameter]
+    private Breadcrumb? objBreadcrumb { get; set; }
+
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes.
+    /// </summary>
+    /// <remarks>
+    /// The list element is rendered by the parent Breadcrumb, so these attributes are forwarded
+    /// onto its <c>&lt;ol&gt;</c>. Used standalone, with no Breadcrumb parent, they are ignored.
+    /// </remarks>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet() => objBreadcrumb?.ApplyListAttributes(AdditionalAttributes);
 }

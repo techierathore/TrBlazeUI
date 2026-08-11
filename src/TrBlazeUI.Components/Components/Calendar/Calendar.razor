@@ -91,7 +91,7 @@
                                 var isFocused = day.HasValue && objFocusedDate.HasValue && day.Value.Date == objFocusedDate.Value.Date;
                                 <td class="@GetCellClasses(day, isSelected)"
                                     role="gridcell"
-                                    aria-selected="@isSelected">
+                                    aria-selected="@(isSelected ? "true" : "false")">
                                     @if (day.HasValue)
                                     {
                                         <button type="button"

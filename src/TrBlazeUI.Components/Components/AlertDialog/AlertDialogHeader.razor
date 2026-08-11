@@ -5,7 +5,7 @@
     Alert Dialog Header - contains title and description.
 *@
 
-<div class="@CssClass">
+<div class="@CssClass" @attributes="AdditionalAttributes">
     @ChildContent
 </div>
 
@@ -29,4 +29,11 @@
         "flex flex-col space-y-2 text-center sm:text-left",
         Class
     );
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

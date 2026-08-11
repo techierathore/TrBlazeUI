@@ -58,6 +58,22 @@ public partial class Item : ComponentBase
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     /// <summary>
+    /// True when this item is rendered inside an ItemGroup, which declares role="list".
+    /// </summary>
+    [CascadingParameter(Name = "ItemGroupIsList")]
+    private bool objIsInItemGroup { get; set; }
+
+    /// <summary>
+    /// Gets the ARIA role for the item element.
+    /// </summary>
+    /// <remarks>
+    /// An element with <c>role="list"</c> may only own <c>role="listitem"</c> children, so an item
+    /// inside an ItemGroup takes that role. An explicit role passed by the consumer always wins.
+    /// </remarks>
+    private string? ItemRole =>
+        objIsInItemGroup && AdditionalAttributes?.ContainsKey("role") != true ? "listitem" : null;
+
+    /// <summary>
     /// Gets the computed CSS classes for the item element.
     /// </summary>
     private string CssClass => ClassNames.cn(
@@ -115,6 +131,11 @@ public partial class Item : ComponentBase
             ["data-slot"] = "item",
             ["ChildContent"] = (object?)ChildContent!
         };
+
+        if (ItemRole != null)
+        {
+            attributes["role"] = ItemRole;
+        }
 
         if (!string.IsNullOrEmpty(Href) && AsChild == "a")
         {

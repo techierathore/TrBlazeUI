@@ -1,0 +1,111 @@
+@page "/components/stat"
+@using TrBlazeUI.Components.Stat
+@using TrBlazeUI.Icons.Lucide.Components
+
+<PageTitle>Stat Tile Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Stat Tile</h1>
+        <p class="text-xl text-muted-foreground">
+            A headline statistic — a large value over a small caption — and a group that lays a row
+            of them out responsively.
+        </p>
+    </div>
+
+    <!-- Basic -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>StatGroup</code> handles the responsive grid so value and caption sizing cannot
+                drift between pages.
+            </p>
+        </div>
+        <StatGroup Columns="4">
+            <StatTile Value="20+" Label="Years of experience" />
+            <StatTile Value="1,284" Label="Posts published" />
+            <StatTile Value="96" Label="Series parts" />
+            <StatTile Value="4.6" Label="Average rating" />
+        </StatGroup>
+    </div>
+
+    <!-- Trends -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Trends</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>TrendDirection</code> selects the colour: <code>Up</code> uses the
+                <code>--success</code> token, <code>Down</code> uses <code>--destructive</code>,
+                <code>Neutral</code> stays muted.
+            </p>
+        </div>
+        <StatGroup Columns="3">
+            <StatTile Value="12,480" Label="Views" Trend="+18% vs last month" TrendDirection="StatTrend.Up" />
+            <StatTile Value="312" Label="Subscribers" Trend="-4% vs last month" TrendDirection="StatTrend.Down" />
+            <StatTile Value="1.4s" Label="Median load time" Trend="unchanged" TrendDirection="StatTrend.Neutral" />
+        </StatGroup>
+    </div>
+
+    <!-- Icons and descriptions -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Icons and supporting text</h2>
+            <p class="text-sm text-muted-foreground">
+                The icon is decorative — it is rendered <code>aria-hidden</code>, so the tile still
+                reads as "value, label" to a screen reader.
+            </p>
+        </div>
+        <StatGroup Columns="2">
+            <StatTile Value="8,102" Label="Unique readers"
+                      Trend="+9%" TrendDirection="StatTrend.Up"
+                      Description="Rolling 30-day window">
+                <Icon><LucideIcon Name="users" Size="18" /></Icon>
+            </StatTile>
+            <StatTile Value="42" Label="Comments awaiting moderation"
+                      Description="Oldest is 3 days old">
+                <Icon><LucideIcon Name="message-square" Size="18" /></Icon>
+            </StatTile>
+        </StatGroup>
+    </div>
+
+    <!-- Columns -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Columns</h2>
+            <p class="text-sm text-muted-foreground">
+                Two columns on small screens, then <code>Columns</code> (1–6) from the medium
+                breakpoint up.
+            </p>
+        </div>
+        <StatGroup Columns="6">
+            <StatTile Value="A" Label="One" />
+            <StatTile Value="B" Label="Two" />
+            <StatTile Value="C" Label="Three" />
+            <StatTile Value="D" Label="Four" />
+            <StatTile Value="E" Label="Five" />
+            <StatTile Value="F" Label="Six" />
+        </StatGroup>
+    </div>
+
+    <!-- Usage -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Usage</h2>
+        <pre class="overflow-x-auto rounded-lg border bg-muted/30 p-4 text-sm"><code>@objUsage</code></pre>
+    </div>
+</div>
+
+@code {
+    private const string objUsage = """
+        @using TrBlazeUI.Components.Stat
+
+        <StatGroup Columns="4">
+            <StatTile Value="20+" Label="Years of experience" />
+            <StatTile Value="1,284" Label="Posts"
+                      Trend="+12% vs last month" TrendDirection="StatTrend.Up"
+                      Description="Rolling 30-day window">
+                <Icon><LucideIcon Name="file-text" Size="18" /></Icon>
+            </StatTile>
+        </StatGroup>
+        """;
+}

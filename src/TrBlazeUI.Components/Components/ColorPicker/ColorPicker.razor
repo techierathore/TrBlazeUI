@@ -5,7 +5,7 @@
 @using TrBlazeUI.Components.Input
 @using TrBlazeUI.Primitives.Services
 
-<Popover @bind-Open="objIsOpen">
+<Popover @bind-Open="objIsOpen" @attributes="AdditionalAttributes">
     <PopoverTrigger AsChild="true">
         <Button Variant="ButtonVariant.Outline"
                 Class="@ButtonClass"
@@ -83,13 +83,13 @@
                 <div class="grid @(ShowAlpha ? "grid-cols-4" : "grid-cols-3") gap-2">
                     <div>
                         <label class="text-xs text-muted-foreground">R</label>
-                        <Input Value="@_r.ToString()"
+                        <Input Value="@objR.ToString()"
                                ValueChanged="@(v => HandleRgbInput(v, 'r'))"
                                Class="text-sm text-center" />
                     </div>
                     <div>
                         <label class="text-xs text-muted-foreground">G</label>
-                        <Input Value="@_g.ToString()"
+                        <Input Value="@objG.ToString()"
                                ValueChanged="@(v => HandleRgbInput(v, 'g'))"
                                Class="text-sm text-center" />
                     </div>
@@ -139,7 +139,7 @@
     private double objSaturation;
     private double objBrightness;
     private double objAlpha = 1;
-    private int _r, _g, objB;
+    private int objR, objG, objB;
     private string objHexInput = "#000000";
     private string? objPreviousValue;
     private long? objActiveAreaPointerId;
@@ -208,14 +208,14 @@
 
     private string[] EffectivePresets => PresetColors ?? DefaultPresets;
 
-    private string CurrentColorWithoutAlpha => ColorUtils.ToHex(_r, _g, objB);
+    private string CurrentColorWithoutAlpha => ColorUtils.ToHex(objR, objG, objB);
 
     private string DisplayValue
     {
         get
         {
             if (!ShowAlpha) return Value;
-            var hex = ColorUtils.ToHex(_r, _g, objB);
+            var hex = ColorUtils.ToHex(objR, objG, objB);
             return objAlpha < 1 ? $"{hex} {(int)Math.Round(objAlpha * 100)}%" : hex;
         }
     }
@@ -240,8 +240,8 @@
         if (!ColorUtils.IsValidHex(hex)) return;
 
         var (r, g, b, a) = ColorUtils.ParseHex(hex);
-        _r = r;
-        _g = g;
+        objR = r;
+        objG = g;
         objB = b;
         objAlpha = a.HasValue ? a.Value / 255.0 : 1;
 
@@ -250,14 +250,14 @@
         objSaturation = s;
         objBrightness = v;
 
-        objHexInput = ColorUtils.ToHex(_r, _g, objB);
+        objHexInput = ColorUtils.ToHex(objR, objG, objB);
     }
 
     private async Task UpdateColorAsync()
     {
         var (r, g, b) = ColorUtils.HsvToRgb(objHue, objSaturation, objBrightness);
-        _r = r;
-        _g = g;
+        objR = r;
+        objG = g;
         objB = b;
 
         var alphaInt = ShowAlpha ? (int)Math.Round(objAlpha * 255) : (int?)null;
@@ -429,12 +429,12 @@
 
         switch (component)
         {
-            case 'r': _r = v; break;
-            case 'g': _g = v; break;
+            case 'r': objR = v; break;
+            case 'g': objG = v; break;
             case 'b': objB = v; break;
         }
 
-        var (h, s, bv) = ColorUtils.RgbToHsv(_r, _g, objB);
+        var (h, s, bv) = ColorUtils.RgbToHsv(objR, objG, objB);
         objHue = h;
         objSaturation = s;
         objBrightness = bv;
@@ -462,4 +462,11 @@
         Disabled ? "opacity-50 pointer-events-none" : null,
         Class
     );
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

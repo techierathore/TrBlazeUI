@@ -5,7 +5,7 @@
 @using TrBlazeUI.Primitives.Services
 
 <CascadingValue Value="this" IsFixed="false">
-    <div class="@ContainerClass">
+    <div class="@ContainerClass" @attributes="AdditionalAttributes">
         <Popover Open="objIsOpen" OpenChanged="HandleOpenChanged">
             <PopoverTrigger role="combobox"
                            aria-expanded="@GetIsOpen().ToString().ToLower()"

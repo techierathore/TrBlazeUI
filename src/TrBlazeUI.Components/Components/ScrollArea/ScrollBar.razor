@@ -1,6 +1,6 @@
 @namespace TrBlazeUI.Components.ScrollArea
 
-<div class="@CssClass">
+<div class="@CssClass" @attributes="AdditionalAttributes">
     <div class="@ThumbClass"></div>
 </div>
 
@@ -23,4 +23,11 @@
         "relative rounded-full bg-border",
         Orientation == ScrollAreaOrientation.Vertical ? "flex-1" : "flex-1"
     );
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

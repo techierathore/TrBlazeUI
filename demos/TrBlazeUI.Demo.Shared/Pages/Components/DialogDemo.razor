@@ -361,9 +361,79 @@
 &lt;/Dialog&gt;</code></pre>
         </div>
     </div>
+    <div class="space-y-4 rounded-lg border border-alert-success bg-alert-success-bg p-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold text-alert-success-foreground">Stacked dialogs (fixed in 2.1.0)</h2>
+            <p class="text-sm text-alert-success-foreground">
+                Two overlays that share a z-index are ordered by their position in the DOM. Portals
+                used to be rendered from an unordered dictionary, so which of two open dialogs
+                painted on top was a coin toss — the second one could render perfectly and still be
+                dead to the mouse. Portals are now rendered in the order they were opened, so
+                "last opened wins" is true by construction.
+            </p>
+        </div>
+
+        <Button OnClick="@(() => objStackOuter = true)">Open the first dialog</Button>
+
+        <Dialog @bind-Open="objStackOuter">
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Edit experience</DialogTitle>
+                    <DialogDescription>
+                        Open the picker below — it is a second dialog, and it lands on top.
+                    </DialogDescription>
+                </DialogHeader>
+                <div class="space-y-3 py-2">
+                    <Button Variant="ButtonVariant.Outline" OnClick="@(() => objStackInner = true)">
+                        Choose an image
+                    </Button>
+                    <p class="text-sm text-muted-foreground">
+                        Picked: <strong>@(objPicked ?? "nothing yet")</strong>
+                    </p>
+                </div>
+                <DialogFooter>
+                    <Button OnClick="@(() => objStackOuter = false)">Done</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+
+        <Dialog @bind-Open="objStackInner">
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Media library</DialogTitle>
+                    <DialogDescription>Click a tile — it is clickable, not merely visible.</DialogDescription>
+                </DialogHeader>
+                <div class="grid grid-cols-3 gap-2 py-2">
+                    @for (var i = 1; i <= 6; i++)
+                    {
+                        var vIndex = i;
+                        <button type="button"
+                                class="aspect-square rounded-md border bg-muted text-sm hover:border-primary"
+                                @onclick="@(() => { objPicked = $"Image {vIndex}"; objStackInner = false; })">
+                            @vIndex
+                        </button>
+                    }
+                </div>
+            </DialogContent>
+        </Dialog>
+
+        <p class="text-sm text-alert-warning-foreground">
+            <strong>Compose stacked dialogs as siblings</strong>, each driven by its own
+            <code>@@bind-Open</code>, as above — not by declaring one
+            <code>&lt;Dialog&gt;</code> inside another's <code>&lt;DialogContent&gt;</code>. A dialog
+            declared inside another dialog's content does not open at all; that is a separate,
+            pre-existing defect tracked as TR-066, and the sibling composition is the supported
+            pattern until it is fixed.
+        </p>
+    </div>
+
 </div>
 
 @code {
+    private bool objStackOuter;
+    private bool objStackInner;
+    private string? objPicked;
+
     private bool isDialogOpen = false;
     private string? selectedComboboxFramework;
 

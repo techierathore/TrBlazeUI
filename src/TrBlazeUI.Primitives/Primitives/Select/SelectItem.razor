@@ -3,7 +3,7 @@
 @implements IDisposable
 
 @* SelectItem primitive - headless selectable option *@
-@if (objContext != null)
+@if (objContext is { IsOpen: true })
 {
     <div id="@ItemId"
          role="option"

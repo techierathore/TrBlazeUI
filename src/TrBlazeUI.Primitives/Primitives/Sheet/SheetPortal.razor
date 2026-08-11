@@ -8,6 +8,16 @@
 *@
 
 @code {
+    /// <summary>
+    /// Gets or sets additional HTML attributes.
+    /// </summary>
+    /// <remarks>
+    /// This component renders no element of its own, so the attributes are accepted (never
+    /// throwing) but are not emitted. Declared so the catalog-wide splatting contract holds.
+    /// </remarks>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
     [CascadingParameter]
     private SheetContext Context { get; set; } = null!;
 

@@ -1,7 +1,7 @@
 @namespace TrBlazeUI.Components.Breadcrumb
 @using TrBlazeUI.Icons.Lucide.Components
 
-<li role="presentation" aria-hidden="true" class="@CssClass">
+<li role="presentation" aria-hidden="true" class="@CssClass" @attributes="AdditionalAttributes">
     @if (ChildContent != null)
     {
         @ChildContent
@@ -23,4 +23,11 @@
         "[&>svg]:w-3.5 [&>svg]:h-3.5",
         Class
     );
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

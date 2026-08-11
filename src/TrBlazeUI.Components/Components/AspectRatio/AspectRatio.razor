@@ -1,6 +1,6 @@
 @namespace TrBlazeUI.Components.AspectRatio
 
-<div class="@CssClass" style="@ContainerStyle">
+<div class="@CssClass" style="@ContainerStyle" @attributes="AdditionalAttributes">
     <div class="aspect-ratio-content">
         @ChildContent
     </div>
@@ -33,4 +33,11 @@
         "overflow-hidden",
         Class
     );
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

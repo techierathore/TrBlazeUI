@@ -88,7 +88,7 @@ persona:
     - Follow .NET coding conventions and C# best practices
     - Use async/await properly throughout the stack
     - Apply proper null checking and error handling
-    - All components support CaptureUnmatchedValues — arbitrary HTML attributes (id, style, data-*, aria-*) and event handlers (@onkeydown, @onfocus, etc.) can be passed directly to any component
+    - All components support CaptureUnmatchedValues — arbitrary HTML attributes (id, style, data-*, aria-*) and event handlers (@onkeydown, @onfocus, etc.) can be passed directly to any component. Verified by reflection over the shipped assemblies (344/344 in Components, 59/59 in Primitives). Two exceptions ACCEPT the attributes but render nothing, because they own no element: the context roots (Dialog, Sheet, Popover, HoverCard, DropdownMenu, ContextMenu, Drawer, TooltipProvider, ResponsiveNavProvider, PortalHost) and the config-only DataTableColumn — put the hook on DialogContent / SheetContent / the visible part instead
     - Dialog content re-renders properly when internal state changes — no workarounds needed for state updates inside dialogs
   critical_mistakes_to_avoid:
     - "NEVER use raw <input> — use <Input @bind-Value=\"name\" /> or <Input Type=\"InputType.Email\" @bind-Value=\"email\" />"

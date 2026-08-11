@@ -237,6 +237,60 @@ public static class TailwindMerge
     /// </summary>
     private static string? ComputeUtilityGroup(string className)
     {
+        // Variants participate in the group key. Without this, "lg:text-5xl" is an unknown
+        // utility that survives every merge, so a consumer's "text-2xl" replaces the base size
+        // and the lg: size still wins above the breakpoint - which is exactly the "the Class
+        // override silently does nothing" trap. Two "lg:text-*" classes now conflict with each
+        // other, and "lg:text-*" no longer conflicts with an unprefixed "text-*".
+        var (vModifiers, vBaseClass) = SplitModifiers(className);
+        var vGroup = ComputeBaseUtilityGroup(vBaseClass);
+
+        if (vGroup == null)
+        {
+            return null;
+        }
+
+        return vModifiers.Length == 0 ? vGroup : vModifiers + vGroup;
+    }
+
+    /// <summary>
+    /// Splits a class name into its variant prefix (for example <c>lg:hover:</c>) and the base
+    /// utility. Colons inside square brackets - arbitrary values such as
+    /// <c>data-[state=open]:block</c> - are not separators.
+    /// </summary>
+    private static (string Modifiers, string BaseClass) SplitModifiers(string className)
+    {
+        var vDepth = 0;
+        var vLastColon = -1;
+
+        for (var i = 0; i < className.Length; i++)
+        {
+            var vChar = className[i];
+
+            if (vChar == '[')
+            {
+                vDepth++;
+            }
+            else if (vChar == ']')
+            {
+                vDepth--;
+            }
+            else if (vChar == ':' && vDepth == 0)
+            {
+                vLastColon = i;
+            }
+        }
+
+        return vLastColon < 0
+            ? (string.Empty, className)
+            : (className[..(vLastColon + 1)], className[(vLastColon + 1)..]);
+    }
+
+    /// <summary>
+    /// Computes the utility group for a class name with its variant prefix already removed.
+    /// </summary>
+    private static string? ComputeBaseUtilityGroup(string className)
+    {
         // Check exact matches first (display, position, etc.)
         if (TailwindGroups.TryGetValue(className, out var group))
         {

@@ -9,7 +9,7 @@
                                           DelayDuration="@DelayDuration"
                                           HideDelay="@HideDelay"
                                           Placement="@Placement.ToValue()"
-                                          Class="contents">
+                                          Class="contents" @attributes="AdditionalAttributes">
     @ChildContent
 </TrBlazeUI.Primitives.Tooltip.Tooltip>
 
@@ -58,4 +58,11 @@
     /// </summary>
     [Parameter]
     public PopoverPlacement Placement { get; set; } = PopoverPlacement.Top;
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

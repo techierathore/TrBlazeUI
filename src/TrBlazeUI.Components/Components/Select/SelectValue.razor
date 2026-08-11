@@ -2,14 +2,21 @@
 
 @if (!string.IsNullOrWhiteSpace(GetSelectedText()))
 {
-    <span id="@GetValueId()">@GetSelectedText()</span>
+    <span id="@GetValueId()" @attributes="AdditionalAttributes">@GetSelectedText()</span>
 }
 else
 {
-    <span id="@GetValueId()" class="text-muted-foreground">@Placeholder</span>
+    <span id="@GetValueId()" class="text-muted-foreground" @attributes="AdditionalAttributes">@Placeholder</span>
 }
 
 @code {
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
     [CascadingParameter]
     private dynamic? SelectContext { get; set; }
 

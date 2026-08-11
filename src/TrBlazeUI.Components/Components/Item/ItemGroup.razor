@@ -1,7 +1,12 @@
 @namespace TrBlazeUI.Components.Item
 
+@* role="list" obliges every child to be a listitem, so the flag below tells Item to emit
+   role="listitem" and ItemSeparator to remove itself from the accessibility tree. Without it a
+   screen reader announces "list, 0 items". *@
 <div
     role="list"
-    class="@CssClass">
-    @ChildContent
+    class="@CssClass" @attributes="AdditionalAttributes">
+    <CascadingValue Name="ItemGroupIsList" Value="true" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
 </div>

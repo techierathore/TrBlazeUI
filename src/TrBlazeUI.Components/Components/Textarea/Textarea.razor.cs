@@ -34,7 +34,7 @@ namespace TrBlazeUI.Components.Textarea;
 /// &lt;Textarea Value="@comment" ValueChanged="HandleCommentChange" MaxLength="500" Required="true" AriaInvalid="@hasError" /&gt;
 /// </code>
 /// </example>
-public partial class Textarea : ComponentBase
+public partial class Textarea : ComponentBase, IDisposable
 {
     /// <summary>
     /// Gets or sets the current value of the textarea.
@@ -196,11 +196,79 @@ public partial class Textarea : ComponentBase
     private async Task HandleInput(ChangeEventArgs args)
     {
         var newValue = args.Value?.ToString();
+
+        // Record what the DOM now holds BEFORE Value changes, so the render that follows this
+        // event does not write the (already stale) echo back over what the user is typing.
+        objValueSync.OnUserInput(newValue);
         Value = newValue;
 
-        if (ValueChanged.HasDelegate)
+        await NotifyValueChangedAsync(newValue);
+    }
+
+    /// <summary>
+    /// Keeps the DOM value out of sync with the server's echo of the user's own keystrokes.
+    /// </summary>
+    private readonly TextValueSync objValueSync = new();
+
+    private CancellationTokenSource? objDebounceCts;
+
+    /// <summary>
+    /// Gets or sets how long, in milliseconds, to wait after the last keystroke before raising
+    /// <c>ValueChanged</c>.
+    /// </summary>
+    /// <remarks>
+    /// Zero (the default) raises the callback on every keystroke. A value in the 150-300 ms range
+    /// cuts the per-keystroke round trips a Blazor <b>Server</b> circuit would otherwise make.
+    /// The control's own DOM value is never debounced - only the notification to the parent is.
+    /// </remarks>
+    [Parameter]
+    public int DebounceMilliseconds { get; set; }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet() => objValueSync.OnValueSupplied(Value);
+
+    /// <summary>
+    /// Releases the debounce timer.
+    /// </summary>
+    public void Dispose()
+    {
+        objDebounceCts?.Cancel();
+        objDebounceCts?.Dispose();
+        objDebounceCts = null;
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Raises <c>ValueChanged</c>, honouring <see cref="DebounceMilliseconds"/>.
+    /// </summary>
+    /// <param name="aValue">The new value.</param>
+    private async Task NotifyValueChangedAsync(string? aValue)
+    {
+        if (!ValueChanged.HasDelegate)
         {
-            await ValueChanged.InvokeAsync(newValue);
+            return;
+        }
+
+        if (DebounceMilliseconds <= 0)
+        {
+            await ValueChanged.InvokeAsync(aValue);
+            return;
+        }
+
+        objDebounceCts?.Cancel();
+        objDebounceCts?.Dispose();
+
+        var vCts = new CancellationTokenSource();
+        objDebounceCts = vCts;
+
+        try
+        {
+            await Task.Delay(DebounceMilliseconds, vCts.Token);
+            await ValueChanged.InvokeAsync(aValue);
+        }
+        catch (OperationCanceledException)
+        {
+            // A newer keystroke superseded this one.
         }
     }
 }

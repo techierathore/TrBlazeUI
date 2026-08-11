@@ -1,0 +1,165 @@
+@namespace TrBlazeUI.Components.CodeBlock
+@using TrBlazeUI.Components.Button
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+@* A monochrome code block with an optional language label and copy button. It deliberately does
+   NOT bundle a syntax highlighter - that is an application choice, and shipping one would drag a
+   large JS dependency into every consumer. Pass pre-highlighted HTML through Html when you have
+   one; otherwise the plain text form below is safe by construction. *@
+
+<div class="@CssClass" data-slot="code-block" @attributes="AdditionalAttributes">
+    @if (!string.IsNullOrWhiteSpace(Language) || ShowCopyButton)
+    {
+        <div class="flex items-center justify-between border-b border-border bg-muted/50 px-3 py-1.5">
+            <span class="font-mono text-xs text-muted-foreground">@Language</span>
+            @if (ShowCopyButton)
+            {
+                <Button Variant="ButtonVariant.Ghost"
+                        Size="ButtonSize.Small"
+                        Class="h-6 px-2 text-xs"
+                        AriaLabel="@objCopyAriaLabel"
+                        OnClick="CopyAsync">
+                    @objCopyLabel
+                </Button>
+            }
+        </div>
+    }
+    <pre class="overflow-x-auto p-4 text-sm leading-relaxed"><code class="font-mono">@if (Html != null)
+{
+    @Html
+}
+else
+{
+    @Code
+}</code></pre>
+    <span class="sr-only" aria-live="polite">@objAnnouncement</span>
+</div>
+
+@code {
+    private IJSObjectReference? objModule;
+    private CopyState objCopyState = CopyState.Idle;
+
+    private string objCopyLabel => objCopyState switch
+    {
+        CopyState.Copied => "Copied",
+        CopyState.Failed => "Press Ctrl+C",
+        _ => "Copy"
+    };
+
+    private string objCopyAriaLabel => objCopyState switch
+    {
+        CopyState.Copied => "Code copied",
+        CopyState.Failed => "Copying is unavailable here - select the code and press Ctrl+C",
+        _ => "Copy code"
+    };
+
+    private string? objAnnouncement => objCopyState switch
+    {
+        CopyState.Copied => "Code copied to clipboard",
+        CopyState.Failed => "Copying is not available here - select the code and press Ctrl+C",
+        _ => null
+    };
+
+    /// <summary>The outcome of the last copy attempt.</summary>
+    private enum CopyState
+    {
+        /// <summary>No copy has been attempted yet.</summary>
+        Idle,
+
+        /// <summary>The code reached the clipboard.</summary>
+        Copied,
+
+        /// <summary>The browser refused; the user has to copy manually.</summary>
+        Failed
+    }
+
+    /// <summary>
+    /// Gets or sets the code to display.
+    /// </summary>
+    [Parameter]
+    public string? Code { get; set; }
+
+    /// <summary>
+    /// Gets or sets pre-highlighted markup to display instead of <see cref="Code"/>.
+    /// </summary>
+    /// <remarks>
+    /// Only pass markup you produced yourself or have sanitised - it is rendered as-is.
+    /// <see cref="Code"/> is still used as the text the copy button writes to the clipboard.
+    /// </remarks>
+    [Parameter]
+    public MarkupString? Html { get; set; }
+
+    /// <summary>
+    /// Gets or sets the language label shown in the header, for example <c>"csharp"</c>.
+    /// </summary>
+    [Parameter]
+    public string? Language { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the copy button is shown. Default is true.
+    /// </summary>
+    [Parameter]
+    public bool ShowCopyButton { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "relative w-full overflow-hidden rounded-md border border-border bg-muted/30",
+        Class
+    );
+
+    private async Task CopyAsync()
+    {
+        try
+        {
+            objModule ??= await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/TrBlazeUI.Components/js/code-block.js");
+
+            var vCopied = await objModule.InvokeAsync<bool>("copyText", Code ?? string.Empty);
+            objCopyState = vCopied ? CopyState.Copied : CopyState.Failed;
+        }
+        catch (JSException)
+        {
+            // The browser refused. Tell the user rather than failing silently.
+            objCopyState = CopyState.Failed;
+        }
+        catch (JSDisconnectedException)
+        {
+            // Expected during circuit disconnect in Blazor Server.
+        }
+        catch (InvalidOperationException)
+        {
+            // JS interop is unavailable during prerendering.
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        if (objModule != null)
+        {
+            try
+            {
+                await objModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Expected during circuit disconnect.
+            }
+        }
+
+        GC.SuppressFinalize(this);
+    }
+}

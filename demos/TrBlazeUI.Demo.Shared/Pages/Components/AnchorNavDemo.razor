@@ -1,0 +1,99 @@
+@page "/components/anchor-nav"
+@using TrBlazeUI.Components.AnchorNav
+
+<PageTitle>Anchor Nav Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Anchor Nav</h1>
+        <p class="text-xl text-muted-foreground">
+            Sticky in-page section navigation with scrollspy — a resume, a long article, a settings
+            page.
+        </p>
+    </div>
+
+    <div class="rounded-lg border border-alert-info bg-alert-info-bg p-4 text-sm text-alert-info-foreground">
+        The links are ordinary anchors, so they are Tab reachable with no roving-tabindex scheme, and
+        the active one is marked <code>aria-current="location"</code> as well as coloured. Scroll the
+        page and watch the chip row follow.
+    </div>
+
+    <!-- Live -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                Active section: <code>@(objActive ?? "(none yet)")</code>
+            </p>
+        </div>
+
+        <AnchorNav Sections="@objSections" @bind-ActiveId="objActive" TopOffset="16"
+                   AriaLabel="On this page" />
+
+        <div class="space-y-4">
+            @foreach (var vSection in objSections)
+            {
+                <section id="@vSection.Id" class="scroll-mt-24 space-y-2 rounded-lg border p-6">
+                    <h3 class="text-xl font-semibold">@vSection.Label</h3>
+                    <p class="text-muted-foreground">
+                        A section tall enough to scroll through. The nav above highlights whichever
+                        section is currently at the top of the viewport, using an
+                        IntersectionObserver rather than a scroll handler.
+                    </p>
+                    <div class="h-48 rounded-md bg-muted/40"></div>
+                </section>
+            }
+        </div>
+    </div>
+
+    <!-- Vertical -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Vertical</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>Orientation="AnchorNavOrientation.Vertical"</code> stacks the links for a side
+                rail.
+            </p>
+        </div>
+        <div class="w-56 rounded-lg border p-3">
+            <AnchorNav Sections="@objSections" Orientation="AnchorNavOrientation.Vertical"
+                       Class="static bg-transparent backdrop-blur-none" AriaLabel="Sections" />
+        </div>
+    </div>
+
+    <!-- Usage -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Usage</h2>
+        <pre class="overflow-x-auto rounded-lg border bg-muted/30 p-4 text-sm"><code>@objUsage</code></pre>
+    </div>
+</div>
+
+@code {
+    private string? objActive;
+
+    private readonly List<AnchorNavSection> objSections =
+    [
+        new("summary", "Summary"),
+        new("experience", "Experience"),
+        new("skills", "Skills"),
+        new("education", "Education"),
+    ];
+
+    private const string objUsage = """
+        @using TrBlazeUI.Components.AnchorNav
+
+        <AnchorNav Sections="@sections" @bind-ActiveId="activeId" TopOffset="80" />
+
+        <section id="summary" class="scroll-mt-24">...</section>
+        <section id="experience" class="scroll-mt-24">...</section>
+
+        @code {
+            private string? activeId;
+            private readonly List<AnchorNavSection> sections =
+            [
+                new("summary", "Summary"),
+                new("experience", "Experience"),
+            ];
+        }
+        """;
+}

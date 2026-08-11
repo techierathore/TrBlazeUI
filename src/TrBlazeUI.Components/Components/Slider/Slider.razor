@@ -8,10 +8,10 @@
      aria-valuemin="@Min"
      aria-valuemax="@Max"
      aria-valuenow="@CurrentValue"
-     aria-disabled="@Disabled"
+     aria-disabled="@(Disabled ? "true" : "false")"
      tabindex="@(Disabled ? -1 : 0)"
      class="@CssClass"
-     @onkeydown="HandleKeyDown">
+     @onkeydown="HandleKeyDown" @attributes="AdditionalAttributes">
     <div class="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
         <div class="absolute h-full bg-primary"
              style="width: @(Percentage)%;">
@@ -183,4 +183,11 @@
         }
         objDotNetRef?.Dispose();
     }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

@@ -1,0 +1,200 @@
+@page "/verify-techieblog"
+@using TrBlazeUI.Components.Card
+@using TrBlazeUI.Components.Rating
+@using TrBlazeUI.Components.Tabs
+@using TrBlazeUI.Components.Select
+@using TrBlazeUI.Components.Input
+@using TrBlazeUI.Components.Textarea
+@using TrBlazeUI.Components.Item
+@using TrBlazeUI.Components.Label
+@using TrBlazeUI.Components.Typography
+@using TrBlazeUI.Components.Breadcrumb
+@using TrBlazeUI.Components.NavigationMenu
+@using TrBlazeUI.Components.Alert
+@using TrBlazeUI.Components.Prose
+@using TrBlazeUI.Components.Stat
+@using TrBlazeUI.Components.Timeline
+@using TrBlazeUI.Components.Stepper
+@using TrBlazeUI.Components.CenteredPanel
+@using TrBlazeUI.Components.PasswordStrength
+@using TrBlazeUI.Components.CodeBlock
+@using TrBlazeUI.Components.SortableList
+
+@* Verification harness for the TechieBlog feedback fixes (docs/TechieBlog-TrBlazeUI-Feedback.md).
+   Not a documentation demo: every block exists so tests/verify/ui-techieblog.spec.js can assert
+   one acceptance criterion. *@
+
+<PageTitle>Verify TechieBlog fixes - TrBlazeUI</PageTitle>
+
+<div class="p-6 space-y-10 max-w-5xl" data-testid="verify-heading">
+    <h1 class="text-2xl font-bold">TechieBlog feedback verification harness</h1>
+
+    @* ---------------- TR-021 / TR-030 / TR-040 / TR-046 / TR-047 / TR-048 / TR-051 -------------
+       Every one of these components used to THROW on a data-testid. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">Splatting - components that used to throw</h2>
+        <TypographyH1 data-testid="splat-h1" Class="text-base">H1</TypographyH1>
+        <TypographyP data-testid="splat-p">P</TypographyP>
+        <Breadcrumb data-testid="splat-breadcrumb">
+            <BreadcrumbList data-testid="splat-breadcrumb-list">
+                <BreadcrumbItem data-testid="splat-breadcrumb-item">
+                    <BreadcrumbLink Href="/" data-testid="splat-breadcrumb-link">Home</BreadcrumbLink>
+                </BreadcrumbItem>
+            </BreadcrumbList>
+        </Breadcrumb>
+        <Label For="splat-input" data-testid="splat-label">Label that used to throw</Label>
+        <Input Id="splat-input" data-testid="splat-input" Placeholder="input" />
+        <Alert data-testid="splat-alert">
+            <AlertTitle data-testid="splat-alert-title">Title</AlertTitle>
+            <AlertDescription data-testid="splat-alert-desc">Description</AlertDescription>
+        </Alert>
+        <Rating Value="3" Max="5" data-testid="splat-rating" />
+    </section>
+
+    @* ---------------- TR-031 / TR-045 / TR-052 - Rating accessibility ---------------- *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">Rating accessibility</h2>
+        <div data-testid="rating-interactive-wrap">
+            <Rating @bind-Value="objScore" Max="5" AriaLabel="Rate this article" data-testid="rating-interactive" />
+        </div>
+        <div data-testid="rating-readonly-wrap">
+            <Rating Value="4" Max="5" ReadOnly="true" data-testid="rating-readonly" />
+        </div>
+        <div data-testid="rating-decorative-wrap" aria-hidden="true">
+            <Rating Value="2" Max="5" Focusable="false" data-testid="rating-decorative" />
+        </div>
+        <p data-testid="rating-value">@objScore</p>
+    </section>
+
+    @* ---------------- TR-054 / TR-063 - Tabs ARIA ---------------- *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">Tabs with panels</h2>
+        <Tabs DefaultValue="one" data-testid="tabs-with-panels">
+            <TabsList data-testid="tabs-list">
+                <TabsTrigger Value="one" data-testid="tab-one">One</TabsTrigger>
+                <TabsTrigger Value="two" data-testid="tab-two">Two</TabsTrigger>
+            </TabsList>
+            <TabsContent Value="one" data-testid="tab-panel-one">Panel one</TabsContent>
+            <TabsContent Value="two" data-testid="tab-panel-two">Panel two</TabsContent>
+        </Tabs>
+
+        <h2 class="text-lg font-semibold">Tabs driven by Value with NO panels</h2>
+        <Tabs Value="@objFilter" ValueChanged="@(v => objFilter = v ?? "all")" data-testid="tabs-no-panels">
+            <TabsList data-testid="tabs-list-nopanels">
+                <TabsTrigger Value="all" data-testid="tab-all">All</TabsTrigger>
+                <TabsTrigger Value="mine" data-testid="tab-mine">Mine</TabsTrigger>
+            </TabsList>
+        </Tabs>
+    </section>
+
+    @* ---------------- TR-049 / TR-058 - SelectValue shows the item text on FIRST paint --------- *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">Select first-paint display text</h2>
+        <Select TValue="string" Value="@objCategory" ValueChanged="@(v => objCategory = v)">
+            <SelectTrigger TValue="string" data-testid="select-trigger">
+                <SelectValue TValue="string" Placeholder="Pick one" data-testid="select-value" />
+            </SelectTrigger>
+            <SelectContent TValue="string">
+                <SelectItem TValue="string" Value="@("0")" Text="-- Select Category --">-- Select Category --</SelectItem>
+                <SelectItem TValue="string" Value="@("1")" Text="Engineering">Engineering</SelectItem>
+            </SelectContent>
+        </Select>
+    </section>
+
+    @* ---------------- TR-053 / TR-057 - fast typing must not lose characters ---------------- *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">Bound text entry</h2>
+        <Input @bind-Value="objTyped" data-testid="typing-input" Placeholder="type fast" />
+        <p data-testid="typing-echo">@objTyped</p>
+        <Textarea @bind-Value="objTypedArea" data-testid="typing-textarea" />
+        <p data-testid="typing-area-echo">@objTypedArea</p>
+    </section>
+
+    @* ---------------- TR-055 / TR-061 - ItemGroup list semantics ---------------- *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">ItemGroup</h2>
+        <ItemGroup data-testid="item-group">
+            <Item data-testid="item-1"><ItemContent><ItemTitle>First</ItemTitle></ItemContent></Item>
+            <Item data-testid="item-2"><ItemContent><ItemTitle>Second</ItemTitle></ItemContent></Item>
+        </ItemGroup>
+    </section>
+
+    @* ---------------- TR-044 - NavigationMenu links must be Tab reachable ---------------- *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">NavigationMenu</h2>
+        <NavigationMenu data-testid="nav-menu">
+            <NavigationMenuList data-testid="nav-list">
+                <NavigationMenuItem>
+                    <NavigationMenuLink Href="/" data-testid="nav-link-1">Home</NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                    <NavigationMenuLink Href="/components" data-testid="nav-link-2">Components</NavigationMenuLink>
+                </NavigationMenuItem>
+            </NavigationMenuList>
+        </NavigationMenu>
+    </section>
+
+    @* ---------------- TR-020 - Typography Size actually shrinks ---------------- *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">Typography size</h2>
+        <TypographyH1 data-testid="type-default">Default H1</TypographyH1>
+        <TypographyH1 Size="TypographySize.Xl2" data-testid="type-small">Small H1</TypographyH1>
+    </section>
+
+    @* ---------------- New components (TR-002/003/004/005/007/009/012/022/059) ---------------- *@
+    <section class="space-y-4">
+        <h2 class="text-lg font-semibold">New components</h2>
+
+        <Prose data-testid="prose">
+            @((MarkupString)"<table><tr><th>Column one is quite wide</th><th>Column two is quite wide</th><th>Column three is quite wide</th></tr><tr><td>a</td><td>b</td><td>c</td></tr></table>")
+        </Prose>
+
+        <StatGroup Columns="4" data-testid="stat-group">
+            <StatTile Value="20+" Label="Years of experience" data-testid="stat-1" />
+            <StatTile Value="1,284" Label="Posts" Trend="+12%" TrendDirection="StatTrend.Up" data-testid="stat-2" />
+        </StatGroup>
+
+        <Timeline data-testid="timeline">
+            <TimelineItem Title="Senior Engineer" Subtitle="Acme" Meta="2022 - now" Current="true" data-testid="timeline-1" />
+            <TimelineItem Title="Engineer" Subtitle="Acme" Meta="2019 - 2022" data-testid="timeline-2" />
+        </Timeline>
+
+        <Stepper Current="2" data-testid="stepper">
+            <StepperItem Title="Draft" data-testid="step-1" />
+            <StepperItem Title="Review" data-testid="step-2" />
+            <StepperItem Title="Publish" data-testid="step-3" />
+        </Stepper>
+
+        <PasswordStrength Value="Str0ng!Passw0rd" data-testid="password-strength" />
+
+        <CodeBlock Language="csharp" Code="var x = 1;" data-testid="code-block" />
+
+        <SortableList TItem="string" Items="@objOrder" ItemsChanged="@(v => objOrder = v.ToList())" data-testid="sortable" />
+        <p data-testid="sortable-order">@string.Join(",", objOrder)</p>
+    </section>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">CenteredPanel</h2>
+        <CenteredPanel Class="min-h-0 py-4" data-testid="centered-panel">
+            <Card><CardContent Class="p-4">Centred</CardContent></Card>
+        </CenteredPanel>
+    </section>
+
+    @* ---------------- TR-019 - utilities that used to be absent from the bundle ------------- *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">Utility bundle</h2>
+        <div class="max-w-7xl gap-6 py-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" data-testid="utility-probe">
+            <div class="min-w-3xl">wide</div>
+        </div>
+        <div class="sm:basis-0 basis-1/2" data-testid="basis-probe">basis</div>
+    </section>
+</div>
+
+@code {
+    private double objScore = 3;
+    private string objFilter = "all";
+    private string? objCategory = "0";
+    private string? objTyped;
+    private string? objTypedArea;
+    private List<string> objOrder = ["Part one", "Part two", "Part three"];
+}

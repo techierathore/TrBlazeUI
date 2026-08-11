@@ -38,15 +38,45 @@
     --secondary: oklch(0.9700 0 0);
     --secondary-foreground: oklch(0.2050 0 0);
     --muted: oklch(0.9700 0 0);
-    --muted-foreground: oklch(0.5560 0 0);
+    --muted-foreground: oklch(0.5420 0 0);
     --accent: oklch(0.9700 0 0);
     --accent-foreground: oklch(0.2050 0 0);
-    --destructive: oklch(0.5770 0.2450 27.3250);
+    --destructive: oklch(0.5590 0.2450 27.3250);
     --destructive-foreground: oklch(1 0 0);
+    --success: oklch(0.5200 0.1300 155);
+    --success-foreground: oklch(1 0 0);
     --border: oklch(0.9220 0 0);
-    --input: oklch(0.9220 0 0);
-    --ring: oklch(0.7080 0 0);
+    --input: oklch(0.6600 0 0);
+    --ring: oklch(0.6600 0 0);
     --radius: 0.625rem;
+
+    --alert-success: oklch(0.5200 0.1300 155);
+    --alert-success-foreground: oklch(0.4200 0.1100 155);
+    --alert-success-bg: oklch(0.9650 0.0300 155);
+    --alert-info: oklch(0.5200 0.1500 250);
+    --alert-info-foreground: oklch(0.4200 0.1300 250);
+    --alert-info-bg: oklch(0.9650 0.0300 250);
+    --alert-warning: oklch(0.5600 0.1400 70);
+    --alert-warning-foreground: oklch(0.4400 0.1200 70);
+    --alert-warning-bg: oklch(0.9700 0.0400 85);
+    --alert-danger: oklch(0.5590 0.2450 27.3250);
+    --alert-danger-foreground: oklch(0.4500 0.2000 27.3250);
+    --alert-danger-bg: oklch(0.9650 0.0250 27.3250);
+
+    --chart-1: oklch(0.6460 0.2220 41.1160);
+    --chart-2: oklch(0.6000 0.1180 184.7040);
+    --chart-3: oklch(0.3980 0.0700 227.3920);
+    --chart-4: oklch(0.8280 0.1890 84.4290);
+    --chart-5: oklch(0.7690 0.1880 70.0800);
+
+    --sidebar: oklch(0.9850 0 0);
+    --sidebar-foreground: oklch(0.1450 0 0);
+    --sidebar-primary: oklch(0.2050 0 0);
+    --sidebar-primary-foreground: oklch(0.9850 0 0);
+    --sidebar-accent: oklch(0.9700 0 0);
+    --sidebar-accent-foreground: oklch(0.2050 0 0);
+    --sidebar-border: oklch(0.9220 0 0);
+    --sidebar-ring: oklch(0.6600 0 0);
   }
 
   :where(.dark) {
@@ -62,13 +92,43 @@
     --secondary-foreground: oklch(0.9850 0 0);
     --muted: oklch(0.2690 0 0);
     --muted-foreground: oklch(0.7080 0 0);
-    --accent: oklch(0.3710 0 0);
+    --accent: oklch(0.3000 0 0);
     --accent-foreground: oklch(0.9850 0 0);
     --destructive: oklch(0.7040 0.1910 22.2160);
-    --destructive-foreground: oklch(0.9850 0 0);
+    --destructive-foreground: oklch(0.1450 0 0);
+    --success: oklch(0.7300 0.1600 155);
+    --success-foreground: oklch(0.1450 0 0);
     --border: oklch(0.2750 0 0);
-    --input: oklch(0.3250 0 0);
+    --input: oklch(0.5500 0 0);
     --ring: oklch(0.5560 0 0);
+
+    --alert-success: oklch(0.7300 0.1600 155);
+    --alert-success-foreground: oklch(0.8800 0.1000 155);
+    --alert-success-bg: oklch(0.2600 0.0450 155);
+    --alert-info: oklch(0.7300 0.1300 250);
+    --alert-info-foreground: oklch(0.8800 0.0800 250);
+    --alert-info-bg: oklch(0.2600 0.0450 250);
+    --alert-warning: oklch(0.8000 0.1400 80);
+    --alert-warning-foreground: oklch(0.9000 0.0900 85);
+    --alert-warning-bg: oklch(0.2700 0.0450 80);
+    --alert-danger: oklch(0.7040 0.1910 22.2160);
+    --alert-danger-foreground: oklch(0.8800 0.1000 22.2160);
+    --alert-danger-bg: oklch(0.2700 0.0600 22.2160);
+
+    --chart-1: oklch(0.4880 0.2430 264.3760);
+    --chart-2: oklch(0.6960 0.1700 162.4800);
+    --chart-3: oklch(0.7690 0.1880 70.0800);
+    --chart-4: oklch(0.6270 0.2650 303.9000);
+    --chart-5: oklch(0.6450 0.2460 16.4390);
+
+    --sidebar: oklch(0.2050 0 0);
+    --sidebar-foreground: oklch(0.9850 0 0);
+    --sidebar-primary: oklch(0.9220 0 0);
+    --sidebar-primary-foreground: oklch(0.2050 0 0);
+    --sidebar-accent: oklch(0.3000 0 0);
+    --sidebar-accent-foreground: oklch(0.9850 0 0);
+    --sidebar-border: oklch(0.2750 0 0);
+    --sidebar-ring: oklch(0.5560 0 0);
   }
 }
 
@@ -443,3 +503,222 @@
   .trblazeui-col-xl-11 { grid-column: span 11 / span 11; }
   .trblazeui-col-xl-12 { grid-column: span 12 / span 12; }
 }
+
+/* Prose - styling for HTML the developer RECEIVES (Markdown output, a CMS body).
+ *
+ * The reflow rules matter more than the typography: a wide table or a long <pre> inside a page
+ * body pushes the WHOLE document sideways at 390px, which is a WCAG 1.4.10 failure. Giving the
+ * table its own block-level scroll box confines the overflow to the element. */
+@layer components {
+  [data-slot="prose"] > * + * { margin-top: 1rem; }
+
+  [data-slot="prose"] h1,
+  [data-slot="prose"] h2,
+  [data-slot="prose"] h3,
+  [data-slot="prose"] h4 {
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin-top: 1.75rem;
+  }
+
+  [data-slot="prose"] h1 { font-size: 1.875rem; }
+  [data-slot="prose"] h2 { font-size: 1.5rem; }
+  [data-slot="prose"] h3 { font-size: 1.25rem; }
+  [data-slot="prose"] h4 { font-size: 1.125rem; }
+
+  [data-slot="prose"] a {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  [data-slot="prose"] ul { list-style: disc; padding-inline-start: 1.5rem; }
+  [data-slot="prose"] ol { list-style: decimal; padding-inline-start: 1.5rem; }
+  [data-slot="prose"] li + li { margin-top: 0.25rem; }
+
+  [data-slot="prose"] blockquote {
+    border-inline-start: 2px solid var(--border);
+    padding-inline-start: 1rem;
+    color: var(--muted-foreground);
+    font-style: italic;
+  }
+
+  [data-slot="prose"] code {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.875em;
+    background-color: var(--muted);
+    border-radius: calc(var(--radius) - 4px);
+    padding: 0.15rem 0.3rem;
+  }
+
+  /* Each of these gets its OWN scroll box so the page itself never scrolls sideways. */
+  [data-slot="prose"] pre {
+    max-width: 100%;
+    overflow-x: auto;
+    background-color: var(--muted);
+    border-radius: calc(var(--radius) - 2px);
+    padding: 1rem;
+  }
+
+  [data-slot="prose"] pre code { background-color: transparent; padding: 0; }
+
+  [data-slot="prose"] table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  [data-slot="prose"] th,
+  [data-slot="prose"] td {
+    border: 1px solid var(--border);
+    padding: 0.5rem 0.75rem;
+    text-align: start;
+  }
+
+  [data-slot="prose"] th { background-color: var(--muted); font-weight: 600; }
+
+  [data-slot="prose"] :is(img, video, iframe, embed, object, svg) {
+    max-width: 100%;
+    height: auto;
+  }
+
+  [data-slot="prose"] hr { border-top: 1px solid var(--border); margin-block: 1.5rem; }
+}
+
+/* ---------------------------------------------------------------------------------------------
+ * APPLICATION UTILITY LAYER  (TechieBlog TR-019 / TR-043 / TR-050)
+ *
+ * `@source "../../Components"` only scans the LIBRARY's own Razor files, so the shipped bundle
+ * used to contain nothing but the ~777 utilities TrBlazeUI itself happens to reference. Any other
+ * class an application wrote - `max-w-7xl`, `gap-6`, `md:grid-cols-2`, `min-w-[720px]`,
+ * `sm:basis-0`, `top-1`, `w-36` - was simply absent, so the element rendered unstyled with no
+ * error, no warning and no visual hint. That silently contradicted the package's own core rule
+ * ("ALWAYS use Tailwind utility classes via the Class parameter") and its "no Node.js required"
+ * promise, because a consumer had no supported way to generate the classes it needed.
+ *
+ * The safelist below force-generates the STANDARD Tailwind scale for the utilities applications
+ * actually write, with the responsive variants, so `trblazeui.css` alone is sufficient. Keep it
+ * in sync when Tailwind adds scale steps; a missing utility is silent, which is why this list is
+ * deliberately generous rather than minimal.
+ * ------------------------------------------------------------------------------------------- */
+
+/* Display, positioning and stacking */
+@source inline("{sm:,md:,lg:,xl:,2xl:,}{block,inline-block,inline,flex,inline-flex,grid,inline-grid,table,contents,hidden}");
+@source inline("{static,fixed,absolute,relative,sticky}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}{static,fixed,absolute,relative,sticky}");
+@source inline("inset-{0,px,1,2,3,4,auto}");
+@source inline("inset-x-0 inset-y-0");
+@source inline("{top,right,bottom,left}-{0,px,0.5,1,1.5,2,2.5,3,3.5,4,5,6,8,10,12,16,20,24,auto,full}");
+@source inline("{top,right,bottom,left}-1/2");
+@source inline("-{top,right,bottom,left}-{1,2,3,4}");
+@source inline("z-{0,10,20,30,40,50,auto}");
+@source inline("isolate overflow-clip");
+
+/* Flexbox and grid */
+@source inline("{sm:,md:,lg:,xl:,2xl:,}flex-{row,row-reverse,col,col-reverse,wrap,wrap-reverse,nowrap}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}{flex-1,flex-auto,flex-initial,flex-none,grow,grow-0,shrink,shrink-0}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}basis-{0,px,1,2,3,4,5,6,8,10,12,16,20,24,32,40,48,56,64,auto,full,1/2,1/3,2/3,1/4,3/4}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}items-{start,end,center,baseline,stretch}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}justify-{start,end,center,between,around,evenly,stretch}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}justify-items-{start,end,center,stretch}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}content-{start,end,center,between,around,evenly,stretch}");
+@source inline("self-{auto,start,end,center,stretch,baseline}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}order-{1..12}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}grid-cols-{1..12}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}grid-cols-none");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}grid-rows-{1..6}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}col-span-{1..12}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}col-span-full");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}row-span-{1..6}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}col-start-{1..13}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}col-end-{1..13}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}auto-cols-{auto,min,max,fr}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}grid-flow-{row,col,dense,row-dense,col-dense}");
+
+/* Gap and space */
+@source inline("{sm:,md:,lg:,xl:,2xl:,}gap-{0,px,0.5,1,1.5,2,2.5,3,3.5,4,5,6,7,8,9,10,11,12,14,16,20,24,28,32}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}gap-x-{0,px,0.5,1,1.5,2,2.5,3,3.5,4,5,6,7,8,10,12,16,20,24}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}gap-y-{0,px,0.5,1,1.5,2,2.5,3,3.5,4,5,6,7,8,10,12,16,20,24}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}space-x-{0,px,0.5,1,1.5,2,2.5,3,3.5,4,5,6,8,10,12,16}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}space-y-{0,px,0.5,1,1.5,2,2.5,3,3.5,4,5,6,8,10,12,16}");
+@source inline("divide-{x,y} divide-{x,y}-{0,2,4} divide-border divide-solid divide-dashed");
+
+/* Padding and margin */
+@source inline("{sm:,md:,lg:,xl:,2xl:,}{p,px,py,pt,pr,pb,pl}-{0,px,0.5,1,1.5,2,2.5,3,3.5,4,5,6,7,8,9,10,11,12,14,16,20,24,28,32,36,40,48,56,64}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}{m,mx,my,mt,mr,mb,ml}-{0,px,0.5,1,1.5,2,2.5,3,3.5,4,5,6,7,8,9,10,11,12,14,16,20,24,28,32,auto}");
+@source inline("-{mt,mr,mb,ml,mx,my}-{1,2,3,4,5,6,8,10,12,16}");
+
+/* Sizing */
+@source inline("{sm:,md:,lg:,xl:,2xl:,}w-{0,px,0.5,1,1.5,2,2.5,3,3.5,4,5,6,7,8,9,10,11,12,14,16,20,24,28,32,36,40,44,48,52,56,60,64,72,80,96}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}w-{auto,full,screen,min,max,fit,1/2,1/3,2/3,1/4,3/4,1/5,2/5,3/5,4/5}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}h-{0,px,0.5,1,1.5,2,2.5,3,3.5,4,5,6,7,8,9,10,11,12,14,16,20,24,28,32,36,40,44,48,52,56,60,64,72,80,96}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}h-{auto,full,screen,min,max,fit,1/2,1/3,2/3}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}size-{0,px,1,2,3,4,5,6,7,8,9,10,11,12,14,16,20,24,32,full}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}min-w-{0,px,1,2,3,4,5,6,8,10,12,16,20,24,32,40,48,56,64,72,80,96,full,min,max,fit}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}min-h-{0,px,4,6,8,10,12,16,20,24,32,40,48,56,64,72,80,96,full,screen,min,max,fit}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}max-w-{0,px,4,8,12,16,20,24,32,40,48,56,64,72,80,96}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}max-w-{none,xs,sm,md,lg,xl,2xl,3xl,4xl,5xl,6xl,7xl,full,min,max,fit,prose,screen-sm,screen-md,screen-lg,screen-xl,screen-2xl}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}max-h-{0,px,4,8,12,16,20,24,32,40,48,56,64,72,80,96,none,full,screen,min,max,fit}");
+
+/* Typography */
+@source inline("{sm:,md:,lg:,xl:,2xl:,}text-{xs,sm,base,lg,xl,2xl,3xl,4xl,5xl,6xl,7xl,8xl,9xl}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}text-{left,center,right,justify,start,end}");
+@source inline("font-{thin,extralight,light,normal,medium,semibold,bold,extrabold,black}");
+@source inline("font-{sans,serif,mono}");
+@source inline("leading-{none,tight,snug,normal,relaxed,loose,3,4,5,6,7,8,9,10}");
+@source inline("tracking-{tighter,tight,normal,wide,wider,widest}");
+@source inline("{underline,overline,line-through,no-underline,uppercase,lowercase,capitalize,normal-case,italic,not-italic,truncate,antialiased}");
+@source inline("underline-offset-{1,2,4,8} decoration-{1,2,4}");
+@source inline("line-clamp-{1..6} line-clamp-none");
+@source inline("whitespace-{normal,nowrap,pre,pre-line,pre-wrap,break-spaces}");
+@source inline("{break-normal,break-words,break-all,break-keep,text-wrap,text-nowrap,text-balance,text-pretty}");
+@source inline("list-{none,disc,decimal,inside,outside} list-image-none");
+@source inline("align-{baseline,top,middle,bottom,text-top,text-bottom}");
+@source inline("indent-{0,1,2,4,8}");
+
+/* Borders, radius and rings */
+@source inline("border border-{0,2,4,8} border-{t,r,b,l,x,y} border-{t,r,b,l,x,y}-{0,2,4,8}");
+@source inline("border-{solid,dashed,dotted,double,none}");
+@source inline("rounded rounded-{none,sm,md,lg,xl,2xl,3xl,full}");
+@source inline("rounded-{t,r,b,l,tl,tr,br,bl}-{none,sm,md,lg,xl,2xl,3xl,full}");
+@source inline("ring ring-{0,1,2,4,8} ring-offset-{0,1,2,4,8} ring-inset");
+@source inline("outline outline-{none,0,1,2,4} outline-offset-{0,1,2,4} outline-dashed outline-solid");
+
+/* Design-token colours, with the opacity modifiers applications actually reach for */
+@source inline("{hover:,focus:,focus-visible:,active:,disabled:,group-hover:,dark:,}{bg,text,border,ring,divide,fill,stroke,decoration,outline,shadow,accent,caret,placeholder}-{background,foreground,card,card-foreground,popover,popover-foreground,primary,primary-foreground,secondary,secondary-foreground,muted,muted-foreground,accent,accent-foreground,destructive,destructive-foreground,success,success-foreground,border,input,ring,chart-1,chart-2,chart-3,chart-4,chart-5,sidebar,sidebar-foreground,sidebar-primary,sidebar-primary-foreground,sidebar-accent,sidebar-accent-foreground,sidebar-border,sidebar-ring,transparent,current,inherit,white,black}");
+@source inline("{bg,text,border,ring}-{background,foreground,card,popover,primary,secondary,muted,accent,destructive,success,border,input,ring}/{5,10,15,20,25,30,40,50,60,70,75,80,90,95}");
+@source inline("{bg,text,border}-alert-{success,info,warning,danger} {bg,text,border}-alert-{success,info,warning,danger}-{foreground,bg}");
+
+/* Backgrounds, effects and transitions */
+@source inline("bg-{none,cover,contain,center,no-repeat,repeat,fixed,local,scroll}");
+@source inline("bg-gradient-to-{t,tr,r,br,b,bl,l,tl}");
+@source inline("shadow shadow-{2xs,xs,sm,md,lg,xl,2xl,inner,none}");
+@source inline("opacity-{0,5,10,15,20,25,30,40,50,60,70,75,80,90,95,100}");
+@source inline("{blur,backdrop-blur}-{none,xs,sm,md,lg,xl,2xl,3xl}");
+@source inline("backdrop-blur blur");
+@source inline("transition transition-{none,all,colors,opacity,shadow,transform}");
+@source inline("duration-{0,75,100,150,200,300,500,700,1000} delay-{0,75,100,150,200,300,500,700,1000}");
+@source inline("ease-{linear,in,out,in-out} animate-{none,spin,ping,pulse,bounce}");
+@source inline("{hover:,focus:,}{scale,rotate}-{0,50,75,90,95,100,105,110,125,150}");
+@source inline("translate-{x,y}-{0,px,0.5,1,2,3,4,5,6,8,10,12,16,full,1/2}");
+@source inline("-translate-{x,y}-{1,2,3,4,full,1/2}");
+@source inline("transform-none origin-{center,top,right,bottom,left}");
+
+/* Overflow, object fit, aspect ratio, interaction */
+@source inline("{sm:,md:,lg:,xl:,2xl:,}overflow-{auto,hidden,visible,scroll,clip}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}overflow-{x,y}-{auto,hidden,visible,scroll,clip}");
+@source inline("object-{contain,cover,fill,none,scale-down} object-{center,top,right,bottom,left}");
+@source inline("aspect-{auto,square,video}");
+@source inline("cursor-{auto,default,pointer,wait,text,move,help,not-allowed,grab,grabbing}");
+@source inline("select-{none,text,all,auto} pointer-events-{none,auto} resize resize-{none,x,y}");
+@source inline("{sr-only,not-sr-only,container,mx-auto}");
+@source inline("scroll-{auto,smooth} scroll-m-{0,4,8,12,16,20,24} scroll-mt-{0,4,8,12,16,20,24}");
+@source inline("{first:,last:,odd:,even:,disabled:,group-hover:,peer-focus:}{border-b-0,border-t-0,bg-muted,opacity-50,underline,hidden,block}");
+
+/* Container-scale sizing (min-w-3xl etc). A wide DataTable inside an `overflow-x-auto` wrapper
+ * needs a minimum width, and only the arbitrary-value form `min-w-[720px]` used to be reachable -
+ * which the pre-built bundle can never generate. */
+@source inline("{sm:,md:,lg:,xl:,2xl:,}{w,min-w,max-w}-{3xs,2xs,xs,sm,md,lg,xl,2xl,3xl,4xl,5xl,6xl,7xl}");

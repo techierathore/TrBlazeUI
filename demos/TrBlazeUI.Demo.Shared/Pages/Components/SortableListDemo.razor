@@ -1,0 +1,92 @@
+@page "/components/sortable-list"
+@using TrBlazeUI.Components.SortableList
+@using TrBlazeUI.Components.Badge
+
+<PageTitle>Sortable List Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Sortable List</h1>
+        <p class="text-xl text-muted-foreground">
+            A reorderable list — series parts, resume entries, a playlist.
+        </p>
+    </div>
+
+    <div class="rounded-lg border border-alert-info bg-alert-info-bg p-4 text-sm text-alert-info-foreground">
+        <strong>Buttons, not drag-and-drop.</strong> Order is changed with real buttons, so it works
+        with a keyboard, a screen reader, a touch screen and a mouse with no pointer-events story —
+        and every move is announced through a live region ("Part two moved to position 1 of 3").
+        Drag is a convenience; buttons are the contract.
+    </div>
+
+    <!-- Basic -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Basic Example</h2>
+            <p class="text-sm text-muted-foreground">
+                Tab to a move button and press Enter. The bound list is updated in place through
+                <code>@@bind-Items</code>.
+            </p>
+        </div>
+        <SortableList TItem="string" @bind-Items="objSimple" />
+        <p class="text-sm text-muted-foreground">Order: <code>@string.Join(" → ", objSimple)</code></p>
+    </div>
+
+    <!-- Templated -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">With an item template</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>ItemTemplate</code> renders the row; <code>ItemLabel</code> supplies the
+                accessible name used by the move buttons and the announcement — without it the
+                buttons would read "Move TrBlazeUI.Demo.SeriesPart up".
+            </p>
+        </div>
+        <SortableList TItem="SeriesPart" Items="@objParts"
+                      ItemsChanged="@(v => objParts = [.. v])"
+                      ItemLabel="@(p => p.Title)">
+            <ItemTemplate Context="part">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="truncate font-medium">@part.Title</p>
+                        <p class="truncate text-sm text-muted-foreground">@part.Summary</p>
+                    </div>
+                    <Badge Variant="BadgeVariant.Secondary">@part.Minutes min</Badge>
+                </div>
+            </ItemTemplate>
+        </SortableList>
+        <p class="text-sm text-muted-foreground">
+            Saved order: <code>@string.Join(", ", objParts.Select(p => p.Title))</code>
+        </p>
+    </div>
+
+    <!-- Usage -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Usage</h2>
+        <pre class="overflow-x-auto rounded-lg border bg-muted/30 p-4 text-sm"><code>@objUsage</code></pre>
+    </div>
+</div>
+
+@code {
+    private IList<string> objSimple = ["Part one", "Part two", "Part three"];
+
+    private List<SeriesPart> objParts =
+    [
+        new("Getting started", "Install the package and wire up the imports", 6),
+        new("Composing primitives", "Build a headless control from scratch", 11),
+        new("Theming", "Override the OKLCH token set", 8),
+    ];
+
+    /// <summary>One part of a blog series, used by the templated example.</summary>
+    public sealed record SeriesPart(string Title, string Summary, int Minutes);
+
+    private const string objUsage = """
+        @using TrBlazeUI.Components.SortableList
+
+        <SortableList TItem="SeriesPart" @bind-Items="parts" ItemLabel="@(p => p.Title)">
+            <ItemTemplate Context="part">
+                <span class="font-medium">@part.Title</span>
+            </ItemTemplate>
+        </SortableList>
+        """;
+}

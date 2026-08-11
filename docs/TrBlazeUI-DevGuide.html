@@ -99,188 +99,170 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 .diagram.fs .mermaid{height:calc(100vh - 40px);display:flex;align-items:center;justify-content:center}
 
 @media(max-width:900px){.layout{grid-template-columns:1fr}nav.side{position:static;height:auto}}
-
-/* --- wide-content containment (wide tables scroll inside their own box; images never overflow) --- */
-.table-wrap{overflow-x:auto;max-width:100%;margin:8px 0;border-radius:8px}
-.table-wrap table{margin:0;min-width:860px}
-main img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:8px;margin:6px 0 14px}
 </style>
 </head>
 <body>
-<button id="themeToggle" class="theme-toggle" title="Toggle light / dark">☾ Dark</button>
+<button id="themeToggle" class="theme-toggle" title="Toggle light / dark">&#9790; Dark</button>
 <div class="layout no-toc">
   <main>
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="subtitle">Last updated: 2026-07-22 · Runtime-verified screen map for the TrBlazeUI component library and demo application</div>
 
-    <p><strong>Last updated:</strong> 2026-07-22<br>
-    <strong>Verification status:</strong> ✅ <strong>RUNTIME-VERIFIED (key screens sampled; DataTable / Dialog / Select / AlertDialog re-confirmed 2026-07-21).</strong> The Blazor Server demo was booted and driven with headless Chromium (Playwright). Home, DataTable, Bar Chart, Toolbar and Icons were verified 2026-06-30 (screenshots in <code>docs/screenshots/TrBlazeUI/</code>). On <strong>2026-07-21</strong>, after the REQ-UI-016 fixes, <code>/components/datatable</code>, <code>/components/dialog</code>, <code>/components/select</code> and <code>/components/alert-dialog</code> were re-driven — all render their data, look right, and produce no console errors or horizontal overflow at 1366px and 390px (<code>tests/verify/ui-ui016.spec.js</code>, 21/21). <code>datatable.png</code> was recaptured because the toolbar default changed. The remaining ~80 component/primitive demo pages were not each individually driven; run <code>*verify ui</code> / <code>*devguide TrBlazeUI --update</code> for exhaustive per-screen confirmation.</p>
-
-    <blockquote>
-      <p><strong>What this document is.</strong> The screen-by-screen, as-built map a developer uses to chase a bug or catch AI-hallucinated code. TrBlazeUI is a <strong>component library with a demo application</strong> and has <strong>no database, no API, no stored procedures, and no auth</strong> — so the usual <em>page → service → data-access → proc</em> lineage collapses to <strong>demo page → demo-shared composition → library component → primitive → JS interop / service</strong>. There is exactly one role: the <strong>anonymous demo visitor</strong>.</p>
-    </blockquote>
-
-    <div class="toc-inline">
-      <div>Contents</div>
-      <ol>
-        <li><a href="#roles-navigation">Roles &amp; navigation</a></li>
-        <li><a href="#app-shell-shared-services">App shell &amp; shared services</a></li>
-        <li><a href="#screen-map">Screen map</a></li>
-        <li><a href="#library-lineage-how-a-styled-component-resolves">Library lineage — how a styled component resolves</a></li>
-        <li><a href="#known-issues">Known issues</a></li>
-        <li><a href="#runtime-screenshots-sampled-2026-06-30">Runtime screenshots (sampled, 2026-06-30)</a>
-          <ul>
-            <li><a href="#home">Home (<code>/</code>)</a></li>
-            <li><a href="#datatable-components-datatable">DataTable (<code>/components/datatable</code>)</a></li>
-            <li><a href="#bar-chart-charts-bar">Bar Chart (<code>/charts/bar</code>)</a></li>
-            <li><a href="#toolbar-components-toolbar">Toolbar (<code>/components/toolbar</code>)</a></li>
-            <li><a href="#icons-icons">Icons (<code>/icons</code>)</a></li>
-          </ul>
-        </li>
-      </ol>
-    </div>
-
-    <h2 id="roles-navigation">1. Roles &amp; navigation<a class="anchor-link" href="#roles-navigation">#</a></h2>
-
-    <ul>
-      <li><strong>Role:</strong> Anonymous demo visitor (no login). One sidebar navigation drives the whole app.</li>
-      <li><strong>Hosts:</strong> <code>Demo.Server</code> (5183/7172), <code>Demo.Wasm</code> (5184/7173), <code>Demo.Auto</code> (5185/7174) — all render the SAME <code>Demo.Shared</code> Razor Class Library, so the screen map below is host-independent.</li>
-      <li><strong>Nav source:</strong> <code>demos/TrBlazeUI.Demo.Shared/Shared/MainLayout.razor</code> (+ <code>.razor.cs</code>), with <code>HorizontalNav.razor</code> / <code>LayoutToggle.razor</code> for the horizontal/vertical layout switch, <code>DarkModeToggle.razor</code> for theme, and <code>CommandSearch.razor</code> for the command palette.</li>
-    </ul>
-
-    <div class="diagram">
-      <div class="dt">
-        <button data-zout title="Zoom out">−</button>
-        <span class="zlabel">100%</span>
-        <button data-zin title="Zoom in">+</button>
-        <button data-fit title="Fit to width">Fit</button>
-        <button data-one title="Actual size">1:1</button>
-        <button data-fs title="Fullscreen">⛶</button>
-        <button data-pop title="Open in new tab">↗</button>
-      </div>
-      <pre class="mermaid">flowchart TB
+<p><strong>Last updated:</strong> 2026-08-11 (handoff refresh — 2.1.0 as-built) <strong>Verification status:</strong> ✅ <strong>RUNTIME-VERIFIED.</strong> The Blazor Server demo was booted and driven with headless Chromium (Playwright) on <strong>2026-08-11 at handoff</strong>: all 22 screens the 2.1.0 release added or changed returned HTTP 200 with <strong>0 error boundaries, 0 console errors and 0px horizontal overflow</strong> at 1366×800, plus a 390px reflow pass on <code>/components/prose</code>, <code>/components/datatable</code> and <code>/whats-new</code> — <strong>25/25</strong>. That sits on top of the same day's REQ-UI-017 gates: <code>ui-techieblog.spec.js</code> <strong>65/65</strong>, <code>ui-demo-2-1-0.spec.js</code> <strong>15/15</strong>, 112/113 demo routes crawled clean, and the regression specs <code>ui-ui014</code> <strong>8/8</strong> + <code>ui-ui016</code> <strong>23/23</strong> still green. Earlier sampled screens (Home, DataTable, Bar Chart, Toolbar, Icons) carry screenshots in <code>docs/screenshots/TrBlazeUI/</code>. Release build re-confirmed <strong>0 warnings / 0 errors</strong> at handoff.</p>
+<blockquote><p><strong>What this document is.</strong> The screen-by-screen, as-built map a developer uses to chase a bug or catch AI-hallucinated code. TrBlazeUI is a <strong>component library with a demo application</strong> and has <strong>no database, no API, no stored procedures, and no auth</strong> — so the usual <em>page → service → data-access → proc</em> lineage collapses to <strong>demo page → demo-shared composition → library component → primitive → JS interop / service</strong>. There is exactly one role: the <strong>anonymous demo visitor</strong>.</p></blockquote>
+<div class="toc-inline">
+  <div>Contents</div>
+  <ol>
+    <li><a href="#roles-navigation">1. Roles &amp; navigation</a></li>
+    <li><a href="#app-shell-shared-services">2. App shell &amp; shared services</a></li>
+    <li><a href="#screen-map">3. Screen map</a></li>
+    <li class="h3"><a href="#screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11">2.1.0 screens (added / changed by REQ-UI-017 — all runtime-verified 2026-08-11)</a></li>
+    <li><a href="#library-lineage-how-a-styled-component-resolves">4. Library lineage — how a styled component resolves</a></li>
+    <li><a href="#known-issues">5. Known issues</a></li>
+    <li><a href="#runtime-screenshots">6. Runtime screenshots</a></li>
+    <li class="h3"><a href="#the-2-1-0-surface-captured-2026-08-11-at-handoff-1366-900">6.1 The 2.1.0 surface (captured 2026-08-11 at handoff, 1366×900)</a></li>
+    <li class="h3"><a href="#earlier-sampled-key-screens-2026-06-30-datatable-png-recaptured-2026-07-21">6.2 Earlier sampled key screens (2026-06-30; <code>datatable.png</code> recaptured 2026-07-21)</a></li>
+  </ol>
+</div>
+<h2 id="roles-navigation">1. Roles &amp; navigation<a class="anchor-link" href="#roles-navigation">#</a></h2>
+<ul><li><strong>Role:</strong> Anonymous demo visitor (no login). One sidebar navigation drives the whole app.</li><li><strong>Hosts:</strong> <code>Demo.Server</code> (5183/7172), <code>Demo.Wasm</code> (5184/7173), <code>Demo.Auto</code> (5185/7174) — all render the SAME <code>Demo.Shared</code> Razor Class Library, so the screen map below is host-independent.</li><li><strong>Nav source:</strong> <code>demos/TrBlazeUI.Demo.Shared/Shared/MainLayout.razor</code> (+ <code>.razor.cs</code>), with <code>HorizontalNav.razor</code> / <code>LayoutToggle.razor</code> for the horizontal/vertical layout switch, <code>DarkModeToggle.razor</code> for theme, and <code>CommandSearch.razor</code> for the command palette.</li></ul>
+<div class="diagram">
+  <div class="dt">
+    <button data-zout title="Zoom out">&minus;</button>
+    <span class="zlabel">100%</span>
+    <button data-zin title="Zoom in">+</button>
+    <button data-fit title="Fit to width">Fit</button>
+    <button data-one title="Actual size">1:1</button>
+    <button data-fs title="Fullscreen">&#9974;</button>
+    <button data-pop title="Open in new tab">&#8599;</button>
+  </div>
+  <pre class="mermaid">flowchart TB
   Shell["MainLayout (sidebar + topbar)"] --> Home["/ (Index)"]
   Shell --> Arch["/architecture"]
   Shell --> GS["/getting-started"]
-  Shell --> Comp["/components (73 demo pages)"]
+  Shell --> Comp["/components (83 demo pages)"]
   Shell --> Prim["/primitives (15 demos)"]
   Shell --> Charts["/charts/* (6 demos)"]
   Shell --> Icons["/icons (browser)"]
-  Shell --> Theme["/ (DynamicThemeDemo)"]</pre>
-    </div>
-
-    <h2 id="app-shell-shared-services">2. App shell &amp; shared services<a class="anchor-link" href="#app-shell-shared-services">#</a></h2>
-
-    <div class="table-wrap">
-    <table>
-      <thead>
-        <tr><th>Element</th><th>File</th><th>Responsibility</th></tr>
-      </thead>
-      <tbody>
-        <tr><td><code>MainLayout</code></td><td><code>Shared/MainLayout.razor(.cs)</code></td><td>Sidebar + topbar shell; hosts <code>&lt;PortalHost/&gt;</code>, theme + layout toggles, command search</td></tr>
-        <tr><td><code>HorizontalNav</code> / <code>LayoutToggle</code></td><td><code>Shared/HorizontalNav.razor</code>, <code>Shared/LayoutToggle.razor</code></td><td>Switch between vertical sidebar and horizontal top nav</td></tr>
-        <tr><td><code>DarkModeToggle</code></td><td><code>Shared/DarkModeToggle.razor</code></td><td>Adds/removes <code>.dark</code> on <code>&lt;html&gt;</code></td></tr>
-        <tr><td><code>CommandSearch</code></td><td><code>Shared/CommandSearch.razor</code></td><td>Command-palette page jump</td></tr>
-        <tr><td><code>ThemeService</code></td><td><code>Services/ThemeService.cs</code></td><td>Current theme + light/dark state</td></tr>
-        <tr><td><code>CollapsibleStateService</code></td><td><code>Services/CollapsibleStateService.cs</code></td><td>Sidebar/collapsible persistence (localStorage)</td></tr>
-        <tr><td><code>MockDataService</code></td><td><code>Services/MockDataService.cs</code></td><td>Sample rows/series for DataTable + Chart demos (no DB)</td></tr>
-        <tr><td><code>LayoutService</code></td><td><code>Services/LayoutService.cs</code></td><td>Horizontal/vertical layout state</td></tr>
-      </tbody>
-    </table>
-    </div>
-
-    <p>There is <strong>no data-access layer</strong>: demo data comes entirely from <code>MockDataService</code> held in memory. Any code path that appears to read a database, call an API, or invoke a stored proc would be hallucinated — there is none in this repo.</p>
-
-    <h2 id="screen-map">3. Screen map<a class="anchor-link" href="#screen-map">#</a></h2>
-
-    <p>Each demo page lives under <code>demos/TrBlazeUI.Demo.Shared/Pages/</code> and composes one library component family. The full set is large (73 component demos + 15 primitive demos + 6 chart demos + icons + 5 top-level pages); the table below maps the representative/structural screens. Every <code>/components/{x}</code> page follows the same lineage shape: <strong>demo page → <code>&lt;Library component&gt;</code> → primitive (if any) → JS interop / service</strong>.</p>
-
-    <div class="table-wrap">
-    <table>
-      <thead>
-        <tr><th>Screen</th><th>Route</th><th>Demo page file</th><th>Library surface exercised</th><th>Lineage notes</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Home</td><td><code>/</code></td><td><code>Pages/Index.razor</code></td><td>(overview)</td><td>Confirms CSS loaded</td></tr>
-        <tr><td>Architecture</td><td><code>/architecture</code></td><td><code>Pages/Architecture.razor</code></td><td>(static content)</td><td>—</td></tr>
-        <tr><td>Getting Started</td><td><code>/getting-started</code></td><td><code>Pages/GettingStarted.razor</code></td><td>(static content + snippets)</td><td>—</td></tr>
-        <tr><td>Dynamic Theme</td><td>(page)</td><td><code>Pages/DynamicThemeDemo.razor</code></td><td><code>ThemeService</code>, CSS variables</td><td>Live theme variable editing</td></tr>
-        <tr><td>Components index</td><td><code>/components</code></td><td><code>Pages/Components/Index.razor</code></td><td>grid of 73 component links</td><td>—</td></tr>
-        <tr><td>Button</td><td><code>/components/button</code></td><td><code>Pages/Components/ButtonDemo.razor</code></td><td><code>Button</code>, <code>ButtonIcon</code></td><td>no primitive; pure styled</td></tr>
-        <tr><td>Sidebar</td><td><code>/components/sidebar</code></td><td><code>Pages/Components/SidebarDemo.razor</code></td><td><code>Sidebar</code> (22 parts) → <code>CollapsibleStateService</code> + <code>sidebar.js</code></td><td>⚠ source trips REQ-NFR-005 (IDE0031)</td></tr>
-        <tr><td>Dialog</td><td><code>/components/dialog</code></td><td><code>Pages/Components/DialogDemo.razor</code></td><td><code>Dialog</code> → Dialog primitive → <code>PortalHost</code> + <code>portal.js</code>/<code>focus-trap.js</code></td><td>reactive portal refresh; <strong>2.0.0</strong>: <code>DialogContent</code>/<code>AlertDialogContent</code> clamped to <code>max-h-[calc(100vh-2rem)] overflow-y-auto</code> so a tall dialog can't render above the viewport. renders ✓ + looks-right ✓ (runtime-confirmed 2026-07-21)</td></tr>
-        <tr><td>Select</td><td><code>/components/select</code></td><td><code>Pages/Components/SelectDemo.razor</code></td><td><code>Select</code> → Select primitive → <code>positioning.js</code>/<code>select.js</code></td><td>custom dropdown (overlay-safe). ✅ <strong>TR-003 fixed (REQ-UI-014, 2026-07-22):</strong> trigger <code>&lt;button role="combobox"&gt;</code> now emits a default <code>aria-labelledby</code> → the <code>SelectValue</code> span, so it has an accessible name from first render; styled <code>SelectTrigger</code> adds an <code>AriaLabel</code> param. axe <code>button-name</code> = 0.</td></tr>
-        <tr><td>DataTable</td><td><code>/components/datatable</code></td><td><code>Pages/Components/DataTableDemo.razor</code></td><td><code>DataTable</code> → <code>MockDataService</code></td><td>sort/filter/paginate/select; <strong>2.0.0</strong>: <code>ShowToolbar</code> defaults <code>false</code> (opt-in), pagination gated on <code>ShouldShowPagination()</code> = <code>TotalItems &gt; PageSize</code>. renders ✓ + looks-right ✓ (runtime-confirmed 2026-07-21, 40 rows real data)</td></tr>
-        <tr><td>Toolbar</td><td><code>/components/toolbar</code></td><td><code>Pages/Components/ToolbarDemo.razor</code></td><td><code>Toolbar</code>/<code>ToolbarGroup</code>/<code>ToolbarButton</code>/<code>ToolbarToggleButton</code>/<code>ToolbarSeparator</code></td><td>composes Button/DropdownMenu</td></tr>
-        <tr><td>RichTextEditor</td><td><code>/components/rich-text-editor</code></td><td><code>Pages/Components/RichTextEditorDemo.razor</code></td><td><code>RichTextEditor</code> → <code>quill-interop.js</code> + HtmlSanitizer</td><td>sanitized HTML output</td></tr>
-        <tr><td>MarkdownEditor</td><td><code>/components/markdown-editor</code></td><td><code>Pages/Components/MarkdownEditorDemo.razor</code></td><td><code>MarkdownEditor</code> → Markdig + <code>markdown-editor.js</code></td><td>live preview</td></tr>
-        <tr><td>Primitives index</td><td><code>/primitives</code></td><td><code>Pages/Primitives/Index.razor</code></td><td>15 headless-primitive demos</td><td>unstyled behavior + ARIA</td></tr>
-        <tr><td>Charts</td><td><code>/charts/{area,bar,line,pie,radar,radial}</code></td><td><code>Pages/Charts/*ChartDemo.razor</code></td><td><code>Chart</code> → Blazor-ApexCharts → <code>MockDataService</code></td><td>6 types</td></tr>
-        <tr><td>Icons</td><td><code>/icons</code></td><td><code>Pages/Icons/*</code></td><td><code>LucideIcon</code> / <code>HeroIcon</code> / <code>FeatherIcon</code></td><td>generated <code>*IconData.cs</code></td></tr>
-      </tbody>
-    </table>
-    </div>
-
-    <p><em>(The remaining ~60 component demos and ~14 primitive demos follow the identical lineage shape; they are enumerated in the demo <code>Pages/Components/</code> and <code>Pages/Primitives/</code> folders and indexed in the BRD §9 feature catalog. A runtime <code>--update</code> pass should stamp render-status per page.)</em></p>
-
-    <h2 id="library-lineage-how-a-styled-component-resolves">4. Library lineage — how a styled component resolves<a class="anchor-link" href="#library-lineage-how-a-styled-component-resolves">#</a></h2>
-
-    <div class="diagram">
-      <div class="dt">
-        <button data-zout title="Zoom out">−</button>
-        <span class="zlabel">100%</span>
-        <button data-zin title="Zoom in">+</button>
-        <button data-fit title="Fit to width">Fit</button>
-        <button data-one title="Actual size">1:1</button>
-        <button data-fs title="Fullscreen">⛶</button>
-        <button data-pop title="Open in new tab">↗</button>
-      </div>
-      <pre class="mermaid">flowchart LR
+  Shell --> Theme["/ (DynamicThemeDemo)"]
+  Shell --> New["/whats-new (2.1.0 release page)"]</pre>
+</div>
+<h2 id="app-shell-shared-services">2. App shell &amp; shared services<a class="anchor-link" href="#app-shell-shared-services">#</a></h2>
+<table>
+<thead><tr><th>Element</th><th>File</th><th>Responsibility</th></tr></thead>
+<tbody>
+<tr><td><code>MainLayout</code></td><td><code>Shared/MainLayout.razor(.cs)</code></td><td>Sidebar + topbar shell; hosts <code>&lt;PortalHost/&gt;</code>, theme + layout toggles, command search</td></tr>
+<tr><td><code>HorizontalNav</code> / <code>LayoutToggle</code></td><td><code>Shared/HorizontalNav.razor</code>, <code>Shared/LayoutToggle.razor</code></td><td>Switch between vertical sidebar and horizontal top nav</td></tr>
+<tr><td><code>DarkModeToggle</code></td><td><code>Shared/DarkModeToggle.razor</code></td><td>Adds/removes <code>.dark</code> on <code>&lt;html&gt;</code></td></tr>
+<tr><td><code>CommandSearch</code></td><td><code>Shared/CommandSearch.razor</code></td><td>Command-palette page jump</td></tr>
+<tr><td><code>ThemeService</code></td><td><code>Services/ThemeService.cs</code></td><td>Current theme + light/dark state</td></tr>
+<tr><td><code>CollapsibleStateService</code></td><td><code>Services/CollapsibleStateService.cs</code></td><td>Sidebar/collapsible persistence (localStorage)</td></tr>
+<tr><td><code>MockDataService</code></td><td><code>Services/MockDataService.cs</code></td><td>Sample rows/series for DataTable + Chart demos (no DB)</td></tr>
+<tr><td><code>LayoutService</code></td><td><code>Services/LayoutService.cs</code></td><td>Horizontal/vertical layout state</td></tr>
+</tbody></table>
+<p>There is <strong>no data-access layer</strong>: demo data comes entirely from <code>MockDataService</code> held in memory. Any code path that appears to read a database, call an API, or invoke a stored proc would be hallucinated — there is none in this repo.</p>
+<h2 id="screen-map">3. Screen map<a class="anchor-link" href="#screen-map">#</a></h2>
+<p>Each demo page lives under <code>demos/TrBlazeUI.Demo.Shared/Pages/</code> and composes one library component family. The full set is large — <strong>117 <code>.razor</code> pages</strong> in total (83 component demos + 15 primitive demos + 6 chart demos + icons + 5 top-level pages + <code>/whats-new</code> + 3 <code>/verify-*</code> test harnesses); the table below maps the representative/structural screens. Every <code>/components/{x}</code> page follows the same lineage shape: <strong>demo page → <code>&lt;Library component&gt;</code> → primitive (if any) → JS interop / service</strong>.</p>
+<table>
+<thead><tr><th>Screen</th><th>Route</th><th>Demo page file</th><th>Library surface exercised</th><th>Lineage notes</th></tr></thead>
+<tbody>
+<tr><td>Home</td><td><code>/</code></td><td><code>Pages/Index.razor</code></td><td>(overview)</td><td>Confirms CSS loaded</td></tr>
+<tr><td>Architecture</td><td><code>/architecture</code></td><td><code>Pages/Architecture.razor</code></td><td>(static content)</td><td>—</td></tr>
+<tr><td>Getting Started</td><td><code>/getting-started</code></td><td><code>Pages/GettingStarted.razor</code></td><td>(static content + snippets)</td><td>—</td></tr>
+<tr><td>Dynamic Theme</td><td>(page)</td><td><code>Pages/DynamicThemeDemo.razor</code></td><td><code>ThemeService</code>, CSS variables</td><td>Live theme variable editing</td></tr>
+<tr><td>Components index</td><td><code>/components</code></td><td><code>Pages/Components/Index.razor</code></td><td>grid of 83 component links</td><td>—</td></tr>
+<tr><td>Button</td><td><code>/components/button</code></td><td><code>Pages/Components/ButtonDemo.razor</code></td><td><code>Button</code>, <code>ButtonIcon</code></td><td>no primitive; pure styled</td></tr>
+<tr><td>Sidebar</td><td><code>/components/sidebar</code></td><td><code>Pages/Components/SidebarDemo.razor</code></td><td><code>Sidebar</code> (22 parts) → <code>CollapsibleStateService</code> + <code>sidebar.js</code></td><td>⚠ source trips REQ-NFR-005 (IDE0031)</td></tr>
+<tr><td>Dialog</td><td><code>/components/dialog</code></td><td><code>Pages/Components/DialogDemo.razor</code></td><td><code>Dialog</code> → Dialog primitive → <code>PortalHost</code> + <code>portal.js</code>/<code>focus-trap.js</code></td><td>reactive portal refresh; <strong>2.0.0</strong>: <code>DialogContent</code>/<code>AlertDialogContent</code> clamped to <code>max-h-[calc(100vh-2rem)] overflow-y-auto</code> so a tall dialog can't render above the viewport. renders ✓ + looks-right ✓ (runtime-confirmed 2026-07-21)</td></tr>
+<tr><td>Select</td><td><code>/components/select</code></td><td><code>Pages/Components/SelectDemo.razor</code></td><td><code>Select</code> → Select primitive → <code>positioning.js</code>/<code>select.js</code></td><td>custom dropdown (overlay-safe). ✅ <strong>TR-003 fixed (REQ-UI-014, 2026-07-22):</strong> trigger <code>&lt;button role=&quot;combobox&quot;&gt;</code> now emits a default <code>aria-labelledby</code> → the <code>SelectValue</code> span (<code>SelectTrigger.razor</code> <code>GetDefaultLabelledBy()</code>), so it has an accessible name from first render; styled <code>SelectTrigger</code> adds an <code>AriaLabel</code> param. axe <code>button-name</code> = 0.</td></tr>
+<tr><td>DataTable</td><td><code>/components/datatable</code></td><td><code>Pages/Components/DataTableDemo.razor</code></td><td><code>DataTable</code> → <code>MockDataService</code></td><td>sort/filter/paginate/select; <strong>2.0.0</strong>: <code>ShowToolbar</code> defaults <code>false</code> (opt-in), pagination gated on <code>ShouldShowPagination()</code> = <code>TotalItems &gt; PageSize</code>. renders ✓ + looks-right ✓ (runtime-confirmed 2026-07-21, 40 rows real data)</td></tr>
+<tr><td>Toolbar</td><td><code>/components/toolbar</code></td><td><code>Pages/Components/ToolbarDemo.razor</code></td><td><code>Toolbar</code>/<code>ToolbarGroup</code>/<code>ToolbarButton</code>/<code>ToolbarToggleButton</code>/<code>ToolbarSeparator</code></td><td>composes Button/DropdownMenu</td></tr>
+<tr><td>RichTextEditor</td><td><code>/components/rich-text-editor</code></td><td><code>Pages/Components/RichTextEditorDemo.razor</code></td><td><code>RichTextEditor</code> → <code>quill-interop.js</code> + HtmlSanitizer</td><td>sanitized HTML output</td></tr>
+<tr><td>MarkdownEditor</td><td><code>/components/markdown-editor</code></td><td><code>Pages/Components/MarkdownEditorDemo.razor</code></td><td><code>MarkdownEditor</code> → Markdig + <code>markdown-editor.js</code></td><td>live preview</td></tr>
+<tr><td>Primitives index</td><td><code>/primitives</code></td><td><code>Pages/Primitives/Index.razor</code></td><td>15 headless-primitive demos</td><td>unstyled behavior + ARIA</td></tr>
+<tr><td>Charts</td><td><code>/charts/{area,bar,line,pie,radar,radial}</code></td><td><code>Pages/Charts/*ChartDemo.razor</code></td><td><code>Chart</code> → Blazor-ApexCharts → <code>MockDataService</code></td><td>6 types</td></tr>
+<tr><td>Icons</td><td><code>/icons</code></td><td><code>Pages/Icons/*</code></td><td><code>LucideIcon</code> / <code>HeroIcon</code> / <code>FeatherIcon</code></td><td>generated <code>*IconData.cs</code></td></tr>
+<tr><td>What's new</td><td><code>/whats-new</code></td><td><code>Pages/WhatsNew.razor</code></td><td>live 2.1.0 examples (splatting, utility scale, retuned tokens)</td><td>release page added in 2.1.0. renders ✓ (2026-08-11)</td></tr>
+<tr><td>Verify harnesses</td><td><code>/verify-techieblog</code>, <code>/verify-ui016</code>, <code>/verify-ui014</code></td><td><code>Pages/VerifyTechieBlog.razor</code>, <code>VerifyUi016.razor</code>, <code>VerifyUi014.razor</code></td><td>fixture pages driven by the matching <code>tests/verify/*.spec.js</code></td><td><strong>not consumer-facing</strong> — they exist so the specs assert against a fixed composition</td></tr>
+</tbody></table>
+<h3 id="screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11">2.1.0 screens (added / changed by REQ-UI-017 — all runtime-verified 2026-08-11)<a class="anchor-link" href="#screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11">#</a></h3>
+<table>
+<thead><tr><th>Screen</th><th>Route</th><th>Demo page file</th><th>Library surface exercised</th><th>Lineage notes</th></tr></thead>
+<tbody>
+<tr><td>Prose</td><td><code>/components/prose</code></td><td><code>Pages/Components/ProseDemo.razor</code></td><td><code>Prose</code></td><td>typographic wrapper for rendered markdown/HTML; wide tables scroll inside themselves (0px page overflow @390)</td></tr>
+<tr><td>Stat</td><td><code>/components/stat</code></td><td><code>Pages/Components/StatDemo.razor</code></td><td><code>StatTile</code>, <code>StatGroup</code></td><td>pure styled; no primitive</td></tr>
+<tr><td>Timeline</td><td><code>/components/timeline</code></td><td><code>Pages/Components/TimelineDemo.razor</code></td><td><code>Timeline</code>, <code>TimelineItem</code></td><td>pure styled</td></tr>
+<tr><td>Stepper</td><td><code>/components/stepper</code></td><td><code>Pages/Components/StepperDemo.razor</code></td><td><code>Stepper</code>, <code>StepperItem</code></td><td>⚠ <code>Current</code> cascades <strong>by value</strong> (not <code>IsFixed</code>) — that was the aria-current bug found while building this page</td></tr>
+<tr><td>AnchorNav</td><td><code>/components/anchor-nav</code></td><td><code>Pages/Components/AnchorNavDemo.razor</code></td><td><code>AnchorNav</code> → JS interop</td><td>in-page nav with scrollspy</td></tr>
+<tr><td>SortableList</td><td><code>/components/sortable-list</code></td><td><code>Pages/Components/SortableListDemo.razor</code></td><td><code>SortableList</code></td><td>button-driven reordering — deliberately not drag-only, so it is keyboard/SR operable</td></tr>
+<tr><td>PasswordStrength</td><td><code>/components/password-strength</code></td><td><code>Pages/Components/PasswordStrengthDemo.razor</code></td><td><code>PasswordStrength</code></td><td>pure styled meter</td></tr>
+<tr><td>CodeBlock</td><td><code>/components/code-block</code></td><td><code>Pages/Components/CodeBlockDemo.razor</code></td><td><code>CodeBlock</code> → clipboard JS</td><td>⚠ copy falls back to <code>execCommand</code> off a secure origin, then reports "Press Ctrl+C" — never silently no-ops</td></tr>
+<tr><td>CenteredPanel</td><td><code>/components/centered-panel</code></td><td><code>Pages/Components/CenteredPanelDemo.razor</code></td><td><code>CenteredPanel</code></td><td>layout wrapper</td></tr>
+<tr><td>Rating</td><td><code>/components/rating</code></td><td><code>Pages/Components/RatingDemo.razor</code></td><td><code>Rating</code></td><td>2.1.0: options are <code>&lt;button role=&quot;radio&quot;&gt;</code> with roving tabindex + literal <code>aria-checked</code>; <code>ReadOnly</code> → <code>role=&quot;img&quot;</code>; new <code>Focusable</code></td></tr>
+<tr><td>Tabs</td><td><code>/components/tabs</code></td><td><code>Pages/Components/TabsDemo.razor</code></td><td><code>Tabs</code> → Tabs primitive</td><td>2.1.0: literal <code>aria-selected</code>; <code>aria-controls</code> only when a panel exists; <code>TabsContent</code> panel stays mounted (hidden)</td></tr>
+<tr><td>Input / Textarea</td><td><code>/components/input</code>, <code>/components/textarea</code></td><td><code>Pages/Components/InputDemo.razor</code>, <code>TextareaDemo.razor</code></td><td><code>Input</code>, <code>Textarea</code> → <code>TextValueSync</code></td><td>2.1.0: DOM value / render-tree value / parent value tracked separately so the Server echo can't overwrite typing; optional <code>DebounceMilliseconds</code></td></tr>
+<tr><td>NavigationMenu</td><td><code>/components/navigation-menu</code></td><td><code>Pages/Components/NavigationMenuDemo.razor</code></td><td><code>NavigationMenu</code></td><td>2.1.0: top-level links Tab reachable; <code>menuitem</code> semantics only inside a real <code>role=&quot;menu&quot;</code> popup</td></tr>
+<tr><td>Item</td><td><code>/components/item</code></td><td><code>Pages/Components/ItemDemo.razor</code></td><td><code>Item</code>, <code>ItemGroup</code>, <code>ItemSeparator</code></td><td>2.1.0: <code>role=&quot;listitem&quot;</code> inside <code>ItemGroup</code>; separator leaves the a11y tree</td></tr>
+<tr><td>Typography</td><td><code>/components/typography</code></td><td><code>Pages/Components/TypographyDemo.razor</code></td><td><code>Typography*</code></td><td>2.1.0: <code>Size</code> replaces baked-in size classes; <code>ClassNames.cn</code> is variant-aware</td></tr>
+</tbody></table>
+<p><em>(The remaining ~68 component demos and ~14 primitive demos follow the identical lineage shape; they are enumerated in the demo <code>Pages/Components/</code> and <code>Pages/Primitives/</code> folders and indexed in the BRD §9 feature catalog.)</em></p>
+<h2 id="library-lineage-how-a-styled-component-resolves">4. Library lineage — how a styled component resolves<a class="anchor-link" href="#library-lineage-how-a-styled-component-resolves">#</a></h2>
+<div class="diagram">
+  <div class="dt">
+    <button data-zout title="Zoom out">&minus;</button>
+    <span class="zlabel">100%</span>
+    <button data-zin title="Zoom in">+</button>
+    <button data-fit title="Fit to width">Fit</button>
+    <button data-one title="Actual size">1:1</button>
+    <button data-fs title="Fullscreen">&#9974;</button>
+    <button data-pop title="Open in new tab">&#8599;</button>
+  </div>
+  <pre class="mermaid">flowchart LR
   Demo["Demo page (Pages/Components/XDemo.razor)"] --> Styled["Styled component (src/TrBlazeUI.Components/Components/X)"]
   Styled --> Prim["Headless primitive (src/TrBlazeUI.Primitives/Primitives/X)"]
   Styled --> CSS["trblazeui.css (Tailwind v4, pre-built)"]
   Prim --> Svc["Primitive services (Portal/Positioning/Focus/Keyboard)"]
   Prim --> JS["JS interop (portal.js, focus-trap.js, positioning.js, ...)"]
   Styled --> ThirdParty["3rd-party (ApexCharts / Quill / Markdig+HtmlSanitizer)"]</pre>
-    </div>
-
-    <p>A reader chasing a bug starts at the demo page, drops into the styled component (<code>.razor</code> markup + <code>.razor.cs</code> logic), then into the primitive it composes (for behavior/ARIA), and finally into the relevant JS interop file or DI service. Symbols that don't resolve to a real file/component in <code>src/</code> are hallucinations — verify against the folders listed in <code>docs/TrBlazeUI-Architecture.md §4</code>.</p>
-
-    <h2 id="known-issues">5. Known issues<a class="anchor-link" href="#known-issues">#</a></h2>
-
-    <ul>
-      <li><strong>Sidebar Release build error (REQ-NFR-005)</strong> — <em>Resolved 2026-06-30.</em> The IDE0031 hits were event-accessor null guards where <code>?.</code> is illegal (CS0131); fixed via a justified one-rule <code>.editorconfig</code> downgrade. Release build is clean (0/0).</li>
-      <li><strong>XML-doc coverage (REQ-FN-003)</strong> — <em>Resolved 2026-06-30.</em> Now 100% on public members; CS1591 suppression removed and build-enforced.</li>
-      <li><strong>NativeSelect in MAUI Hybrid overlays</strong> — platform limitation (WebView2); use <code>&lt;Select&gt;</code> inside overlays (<code>docs/OldDocs/TrBlazeUI-Issues-Report-1.md</code> #2). Not a library defect.</li>
-      <li><strong>Doc fix (found at runtime 2026-06-30):</strong> the DataTable demo route is <code>/components/datatable</code> (no hyphen), not <code>/components/data-table</code> as earlier drafts stated — corrected above and in the UsageGuide.</li>
-      <li><strong>DataTable default chrome / Dialog off-viewport / transparent popover (REQ-UI-016)</strong> — <em>Resolved 2026-07-21.</em> AstroLyfe UAT findings TR-010/011/012: <code>ShowToolbar</code> now defaults <code>false</code> and pagination auto-hides for a single page; <code>DialogContent</code>/<code>AlertDialogContent</code> clamped to the viewport (<code>top</code> was −245/−305px, now +16px); library now ships zero-specificity <code>:where()</code> theme-token fallbacks so popovers stay opaque without host tokens. Verified 21/21 headless — <code>tests/verify/ui-ui016.spec.js</code>.</li>
-      <li><strong>⚠ Breaking for consumers (2.0.0):</strong> <code>DataTable.ShowToolbar</code> default flipped <code>true</code> → <code>false</code>. Any grid relying on the implicit toolbar must now pass <code>ShowToolbar="true"</code>.</li>
-      <li><strong>✅ RESOLVED — SelectTrigger accessible name (TR-003, REQ-UI-014)</strong> — <em>Fixed + verified 2026-07-22 (<code>*fix-issues</code>).</em> The primitive <code>SelectTrigger</code> now emits a default <code>aria-labelledby</code> → the <code>SelectValue</code> span id (<code>GetDefaultLabelledBy()</code> → <code>SelectContext.ValueId</code>), giving the <code>&lt;button role="combobox"&gt;</code> a non-empty accessible name from first render; it defers to a non-empty splatted <code>aria-label</code>/<code>aria-labelledby</code>. The styled <code>SelectTrigger</code> gains an <code>AriaLabel</code> param (emits <code>aria-label</code>, overrides the default per ARIA precedence). Verified on <code>/verify-ui014</code> (<code>tests/verify/ui-ui014.spec.js</code>, 8/8): axe <code>button-name</code> = <strong>0 violations</strong>; valued/placeholder/AriaLabel cases all named. Consumers can drop their per-Select <code>aria-label</code> workaround on upgrade to 2.0.1.</li>
-      <li><strong>✅ TR-014 (AstroLyfe post-upgrade) — Dialog double-offset — DEFENSIVELY HARDENED</strong> — <em>Fixed 2026-07-22 (owner-requested).</em> The double-offset couldn't be reproduced on current source, but <code>DialogContent</code>/<code>AlertDialogContent</code> were switched from translate-based centering to <strong>auto-margin centering</strong> (<code>fixed inset-0 m-auto grid h-fit max-h-[calc(100vh-2rem)]</code>) so the top can never go above <code>y=0</code> regardless of any stray <code>transform</code>/<code>translate</code> −50% offset stacking — the clipping is now structurally impossible. Slide animations dropped for zoom+fade; Sheet/Drawer untouched; <code>trblazeui.css</code> regenerated. Verified 23/23 (<code>ui-ui016.spec.js</code>): settled <code>transform:none</code> <strong>and</strong> <code>translate:none</code>, <code>top=16px</code> @1366/1280/390; AlertDialog centers on-screen (<code>top=269</code>).</li>
-      <li>Status is reflected in <code>docs/TrBlazeUI-Checklist.md</code> (all REQs terminal). Key screens are runtime-verified with screenshots in <code>docs/screenshots/TrBlazeUI/</code>; run <code>*devguide TrBlazeUI --update</code> for exhaustive per-screen confirmation across all ~80 demo pages.</li>
-    </ul>
-
-    <h2 id="runtime-screenshots-sampled-2026-06-30">6. Runtime screenshots (sampled, 2026-06-30)<a class="anchor-link" href="#runtime-screenshots-sampled-2026-06-30">#</a></h2>
-
-    <p>Captured from the booted Blazor Server demo via headless Chromium (Playwright). These prove the as-built screens render with real data and correct layout.</p>
-
-    <h3 id="home">Home (<code>/</code>)<a class="anchor-link" href="#home">#</a></h3>
-    <p><img src="screenshots/TrBlazeUI/home.png" alt="Home"></p>
-
-    <h3 id="datatable-components-datatable">DataTable (<code>/components/datatable</code>)<a class="anchor-link" href="#datatable-components-datatable">#</a></h3>
-    <p><img src="screenshots/TrBlazeUI/datatable.png" alt="DataTable"></p>
-
-    <h3 id="bar-chart-charts-bar">Bar Chart (<code>/charts/bar</code>)<a class="anchor-link" href="#bar-chart-charts-bar">#</a></h3>
-    <p><img src="screenshots/TrBlazeUI/chart-bar.png" alt="Bar Chart"></p>
-
-    <h3 id="toolbar-components-toolbar">Toolbar (<code>/components/toolbar</code>)<a class="anchor-link" href="#toolbar-components-toolbar">#</a></h3>
-    <p><img src="screenshots/TrBlazeUI/toolbar.png" alt="Toolbar"></p>
-
-    <h3 id="icons-icons">Icons (<code>/icons</code>)<a class="anchor-link" href="#icons-icons">#</a></h3>
-    <p><img src="screenshots/TrBlazeUI/icons.png" alt="Icons"></p>
-
-    <hr>
-    <p>Last updated: 2026-06-30 · RUNTIME-VERIFIED for sampled key screens (screenshots in docs/screenshots/TrBlazeUI/); run <code>*devguide --update</code> for exhaustive coverage</p>
+</div>
+<p>A reader chasing a bug starts at the demo page, drops into the styled component (<code>.razor</code> markup + <code>.razor.cs</code> logic), then into the primitive it composes (for behavior/ARIA), and finally into the relevant JS interop file or DI service. Symbols that don't resolve to a real file/component in <code>src/</code> are hallucinations — verify against the folders listed in <code>docs/TrBlazeUI-Architecture.md §4</code>.</p>
+<h2 id="known-issues">5. Known issues<a class="anchor-link" href="#known-issues">#</a></h2>
+<ul><li><strong>Sidebar Release build error (REQ-NFR-005)</strong> — <em>Resolved 2026-06-30.</em> The IDE0031 hits were event-accessor null guards where <code>?.</code> is illegal (CS0131); fixed via a justified one-rule <code>.editorconfig</code> downgrade. Release build is clean (0/0).</li><li><strong>XML-doc coverage (REQ-FN-003)</strong> — <em>Resolved 2026-06-30.</em> Now 100% on public members; CS1591 suppression removed and build-enforced.</li><li><strong>NativeSelect in MAUI Hybrid overlays</strong> — platform limitation (WebView2); use <code>&lt;Select&gt;</code> inside overlays (<code>docs/OldDocs/TrBlazeUI-Issues-Report-1.md</code> #2). Not a library defect.</li><li><strong>Doc fix (found at runtime 2026-06-30):</strong> the DataTable demo route is <code>/components/datatable</code> (no hyphen), not <code>/components/data-table</code> as earlier drafts stated — corrected above and in the UsageGuide.</li><li><strong>DataTable default chrome / Dialog off-viewport / transparent popover (REQ-UI-016)</strong> — <em>Resolved 2026-07-21.</em> AstroLyfe UAT findings TR-010/011/012: <code>ShowToolbar</code> now defaults <code>false</code> and pagination auto-hides for a single page; <code>DialogContent</code>/<code>AlertDialogContent</code> clamped to the viewport (<code>top</code> was −245/−305px, now +16px); library now ships zero-specificity <code>:where()</code> theme-token fallbacks so popovers stay opaque without host tokens. Verified 21/21 headless — <code>tests/verify/ui-ui016.spec.js</code>.</li><li><strong>⚠ Breaking for consumers (2.0.0):</strong> <code>DataTable.ShowToolbar</code> default flipped <code>true</code> → <code>false</code>. Any grid relying on the implicit toolbar must now pass <code>ShowToolbar=&quot;true&quot;</code>.</li><li><strong>✅ RESOLVED — SelectTrigger accessible name (TR-003, REQ-UI-014)</strong> — <em>Fixed + verified 2026-07-22 (<code>*fix-issues</code>).</em> The primitive <code>SelectTrigger</code> now emits a default <code>aria-labelledby</code> → the <code>SelectValue</code> span id (<code>GetDefaultLabelledBy()</code> → <code>SelectContext.ValueId</code>), giving the <code>&lt;button role=&quot;combobox&quot;&gt;</code> a non-empty accessible name from first render; it defers to a non-empty splatted <code>aria-label</code>/<code>aria-labelledby</code>. The styled <code>SelectTrigger</code> gains an <code>AriaLabel</code> param (emits <code>aria-label</code>, overrides the default per ARIA precedence). Verified on <code>/verify-ui014</code> (<code>tests/verify/ui-ui014.spec.js</code>, 8/8): axe <code>button-name</code> = <strong>0 violations</strong>; valued/placeholder/AriaLabel cases all named. Consumers can drop their per-Select <code>aria-label</code> workaround on upgrade to 2.0.1.</li><li><strong>✅ TR-014 (AstroLyfe post-upgrade) — Dialog double-offset — DEFENSIVELY HARDENED</strong> — <em>Fixed 2026-07-22 (owner-requested).</em> The double-offset couldn't be reproduced on current source, but <code>DialogContent</code>/<code>AlertDialogContent</code> were switched from translate-based centering to <strong>auto-margin centering</strong> (<code>fixed inset-0 m-auto grid h-fit max-h-[calc(100vh-2rem)]</code>) so the top can never go above <code>y=0</code> regardless of any stray <code>transform</code>/<code>translate</code> −50% offset stacking — the clipping is now structurally impossible. Slide animations dropped for zoom+fade; Sheet/Drawer untouched; <code>trblazeui.css</code> regenerated. Verified 23/23 (<code>ui-ui016.spec.js</code>): settled <code>transform:none</code> <strong>and</strong> <code>translate:none</code>, <code>top=16px</code> @1366/1280/390; AlertDialog centers on-screen (<code>top=269</code>).</li><li><strong>⚠ OPEN — TR-066: a <code>Dialog</code> declared inside another <code>Dialog</code>'s <code>DialogContent</code> never opens.</strong> Found 2026-08-11 while building the 2.1.0 demo pages. <strong>Pre-existing</strong>, not a 2.1.0 regression — it reproduces against the 2.0.1 <code>PortalService</code> source. The inner trigger keeps <code>aria-expanded=&quot;false&quot;</code>, no second portal registers, and a direct <code>.click()</code> through <code>page.evaluate</code> (bypassing hit testing) does nothing either — so it is a render-propagation problem, not interception. An ordinary <code>&lt;Button OnClick&gt;</code> in the same portal content <strong>does</strong> work, which narrows it to the nested dialog's own state change. Likely culprit: the <code>CascadingValue</code> in <code>Dialog.razor</code> skips its subtree because <code>objContext</code> is the same instance mutated in place, leaving the nested <code>DialogPortal</code> with no parent render to ride on. Two candidate fixes were tried and <strong>reverted rather than shipped unproven</strong>: re-rendering <code>PortalHost</code> when the registry changes during its own render, and registering from <code>OnStateChanged</code> instead of <code>OnParametersSet</code>. <em>Supported workaround (demonstrated on <code>/components/dialog</code>):</em> compose stacked dialogs as <strong>siblings</strong>, each with its own <code>@bind-Open</code>. Full write-up: <code>docs/TechieBlog-TrBlazeUI-Feedback.md</code> → TR-066.</li><li><strong>Log noise on circuit teardown (cosmetic, observed 2026-08-11).</strong> Closing a browser tab that had an open <code>Select</code> logs <code>JSDisconnectedException</code> from <code>SelectContent.DisposeAsync</code> (<code>src/TrBlazeUI.Primitives/Primitives/Select/SelectContent.razor:287</code>). It is the standard Blazor Server dispose race — the circuit is already gone when <code>IJSObjectReference.DisposeAsync()</code> runs — and has no user-visible effect, but the throw should be caught so hosts don't log a stack trace per disconnect. Deferred, not a release blocker.</li><li><strong>✅ RESOLVED 2.1.0 — the whole TechieBlog cycle (TR-001…TR-065, REQ-UI-017).</strong> Catalog-wide attribute splatting (measured 344/344 + 59/59 by <code>tools/splat-audit</code>, not asserted); <code>Rating</code>/<code>Tabs</code>/<code>NavigationMenu</code>/<code>MarkdownEditor</code>/<code>Item</code> WCAG corrections; <code>Input</code>/<code>Textarea</code> keystroke loss on a Server circuit; <code>SelectValue</code> first-paint text; ordered portals so stacked dialogs are clickable by construction (TR-060); the full Tailwind utility scale in <code>trblazeui.css</code> (~906 KB min / ~97 KB gz, was ~88 KB); tokens re-solved as a contrast matrix by <code>tools/token-contrast.py</code> (18 failing pairings → 0, <code>--input</code> 1.26:1 → 3.11:1); and 9 new components. Verified 65/65 + 15/15 headless.</li><li><strong>⚠ Breaking for consumers (2.1.0):</strong> <code>Rating</code> options changed from <code>&lt;span role=&quot;radio&quot;&gt;</code> to <code>&lt;button role=&quot;radio&quot;&gt;</code>; <code>TabsContent</code> always renders its panel element; the light <code>--input</code>/<code>--ring</code> and dark <code>--input</code>/<code>--accent</code>/<code>--destructive-foreground</code> tokens moved for contrast; the CSS bundle grew ~10×. See the CHANGELOG's "Behaviour changes to review before upgrading".</li><li>Status is reflected in <code>docs/TrBlazeUI-Checklist.md</code> (all REQs terminal). Screens are runtime-verified — the 2.1.0 set on 2026-08-11 (25/25), earlier key screens with screenshots in <code>docs/screenshots/TrBlazeUI/</code>; run <code>*devguide TrBlazeUI --update</code> for a fresh sweep after the next change.</li></ul>
+<h2 id="runtime-screenshots">6. Runtime screenshots<a class="anchor-link" href="#runtime-screenshots">#</a></h2>
+<p>Captured from the booted Blazor Server demo via headless Chromium (Playwright). These prove the as-built screens render with real data and correct layout.</p>
+<h3 id="the-2-1-0-surface-captured-2026-08-11-at-handoff-1366-900">6.1 The 2.1.0 surface (captured 2026-08-11 at handoff, 1366×900)<a class="anchor-link" href="#the-2-1-0-surface-captured-2026-08-11-at-handoff-1366-900">#</a></h3>
+<h4 id="what-s-new-2-1-0-release-page-whats-new">What's new — 2.1.0 release page (<code>/whats-new</code>)<a class="anchor-link" href="#what-s-new-2-1-0-release-page-whats-new">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/whats-new.png" alt="What&#x27;s new"></p>
+<h4 id="prose-components-prose">Prose (<code>/components/prose</code>)<a class="anchor-link" href="#prose-components-prose">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/prose.png" alt="Prose"></p>
+<h4 id="stattile-statgroup-components-stat">StatTile / StatGroup (<code>/components/stat</code>)<a class="anchor-link" href="#stattile-statgroup-components-stat">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/stat.png" alt="Stat"></p>
+<h4 id="timeline-components-timeline">Timeline (<code>/components/timeline</code>)<a class="anchor-link" href="#timeline-components-timeline">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/timeline.png" alt="Timeline"></p>
+<h4 id="stepper-components-stepper">Stepper (<code>/components/stepper</code>)<a class="anchor-link" href="#stepper-components-stepper">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/stepper.png" alt="Stepper"></p>
+<h4 id="anchornav-components-anchor-nav">AnchorNav (<code>/components/anchor-nav</code>)<a class="anchor-link" href="#anchornav-components-anchor-nav">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/anchor-nav.png" alt="AnchorNav"></p>
+<h4 id="sortablelist-components-sortable-list">SortableList (<code>/components/sortable-list</code>)<a class="anchor-link" href="#sortablelist-components-sortable-list">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/sortable-list.png" alt="SortableList"></p>
+<h4 id="passwordstrength-components-password-strength">PasswordStrength (<code>/components/password-strength</code>)<a class="anchor-link" href="#passwordstrength-components-password-strength">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/password-strength.png" alt="PasswordStrength"></p>
+<h4 id="codeblock-components-code-block">CodeBlock (<code>/components/code-block</code>)<a class="anchor-link" href="#codeblock-components-code-block">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/code-block.png" alt="CodeBlock"></p>
+<h4 id="centeredpanel-components-centered-panel">CenteredPanel (<code>/components/centered-panel</code>)<a class="anchor-link" href="#centeredpanel-components-centered-panel">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/centered-panel.png" alt="CenteredPanel"></p>
+<h3 id="earlier-sampled-key-screens-2026-06-30-datatable-png-recaptured-2026-07-21">6.2 Earlier sampled key screens (2026-06-30; <code>datatable.png</code> recaptured 2026-07-21)<a class="anchor-link" href="#earlier-sampled-key-screens-2026-06-30-datatable-png-recaptured-2026-07-21">#</a></h3>
+<h4 id="home">Home (<code>/</code>)<a class="anchor-link" href="#home">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/home.png" alt="Home"></p>
+<h4 id="datatable-components-datatable">DataTable (<code>/components/datatable</code>)<a class="anchor-link" href="#datatable-components-datatable">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/datatable.png" alt="DataTable"></p>
+<h4 id="bar-chart-charts-bar">Bar Chart (<code>/charts/bar</code>)<a class="anchor-link" href="#bar-chart-charts-bar">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/chart-bar.png" alt="Bar Chart"></p>
+<h4 id="toolbar-components-toolbar">Toolbar (<code>/components/toolbar</code>)<a class="anchor-link" href="#toolbar-components-toolbar">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/toolbar.png" alt="Toolbar"></p>
+<h4 id="icons-icons">Icons (<code>/icons</code>)<a class="anchor-link" href="#icons-icons">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/icons.png" alt="Icons"></p>
+<hr>
+<p>Last updated: 2026-08-11 (handoff, 2.1.0 as-built) · RUNTIME-VERIFIED — 25/25 on the 2.1.0 screens 2026-08-11, plus 65/65 + 15/15 REQ-UI-017 gates; screenshots for the earlier sampled key screens in docs/screenshots/TrBlazeUI/</p>
   </main>
 </div>
 
@@ -305,11 +287,7 @@ main img{max-width:100%;height:auto;display:block;border:1px solid var(--line);b
   });
 })();
 
-// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`:
-// mermaid reads the <pre>'s textContent as the diagram source, so a button
-// appended here glues "copy" onto the last line and breaks the parse
-// (flowcharts → "Syntax error"; sequence diagrams silently absorb it).
-// Mermaid blocks get copy/export from their own .diagram toolbar instead.
+// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`.
 document.querySelectorAll('pre:not(.mermaid)').forEach(pre => {
   const btn = document.createElement('button');
   btn.className = 'copy';
@@ -330,7 +308,6 @@ if (window.mermaid) {
   mermaid.initialize({ startOnLoad: true, theme: mermaidTheme, securityLevel: 'loose' });
 }
 
-// Mermaid toolbar wiring — run after mermaid renders
 function wireMermaidToolbars() {
   document.querySelectorAll('.diagram').forEach(dia => {
     if (dia.dataset.wired) return;
@@ -374,7 +351,6 @@ function wireMermaidToolbars() {
     };
     function escFs(e) { if (e.key === 'Escape') { dia.classList.remove('fs'); document.removeEventListener('keydown', escFs); } }
     dia.querySelector('[data-pop]').onclick = () => openInNewTab(svg);
-    // Ctrl+wheel zoom
     merm.addEventListener('wheel', (e) => {
       if (!e.ctrlKey) return;
       e.preventDefault();
@@ -439,10 +415,9 @@ function openInNewTab(svg) {
   w.document.close();
 }
 
-// Run wiring after mermaid finishes (it renders async)
 if (window.mermaid) {
   setTimeout(wireMermaidToolbars, 400);
-  setTimeout(wireMermaidToolbars, 1200);  // safety re-run for slow renders
+  setTimeout(wireMermaidToolbars, 1200);
 }
 </script>
 </body>

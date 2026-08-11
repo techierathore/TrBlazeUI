@@ -1,0 +1,90 @@
+@namespace TrBlazeUI.Components.Stat
+@using TrBlazeUI.Components.Card
+
+@* A single headline statistic: a large value over a small caption, optionally with an icon,
+   a trend and a supporting line. Hand-composing this from Card + spans is what makes the
+   type scale drift between pages. *@
+
+<Card Class="@CssClass" @attributes="AdditionalAttributes">
+    <CardContent Class="flex items-start gap-3 p-4">
+        @if (Icon != null)
+        {
+            <span class="mt-0.5 shrink-0 text-muted-foreground" aria-hidden="true">@Icon</span>
+        }
+        <div class="min-w-0">
+            <div class="text-2xl font-semibold tracking-tight tabular-nums">@Value</div>
+            <div class="mt-1 text-sm text-muted-foreground">@Label</div>
+            @if (!string.IsNullOrWhiteSpace(Trend))
+            {
+                <div class="@TrendCssClass">@Trend</div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Description))
+            {
+                <div class="mt-1 text-xs text-muted-foreground">@Description</div>
+            }
+        </div>
+    </CardContent>
+</Card>
+
+@code {
+    /// <summary>
+    /// Gets or sets the headline value, for example <c>"20+"</c> or <c>"1,284"</c>.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public string? Value { get; set; }
+
+    /// <summary>
+    /// Gets or sets the caption under the value, for example <c>"Years of experience"</c>.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public string? Label { get; set; }
+
+    /// <summary>
+    /// Gets or sets an optional trend line, for example <c>"+12% vs last month"</c>.
+    /// </summary>
+    [Parameter]
+    public string? Trend { get; set; }
+
+    /// <summary>
+    /// Gets or sets the direction of <see cref="Trend"/>, which selects its colour.
+    /// </summary>
+    [Parameter]
+    public StatTrend TrendDirection { get; set; } = StatTrend.Neutral;
+
+    /// <summary>
+    /// Gets or sets an optional supporting line under the trend.
+    /// </summary>
+    [Parameter]
+    public string? Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets an optional leading icon.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Icon { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn("h-full", Class);
+
+    private string TrendCssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "mt-1 text-xs font-medium",
+        TrendDirection switch
+        {
+            StatTrend.Up => "text-success",
+            StatTrend.Down => "text-destructive",
+            _ => "text-muted-foreground"
+        }
+    );
+}

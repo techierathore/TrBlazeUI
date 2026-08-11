@@ -114,4 +114,15 @@
     {
         objContext.OnStateChanged -= HandleContextStateChanged;
     }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes.
+    /// </summary>
+    /// <remarks>
+    /// This component renders no element of its own - it only supplies a cascading context - so
+    /// the attributes are accepted (never throwing) but are not emitted. Put the attribute on the
+    /// component that renders the visible element instead.
+    /// </remarks>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

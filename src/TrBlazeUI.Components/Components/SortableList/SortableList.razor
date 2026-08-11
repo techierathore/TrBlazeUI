@@ -1,0 +1,116 @@
+@typeparam TItem
+@namespace TrBlazeUI.Components.SortableList
+@using TrBlazeUI.Components.Button
+
+@* Reorderable list. Order is changed with real buttons rather than drag-and-drop, so it works
+   with a keyboard, a screen reader, a touch screen and a mouse without a pointer-events story -
+   and every move is announced. Drag is a convenience; buttons are the contract. *@
+
+<ol class="@CssClass" @attributes="AdditionalAttributes">
+    @foreach (var (vItem, vIndex) in Items.Select((item, index) => (item, index)))
+    {
+        var vPosition = vIndex;
+        <li class="@ItemCssClass" @key="vItem">
+            <div class="flex shrink-0 flex-col">
+                <Button Variant="ButtonVariant.Ghost"
+                        Size="ButtonSize.IconSmall"
+                        Class="h-5 w-6"
+                        Disabled="@(vPosition == 0)"
+                        AriaLabel="@($"Move {DescribeItem(vItem)} up")"
+                        OnClick="@(() => MoveAsync(vPosition, vPosition - 1))">
+                    <span aria-hidden="true">&#9650;</span>
+                </Button>
+                <Button Variant="ButtonVariant.Ghost"
+                        Size="ButtonSize.IconSmall"
+                        Class="h-5 w-6"
+                        Disabled="@(vPosition == Items.Count - 1)"
+                        AriaLabel="@($"Move {DescribeItem(vItem)} down")"
+                        OnClick="@(() => MoveAsync(vPosition, vPosition + 1))">
+                    <span aria-hidden="true">&#9660;</span>
+                </Button>
+            </div>
+            <div class="min-w-0 flex-1">
+                @if (ItemTemplate != null)
+                {
+                    @ItemTemplate(vItem)
+                }
+                else
+                {
+                    @DescribeItem(vItem)
+                }
+            </div>
+        </li>
+    }
+</ol>
+<span class="sr-only" aria-live="polite">@objAnnouncement</span>
+
+@code {
+    private string? objAnnouncement;
+
+    /// <summary>
+    /// Gets or sets the items in their current order.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public IList<TItem> Items { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the callback raised with the reordered list. Use with <c>@bind-Items</c>.
+    /// </summary>
+    [Parameter]
+    public EventCallback<IList<TItem>> ItemsChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets how each item is rendered.
+    /// </summary>
+    [Parameter]
+    public RenderFragment<TItem>? ItemTemplate { get; set; }
+
+    /// <summary>
+    /// Gets or sets a function returning the accessible name of an item, used in the move buttons
+    /// and in the live announcement. Defaults to <c>ToString()</c>.
+    /// </summary>
+    [Parameter]
+    public Func<TItem, string>? ItemLabel { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "list-none divide-y divide-border rounded-md border border-border",
+        Class
+    );
+
+    private static string ItemCssClass => "flex items-center gap-3 p-3";
+
+    private string DescribeItem(TItem aItem) =>
+        ItemLabel?.Invoke(aItem) ?? aItem?.ToString() ?? string.Empty;
+
+    private async Task MoveAsync(int aFrom, int aTo)
+    {
+        if (aTo < 0 || aTo >= Items.Count || aFrom == aTo)
+        {
+            return;
+        }
+
+        var vItem = Items[aFrom];
+        Items.RemoveAt(aFrom);
+        Items.Insert(aTo, vItem);
+
+        objAnnouncement = $"{DescribeItem(vItem)} moved to position {aTo + 1} of {Items.Count}";
+
+        if (ItemsChanged.HasDelegate)
+        {
+            await ItemsChanged.InvokeAsync(Items);
+        }
+    }
+}

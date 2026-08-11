@@ -4,7 +4,7 @@
 
 @* Styled SelectContent wrapper around SelectContent primitive *@
 <TrBlazeUI.Primitives.Select.SelectContent TValue="TValue"
-                                               class="@CssClass">
+                                               class="@CssClass" @attributes="AdditionalAttributes">
     <div class="p-1">
         @ChildContent
     </div>
@@ -43,4 +43,11 @@
         "[&::-webkit-scrollbar]:hidden",
         Class
     );
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 }

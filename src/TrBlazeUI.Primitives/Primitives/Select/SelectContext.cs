@@ -211,13 +211,26 @@ public class SelectContext<TValue> : PrimitiveContextWithEvents<SelectState<TVal
     /// <returns>The index of the registered item.</returns>
     public int RegisterItem(TValue? value, bool disabled, string? displayText = null)
     {
-        var metadata = new SelectItemMetadata<TValue>
+        // Registration is keyed on the item's value and therefore idempotent: items re-register
+        // every time the listbox is opened, and an append-only list would both duplicate the
+        // keyboard-navigation entries and shift every previously handed-out index.
+        var vIndex = Items.FindIndex(item => EqualityComparer<TValue?>.Default.Equals(item.Value, value));
+
+        if (vIndex >= 0)
         {
-            Value = value,
-            Disabled = disabled,
-            DisplayText = displayText
-        };
-        Items.Add(metadata);
+            Items[vIndex].Disabled = disabled;
+            Items[vIndex].DisplayText = displayText ?? Items[vIndex].DisplayText;
+        }
+        else
+        {
+            Items.Add(new SelectItemMetadata<TValue>
+            {
+                Value = value,
+                Disabled = disabled,
+                DisplayText = displayText
+            });
+            vIndex = Items.Count - 1;
+        }
 
         // If this item's value matches the currently selected value,
         // update the DisplayText to show the proper display name
@@ -226,7 +239,7 @@ public class SelectContext<TValue> : PrimitiveContextWithEvents<SelectState<TVal
             UpdateState(state => state.DisplayText = displayText);
         }
 
-        return Items.Count - 1;
+        return vIndex;
     }
 
     /// <summary>

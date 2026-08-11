@@ -1,7 +1,7 @@
 @namespace TrBlazeUI.Components.NumericInput
 @typeparam TValue where TValue : struct, System.Numerics.INumber<TValue>
 
-<div class="@ContainerClass">
+<div class="@ContainerClass" @attributes="AdditionalAttributes">
     <input
         @ref="objInputRef"
         id="@Id"

@@ -10,6 +10,13 @@ namespace TrBlazeUI.Components.Rating;
 /// </summary>
 public partial class Rating : ComponentBase
 {
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
     private readonly string objInstanceId = Guid.NewGuid().ToString("N")[..8];
     private double objHoverValue;
 
@@ -97,6 +104,54 @@ public partial class Rating : ComponentBase
     [Parameter]
     public RatingSize Size { get; set; } = RatingSize.Default;
 
+    /// <summary>
+    /// Gets or sets whether the rating participates in the keyboard tab order.
+    /// </summary>
+    /// <remarks>
+    /// Set to <c>false</c> when the rating is presented as decoration (for example inside an
+    /// <c>aria-hidden</c> subtree with the value exposed some other way). Every option then
+    /// renders <c>tabindex="-1"</c>, so the control cannot become a silent tab stop.
+    /// Read-only ratings are never focusable regardless of this value.
+    /// </remarks>
+    [Parameter]
+    public bool Focusable { get; set; } = true;
+
+    /// <summary>
+    /// Gets the accessible name used when the rating renders as a read-only value.
+    /// </summary>
+    private string ReadOnlyAriaLabel => AriaLabel
+        ?? string.Format(CultureInfo.InvariantCulture, "Rated {0} out of {1}", Value, Max);
+
+    /// <summary>
+    /// Gets a value indicating whether the option at <paramref name="index"/> is the selected one.
+    /// </summary>
+    private bool IsChecked(int index) => Math.Abs(Value - index) < 0.001;
+
+    /// <summary>
+    /// Gets the roving tabindex for the option at <paramref name="index"/>: exactly one option is
+    /// reachable with Tab, and the arrow keys move the selection within the group.
+    /// </summary>
+    private int GetOptionTabIndex(int index)
+    {
+        if (!Focusable || Disabled)
+        {
+            return -1;
+        }
+
+        var vActive = Value <= 0 ? 1 : Math.Clamp((int)Math.Ceiling(Value), 1, Max);
+        return index == vActive ? 0 : -1;
+    }
+
+    /// <summary>
+    /// Builds a DOM-unique gradient id for the icon at <paramref name="index"/>.
+    /// </summary>
+    /// <remarks>
+    /// The index is part of the id: two icons with the same fill would otherwise share one id, and
+    /// duplicate ids make every reference after the first resolve to the wrong gradient.
+    /// </remarks>
+    private string GradientId(string aShape, int index) =>
+        string.Create(CultureInfo.InvariantCulture, $"{aShape}-gradient-{objInstanceId}-{index}");
+
     private string CssClass => ClassNames.cn(
         "inline-flex items-center gap-1",
         (Disabled || ReadOnly) ? "cursor-default" : "cursor-pointer",
@@ -117,10 +172,13 @@ public partial class Rating : ComponentBase
 
     private string GetIconContainerClass(int index)
     {
-        var isActive = GetFillPercentage(index) > 0;
+        _ = index;
         return ClassNames.cn(
-            "relative inline-flex",
-            !(Disabled || ReadOnly) ? "cursor-pointer" : null
+            // Reset the <button> chrome so the icon looks exactly as it did as a <span>.
+            "relative inline-flex appearance-none border-0 bg-transparent p-0",
+            !(Disabled || ReadOnly)
+                ? "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
+                : null
         );
     }
 

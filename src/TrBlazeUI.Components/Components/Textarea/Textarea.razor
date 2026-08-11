@@ -1,9 +1,12 @@
 @namespace TrBlazeUI.Components.Textarea
 
+@* value/@key come from TextValueSync, not straight from Value: on a Blazor Server circuit the
+   echo of the user's own typing must never be written back into the DOM. See TextValueSync. *@
 <textarea
+    @key="objValueSync.RenderKey"
     id="@Id"
     class="@CssClass"
-    value="@Value"
+    value="@objValueSync.RenderedValue"
     placeholder="@Placeholder"
     disabled="@Disabled"
     required="@Required"

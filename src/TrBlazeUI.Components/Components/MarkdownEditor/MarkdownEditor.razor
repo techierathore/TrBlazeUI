@@ -16,14 +16,17 @@
         @* Header with tabs and toolbar *@
         <div class="flex flex-wrap items-center justify-between gap-2 px-3 py-2 border-b border-input bg-muted/40">
             @* Write/Preview tabs - GitHub style boxed tabs *@
-            <div class="inline-flex items-center rounded-md border border-input bg-muted/60 p-0.5">
+            @* Rendered through the TabsList primitive (not a bare div) so the pair emits
+               role="tablist" and inherits the Tabs arrow-key/Home/End navigation. The class
+               string is the editor's own boxed-tab styling, unchanged. *@
+            <TrBlazeUI.Primitives.Tabs.TabsList class="inline-flex items-center rounded-md border border-input bg-muted/60 p-0.5">
                 <TabsTrigger Value="write"
                              Class="@GetTabClass("write")"
                              Disabled="@Disabled">Write</TabsTrigger>
                 <TabsTrigger Value="preview"
                              Class="@GetTabClass("preview")"
                              Disabled="@Disabled">Preview</TabsTrigger>
-            </div>
+            </TrBlazeUI.Primitives.Tabs.TabsList>
 
             @* Toolbar - only visible in Write mode *@
             @if (objActiveTab == "write")
