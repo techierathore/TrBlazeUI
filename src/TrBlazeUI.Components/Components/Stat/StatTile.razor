@@ -12,8 +12,8 @@
             <span class="mt-0.5 shrink-0 text-muted-foreground" aria-hidden="true">@Icon</span>
         }
         <div class="min-w-0">
-            <div class="text-2xl font-semibold tracking-tight tabular-nums">@Value</div>
-            <div class="mt-1 text-sm text-muted-foreground">@Label</div>
+            <div data-slot="stat-tile-value" class="text-2xl font-semibold tracking-tight tabular-nums">@Value</div>
+            <div data-slot="stat-tile-label" class="mt-1 text-sm text-muted-foreground">@Label</div>
             @if (!string.IsNullOrWhiteSpace(Trend))
             {
                 <div class="@TrendCssClass">@Trend</div>

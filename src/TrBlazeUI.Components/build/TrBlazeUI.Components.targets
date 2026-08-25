@@ -60,6 +60,27 @@
                      Overwrite="true"
                      Condition="!Exists('$(_TrBlazeUISolutionRoot)\.opencode\command\.gitignore')" />
 
+    <!--
+      Codex: .codex/agents/trblazeui.toml
+      The ownership marker distinguishes a package-deployed agent from a consumer-owned
+      agent with the same name. First install preserves an existing consumer file; package
+      upgrades refresh only a file for which this package previously wrote the marker.
+    -->
+    <MakeDir Directories="$(_TrBlazeUISolutionRoot)\.codex\agents" />
+    <PropertyGroup>
+      <_TrBlazeUICodexAgentPath>$(_TrBlazeUISolutionRoot)\.codex\agents\trblazeui.toml</_TrBlazeUICodexAgentPath>
+      <_TrBlazeUICodexOwnershipPath>$(_TrBlazeUISolutionRoot)\.trblazeui\.codex-agent-package-owned</_TrBlazeUICodexOwnershipPath>
+      <_TrBlazeUICanDeployCodexAgent Condition="!Exists('$(_TrBlazeUICodexAgentPath)') OR Exists('$(_TrBlazeUICodexOwnershipPath)')">true</_TrBlazeUICanDeployCodexAgent>
+    </PropertyGroup>
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)..\skills\codex-trblazeui.toml"
+          DestinationFiles="$(_TrBlazeUICodexAgentPath)"
+          SkipUnchangedFiles="true"
+          Condition="'$(_TrBlazeUICanDeployCodexAgent)' == 'true'" />
+    <WriteLinesToFile File="$(_TrBlazeUICodexOwnershipPath)"
+                     Lines="TrBlazeUI.Components"
+                     Overwrite="true"
+                     Condition="'$(_TrBlazeUICanDeployCodexAgent)' == 'true'" />
+
     <Message Text="TrBlazeUI: AI skill files deployed to $(_TrBlazeUISolutionRoot)" Importance="normal" />
   </Target>
 

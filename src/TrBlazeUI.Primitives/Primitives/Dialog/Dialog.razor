@@ -1,4 +1,5 @@
 @namespace TrBlazeUI.Primitives.Dialog
+@inject TrBlazeUI.Primitives.Services.IPortalService PortalService
 
 @* Dialog primitive root component - headless, unstyled behavior only *@
 <CascadingValue Value="@objContext" IsFixed="false">
@@ -8,6 +9,9 @@
 @code {
     private DialogContext objContext = new();
     private UseControllableState<bool> objState = null!;
+
+    [CascadingParameter(Name = "TrBlazeUIPortalId")]
+    private string? ContainingPortalId { get; set; }
 
     /// <summary>
     /// The child content to render within the dialog context.
@@ -95,6 +99,11 @@
 
             StateHasChanged();
         }
+
+        // A nested Dialog is already an attached component within the containing portal.
+        // Rebuilding that portal here can dispose its DialogPortal before the open notification
+        // registers the child surface; the local render plus DialogPortal's context subscription
+        // are sufficient.
     }
 
     public void Dispose()

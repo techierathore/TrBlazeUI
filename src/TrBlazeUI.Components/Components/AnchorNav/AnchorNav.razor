@@ -13,6 +13,8 @@
             <li>
                 <a href="@($"#{vSection.Id}")"
                    class="@LinkCssClass(vSection.Id)"
+                   @onclick="() => NavigateAsync(vSection.Id)"
+                   @onclick:preventDefault="true"
                    aria-current="@(IsActive(vSection.Id) ? "location" : null)">@vSection.Label</a>
             </li>
         }
@@ -145,6 +147,14 @@
     }
 
     private bool IsActive(string aId) => string.Equals(objActiveId, aId, StringComparison.Ordinal);
+
+    private async Task NavigateAsync(string aId)
+    {
+        if (objModule is not null)
+        {
+            await objModule.InvokeVoidAsync("navigate", aId, TopOffset);
+        }
+    }
 
     private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
         "sticky top-0 z-10 bg-background/95 py-2 backdrop-blur",

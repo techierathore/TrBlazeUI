@@ -19,6 +19,9 @@
 @using TrBlazeUI.Components.PasswordStrength
 @using TrBlazeUI.Components.CodeBlock
 @using TrBlazeUI.Components.SortableList
+@using TrBlazeUI.Components.DatePicker
+@using TrBlazeUI.Components.TimePicker
+@using TrBlazeUI.Components.AnchorNav
 
 @* Verification harness for the TechieBlog feedback fixes (docs/TechieBlog-TrBlazeUI-Feedback.md).
    Not a documentation demo: every block exists so tests/verify/ui-techieblog.spec.js can assert
@@ -108,6 +111,25 @@
         <p data-testid="typing-echo">@objTyped</p>
         <Textarea @bind-Value="objTypedArea" data-testid="typing-textarea" />
         <p data-testid="typing-area-echo">@objTypedArea</p>
+        <Input Value="@objDelayedTyped" ValueChanged="HandleDelayedInputAsync" data-testid="delayed-typing-input" />
+        <p data-testid="delayed-typing-echo">@objDelayedTyped</p>
+    </section>
+
+    @* ---------------- TR-068...TR-074 - post-2.0.2 fixes ---------------- *@
+    <section class="space-y-3 min-w-0" data-testid="post-202-fixes">
+        <h2 id="post-202-start" class="text-lg font-semibold">Post-2.0.2 feedback</h2>
+        <Select TValue="string" Value="@("1")" DisplayTextSelector="@(v => v == "1" ? "Engineering" : v)">
+            <SelectTrigger TValue="string" data-testid="one-way-select"><SelectValue TValue="string" Placeholder="Pick one" /></SelectTrigger>
+            <SelectContent TValue="string"><SelectItem TValue="string" Value="@("1")" Text="Engineering">Engineering</SelectItem></SelectContent>
+        </Select>
+        <DatePicker Value="@objHarnessDate" data-testid="date-picker-trigger-hook" />
+        <TimePicker Value="@objHarnessTime" data-testid="time-picker-trigger-hook" />
+        <ItemGroup Class="max-w-full"><Item><ItemContent data-testid="narrow-item-content"><ItemTitle>Responsive content</ItemTitle><ItemDescription>This deliberately long sentence must wrap without imposing a min-content width on a narrow mobile grid.</ItemDescription></ItemContent></Item></ItemGroup>
+        <StatTile Value="42" Label="Stable caption" data-testid="hooked-stat" />
+        <div class="min-h-28 min-h-36 hover:opacity-90 md:-mx-6 bg-gradient-to-br from-muted to-card" data-testid="utility-cases">Utility cases</div>
+        <AnchorNav Sections="@objHarnessSections" TopOffset="0" data-testid="route-anchor-nav" />
+        <div class="h-24"></div>
+        <h3 id="post-202-target">Anchor target</h3>
     </section>
 
     @* ---------------- TR-055 / TR-061 - ItemGroup list semantics ---------------- *@
@@ -196,5 +218,21 @@
     private string? objCategory = "0";
     private string? objTyped;
     private string? objTypedArea;
+    private string? objDelayedTyped;
+    private DateTime? objHarnessDate = new(2026, 8, 25);
+    private TimeSpan? objHarnessTime = new(14, 30, 0);
+    private readonly List<AnchorNavSection> objHarnessSections =
+    [
+        new("post-202-start", "Start"),
+        new("post-202-target", "Target")
+    ];
     private List<string> objOrder = ["Part one", "Part two", "Part three"];
+
+    private async Task HandleDelayedInputAsync(string? aValue)
+    {
+        var vPreviousValue = objDelayedTyped;
+        objDelayedTyped = aValue;
+        await Task.Delay(250);
+        objDelayedTyped = vPreviousValue;
+    }
 }

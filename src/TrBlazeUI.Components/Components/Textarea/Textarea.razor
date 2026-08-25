@@ -16,4 +16,6 @@
     aria-invalid="@(AriaInvalid?.ToString().ToLower())"
     data-slot="textarea-control"
     @attributes="AdditionalAttributes"
+    @onfocusin="HandleFocus"
+    @onfocusout="HandleBlur"
     @oninput="HandleInput"></textarea>

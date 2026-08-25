@@ -7,6 +7,7 @@
 <TrBlazeUI.Primitives.Select.Select TValue="TValue"
                  Value="@Value"
                  ValueChanged="@ValueChanged"
+                 DefaultValue="@EffectiveDefaultValue"
                  @bind-Open="IsOpen"
                  Disabled="Disabled"
                  DisplayTextSelector="@DisplayTextSelector"
@@ -26,6 +27,16 @@
     /// </summary>
     [Parameter]
     public EventCallback<TValue?> ValueChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets the initial value when the select is not controlled with <see cref="ValueChanged"/>.
+    /// </summary>
+    /// <remarks>
+    /// When omitted, a one-way <see cref="Value"/> is used as the initial value, so callers do
+    /// not need a dummy callback to preselect an item.
+    /// </remarks>
+    [Parameter]
+    public TValue? DefaultValue { get; set; }
 
     /// <summary>
     /// Gets or sets whether the select is disabled.
@@ -68,6 +79,8 @@
     public RenderFragment? ChildContent { get; set; }
 
     private bool IsOpen { get; set; }
+
+    private TValue? EffectiveDefaultValue => ValueChanged.HasDelegate ? DefaultValue : Value;
 
     /// <summary>
     /// Gets the computed CSS classes for the select container.

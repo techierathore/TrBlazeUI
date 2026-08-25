@@ -98,6 +98,10 @@
     [Parameter]
     public EventCallback OnReady { get; set; }
 
+    /// <summary>Render inline when this surface is already inside a portal host entry.</summary>
+    [Parameter]
+    public bool InlineWhenNested { get; set; }
+
     /// <summary>
     /// Additional attributes to apply to the portal container.
     /// </summary>
@@ -105,6 +109,9 @@
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private static bool HasWarnedAboutMissingHost;
+
+    [CascadingParameter(Name = "TrBlazeUIPortalId")]
+    private string? ContainingPortalId { get; set; }
 
     private IAsyncDisposable? objPositioningCleanup;
     private bool objIsInitialized = false;
@@ -147,7 +154,13 @@
         // so fall back to inline rendering (the mode stays fixed while open).
         if (IsOpen && !objIsInitialized)
         {
-            objUseInlineFallback = !PortalService.HasHost;
+            // Content already hosted by PortalHost is at the document overlay level. Rendering a
+            // nested floating surface inline there avoids replacing the containing portal's
+            // RenderFragment while this component is mounting (which can dispose it before
+            // OnAfterRenderAsync registers the nested portal). Fixed positioning still provides
+            // the same viewport-relative placement and stacking behavior.
+            objUseInlineFallback = !PortalService.HasHost ||
+                (InlineWhenNested && !string.IsNullOrEmpty(ContainingPortalId));
 
             if (objUseInlineFallback && !HasWarnedAboutMissingHost)
             {

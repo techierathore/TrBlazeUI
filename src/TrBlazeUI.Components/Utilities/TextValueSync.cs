@@ -27,7 +27,10 @@ internal sealed class TextValueSync
     private string? objDomValue;
     private string? objRenderedValue;
     private string? objSuppliedValue;
+    private string? objPendingSuppliedValue;
+    private bool objHasPendingSuppliedValue;
     private bool objInitialized;
+    private bool objIsFocused;
 
     /// <summary>
     /// Gets the value the control should render into its <c>value</c> attribute.
@@ -61,7 +64,16 @@ internal sealed class TextValueSync
             return;
         }
 
+        if (objIsFocused && !string.Equals(aValue, objDomValue, StringComparison.Ordinal))
+        {
+            objPendingSuppliedValue = aValue;
+            objHasPendingSuppliedValue = true;
+            return;
+        }
+
         objSuppliedValue = aValue;
+        objPendingSuppliedValue = null;
+        objHasPendingSuppliedValue = false;
 
         // The parent is echoing back exactly what the user just typed: leave the DOM alone.
         if (string.Equals(aValue, objDomValue, StringComparison.Ordinal))
@@ -88,5 +100,25 @@ internal sealed class TextValueSync
     {
         objDomValue = aValue;
         objSuppliedValue = aValue;
+    }
+
+    /// <summary>
+    /// Records that the user has focused the text control.
+    /// </summary>
+    public void OnFocus() => objIsFocused = true;
+
+    /// <summary>
+    /// Records that the text control lost focus and applies the latest deferred parent value.
+    /// </summary>
+    public void OnBlur()
+    {
+        objIsFocused = false;
+        if (objHasPendingSuppliedValue)
+        {
+            var vPendingValue = objPendingSuppliedValue;
+            objPendingSuppliedValue = null;
+            objHasPendingSuppliedValue = false;
+            OnValueSupplied(vPendingValue);
+        }
     }
 }

@@ -23,6 +23,7 @@
                     MatchAnchorWidth="@MatchTriggerWidth"
                     Strategy="fixed"
                     ZIndex="9999"
+                    InlineWhenNested="true"
                     OnReady="@HandleFloatingReady">
         @RenderSelectListbox()
     </FloatingPortal>
@@ -109,6 +110,13 @@ else
         {
             objJsModule = await JS.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/TrBlazeUI.Primitives/js/primitives/select.js");
+
+            // Inline nested portals can report ready before this component's first asynchronous
+            // module import completes. Finish keyboard/click-outside setup once the module exists.
+            if (objContext?.IsOpen == true)
+            {
+                await HandleFloatingReady();
+            }
         }
     }
 
@@ -187,16 +195,31 @@ else
         }
     }
 
-    private async void HandleContextStateChanged()
+    private void HandleContextStateChanged()
     {
-        // When context closes, clean up
-        if (objContext?.IsOpen == false && objIsKeyboardSetup)
+        // SelectContent may live inside another portal's RenderFragment. Re-render this component
+        // directly for both transitions so opening mounts FloatingPortal without relying on a
+        // parent render crossing the portal boundary.
+        if (objContext?.IsOpen == true)
         {
-            await InvokeAsync(async () =>
+            // Context notifications originate on the renderer dispatcher. Render synchronously
+            // while this portalled component instance is still attached; deferring the open by a
+            // yield lets PortalHost refresh/dispose the instance before FloatingPortal mounts.
+            StateHasChanged();
+            return;
+        }
+
+        if (objIsKeyboardSetup)
+        {
+            _ = InvokeAsync(async () =>
             {
                 await CleanupSelectAsync();
                 StateHasChanged();
             });
+        }
+        else
+        {
+            StateHasChanged();
         }
     }
 

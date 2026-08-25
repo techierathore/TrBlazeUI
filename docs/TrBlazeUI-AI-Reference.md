@@ -53,9 +53,10 @@ These rules are non-negotiable. Violating them produces broken or inconsistent U
 - **Tailwind utilities work in application markup.** `trblazeui.css` ships the standard Tailwind
   scale (spacing, sizing, grid, flex, typography, colour tokens) with the `sm:`/`md:`/`lg:`/`xl:`/
   `2xl:` responsive variants, not just the utilities the library's own components happen to use.
-  The one thing a pre-built bundle can never generate is an **arbitrary value** — `min-w-[720px]`,
-  `w-[37px]`, `text-[13px]` will silently do nothing. Use the scale (`min-w-3xl`, `w-9`,
-  `text-sm`), or a component parameter where one exists (for example `DataTable.MinWidth`).
+  Arbitrary values work only when that exact class was present when the bundle was built; consumers
+  cannot rely on a new bracket value being generated at runtime. Use the shipped scale
+  (`min-w-3xl`, `w-9`, `text-sm`) or a component parameter such as `DataTable.MinWidth`.
+  Gradient directions and semantic stops (`from-muted`, `via-primary`, `to-card`) are included.
 
 - **Theming is an ordinary CSS override.** The library declares its own tokens through
   zero-specificity `:where(:root)` / `:where(.dark)` selectors, so an application `theme.css` using
@@ -210,6 +211,10 @@ builder.Services.AddScoped<ToastService>();  // Required for Toast notifications
 @using TrBlazeUI.Icons.Lucide.Components
 @using TrBlazeUI.Icons.Lucide.Data
 ```
+
+When upgrading, merge newly introduced component namespaces into the consumer's existing
+`_Imports.razor`. An unknown component tag can otherwise compile as a literal HTML element and fail
+silently at runtime; the compiler does not diagnose the missing namespace.
 
 ### App.razor / MainLayout.razor Setup
 
@@ -727,8 +732,9 @@ tables get pagination for free through `<DataTable>`, which embeds this internal
 
 > **Blazor Server note.** `Input` and `Textarea` keep the DOM value and the server echo separate, so
 > fast typing, pasted text and text injected by assistive technology (voice input, switch/AAC
-> devices, password managers) is never dropped or reordered by a slow circuit. You do not need to
-> debounce for correctness — `DebounceMilliseconds` only reduces traffic.
+> devices, password managers) is never dropped or reordered by a slow circuit. Delayed parent
+> echoes are deferred while the control remains focused, so they cannot overwrite a newer edit.
+> `DebounceMilliseconds` only reduces traffic.
 
 ### Label
 
@@ -785,6 +791,7 @@ tables get pagination for free through `<DataTable>`, which embeds this internal
 | TValue | type param | - | Value type (e.g., string) |
 | Value | TValue? | null | Selected value |
 | ValueChanged | EventCallback<TValue?> | - | Two-way: @bind-Value |
+| DefaultValue | TValue? | null | Initial uncontrolled value. A one-way `Value` is used when this is omitted, so no dummy callback is required. |
 | Disabled | bool | false | Disabled state |
 | DisplayTextSelector | Func<TValue, string>? | null | Display text function |
 | Class | string? | null | Additional CSS classes |
@@ -803,6 +810,9 @@ Sub-components: `SelectTrigger`, `SelectValue`, `SelectContent`, `SelectItem`, `
     </SelectContent>
 </Select>
 ```
+
+If `DisplayTextSelector` returns null or empty, `SelectValue` falls back to `Value.ToString()` rather
+than the placeholder. Map sentinel values explicitly.
 
 #### Grouped Select
 
@@ -925,6 +935,9 @@ Sub-components: `FieldLabel`, `FieldContent`, `FieldDescription`, `FieldError`, 
 ```razor
 <DatePicker @bind-Value="selectedDate" Placeholder="Pick a date" />
 ```
+
+Unmatched attributes such as `data-testid`, `aria-*` and event handlers are forwarded to the
+visible trigger button. `TimePicker` follows the same rule.
 
 ### DateRangePicker
 
@@ -1759,6 +1772,9 @@ drift between pages.
 </StatGroup>
 ```
 
+The value and caption expose stable `data-slot="stat-tile-value"` and
+`data-slot="stat-tile-label"` hooks.
+
 ### Timeline
 
 ```razor
@@ -1782,6 +1798,9 @@ Numbered steps for a multi-part flow or a series index. The current step carries
 ```
 
 ### AnchorNav (in-page navigation with scrollspy)
+
+AnchorNav intercepts fragment clicks, scrolls with `TopOffset`, and updates history using the
+current path. This preserves a nested route even when the document declares `<base href="/">`.
 
 ```razor
 <AnchorNav Sections="@objSections" @bind-ActiveId="objActiveSection" TopOffset="80" />

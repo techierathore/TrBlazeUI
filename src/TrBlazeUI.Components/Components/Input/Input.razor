@@ -19,5 +19,7 @@
     aria-describedby="@AriaDescribedBy"
     aria-invalid="@(AriaInvalid?.ToString().ToLower())"
     @attributes="AdditionalAttributes"
+    @onfocusin="HandleFocus"
+    @onfocusout="HandleBlur"
     @oninput="HandleInput"
     @onchange="HandleChange" />

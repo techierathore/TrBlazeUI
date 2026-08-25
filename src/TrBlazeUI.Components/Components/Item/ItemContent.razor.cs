@@ -28,7 +28,7 @@ public partial class ItemContent : ComponentBase
     /// Gets the computed CSS classes for the content element.
     /// </summary>
     private string CssClass => ClassNames.cn(
-        "flex flex-1 flex-col gap-1",
+        "flex min-w-0 flex-1 flex-col gap-1",
         Class
     );
 
