@@ -53,6 +53,7 @@ else
                     aria-label="@($"{index} out of {Max}")"
                     tabindex="@GetOptionTabIndex(index)"
                     disabled="@Disabled"
+                    @ref="objOptionRefs[index - 1]"
                     class="@GetIconContainerClass(index)"
                     @onclick="() => HandleClick(index)"
                     @onmousemove="e => HandleMouseMove(e, index)">

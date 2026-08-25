@@ -13,7 +13,9 @@
 <Popover @bind-Open="objIsOpen">
     <PopoverTrigger AsChild="true">
         <Button Variant="ButtonVariant.Outline"
-                Class="@ButtonCssClass">
+                Class="@ButtonCssClass"
+                Disabled="@Disabled"
+                @attributes="AdditionalAttributes">
             <LucideIcon Name="calendar" Class="mr-2 h-4 w-4" />
             @if (Value.HasValue)
             {
@@ -100,7 +102,7 @@
     public string? Class { get; set; }
 
     /// <summary>
-    /// Additional attributes to apply to the date picker.
+    /// Additional attributes to apply to the date picker trigger button.
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }

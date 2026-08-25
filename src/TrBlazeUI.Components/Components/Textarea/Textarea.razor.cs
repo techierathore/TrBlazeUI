@@ -227,6 +227,10 @@ public partial class Textarea : ComponentBase, IDisposable
     /// <inheritdoc />
     protected override void OnParametersSet() => objValueSync.OnValueSupplied(Value);
 
+    private void HandleFocus() => objValueSync.OnFocus();
+
+    private void HandleBlur() => objValueSync.OnBlur();
+
     /// <summary>
     /// Releases the debounce timer.
     /// </summary>

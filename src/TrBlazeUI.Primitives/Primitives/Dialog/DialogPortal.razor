@@ -7,7 +7,16 @@
     This ensures proper z-index stacking for overlays.
 *@
 
+@if (!string.IsNullOrEmpty(ContainingPortalId) && (Context.IsOpen || ForceMount))
+{
+    <CascadingValue Value="@Context" IsFixed="false">
+        @ChildContent
+    </CascadingValue>
+}
+
 @code {
+    [CascadingParameter(Name = "TrBlazeUIPortalId")]
+    private string? ContainingPortalId { get; set; }
     /// <summary>
     /// Gets or sets additional HTML attributes.
     /// </summary>
@@ -60,7 +69,7 @@
         Context.OnStateChanged += HandleStateChanged;
 
         // Register initial portal if dialog is open or force mount
-        if (Context.IsOpen || ForceMount)
+        if (string.IsNullOrEmpty(ContainingPortalId) && (Context.IsOpen || ForceMount))
         {
             RegisterPortal();
         }
@@ -68,6 +77,12 @@
 
     protected override void OnParametersSet()
     {
+        if (!string.IsNullOrEmpty(ContainingPortalId))
+        {
+            UnregisterPortal();
+            return;
+        }
+
         // Update portal registration based on open state
         if (Context.IsOpen || ForceMount)
         {
@@ -89,7 +104,36 @@
 
     private void HandleStateChanged()
     {
-        StateHasChanged();
+        // A DialogPortal can itself live inside content rendered by PortalHost. In that shape,
+        // waiting for its parent Dialog to re-render is not sufficient: the parent belongs to
+        // the portal RenderFragment and no parameter update reaches this component. Synchronize
+        // the registration directly from the shared context notification.
+        _ = InvokeAsync(() =>
+        {
+            if (!string.IsNullOrEmpty(ContainingPortalId))
+            {
+                StateHasChanged();
+                return;
+            }
+
+            if (Context.IsOpen || ForceMount)
+            {
+                if (!objIsRegistered)
+                {
+                    RegisterPortal();
+                }
+                else
+                {
+                    PortalService.RefreshPortal(objPortalId);
+                }
+            }
+            else
+            {
+                UnregisterPortal();
+            }
+
+            StateHasChanged();
+        });
     }
 
     private void RegisterPortal()

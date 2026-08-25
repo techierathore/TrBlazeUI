@@ -1,6 +1,7 @@
 @page "/components/dialog"
 @using TrBlazeUI.Components.Dialog
 @using TrBlazeUI.Components.Combobox
+@using TrBlazeUI.Components.Field
 
 <PageTitle>Dialog Component - TrBlazeUI</PageTitle>
 
@@ -417,14 +418,63 @@
             </DialogContent>
         </Dialog>
 
-        <p class="text-sm text-alert-warning-foreground">
-            <strong>Compose stacked dialogs as siblings</strong>, each driven by its own
-            <code>@@bind-Open</code>, as above — not by declaring one
-            <code>&lt;Dialog&gt;</code> inside another's <code>&lt;DialogContent&gt;</code>. A dialog
-            declared inside another dialog's content does not open at all; that is a separate,
-            pre-existing defect tracked as TR-066, and the sibling composition is the supported
-            pattern until it is fixed.
+        <p class="text-sm text-alert-success-foreground">
+            Portalled state changes are reactive, including overlays declared literally inside
+            another dialog's content. The regression example below exercises that composition and
+            a styled Select whose listbox is also rendered through PortalHost.
         </p>
+
+        <Dialog>
+            <DialogTrigger AsChild>
+                <Button data-testid="portal-regression-open">Open nested portal regression</Button>
+            </DialogTrigger>
+            <DialogContent data-testid="portal-regression-outer">
+                <DialogHeader>
+                    <DialogTitle>Portal regression fixture</DialogTitle>
+                    <DialogDescription>
+                        Open the literal child dialog and choose a release channel.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <Field>
+                    <FieldLabel>Release channel</FieldLabel>
+                    <FieldContent>
+                        <Select TValue="string" @bind-Value="objReleaseChannel">
+                            <SelectTrigger data-testid="portal-regression-select">
+                                <SelectValue Placeholder="Choose a channel" />
+                            </SelectTrigger>
+                            <SelectContent data-testid="portal-regression-options">
+                                <SelectItem TValue="string" Value="@("stable")" Text="Stable">Stable</SelectItem>
+                                <SelectItem TValue="string" Value="@("preview")" Text="Preview">Preview</SelectItem>
+                                <SelectItem TValue="string" Value="@("nightly")" Text="Nightly">Nightly</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </FieldContent>
+                </Field>
+
+                <Dialog>
+                    <DialogTrigger data-testid="portal-regression-inner-open"
+                                   class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent">
+                        Open literal child dialog
+                    </DialogTrigger>
+                    <DialogContent data-testid="portal-regression-inner">
+                        <DialogHeader>
+                            <DialogTitle>Literal child dialog</DialogTitle>
+                            <DialogDescription>
+                                This is declared inside the outer DialogContent and owns a second portal.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogClose AsChild>
+                            <Button>Close child dialog</Button>
+                        </DialogClose>
+                    </DialogContent>
+                </Dialog>
+
+                <p data-testid="portal-regression-selection" class="text-sm text-muted-foreground">
+                    Selected channel: <strong>@(objReleaseChannel ?? "none")</strong>
+                </p>
+            </DialogContent>
+        </Dialog>
     </div>
 
 </div>
@@ -433,6 +483,7 @@
     private bool objStackOuter;
     private bool objStackInner;
     private string? objPicked;
+    private string? objReleaseChannel;
 
     private bool isDialogOpen = false;
     private string? selectedComboboxFramework;

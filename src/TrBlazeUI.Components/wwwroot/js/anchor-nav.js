@@ -6,6 +6,23 @@
 const observers = new Map();
 
 /**
+ * Scrolls to a section without resolving a fragment against the document base URI.
+ * @param {string} sectionId - Target element id.
+ * @param {number} topOffset - Pixels of sticky chrome above the content.
+ */
+export function navigate(sectionId, topOffset) {
+    const target = document.getElementById(sectionId);
+    if (!target) {
+        return;
+    }
+
+    const top = window.scrollY + target.getBoundingClientRect().top - (topOffset || 0);
+    window.scrollTo({ top, behavior: 'smooth' });
+    const url = `${window.location.pathname}${window.location.search}#${encodeURIComponent(sectionId)}`;
+    window.history.replaceState(window.history.state, '', url);
+}
+
+/**
  * Starts observing the supplied section ids.
  * @param {string} navId - Unique id for this AnchorNav instance.
  * @param {string[]} sectionIds - The element ids to watch, in document order.

@@ -5,11 +5,12 @@
 @using TrBlazeUI.Icons.Lucide.Components
 @using TrBlazeUI.Primitives.Services
 
-<Popover @bind-Open="objIsOpen" @attributes="AdditionalAttributes">
+<Popover @bind-Open="objIsOpen">
     <PopoverTrigger AsChild="true">
         <Button Variant="ButtonVariant.Outline"
                 Class="@ButtonCssClass"
-                Disabled="@Disabled">
+                Disabled="@Disabled"
+                @attributes="AdditionalAttributes">
             <LucideIcon Name="clock" Class="mr-2 h-4 w-4" />
             @if (Value.HasValue)
             {

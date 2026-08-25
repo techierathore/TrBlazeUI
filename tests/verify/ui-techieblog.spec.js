@@ -7,7 +7,7 @@
 const { chromium } = require('playwright');
 
 const BASE = process.env.SMOKE_URL || 'http://localhost:5183';
-const URL = BASE + '/verify-techieblog';
+const PAGE_URL = BASE + '/verify-techieblog';
 const OUT = process.env.OUT_DIR || __dirname + '/../../test-results';
 
 const results = [];
@@ -22,7 +22,7 @@ function check(id, cond, detail) {
   const pageErrors = [];
   page.on('pageerror', e => pageErrors.push(e.message));
 
-  await page.goto(URL, { waitUntil: 'networkidle', timeout: 60000 });
+  await page.goto(PAGE_URL, { waitUntil: 'networkidle', timeout: 60000 });
   await page.waitForSelector('[data-testid="verify-heading"]', { timeout: 30000 });
   // Blazor Server needs the circuit up before anything interactive is meaningful.
   await page.waitForTimeout(1500);
@@ -87,6 +87,17 @@ function check(id, cond, detail) {
   await page.waitForTimeout(400);
   const after = (await page.textContent('[data-testid="rating-value"]')).trim();
   check('tr031-rating-keyboard-operable', before !== after, `value ${before} -> ${after}`);
+  const ratingFocus = await page.evaluate(() => {
+    const opts = [...document.querySelectorAll('[data-testid="rating-interactive"] [role="radio"]')];
+    return {
+      focus: opts.indexOf(document.activeElement),
+      roving: opts.findIndex(v => v.tabIndex === 0),
+      checked: opts.findIndex(v => v.getAttribute('aria-checked') === 'true'),
+    };
+  });
+  check('tr070-rating-focus-follows-selection',
+    ratingFocus.focus === ratingFocus.roving && ratingFocus.roving === ratingFocus.checked,
+    `focus=${ratingFocus.focus}, roving=${ratingFocus.roving}, checked=${ratingFocus.checked}`);
 
   // ---- TR-054/TR-063 — Tabs ---------------------------------------------------------------
   const tabs = await page.evaluate(() => {
@@ -122,6 +133,9 @@ function check(id, cond, detail) {
   const selectText = (await page.textContent('[data-testid="select-value"]')).trim();
   check('tr058-select-first-paint-text', selectText === '-- Select Category --',
     `trigger reads "${selectText}" (raw bound value is "0")`);
+  const oneWaySelectText = (await page.textContent('[data-testid="one-way-select"]')).trim();
+  check('tr068-select-one-way-initializes', oneWaySelectText.includes('Engineering'),
+    `one-way trigger reads "${oneWaySelectText}"`);
 
   // ---- TR-055/TR-061 — ItemGroup list semantics --------------------------------------------
   const list = await page.evaluate(() => {
@@ -173,6 +187,22 @@ function check(id, cond, detail) {
   const areaDom = await page.inputValue('[data-testid="typing-textarea"]');
   check('tr057-textarea-keeps-every-character', areaDom === areaTarget, `DOM value "${areaDom}"`);
 
+  const delayedTarget = 'newer focused text';
+  const delayedInput = page.locator('[data-testid="delayed-typing-input"]');
+  await delayedInput.focus();
+  await delayedInput.type(delayedTarget, { delay: 15 });
+  await page.waitForTimeout(900);
+  const delayedDom = await delayedInput.inputValue();
+  check('tr069-delayed-echo-does-not-clobber-focused-text', delayedDom === delayedTarget,
+    `focused DOM value "${delayedDom}"`);
+
+  for (const id of ['date-picker-trigger-hook', 'time-picker-trigger-hook']) {
+    const tag = await page.locator(`[data-testid="${id}"]`).evaluate(v => v.tagName);
+    check(`tr072-${id}`, tag === 'BUTTON', `${id} rendered on ${tag}`);
+  }
+  const statSlots = await page.locator('[data-testid="hooked-stat"] [data-slot^="stat-tile-"]').count();
+  check('tr072b-stat-slots', statSlots === 2, `${statSlots} stable value/label slots`);
+
   // ---- TR-019/TR-043/TR-050 — utilities that used to be absent from the bundle --------------
   const css = await page.evaluate(() => {
     const probe = document.createElement('div');
@@ -198,6 +228,17 @@ function check(id, cond, detail) {
   check('tr019-top-1', css.top1 !== 'auto', `top: ${css.top1}`);
   check('tr019-w-36', css.w36 !== 'auto' && css.w36 !== '0px', `width: ${css.w36}`);
 
+  const utilityCases = await page.evaluate(() => {
+    const probe = document.querySelector('[data-testid="utility-cases"]');
+    const cs = getComputedStyle(probe);
+    return { minHeight: cs.minHeight, opacity: cs.opacity, marginLeft: cs.marginLeft,
+      backgroundImage: cs.backgroundImage };
+  });
+  check('tr072c-min-height', utilityCases.minHeight === '144px', `min-height=${utilityCases.minHeight}`);
+  check('tr072c-responsive-negative-margin', utilityCases.marginLeft === '-24px', `margin-left=${utilityCases.marginLeft}`);
+  check('tr073-gradient-stops', utilityCases.backgroundImage.includes('linear-gradient'),
+    `background-image=${utilityCases.backgroundImage}`);
+
   const grid = await page.evaluate(() =>
     getComputedStyle(document.querySelector('[data-testid="utility-probe"]')).gridTemplateColumns);
   check('tr019-responsive-grid-cols', grid.split(' ').length === 3,
@@ -217,7 +258,20 @@ function check(id, cond, detail) {
     `table overflow-x: ${reflow.tableScrolls}`);
   check('tr059-no-page-horizontal-scroll', reflow.overflow <= 0,
     `page overflows by ${reflow.overflow}px at 390px`);
+  const itemContent = await page.locator('[data-testid="narrow-item-content"]').evaluate(v => ({
+    width: v.getBoundingClientRect().width,
+    minWidth: getComputedStyle(v).minWidth,
+  }));
+  check('tr071-item-content-shrinks', itemContent.minWidth === '0px' && itemContent.width <= 358,
+    `width=${itemContent.width}px, min-width=${itemContent.minWidth}`);
   await page.setViewportSize({ width: 1280, height: 900 });
+
+  const pathBeforeAnchor = new URL(page.url()).pathname;
+  await page.locator('[data-testid="route-anchor-nav"] a[href="#post-202-target"]').click();
+  await page.waitForTimeout(400);
+  const anchorUrl = new URL(page.url());
+  check('tr074-anchor-preserves-route', anchorUrl.pathname === pathBeforeAnchor && anchorUrl.hash === '#post-202-target',
+    `${pathBeforeAnchor} -> ${anchorUrl.pathname}${anchorUrl.hash}`);
 
   // ---- New components render ----------------------------------------------------------------
   for (const id of ['prose', 'stat-group', 'stat-1', 'timeline', 'timeline-1', 'stepper',

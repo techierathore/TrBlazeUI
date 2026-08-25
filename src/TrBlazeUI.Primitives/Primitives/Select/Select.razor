@@ -2,6 +2,7 @@
 @namespace TrBlazeUI.Primitives.Select
 @implements IDisposable
 @inject TrBlazeUI.Primitives.Services.DropdownManagerService? DropdownManager
+@inject TrBlazeUI.Primitives.Services.IPortalService PortalService
 
 @* Select root component - headless, unstyled behavior only *@
 <CascadingValue Value="@objContext" IsFixed="false">
@@ -13,6 +14,9 @@
 @code {
     private SelectContext<TValue> objContext = new();
     private UseControllableState<TValue?> objState = null!;
+
+    [CascadingParameter(Name = "TrBlazeUIPortalId")]
+    private string? ContainingPortalId { get; set; }
 
     /// <summary>
     /// The child content to render within the select context.
@@ -187,7 +191,19 @@
             }
         }
 
+        // This Select instance remains attached when it is rendered inside another portal, so
+        // its own render is sufficient. Refreshing the containing PortalHost here rebuilds the
+        // parent's stored RenderFragment and can dispose SelectContent before its nested
+        // FloatingPortal reaches OnAfterRenderAsync, leaving aria-expanded=true with no options.
         StateHasChanged();
+
+        // Once the nested list has closed, refresh the containing portal so bindings and event
+        // handlers captured by its stored RenderFragment reflect the selected value. Doing this
+        // only on close avoids interrupting the nested FloatingPortal's mount cycle.
+        if (!objContext.IsOpen && !string.IsNullOrEmpty(ContainingPortalId))
+        {
+            PortalService.RefreshPortal(ContainingPortalId);
+        }
     }
 
     /// <summary>

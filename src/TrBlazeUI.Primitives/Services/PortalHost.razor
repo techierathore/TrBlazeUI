@@ -15,7 +15,9 @@
 {
     objRenderedThisCycle.Add(portal.Key);
     <div @key="portal.Key" data-portal-id="@portal.Key" class="trblazeui-portal" style="display: contents;">
-        @portal.Value
+        <CascadingValue Value="@portal.Key" Name="TrBlazeUIPortalId" IsFixed="true">
+            @portal.Value
+        </CascadingValue>
     </div>
 }
 

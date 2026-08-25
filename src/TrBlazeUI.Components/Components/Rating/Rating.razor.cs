@@ -19,6 +19,8 @@ public partial class Rating : ComponentBase
 
     private readonly string objInstanceId = Guid.NewGuid().ToString("N")[..8];
     private double objHoverValue;
+    private ElementReference[] objOptionRefs = [];
+    private int? objPendingFocusIndex;
 
     /// <summary>
     /// Gets or sets the current rating value.
@@ -286,7 +288,7 @@ public partial class Rating : ComponentBase
                 newValue = Math.Max(0, Value - step);
                 break;
             case "Home":
-                newValue = 0;
+                newValue = 1;
                 break;
             case "End":
                 newValue = Max;
@@ -317,8 +319,31 @@ public partial class Rating : ComponentBase
         if (newValue != Value)
         {
             Value = newValue;
+            objPendingFocusIndex = Math.Clamp((int)Math.Ceiling(newValue), 1, Max);
             await ValueChanged.InvokeAsync(newValue);
         }
+    }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        if (objOptionRefs.Length != Max)
+        {
+            objOptionRefs = new ElementReference[Math.Max(0, Max)];
+        }
+    }
+
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        _ = firstRender;
+        if (objPendingFocusIndex is not int vIndex || vIndex > objOptionRefs.Length)
+        {
+            return;
+        }
+
+        objPendingFocusIndex = null;
+        await objOptionRefs[vIndex - 1].FocusAsync();
     }
 }
 
