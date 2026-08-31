@@ -106,90 +106,196 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Business Requirements</h1>
-    <div class="sub">Last rendered: 2026-08-11</div>
+    <div class="sub">Last rendered: 2026-08-31</div>
     <div class="group">Contents</div>
     <ol>
-      <li><a href="#executive-summary">1. Executive summary</a></li>
-      <li><a href="#business-objectives">2. Business objectives</a></li>
-      <li><a href="#scope">3. Scope</a></li>
-      <li><a href="#development-status">4. Development status</a></li>
-      <li><a href="#stakeholders-users">5. Stakeholders / users</a></li>
-      <li><a href="#context-diagram">6. Context diagram</a></li>
-      <li><a href="#user-journey-primary-use-case">7. User journey — primary use case</a></li>
-      <li><a href="#component-sketch">8. Component sketch</a></li>
-      <li><a href="#feature-catalog">9. Feature catalog</a></li>
-      <li class="h3"><a href="#f-prim-headless-primitives">F-PRIM: Headless primitives</a></li>
-      <li class="h3"><a href="#f-form-form-components">F-FORM: Form components</a></li>
-      <li class="h3"><a href="#f-layout-layout-navigation-components">F-LAYOUT: Layout &amp; navigation components</a></li>
-      <li class="h3"><a href="#f-overlay-overlay-feedback-components">F-OVERLAY: Overlay &amp; feedback components</a></li>
-      <li class="h3"><a href="#f-data-data-content-components">F-DATA: Data &amp; content components</a></li>
-      <li class="h3"><a href="#f-display-display-components">F-DISPLAY: Display components</a></li>
-      <li class="h3"><a href="#f-toolbar-toolbar-component">F-TOOLBAR: Toolbar component</a></li>
-      <li class="h3"><a href="#f-chart-charts">F-CHART: Charts</a></li>
-      <li class="h3"><a href="#f-icons-icon-libraries">F-ICONS: Icon libraries</a></li>
-      <li class="h3"><a href="#f-theme-theming-dark-mode">F-THEME: Theming &amp; dark mode</a></li>
-      <li class="h3"><a href="#f-a11y-accessibility">F-A11Y: Accessibility</a></li>
-      <li class="h3"><a href="#f-demo-demo-applications">F-DEMO: Demo applications</a></li>
-      <li class="h3"><a href="#f-dist-packaging-distribution">F-DIST: Packaging &amp; distribution</a></li>
-      <li class="h3"><a href="#f-ai-ai-agent-skills">F-AI: AI agent skills</a></li>
-      <li><a href="#functional-requirements-brd-ledger">10. Functional requirements (BRD ledger)</a></li>
-      <li><a href="#non-functional-requirements">11. Non-functional requirements</a></li>
-      <li><a href="#constraints-assumptions">12. Constraints &amp; assumptions</a></li>
-      <li><a href="#success-metrics">13. Success metrics</a></li>
-      <li><a href="#risks">14. Risks</a></li>
-      <li><a href="#glossary">15. Glossary</a></li>
+        <li><a href="#table-of-contents">Table of Contents</a></li>
+        <li><a href="#executive-summary">1. Executive summary</a></li>
+        <li><a href="#business-objectives">2. Business objectives</a></li>
+        <li><a href="#scope">3. Scope</a></li>
+        <li><a href="#development-status">4. Development status</a></li>
+        <li><a href="#stakeholders-users">5. Stakeholders / users</a></li>
+        <li><a href="#context-diagram">6. Context diagram</a></li>
+        <li><a href="#user-journey-primary-use-case">7. User journey — primary use case</a></li>
+        <li><a href="#component-sketch">8. Component sketch</a></li>
+        <li><a href="#feature-catalog">9. Feature catalog</a></li>
+        <li class="h3"><a href="#f-prim-headless-primitives">F-PRIM: Headless primitives</a></li>
+        <li class="h3"><a href="#f-form-form-components">F-FORM: Form components</a></li>
+        <li class="h3"><a href="#f-layout-layout-navigation-components">F-LAYOUT: Layout &amp;amp; navigation components</a></li>
+        <li class="h3"><a href="#f-overlay-overlay-feedback-components">F-OVERLAY: Overlay &amp;amp; feedback components</a></li>
+        <li class="h3"><a href="#f-data-data-content-components">F-DATA: Data &amp;amp; content components</a></li>
+        <li class="h3"><a href="#f-display-display-components">F-DISPLAY: Display components</a></li>
+        <li class="h3"><a href="#f-toolbar-toolbar-component">F-TOOLBAR: Toolbar component</a></li>
+        <li class="h3"><a href="#f-chart-charts">F-CHART: Charts</a></li>
+        <li class="h3"><a href="#f-icons-icon-libraries">F-ICONS: Icon libraries</a></li>
+        <li class="h3"><a href="#f-theme-theming-dark-mode">F-THEME: Theming &amp;amp; dark mode</a></li>
+        <li class="h3"><a href="#f-a11y-accessibility">F-A11Y: Accessibility</a></li>
+        <li class="h3"><a href="#f-demo-demo-applications">F-DEMO: Demo applications</a></li>
+        <li class="h3"><a href="#f-dist-packaging-distribution">F-DIST: Packaging &amp;amp; distribution</a></li>
+        <li class="h3"><a href="#f-ai-ai-agent-skills">F-AI: AI agent skills</a></li>
+        <li><a href="#functional-requirements-brd-ledger">10. Functional requirements (BRD ledger)</a></li>
+        <li><a href="#non-functional-requirements">11. Non-functional requirements</a></li>
+        <li><a href="#constraints-assumptions">12. Constraints &amp;amp; assumptions</a></li>
+        <li><a href="#success-metrics">13. Success metrics</a></li>
+        <li><a href="#risks">14. Risks</a></li>
+        <li><a href="#glossary">15. Glossary</a></li>
     </ol>
   </nav>
   <main>
     <h1>TrBlazeUI — Business Requirements</h1>
+    <div class="subtitle">Rendered 2026-08-31 &middot; source <code>TrBlazeUI-BRD.md</code></div>
 
-<div class="toc-inline">
-  <div>Contents</div>
-  <ol>
-    <li><a href="#executive-summary">1. Executive summary</a></li>
-    <li><a href="#business-objectives">2. Business objectives</a></li>
-    <li><a href="#scope">3. Scope</a></li>
-    <li><a href="#development-status">4. Development status</a></li>
-    <li><a href="#stakeholders-users">5. Stakeholders / users</a></li>
-    <li><a href="#context-diagram">6. Context diagram</a></li>
-    <li><a href="#user-journey-primary-use-case">7. User journey — primary use case</a></li>
-    <li><a href="#component-sketch">8. Component sketch</a></li>
-    <li><a href="#feature-catalog">9. Feature catalog</a></li>
-    <li class="h3"><a href="#f-prim-headless-primitives">F-PRIM: Headless primitives</a></li>
-    <li class="h3"><a href="#f-form-form-components">F-FORM: Form components</a></li>
-    <li class="h3"><a href="#f-layout-layout-navigation-components">F-LAYOUT: Layout &amp; navigation components</a></li>
-    <li class="h3"><a href="#f-overlay-overlay-feedback-components">F-OVERLAY: Overlay &amp; feedback components</a></li>
-    <li class="h3"><a href="#f-data-data-content-components">F-DATA: Data &amp; content components</a></li>
-    <li class="h3"><a href="#f-display-display-components">F-DISPLAY: Display components</a></li>
-    <li class="h3"><a href="#f-toolbar-toolbar-component">F-TOOLBAR: Toolbar component</a></li>
-    <li class="h3"><a href="#f-chart-charts">F-CHART: Charts</a></li>
-    <li class="h3"><a href="#f-icons-icon-libraries">F-ICONS: Icon libraries</a></li>
-    <li class="h3"><a href="#f-theme-theming-dark-mode">F-THEME: Theming &amp; dark mode</a></li>
-    <li class="h3"><a href="#f-a11y-accessibility">F-A11Y: Accessibility</a></li>
-    <li class="h3"><a href="#f-demo-demo-applications">F-DEMO: Demo applications</a></li>
-    <li class="h3"><a href="#f-dist-packaging-distribution">F-DIST: Packaging &amp; distribution</a></li>
-    <li class="h3"><a href="#f-ai-ai-agent-skills">F-AI: AI agent skills</a></li>
-    <li><a href="#functional-requirements-brd-ledger">10. Functional requirements (BRD ledger)</a></li>
-    <li><a href="#non-functional-requirements">11. Non-functional requirements</a></li>
-    <li><a href="#constraints-assumptions">12. Constraints &amp; assumptions</a></li>
-    <li><a href="#success-metrics">13. Success metrics</a></li>
-    <li><a href="#risks">14. Risks</a></li>
-    <li><a href="#glossary">15. Glossary</a></li>
-  </ol>
-</div>
+    <div class="toc-inline">
+      <div>Contents</div>
+      <ol>
+        <li><a href="#table-of-contents">Table of Contents</a></li>
+        <li><a href="#executive-summary">1. Executive summary</a></li>
+        <li><a href="#business-objectives">2. Business objectives</a></li>
+        <li><a href="#scope">3. Scope</a></li>
+        <li><a href="#development-status">4. Development status</a></li>
+        <li><a href="#stakeholders-users">5. Stakeholders / users</a></li>
+        <li><a href="#context-diagram">6. Context diagram</a></li>
+        <li><a href="#user-journey-primary-use-case">7. User journey — primary use case</a></li>
+        <li><a href="#component-sketch">8. Component sketch</a></li>
+        <li><a href="#feature-catalog">9. Feature catalog</a></li>
+        <li class="h3"><a href="#f-prim-headless-primitives">F-PRIM: Headless primitives</a></li>
+        <li class="h3"><a href="#f-form-form-components">F-FORM: Form components</a></li>
+        <li class="h3"><a href="#f-layout-layout-navigation-components">F-LAYOUT: Layout &amp;amp; navigation components</a></li>
+        <li class="h3"><a href="#f-overlay-overlay-feedback-components">F-OVERLAY: Overlay &amp;amp; feedback components</a></li>
+        <li class="h3"><a href="#f-data-data-content-components">F-DATA: Data &amp;amp; content components</a></li>
+        <li class="h3"><a href="#f-display-display-components">F-DISPLAY: Display components</a></li>
+        <li class="h3"><a href="#f-toolbar-toolbar-component">F-TOOLBAR: Toolbar component</a></li>
+        <li class="h3"><a href="#f-chart-charts">F-CHART: Charts</a></li>
+        <li class="h3"><a href="#f-icons-icon-libraries">F-ICONS: Icon libraries</a></li>
+        <li class="h3"><a href="#f-theme-theming-dark-mode">F-THEME: Theming &amp;amp; dark mode</a></li>
+        <li class="h3"><a href="#f-a11y-accessibility">F-A11Y: Accessibility</a></li>
+        <li class="h3"><a href="#f-demo-demo-applications">F-DEMO: Demo applications</a></li>
+        <li class="h3"><a href="#f-dist-packaging-distribution">F-DIST: Packaging &amp;amp; distribution</a></li>
+        <li class="h3"><a href="#f-ai-ai-agent-skills">F-AI: AI agent skills</a></li>
+        <li><a href="#functional-requirements-brd-ledger">10. Functional requirements (BRD ledger)</a></li>
+        <li><a href="#non-functional-requirements">11. Non-functional requirements</a></li>
+        <li><a href="#constraints-assumptions">12. Constraints &amp;amp; assumptions</a></li>
+        <li><a href="#success-metrics">13. Success metrics</a></li>
+        <li><a href="#risks">14. Risks</a></li>
+        <li><a href="#glossary">15. Glossary</a></li>
+      </ol>
+    </div>
+<h2 id="table-of-contents">Table of Contents<a class="anchor-link" href="#table-of-contents">#</a></h2>
+<ol>
+<li><a href="#executive-summary">Executive summary</a>
+</li>
+<li><a href="#business-objectives">Business objectives</a>
+</li>
+<li><a href="#scope">Scope</a>
+</li>
+<li><a href="#development-status">Development status</a>
+</li>
+<li><a href="#stakeholders-users">Stakeholders / users</a>
+</li>
+<li><a href="#context-diagram">Context diagram</a>
+</li>
+<li><a href="#user-journey-primary-use-case">User journey — primary use case</a>
+</li>
+<li><a href="#component-sketch">Component sketch</a>
+</li>
+<li><a href="#feature-catalog">Feature catalog</a>
+<ul>
+<li><a href="#f-prim-headless-primitives">F-PRIM: Headless primitives</a>
+</li>
+<li><a href="#f-form-form-components">F-FORM: Form components</a>
+</li>
+<li><a href="#f-layout-layout-navigation-components">F-LAYOUT: Layout &amp; navigation components</a>
+</li>
+<li><a href="#f-overlay-overlay-feedback-components">F-OVERLAY: Overlay &amp; feedback components</a>
+</li>
+<li><a href="#f-data-data-content-components">F-DATA: Data &amp; content components</a>
+</li>
+<li><a href="#f-display-display-components">F-DISPLAY: Display components</a>
+</li>
+<li><a href="#f-toolbar-toolbar-component">F-TOOLBAR: Toolbar component</a>
+</li>
+<li><a href="#f-chart-charts">F-CHART: Charts</a>
+</li>
+<li><a href="#f-icons-icon-libraries">F-ICONS: Icon libraries</a>
+</li>
+<li><a href="#f-theme-theming-dark-mode">F-THEME: Theming &amp; dark mode</a>
+</li>
+<li><a href="#f-a11y-accessibility">F-A11Y: Accessibility</a>
+</li>
+<li><a href="#f-demo-demo-applications">F-DEMO: Demo applications</a>
+</li>
+<li><a href="#f-dist-packaging-distribution">F-DIST: Packaging &amp; distribution</a>
+</li>
+<li><a href="#f-ai-ai-agent-skills">F-AI: AI agent skills</a>
+</li>
+</ul>
+</li>
+<li><a href="#functional-requirements-brd-ledger">Functional requirements (BRD ledger)</a>
+</li>
+<li><a href="#non-functional-requirements">Non-functional requirements</a>
+</li>
+<li><a href="#constraints-assumptions">Constraints &amp; assumptions</a>
+</li>
+<li><a href="#success-metrics">Success metrics</a>
+</li>
+<li><a href="#risks">Risks</a>
+</li>
+<li><a href="#glossary">Glossary</a>
+</li>
+</ol>
 <h2 id="executive-summary">1. Executive summary<a class="anchor-link" href="#executive-summary">#</a></h2>
 <p><strong>TrBlazeUI</strong> is a comprehensive, production-ready <strong>Blazor UI component library</strong> for .NET 10 that brings the shadcn/ui design system to Blazor. It is a renamed fork of the open-source <em>Blazor Blueprint</em> project (Apache 2.0), restructured into a layered architecture: <strong>16 headless, accessible primitives</strong> at the base and <strong>~69 pre-styled components</strong> on top, complemented by <strong>three icon packages</strong> (Lucide, Heroicons, Feather; 3,200+ icons total). It ships pre-built Tailwind CSS so consumers need no Node.js or Tailwind toolchain ("zero configuration"), is 100% compatible with shadcn/ui and tweakcn themes, and works identically across all three Blazor hosting models — Server, WebAssembly, and Auto.</p>
 <p>The product solves a real gap: Blazor developers have lacked a modern, system-first UI library equivalent to React's shadcn/ui. TrBlazeUI fills it with WCAG 2.1 AA-accessible components, built-in light/dark theming via CSS variables, and a familiar React-inspired API (<code>@bind-Value</code>, <code>AsChild</code>, composition over inheritance). The library is distributed as NuGet packages via GitHub Packages and is consumed by real downstream applications (e.g. an AppStudio IDE and a TechieRag web sample), whose feedback has driven hardening fixes.</p>
 <p>This document captures, for the product owner, what TrBlazeUI delivers today (the bulk of which is <strong>built and shipping</strong> following a .NET 8→10 modernization pass) and the small set of open enhancements. Because the codebase is brownfield, §4 is the first thing to read: it states feature-by-feature what is Done versus pending.</p>
 <h2 id="business-objectives">2. Business objectives<a class="anchor-link" href="#business-objectives">#</a></h2>
-<ul><li>Provide Blazor developers a <strong>drop-in, shadcn/ui-equivalent component library</strong> so they don't design accessible UI components from scratch.</li><li>Guarantee <strong>zero-configuration adoption</strong> — pre-built CSS, no Tailwind/Node setup, works in Server/WASM/Auto unchanged.</li><li>Achieve <strong>WCAG 2.1 AA accessibility</strong> as a baseline for every interactive component.</li><li>Be <strong>100% theme-compatible</strong> with the existing shadcn/ui and tweakcn ecosystems.</li><li>Enable <strong>AI-assisted UI generation</strong> by shipping agent skills + a component reference so Claude Code / OpenCode can scaffold TrBlazeUI UIs.</li><li>Maintain a <strong>clean, modern, standards-compliant codebase</strong> (.NET 10, C# 14, strict warnings-as-errors, mandatory XML docs) suitable for long-term maintenance and confident downstream consumption.</li></ul>
+<ul>
+<li>Provide Blazor developers a <strong>drop-in, shadcn/ui-equivalent component library</strong> so they don't design accessible UI components from scratch.
+</li>
+<li>Guarantee <strong>zero-configuration adoption</strong> — pre-built CSS, no Tailwind/Node setup, works in Server/WASM/Auto unchanged.
+</li>
+<li>Achieve <strong>WCAG 2.1 AA accessibility</strong> as a baseline for every interactive component.
+</li>
+<li>Be <strong>100% theme-compatible</strong> with the existing shadcn/ui and tweakcn ecosystems.
+</li>
+<li>Enable <strong>AI-assisted UI generation</strong> by shipping agent skills + a component reference so Claude Code / OpenCode can scaffold TrBlazeUI UIs.
+</li>
+<li>Maintain a <strong>clean, modern, standards-compliant codebase</strong> (.NET 10, C# 14, strict warnings-as-errors, mandatory XML docs) suitable for long-term maintenance and confident downstream consumption.
+</li>
+</ul>
 <h2 id="scope">3. Scope<a class="anchor-link" href="#scope">#</a></h2>
 <p><strong>In scope:</strong></p>
-<ul><li>Headless primitive components (behavior + accessibility, unstyled).</li><li>Pre-styled components matching shadcn/ui across forms, layout, navigation, overlays, feedback, data display, rich content (charts, markdown/rich-text editors), and a desktop-style toolbar.</li><li>Three icon-library packages.</li><li>CSS-variable theming with light/dark mode and shadcn/tweakcn compatibility.</li><li>A demo application in all three render modes showcasing every component.</li><li>NuGet packaging + GitHub Packages CI/CD distribution.</li><li>AI agent skills (Claude Code + OpenCode) and a component reference document.</li></ul>
+<ul>
+<li>Headless primitive components (behavior + accessibility, unstyled).
+</li>
+<li>Pre-styled components matching shadcn/ui across forms, layout, navigation, overlays, feedback, data display, rich content (charts, markdown/rich-text editors), and a desktop-style toolbar.
+</li>
+<li>Three icon-library packages.
+</li>
+<li>CSS-variable theming with light/dark mode and shadcn/tweakcn compatibility.
+</li>
+<li>A demo application in all three render modes showcasing every component.
+</li>
+<li>NuGet packaging + GitHub Packages CI/CD distribution.
+</li>
+<li>AI agent skills (Claude Code + OpenCode) and a component reference document.
+</li>
+</ul>
 <p><strong>Out of scope (explicit):</strong></p>
-<ul><li>Any backend, database, persistence, or server API (this is a UI library).</li><li>Authentication / authorization / user management.</li><li>AI/RAG runtime features inside the library (TechieRag is a <em>consumer</em>, not a dependency).</li><li>A hosted public documentation website (the demo app is the reference; doc-site links are TODO).</li><li>Mobile-native (MAUI) component variants — MAUI Blazor Hybrid is a <em>consumer host</em>, and one known platform limitation (NativeSelect in overlays) is documented, not fixed in the library.</li><li>Publishing to nuget.org (currently GitHub Packages under <code>techierathore</code>).</li></ul>
+<ul>
+<li>Any backend, database, persistence, or server API (this is a UI library).
+</li>
+<li>Authentication / authorization / user management.
+</li>
+<li>AI/RAG runtime features inside the library (TechieRag is a <em>consumer</em>, not a dependency).
+</li>
+<li>A hosted public documentation website (the demo app is the reference; doc-site links are TODO).
+</li>
+<li>Mobile-native (MAUI) component variants — MAUI Blazor Hybrid is a <em>consumer host</em>, and one known platform limitation (NativeSelect in overlays) is documented, not fixed in the library.
+</li>
+<li>Publishing to nuget.org (currently GitHub Packages under <code>techierathore</code>).
+</li>
+</ul>
 <h2 id="development-status">4. Development status<a class="anchor-link" href="#development-status">#</a></h2>
-<!-- Feature-level snapshot. Live per-REQ status: PROJECT-STATUS.md + docs/TrBlazeUI-Checklist.md. -->
 <p><strong>Snapshot as of 2026-08-11.</strong> Live, per-requirement status: see <code>PROJECT-STATUS.md</code> and the <strong>Requirements Status</strong> table in <code>docs/TrBlazeUI-Checklist.md</code>. Status is derived from the migrated modernization/toolbar plans (both fully delivered), a static scan of the as-built codebase, and the runtime verification runs logged in PROJECT-STATUS.</p>
 <p><strong>All features are <code>Done</code>; every REQ in the checklist is terminal (23 <code>Done (pre-existing)</code> + 8 <code>Verified</code>).</strong> Four consumer-feedback cycles have landed and been runtime-verified since the 2026-06-30 snapshot: REQ-UI-014 (AstroLyfe TR-001…009 and, after their 2.0.0 re-verification, TR-003), REQ-UI-015 (TrStudio TR-001…011 incl. the Mac Catalyst packaging blocker), REQ-FN-009 (AngleSharp / CVE-2026-54570 supply-chain fix), REQ-UI-016 (AstroLyfe TR-010/011/012 plus the TR-014 auto-margin hardening) and, most recently, <strong>REQ-UI-017 — the TechieBlog cycle (TR-001…TR-065), released as 2.1.0</strong>. That last cycle changed the most: attribute splatting became a measured guarantee across the whole catalog (344/344 styled + 59/59 primitive component types, checked by <code>tools/splat-audit</code>); Rating, Tabs, NavigationMenu, MarkdownEditor and Item had real WCAG defects corrected; <code>Input</code>/<code>Textarea</code> no longer lose keystrokes on a Blazor Server circuit; the shipped stylesheet gained the full Tailwind utility scale so consumer markup can actually be styled with utility classes; the token set is now validated as a contrast matrix by <code>tools/token-contrast.py</code> (18 failing pairings → 0, including <code>--input</code> at 1.26:1 against a 3:1 obligation); and nine components were added — <code>Prose</code>, <code>StatTile</code>/<code>StatGroup</code>, <code>Timeline</code>, <code>Stepper</code>, <code>AnchorNav</code>, <code>SortableList</code>, <code>PasswordStrength</code>, <code>CodeBlock</code>, <code>CenteredPanel</code> — each with its own demo page. F-A11Y holds at <code>Done</code> but is annotated: the consumer-reported defects are fixed and verified, an independent third-party audit still has not been run.</p>
 <table>
@@ -207,12 +313,15 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>F-THEME: Theming &amp; dark mode</td><td>Pre-existing</td><td>Done</td><td>100</td><td>CSS variables, OKLCH, shadcn/tweakcn compatible, <code>.dark</code> toggle. 2.1.0: full Tailwind utility scale shipped, contrast-validated token matrix, new <code>--success</code> / <code>--alert-*</code> / <code>--chart-*</code> / <code>--sidebar*</code> defaults (REQ-UI-017)</td></tr>
 <tr><td>F-A11Y: Accessibility</td><td>Pre-existing</td><td>Done</td><td>100</td><td>WCAG 2.1 AA patterns library-wide; consumer axe findings resolved + verified (REQ-UI-014/016/017 — keyboard-operable Rating, literal ARIA state serialisation, list semantics, tablist parents); still not independently audited</td></tr>
 <tr><td>F-DEMO: Demo applications</td><td>Pre-existing</td><td>Done</td><td>100</td><td>100+ pages across Server / WASM / Auto; 2.1.0 added 9 component pages plus a <code>/whats-new</code> release page, gated by <code>tests/verify/ui-demo-2-1-0.spec.js</code></td></tr>
-<tr><td>F-DIST: Packaging &amp; distribution</td><td>Pre-existing</td><td>Done</td><td>100</td><td>MinVer, 5 packages, GitHub Actions → GitHub Packages</td></tr>
+<tr><td>F-DIST: Packaging &amp; distribution</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Shared versioning from the release tag, 5 packages, GitHub Actions → GitHub Packages + NuGet.org (BRD-43 amended 2026-08-31: per-package MinVer evaluated and rejected)</td></tr>
 <tr><td>F-AI: AI agent skills</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Claude Code + OpenCode skills + AI reference doc. 2.1.0: the false "all components splat" claim corrected in the reference and both personas, imports/chart API fixed (REQ-UI-017)</td></tr>
 <tr><td>(cross-cutting) XML documentation</td><td>Pre-existing</td><td>Done</td><td>100</td><td>All public members documented; CS1591 suppression removed (now build-enforced)</td></tr>
-</tbody></table>
+</tbody>
+</table>
 <p><strong>Legend:</strong> <strong>Done</strong> = shipped &amp; working · <strong>In progress</strong> = actively being built · <strong>Partial</strong> = some sub-features done · <strong>Planned</strong> = not started. (Maps to checklist <code>Done (pre-existing)</code> / <code>In Progress</code> / <code>PARTIAL</code> / <code>Not Started</code>.)</p>
-<blockquote><p>Note (resolved 2026-06-30): the strict Release build is now clean (0 warnings / 0 errors). The IDE0031 analyzer errors in the Sidebar component were event-accessor null guards where <code>?.</code> is illegal (CS0131), resolved via a justified one-rule <code>.editorconfig</code> downgrade; XML-doc coverage was completed to 100% and the CS1591 suppression removed. All features are <code>Done</code> and the build is green.</p></blockquote>
+<blockquote>
+<p>Note (resolved 2026-06-30): the strict Release build is now clean (0 warnings / 0 errors). The IDE0031 analyzer errors in the Sidebar component were event-accessor null guards where <code>?.</code> is illegal (CS0131), resolved via a justified one-rule <code>.editorconfig</code> downgrade; XML-doc coverage was completed to 100% and the CS1591 suppression removed. All features are <code>Done</code> and the build is green.</p>
+</blockquote>
 <h2 id="stakeholders-users">5. Stakeholders / users<a class="anchor-link" href="#stakeholders-users">#</a></h2>
 <p>TrBlazeUI has no end-user accounts — its "users" are <strong>developers</strong> who consume the library, plus the maintainers. There is no authentication or role system anywhere in the product.</p>
 <table>
@@ -223,7 +332,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td><strong>AI coding agent (Claude Code / OpenCode)</strong></td><td>Read the AI reference + skills, generate correct TrBlazeUI Razor (pages, forms, dashboards) using the right components and binding patterns.</td></tr>
 <tr><td><strong>Downstream app teams (e.g. AppStudio IDE, TechieRag web sample)</strong></td><td>Depend on the packages, report issues, receive fixes; some run inside MAUI Blazor Hybrid (WebView2).</td></tr>
 <tr><td><strong>Theme author</strong></td><td>Drop shadcn/ui or tweakcn CSS variables into <code>theme.css</code> and have every component adopt them, including dark mode.</td></tr>
-</tbody></table>
+</tbody>
+</table>
 <p><strong>Persona detail — Consuming developer onboarding path:</strong> (1) create a GitHub PAT with <code>read:packages</code>; (2) add the <code>techierathore</code> GitHub Packages NuGet source; (3) <code>dotnet add package TrBlazeUI.Components</code> (+ optional Primitives/Icons); (4) add <code>@using</code> lines to <code>_Imports.razor</code>; (5) add <code>&lt;PortalHost /&gt;</code> to the root layout; (6) link <code>theme.css</code> then <code>trblazeui.css</code> in <code>App.razor</code>; (7) register services (<code>AddTrBlazeUIPrimitives()</code>, <code>AddScoped&lt;ToastService&gt;()</code>); (8) start composing components.</p>
 <h2 id="context-diagram">6. Context diagram<a class="anchor-link" href="#context-diagram">#</a></h2>
 <div class="diagram">
@@ -233,19 +343,19 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
     <button data-zin title="Zoom in">+</button>
     <button data-fit title="Fit to width">Fit</button>
     <button data-one title="Actual size">1:1</button>
-    <button data-fs title="Fullscreen">&#9974;</button>
+    <button data-fs title="Fullscreen">&#9166;</button>
     <button data-pop title="Open in new tab">&#8599;</button>
   </div>
   <pre class="mermaid">flowchart LR
-  Dev(["Consuming developer"]) --> Lib["TrBlazeUI packages"]
-  Agent(["AI coding agent"]) --> Skills["TrBlazeUI agent skills + AI reference"]
-  Skills --> Lib
-  Lib --> GHP[("GitHub Packages (techierathore)")]
-  Lib --> Theme["shadcn/ui & tweakcn themes"]
-  Lib --> ConsumerApp["Consumer Blazor app (Server / WASM / Auto / MAUI Hybrid)"]
-  Maintainer(["Maintainer"]) --> Repo["TrBlazeUI repo + demo apps"]
-  Repo --> CI["GitHub Actions"]
-  CI --> GHP</pre>
+  Dev(["Consuming developer"]) --&gt; Lib["TrBlazeUI packages"]
+  Agent(["AI coding agent"]) --&gt; Skills["TrBlazeUI agent skills + AI reference"]
+  Skills --&gt; Lib
+  Lib --&gt; GHP[("GitHub Packages (techierathore)")]
+  Lib --&gt; Theme["shadcn/ui &amp; tweakcn themes"]
+  Lib --&gt; ConsumerApp["Consumer Blazor app (Server / WASM / Auto / MAUI Hybrid)"]
+  Maintainer(["Maintainer"]) --&gt; Repo["TrBlazeUI repo + demo apps"]
+  Repo --&gt; CI["GitHub Actions"]
+  CI --&gt; GHP</pre>
 </div>
 <h2 id="user-journey-primary-use-case">7. User journey — primary use case<a class="anchor-link" href="#user-journey-primary-use-case">#</a></h2>
 <p>The primary journey is a developer adding TrBlazeUI to an existing Blazor app and rendering a themed, accessible component.</p>
@@ -256,7 +366,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
     <button data-zin title="Zoom in">+</button>
     <button data-fit title="Fit to width">Fit</button>
     <button data-one title="Actual size">1:1</button>
-    <button data-fs title="Fullscreen">&#9974;</button>
+    <button data-fs title="Fullscreen">&#9166;</button>
     <button data-pop title="Open in new tab">&#8599;</button>
   </div>
   <pre class="mermaid">sequenceDiagram
@@ -264,11 +374,11 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   participant N as "NuGet (GitHub Packages)"
   participant App as "Their Blazor app"
   participant UI as "TrBlazeUI component"
-  D->>N: "dotnet add package TrBlazeUI.Components"
-  D->>App: "add _Imports, PortalHost, theme.css + trblazeui.css, AddTrBlazeUIPrimitives()"
-  D->>App: "write <Dialog>, <Button>, <DataTable> ..."
-  App->>UI: "render with consumer theme variables"
-  UI-->>D: "accessible, themed, dark-mode-ready UI"</pre>
+  D-&gt;&gt;N: "dotnet add package TrBlazeUI.Components"
+  D-&gt;&gt;App: "add _Imports, PortalHost, theme.css + trblazeui.css, AddTrBlazeUIPrimitives()"
+  D-&gt;&gt;App: "write &lt;Dialog&gt;, &lt;Button&gt;, &lt;DataTable&gt; ..."
+  App-&gt;&gt;UI: "render with consumer theme variables"
+  UI--&gt;&gt;D: "accessible, themed, dark-mode-ready UI"</pre>
 </div>
 <h2 id="component-sketch">8. Component sketch<a class="anchor-link" href="#component-sketch">#</a></h2>
 <div class="diagram">
@@ -278,17 +388,17 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
     <button data-zin title="Zoom in">+</button>
     <button data-fit title="Fit to width">Fit</button>
     <button data-one title="Actual size">1:1</button>
-    <button data-fs title="Fullscreen">&#9974;</button>
+    <button data-fs title="Fullscreen">&#9166;</button>
     <button data-pop title="Open in new tab">&#8599;</button>
   </div>
   <pre class="mermaid">flowchart TB
-  Consumer["Consumer Blazor app"] --> Comp["TrBlazeUI.Components (styled)"]
-  Consumer --> Icons["Icon packages (Lucide / Heroicons / Feather)"]
-  Comp --> Prim["TrBlazeUI.Primitives (headless + services)"]
-  Comp --> CSS["Pre-built trblazeui.css (Tailwind v4)"]
-  Comp --> Apex["Blazor-ApexCharts"]
-  Comp --> Markdig["Markdig + HtmlSanitizer"]
-  Prim --> JS["JS interop (portal, focus, positioning, keyboard)"]</pre>
+  Consumer["Consumer Blazor app"] --&gt; Comp["TrBlazeUI.Components (styled)"]
+  Consumer --&gt; Icons["Icon packages (Lucide / Heroicons / Feather)"]
+  Comp --&gt; Prim["TrBlazeUI.Primitives (headless + services)"]
+  Comp --&gt; CSS["Pre-built trblazeui.css (Tailwind v4)"]
+  Comp --&gt; Apex["Blazor-ApexCharts"]
+  Comp --&gt; Markdig["Markdig + HtmlSanitizer"]
+  Prim --&gt; JS["JS interop (portal, focus, positioning, keyboard)"]</pre>
 </div>
 <h2 id="feature-catalog">9. Feature catalog<a class="anchor-link" href="#feature-catalog">#</a></h2>
 <h3 id="f-prim-headless-primitives">F-PRIM: Headless primitives<a class="anchor-link" href="#f-prim-headless-primitives">#</a></h3>
@@ -299,7 +409,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tbody>
 <tr><td>Primitives overview</td><td><code>/primitives</code></td><td>Index of all primitives</td></tr>
 <tr><td>Per-primitive demos</td><td><code>/primitives/*</code></td><td>Accordion, Checkbox, Collapsible, Dialog, DropdownMenu, HoverCard, Label, Popover, RadioGroup, Select, Sheet, Switch, Table, Tabs, Tooltip</td></tr>
-</tbody></table>
+</tbody>
+</table>
 <p><strong>Primitives:</strong> Accordion, Checkbox, Collapsible, Dialog, DropdownMenu, Floating, HoverCard, Label, Popover, RadioGroup, Select, Sheet, Switch, Table, Tabs, Tooltip.</p>
 <p><strong>Workflow:</strong> 1) consumer installs <code>TrBlazeUI.Primitives</code>; 2) registers services; 3) composes a primitive and supplies their own classes/styles; 4) primitive handles keyboard/focus/ARIA + portal positioning.</p>
 <p><strong>Requirements:</strong> BRD-1, BRD-2, BRD-3 (see §10)</p>
@@ -316,7 +427,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>Calendar, DatePicker, DateRangePicker, TimePicker</td><td>Date/time selection</td></tr>
 <tr><td>NumericInput, CurrencyInput, MaskedInput, InputOTP, InputGroup</td><td>Specialized inputs</td></tr>
 <tr><td>Slider, RangeSlider, Rating, ColorPicker, FileUpload</td><td>Range, rating, color, drag-and-drop upload</td></tr>
-</tbody></table>
+</tbody>
+</table>
 <p><strong>Workflow:</strong> compose control → bind value → optional <code>Field</code> wrapper for label/validation → submit with <code>Button</code> → feedback via <code>ToastService</code>.</p>
 <p><strong>Requirements:</strong> BRD-4 … BRD-12 (see §10)</p>
 <div class="diagram">
@@ -326,14 +438,14 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
     <button data-zin title="Zoom in">+</button>
     <button data-fit title="Fit to width">Fit</button>
     <button data-one title="Actual size">1:1</button>
-    <button data-fs title="Fullscreen">&#9974;</button>
+    <button data-fs title="Fullscreen">&#9166;</button>
     <button data-pop title="Open in new tab">&#8599;</button>
   </div>
   <pre class="mermaid">flowchart LR
-  A["User input"] --> B["Form control (@bind-Value)"]
-  B --> C{"Valid?"}
-  C -->|"yes"| D["Submit + Toast success"]
-  C -->|"no"| E["Field shows validation message"]</pre>
+  A["User input"] --&gt; B["Form control (@bind-Value)"]
+  B --&gt; C{"Valid?"}
+  C --&gt;|"yes"| D["Submit + Toast success"]
+  C --&gt;|"no"| E["Field shows validation message"]</pre>
 </div>
 <h3 id="f-layout-layout-navigation-components">F-LAYOUT: Layout &amp; navigation components<a class="anchor-link" href="#f-layout-layout-navigation-components">#</a></h3>
 <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
@@ -344,7 +456,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>Sidebar</td><td>Responsive collapsible sidebar with variants + mobile sheet</td></tr>
 <tr><td>NavigationMenu, Menubar, Breadcrumb, Pagination, ResponsiveNav, Tabs</td><td>Navigation primitives (horizontal nav uses FloatingPortal to fix overflow)</td></tr>
 <tr><td>Card, Resizable, ScrollArea, AspectRatio, Separator, Item</td><td>Layout containers</td></tr>
-</tbody></table>
+</tbody>
+</table>
 <p><strong>Requirements:</strong> BRD-13 … BRD-18 (see §10)</p>
 <h3 id="f-overlay-overlay-feedback-components">F-OVERLAY: Overlay &amp; feedback components<a class="anchor-link" href="#f-overlay-overlay-feedback-components">#</a></h3>
 <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
@@ -355,7 +468,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>Dialog, AlertDialog, Sheet, Drawer</td><td>Modal/side overlays via PortalHost with focus trap</td></tr>
 <tr><td>Popover, HoverCard, Tooltip, DropdownMenu, ContextMenu, Command</td><td>Floating panels / menus / command palette</td></tr>
 <tr><td>Alert, Toast</td><td>Inline callouts + transient notifications (<code>ToastService.ShowSuccess/Error/Warning/Info</code>)</td></tr>
-</tbody></table>
+</tbody>
+</table>
 <p><strong>Workflow (overlay):</strong> trigger (often <code>AsChild</code>) opens overlay → content rendered into portal root → focus trapped → internal interactions refresh the portal → close restores focus.</p>
 <p><strong>Requirements:</strong> BRD-19 … BRD-24 (see §10)</p>
 <div class="diagram">
@@ -365,18 +479,18 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
     <button data-zin title="Zoom in">+</button>
     <button data-fit title="Fit to width">Fit</button>
     <button data-one title="Actual size">1:1</button>
-    <button data-fs title="Fullscreen">&#9974;</button>
+    <button data-fs title="Fullscreen">&#9166;</button>
     <button data-pop title="Open in new tab">&#8599;</button>
   </div>
   <pre class="mermaid">sequenceDiagram
   actor U as "User"
   participant T as "Trigger (AsChild)"
   participant P as "PortalHost"
-  U->>T: "open"
-  T->>P: "render content into portal root"
-  P-->>U: "overlay shown, focus trapped"
-  U->>P: "interact (toggle/select)"
-  P-->>U: "RefreshPortal re-renders content"</pre>
+  U-&gt;&gt;T: "open"
+  T-&gt;&gt;P: "render content into portal root"
+  P--&gt;&gt;U: "overlay shown, focus trapped"
+  U-&gt;&gt;P: "interact (toggle/select)"
+  P--&gt;&gt;U: "RefreshPortal re-renders content"</pre>
 </div>
 <h3 id="f-data-data-content-components">F-DATA: Data &amp; content components<a class="anchor-link" href="#f-data-data-content-components">#</a></h3>
 <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
@@ -387,7 +501,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>DataTable</td><td>Column/SelectionMode/Toolbar; sortable, filterable, paginated, selectable</td></tr>
 <tr><td>MarkdownEditor</td><td>Markdown editing + preview</td></tr>
 <tr><td>RichTextEditor</td><td>WYSIWYG with sanitized HTML output</td></tr>
-</tbody></table>
+</tbody>
+</table>
 <p><strong>Requirements:</strong> BRD-25, BRD-26, BRD-27 (see §10)</p>
 <h3 id="f-display-display-components">F-DISPLAY: Display components<a class="anchor-link" href="#f-display-display-components">#</a></h3>
 <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
@@ -395,12 +510,13 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <p><strong>Requirements:</strong> BRD-28, BRD-29 (see §10)</p>
 <h3 id="f-toolbar-toolbar-component">F-TOOLBAR: Toolbar component<a class="anchor-link" href="#f-toolbar-toolbar-component">#</a></h3>
 <p><strong>Personas:</strong> Consuming developer (desktop/hybrid apps) · <strong>Phase:</strong> Pre-existing (Done)</p>
-<p>A compound <strong>Toolbar</strong> for desktop/hybrid Blazor apps (Visual-Studio-style action bars): <code>Toolbar</code> container (Default/Compact/Dense density, horizontal/vertical) with <code>ToolbarGroup</code>, <code>ToolbarButton</code>, <code>ToolbarToggleButton</code> (<code>@bind-IsPressed</code>), and <code>ToolbarSeparator</code>. Full <code>role=&quot;toolbar&quot;</code> / <code>aria-pressed</code> accessibility; composes existing Button/DropdownMenu/Select as children.</p>
+<p>A compound <strong>Toolbar</strong> for desktop/hybrid Blazor apps (Visual-Studio-style action bars): <code>Toolbar</code> container (Default/Compact/Dense density, horizontal/vertical) with <code>ToolbarGroup</code>, <code>ToolbarButton</code>, <code>ToolbarToggleButton</code> (<code>@bind-IsPressed</code>), and <code>ToolbarSeparator</code>. Full <code>role="toolbar"</code> / <code>aria-pressed</code> accessibility; composes existing Button/DropdownMenu/Select as children.</p>
 <table>
 <thead><tr><th>Surface</th><th>Route (demo)</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td>Toolbar demo</td><td><code>/components/toolbar</code></td><td>Basic, grouped, variants, toggle, dropdowns, vertical, IDE/editor examples</td></tr>
-</tbody></table>
+</tbody>
+</table>
 <p><strong>Workflow:</strong> compose <code>Toolbar</code> → add <code>ToolbarGroup</code>s of <code>ToolbarButton</code>/<code>ToolbarToggleButton</code> → divide with <code>ToolbarSeparator</code> → wire click/toggle handlers.</p>
 <p><strong>Requirements:</strong> BRD-30, BRD-31 (see §10)</p>
 <h3 id="f-chart-charts">F-CHART: Charts<a class="anchor-link" href="#f-chart-charts">#</a></h3>
@@ -410,7 +526,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <thead><tr><th>Surface</th><th>Route (demo)</th><th>Description</th></tr></thead>
 <tbody>
 <tr><td>Chart demos</td><td><code>/charts/*</code></td><td>Area, Bar, Line, Pie, Radar, Radial</td></tr>
-</tbody></table>
+</tbody>
+</table>
 <p><strong>Requirements:</strong> BRD-32 (see §10)</p>
 <h3 id="f-icons-icon-libraries">F-ICONS: Icon libraries<a class="anchor-link" href="#f-icons-icon-libraries">#</a></h3>
 <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
@@ -421,7 +538,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>Lucide</td><td><code>LucideIcon</code></td><td>1,640+</td></tr>
 <tr><td>Heroicons</td><td><code>HeroIcon</code></td><td>1,288 (4 variants)</td></tr>
 <tr><td>Feather</td><td><code>FeatherIcon</code></td><td>286</td></tr>
-</tbody></table>
+</tbody>
+</table>
 <p><strong>Requirements:</strong> BRD-33, BRD-34 (see §10)</p>
 <h3 id="f-theme-theming-dark-mode">F-THEME: Theming &amp; dark mode<a class="anchor-link" href="#f-theme-theming-dark-mode">#</a></h3>
 <p><strong>Personas:</strong> Consuming developer, theme author · <strong>Phase:</strong> Pre-existing (Done)</p>
@@ -437,16 +555,124 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <p><strong>Requirements:</strong> BRD-40, BRD-41 (see §10)</p>
 <h3 id="f-dist-packaging-distribution">F-DIST: Packaging &amp; distribution<a class="anchor-link" href="#f-dist-packaging-distribution">#</a></h3>
 <p><strong>Personas:</strong> Maintainer · <strong>Phase:</strong> Pre-existing (Done)</p>
-<p>Five NuGet packages with per-package MinVer versioning, published to GitHub Packages (<code>techierathore</code>) by GitHub Actions (<code>publish-nuget.yml</code> on master; <code>build.yml</code> validates PRs). <code>Directory.Build.props</code> centralizes metadata, Apache-2.0 license, repo URLs, and strict build settings. NOTICE preserves original attribution.</p>
+<p>Five NuGet packages sharing a single version number taken from the release tag, published to GitHub Packages (<code>techierathore</code>) by GitHub Actions (<code>publish-github-packages.yml</code>; <code>build.yml</code> validates PRs) and to NuGet.org by the manually dispatched <code>publish-nuget.yml</code>. The publish workflows resolve the version from the release tag and pass it as <code>-p:Version=</code> to both <code>dotnet build</code> and <code>dotnet pack</code>; <code>Directory.Build.props</code> holds only the local-build base. <code>Directory.Build.props</code> centralizes metadata, Apache-2.0 license, repo URLs, and strict build settings. NOTICE preserves original attribution.</p>
 <p><strong>Requirements:</strong> BRD-42, BRD-43, BRD-44 (see §10)</p>
 <h3 id="f-ai-ai-agent-skills">F-AI: AI agent skills<a class="anchor-link" href="#f-ai-ai-agent-skills">#</a></h3>
 <p><strong>Personas:</strong> AI coding agent + their developer · <strong>Phase:</strong> Pre-existing (Done)</p>
 <p>Claude Code (<code>/trblazeui</code>) and OpenCode agent skills (distributable copies in <code>docs/skills/</code>) turn an AI assistant into a TrBlazeUI-aware .NET/Blazor developer (integrate, generate page/form/dashboard/component/service, setup-theme, list-components), backed by the <code>TrBlazeUI-AI-Reference.md</code> component reference.</p>
 <p><strong>Requirements:</strong> BRD-45, BRD-46, BRD-47 (see §10)</p>
 <h2 id="functional-requirements-brd-ledger">10. Functional requirements (BRD ledger)<a class="anchor-link" href="#functional-requirements-brd-ledger">#</a></h2>
-<ul><li><strong>BRD-1</strong> — A developer can install and register the headless primitives via <code>AddTrBlazeUIPrimitives()</code>. <em>(F-PRIM)</em> <!-- from: TrBlazeUI-Doc.md --></li><li><strong>BRD-2</strong> — Each of the 16 primitives provides keyboard navigation and ARIA semantics with no styling. <em>(F-PRIM)</em></li><li><strong>BRD-3</strong> — A developer can style any primitive with Tailwind, CSS modules, or inline styles. <em>(F-PRIM)</em></li><li><strong>BRD-4</strong> — A developer can render Buttons with variants (Default/Destructive/Outline/Secondary/Ghost/Link), sizes, and icons. <em>(F-FORM)</em></li><li><strong>BRD-5</strong> — A developer can two-way bind text inputs (Input, Textarea) and pass arbitrary HTML attributes/events to them. <em>(F-FORM)</em></li><li><strong>BRD-6</strong> — A developer can use selection controls: Checkbox, Switch, RadioGroup, Toggle, ToggleGroup. <em>(F-FORM)</em></li><li><strong>BRD-7</strong> — A developer can use dropdown selection: Select, NativeSelect, Combobox, MultiSelect. <em>(F-FORM)</em></li><li><strong>BRD-8</strong> — A developer can pick dates/times via Calendar, DatePicker, DateRangePicker, TimePicker. <em>(F-FORM)</em></li><li><strong>BRD-9</strong> — A developer can capture numeric/currency/masked/OTP input via NumericInput, CurrencyInput, MaskedInput, InputOTP, InputGroup. <em>(F-FORM)</em></li><li><strong>BRD-10</strong> — A developer can use Slider, RangeSlider, and Rating controls. <em>(F-FORM)</em></li><li><strong>BRD-11</strong> — A developer can pick colors via ColorPicker and upload files via drag-and-drop FileUpload. <em>(F-FORM)</em></li><li><strong>BRD-12</strong> — A developer can compose accessible forms with Field (label, control, help text, validation message). <em>(F-FORM)</em></li><li><strong>BRD-13</strong> — A developer can build an app shell with a responsive, collapsible Sidebar (variants + mobile sheet + Ctrl/Cmd+B toggle). <em>(F-LAYOUT)</em></li><li><strong>BRD-14</strong> — The Sidebar persists its collapsed state across sessions. <em>(F-LAYOUT)</em></li><li><strong>BRD-15</strong> — A developer can build navigation with Breadcrumb, NavigationMenu, Menubar, Pagination, ResponsiveNav, Tabs. <em>(F-LAYOUT)</em></li><li><strong>BRD-16</strong> — A developer can lay out content with Card, Resizable, ScrollArea, AspectRatio, Separator, Item. <em>(F-LAYOUT)</em></li><li><strong>BRD-17</strong> — A developer can group collapsible content with Accordion and Collapsible. <em>(F-LAYOUT)</em></li><li><strong>BRD-18</strong> — Horizontal navigation dropdowns render without overflow clipping (FloatingPortal). <em>(F-LAYOUT)</em></li><li><strong>BRD-19</strong> — A developer can show modal overlays (Dialog, AlertDialog) with focus trap and ARIA. <em>(F-OVERLAY)</em></li><li><strong>BRD-20</strong> — A developer can show side panels (Sheet on any edge, Drawer). <em>(F-OVERLAY)</em></li><li><strong>BRD-21</strong> — A developer can show floating panels and menus (Popover, HoverCard, Tooltip, DropdownMenu, ContextMenu, Menubar). <em>(F-OVERLAY)</em></li><li><strong>BRD-22</strong> — A developer can show a command palette (Command) with keyboard navigation and filtering. <em>(F-OVERLAY)</em></li><li><strong>BRD-23</strong> — Internal state changes inside an overlay re-render correctly through the reactive portal. <em>(F-OVERLAY)</em> <!-- from: TrBlazeUI-Issues-Report-1.md --></li><li><strong>BRD-24</strong> — A developer can show inline Alerts and transient Toasts via ToastService (success/error/warning/info). <em>(F-OVERLAY)</em></li><li><strong>BRD-25</strong> — A developer can render a DataTable with sorting, filtering, pagination, selection, and a toolbar. <em>(F-DATA)</em></li><li><strong>BRD-26</strong> — A developer can edit markdown with a toolbar and live preview (MarkdownEditor). <em>(F-DATA)</em></li><li><strong>BRD-27</strong> — A developer can edit rich text (RichTextEditor) with sanitized HTML output. <em>(F-DATA)</em></li><li><strong>BRD-28</strong> — A developer can display Avatar, Badge, Empty, Item, Kbd, Progress, Skeleton, Spinner. <em>(F-DISPLAY)</em></li><li><strong>BRD-29</strong> — A developer can apply consistent text styling via Typography variants (H1–H4, P, Lead, Large, Small, Muted). <em>(F-DISPLAY)</em></li><li><strong>BRD-30</strong> — A developer can build a desktop-style Toolbar (Default/Compact/Dense, horizontal/vertical) with groups and separators. <em>(F-TOOLBAR)</em> <!-- from: toolbarplan.md --></li><li><strong>BRD-31</strong> — A developer can use ToolbarButton and toggle-able ToolbarToggleButton (<code>@bind-IsPressed</code>). <em>(F-TOOLBAR)</em></li><li><strong>BRD-32</strong> — A developer can render Area, Bar, Line, Pie, Radar, and Radial charts themed via chart CSS variables. <em>(F-CHART)</em></li><li><strong>BRD-33</strong> — A developer can render icons from Lucide, Heroicons (4 variants), and Feather via typed components. <em>(F-ICONS)</em></li><li><strong>BRD-34</strong> — Icon packages are installable independently and versioned separately. <em>(F-ICONS)</em></li><li><strong>BRD-35</strong> — A developer can theme the whole app with shadcn/ui or tweakcn CSS variables in <code>theme.css</code>. <em>(F-THEME)</em></li><li><strong>BRD-36</strong> — A developer can toggle dark mode by adding/removing <code>.dark</code> on <code>&lt;html&gt;</code>. <em>(F-THEME)</em></li><li><strong>BRD-37</strong> — Components require no Tailwind/Node setup (pre-built CSS shipped). <em>(F-THEME)</em></li><li><strong>BRD-38</strong> — Every interactive component meets WCAG 2.1 AA keyboard + ARIA expectations. <em>(F-A11Y)</em></li><li><strong>BRD-39</strong> — Overlays trap and restore focus correctly. <em>(F-A11Y)</em></li><li><strong>BRD-40</strong> — A maintainer can run a demo app in Server, WASM, or Auto mode showing every component. <em>(F-DEMO)</em></li><li><strong>BRD-41</strong> — A user can switch the demo between horizontal and vertical navigation layouts. <em>(F-DEMO)</em></li><li><strong>BRD-42</strong> — A maintainer can publish all 5 packages to GitHub Packages via GitHub Actions on master. <em>(F-DIST)</em></li><li><strong>BRD-43</strong> — Each package is versioned independently from its own git tag prefix (MinVer). <em>(F-DIST)</em></li><li><strong>BRD-44</strong> — A consumer can install packages from the <code>techierathore</code> GitHub Packages source with a PAT. <em>(F-DIST)</em></li><li><strong>BRD-45</strong> — An AI agent can be activated as <code>/trblazeui</code> (Claude Code) or the OpenCode equivalent. <em>(F-AI)</em></li><li><strong>BRD-46</strong> — The AI agent can integrate TrBlazeUI into an app and generate pages/forms/dashboards/components/services/themes. <em>(F-AI)</em></li><li><strong>BRD-47</strong> — The AI agent draws on <code>TrBlazeUI-AI-Reference.md</code> for component parameters and patterns. <em>(F-AI)</em></li></ul>
+<ul>
+<li><strong>BRD-1</strong> — A developer can install and register the headless primitives via <code>AddTrBlazeUIPrimitives()</code>. <em>(F-PRIM)</em> &lt;!-- from: TrBlazeUI-Doc.md --&gt;
+</li>
+<li><strong>BRD-2</strong> — Each of the 16 primitives provides keyboard navigation and ARIA semantics with no styling. <em>(F-PRIM)</em>
+</li>
+<li><strong>BRD-3</strong> — A developer can style any primitive with Tailwind, CSS modules, or inline styles. <em>(F-PRIM)</em>
+</li>
+<li><strong>BRD-4</strong> — A developer can render Buttons with variants (Default/Destructive/Outline/Secondary/Ghost/Link), sizes, and icons. <em>(F-FORM)</em>
+</li>
+<li><strong>BRD-5</strong> — A developer can two-way bind text inputs (Input, Textarea) and pass arbitrary HTML attributes/events to them. <em>(F-FORM)</em>
+</li>
+<li><strong>BRD-6</strong> — A developer can use selection controls: Checkbox, Switch, RadioGroup, Toggle, ToggleGroup. <em>(F-FORM)</em>
+</li>
+<li><strong>BRD-7</strong> — A developer can use dropdown selection: Select, NativeSelect, Combobox, MultiSelect. <em>(F-FORM)</em>
+</li>
+<li><strong>BRD-8</strong> — A developer can pick dates/times via Calendar, DatePicker, DateRangePicker, TimePicker. <em>(F-FORM)</em>
+</li>
+<li><strong>BRD-9</strong> — A developer can capture numeric/currency/masked/OTP input via NumericInput, CurrencyInput, MaskedInput, InputOTP, InputGroup. <em>(F-FORM)</em>
+</li>
+<li><strong>BRD-10</strong> — A developer can use Slider, RangeSlider, and Rating controls. <em>(F-FORM)</em>
+</li>
+<li><strong>BRD-11</strong> — A developer can pick colors via ColorPicker and upload files via drag-and-drop FileUpload. <em>(F-FORM)</em>
+</li>
+<li><strong>BRD-12</strong> — A developer can compose accessible forms with Field (label, control, help text, validation message). <em>(F-FORM)</em>
+</li>
+<li><strong>BRD-13</strong> — A developer can build an app shell with a responsive, collapsible Sidebar (variants + mobile sheet + Ctrl/Cmd+B toggle). <em>(F-LAYOUT)</em>
+</li>
+<li><strong>BRD-14</strong> — The Sidebar persists its collapsed state across sessions. <em>(F-LAYOUT)</em>
+</li>
+<li><strong>BRD-15</strong> — A developer can build navigation with Breadcrumb, NavigationMenu, Menubar, Pagination, ResponsiveNav, Tabs. <em>(F-LAYOUT)</em>
+</li>
+<li><strong>BRD-16</strong> — A developer can lay out content with Card, Resizable, ScrollArea, AspectRatio, Separator, Item. <em>(F-LAYOUT)</em>
+</li>
+<li><strong>BRD-17</strong> — A developer can group collapsible content with Accordion and Collapsible. <em>(F-LAYOUT)</em>
+</li>
+<li><strong>BRD-18</strong> — Horizontal navigation dropdowns render without overflow clipping (FloatingPortal). <em>(F-LAYOUT)</em>
+</li>
+<li><strong>BRD-19</strong> — A developer can show modal overlays (Dialog, AlertDialog) with focus trap and ARIA. <em>(F-OVERLAY)</em>
+</li>
+<li><strong>BRD-20</strong> — A developer can show side panels (Sheet on any edge, Drawer). <em>(F-OVERLAY)</em>
+</li>
+<li><strong>BRD-21</strong> — A developer can show floating panels and menus (Popover, HoverCard, Tooltip, DropdownMenu, ContextMenu, Menubar). <em>(F-OVERLAY)</em>
+</li>
+<li><strong>BRD-22</strong> — A developer can show a command palette (Command) with keyboard navigation and filtering. <em>(F-OVERLAY)</em>
+</li>
+<li><strong>BRD-23</strong> — Internal state changes inside an overlay re-render correctly through the reactive portal. <em>(F-OVERLAY)</em> &lt;!-- from: TrBlazeUI-Issues-Report-1.md --&gt;
+</li>
+<li><strong>BRD-24</strong> — A developer can show inline Alerts and transient Toasts via ToastService (success/error/warning/info). <em>(F-OVERLAY)</em>
+</li>
+<li><strong>BRD-25</strong> — A developer can render a DataTable with sorting, filtering, pagination, selection, and a toolbar. <em>(F-DATA)</em>
+</li>
+<li><strong>BRD-26</strong> — A developer can edit markdown with a toolbar and live preview (MarkdownEditor). <em>(F-DATA)</em>
+</li>
+<li><strong>BRD-27</strong> — A developer can edit rich text (RichTextEditor) with sanitized HTML output. <em>(F-DATA)</em>
+</li>
+<li><strong>BRD-28</strong> — A developer can display Avatar, Badge, Empty, Item, Kbd, Progress, Skeleton, Spinner. <em>(F-DISPLAY)</em>
+</li>
+<li><strong>BRD-29</strong> — A developer can apply consistent text styling via Typography variants (H1–H4, P, Lead, Large, Small, Muted). <em>(F-DISPLAY)</em>
+</li>
+<li><strong>BRD-30</strong> — A developer can build a desktop-style Toolbar (Default/Compact/Dense, horizontal/vertical) with groups and separators. <em>(F-TOOLBAR)</em> &lt;!-- from: toolbarplan.md --&gt;
+</li>
+<li><strong>BRD-31</strong> — A developer can use ToolbarButton and toggle-able ToolbarToggleButton (<code>@bind-IsPressed</code>). <em>(F-TOOLBAR)</em>
+</li>
+<li><strong>BRD-32</strong> — A developer can render Area, Bar, Line, Pie, Radar, and Radial charts themed via chart CSS variables. <em>(F-CHART)</em>
+</li>
+<li><strong>BRD-33</strong> — A developer can render icons from Lucide, Heroicons (4 variants), and Feather via typed components. <em>(F-ICONS)</em>
+</li>
+<li><strong>BRD-34</strong> — Icon packages are installable independently and versioned separately. <em>(F-ICONS)</em>
+</li>
+<li><strong>BRD-35</strong> — A developer can theme the whole app with shadcn/ui or tweakcn CSS variables in <code>theme.css</code>. <em>(F-THEME)</em>
+</li>
+<li><strong>BRD-36</strong> — A developer can toggle dark mode by adding/removing <code>.dark</code> on <code>&lt;html&gt;</code>. <em>(F-THEME)</em>
+</li>
+<li><strong>BRD-37</strong> — Components require no Tailwind/Node setup (pre-built CSS shipped). <em>(F-THEME)</em>
+</li>
+<li><strong>BRD-38</strong> — Every interactive component meets WCAG 2.1 AA keyboard + ARIA expectations. <em>(F-A11Y)</em>
+</li>
+<li><strong>BRD-39</strong> — Overlays trap and restore focus correctly. <em>(F-A11Y)</em>
+</li>
+<li><strong>BRD-40</strong> — A maintainer can run a demo app in Server, WASM, or Auto mode showing every component. <em>(F-DEMO)</em>
+</li>
+<li><strong>BRD-41</strong> — A user can switch the demo between horizontal and vertical navigation layouts. <em>(F-DEMO)</em>
+</li>
+<li><strong>BRD-42</strong> — A maintainer can publish all 5 packages to GitHub Packages via GitHub Actions on master. <em>(F-DIST)</em>
+</li>
+<li><strong>BRD-43</strong> — All five packages share a single version number, taken from the release tag. <em>(F-DIST)</em> <strong>Amended 2026-08-31 (owner decision).</strong> This previously read <em>"Each package is versioned independently from its own git tag prefix (MinVer)"</em> — a requirement that was never implemented and, when it finally was, proved to be the wrong fit. Per-package MinVer was built, measured and removed the same day: every publish path already resolves one explicit version (the release tag, or <code>&lt;base&gt;-ci.&lt;run&gt;</code> for the pre-release feed) and passes it as <code>-p:Version=</code>, so MinVer could never influence a published package. Worse, MinVer sets the version in an MSBuild <strong>target</strong>, which makes a command-line <code>-p:Version=</code> <strong>silently ignored</strong> — it would have added an invisible way for the release version to stop working, the same class of defect that had already frozen nuget.org at 2.0.0. Shared versioning is now the specified behaviour, matching <code>RELEASE.md</code> and <code>CHANGELOG.md</code>, which had described it all along.
+</li>
+<li><strong>BRD-44</strong> — A consumer can install packages from the <code>techierathore</code> GitHub Packages source with a PAT. <em>(F-DIST)</em>
+</li>
+<li><strong>BRD-45</strong> — An AI agent can be activated as <code>/trblazeui</code> (Claude Code) or the OpenCode equivalent. <em>(F-AI)</em>
+</li>
+<li><strong>BRD-46</strong> — The AI agent can integrate TrBlazeUI into an app and generate pages/forms/dashboards/components/services/themes. <em>(F-AI)</em>
+</li>
+<li><strong>BRD-47</strong> — The AI agent draws on <code>TrBlazeUI-AI-Reference.md</code> for component parameters and patterns. <em>(F-AI)</em>
+</li>
+</ul>
 <h2 id="non-functional-requirements">11. Non-functional requirements<a class="anchor-link" href="#non-functional-requirements">#</a></h2>
-<ul><li><strong>BRD-48</strong> — Performance: pre-built minified CSS (~906 KB / ~97 KB gzipped as of 2.1.0, which ships the full Tailwind utility scale so consumer markup can be styled with utility classes); components render identically across Server/WASM/Auto with no per-component JS bundle bloat.</li><li><strong>BRD-49</strong> — Security: RichTextEditor HTML output is sanitized via HtmlSanitizer; no credentials or secrets in the library; consumers keep PATs out of source control.</li><li><strong>BRD-50</strong> — Accessibility: WCAG 2.1 AA baseline (keyboard, ARIA, focus, screen reader) for all interactive components.</li><li><strong>BRD-51</strong> — Compatibility: 100% shadcn/ui + tweakcn theme compatibility; works on .NET 10 across all three Blazor render modes; usable from MAUI Blazor Hybrid (with the documented NativeSelect-in-overlay caveat).</li><li><strong>BRD-52</strong> — Maintainability: .NET 10 / C# 14, <code>TreatWarningsAsErrors</code>, <code>EnforceCodeStyleInBuild</code>, mandatory XML docs on public members, one-class-per-file, file-scoped namespaces, <code>obj</code>-prefixed instance fields.</li><li><strong>BRD-53</strong> — Reliability: every component implements <code>CaptureUnmatchedValues</code> so arbitrary HTML attributes/events never cause runtime <code>InvalidOperationException</code>.</li></ul>
+<ul>
+<li><strong>BRD-48</strong> — Performance: pre-built minified CSS (~906 KB / ~97 KB gzipped as of 2.1.0, which ships the full Tailwind utility scale so consumer markup can be styled with utility classes); components render identically across Server/WASM/Auto with no per-component JS bundle bloat.
+</li>
+<li><strong>BRD-49</strong> — Security: RichTextEditor HTML output is sanitized via HtmlSanitizer; no credentials or secrets in the library; consumers keep PATs out of source control.
+</li>
+<li><strong>BRD-50</strong> — Accessibility: WCAG 2.1 AA baseline (keyboard, ARIA, focus, screen reader) for all interactive components.
+</li>
+<li><strong>BRD-51</strong> — Compatibility: 100% shadcn/ui + tweakcn theme compatibility; works on .NET 10 across all three Blazor render modes; usable from MAUI Blazor Hybrid (with the documented NativeSelect-in-overlay caveat).
+</li>
+<li><strong>BRD-52</strong> — Maintainability: .NET 10 / C# 14, <code>TreatWarningsAsErrors</code>, <code>EnforceCodeStyleInBuild</code>, mandatory XML docs on public members, one-class-per-file, file-scoped namespaces, <code>obj</code>-prefixed instance fields.
+</li>
+<li><strong>BRD-53</strong> — Reliability: every component implements <code>CaptureUnmatchedValues</code> so arbitrary HTML attributes/events never cause runtime <code>InvalidOperationException</code>.
+</li>
+</ul>
 <table>
 <thead><tr><th>NFR area</th><th>Target</th></tr></thead>
 <tbody>
@@ -455,11 +681,34 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>Accessibility</td><td>WCAG 2.1 AA</td></tr>
 <tr><td>Build warnings</td><td>0 (warnings-as-errors)</td></tr>
 <tr><td>Theme compatibility</td><td>shadcn/ui + tweakcn, light + dark</td></tr>
-</tbody></table>
+</tbody>
+</table>
 <h2 id="constraints-assumptions">12. Constraints &amp; assumptions<a class="anchor-link" href="#constraints-assumptions">#</a></h2>
-<ul><li>Apache 2.0 license; the NOTICE file (original <em>Blazor Blueprint</em> attribution) MUST ship with any distribution.</li><li>Distribution is via GitHub Packages under <code>techierathore</code>; consumers need a PAT with <code>read:packages</code>.</li><li>Build relies on the standalone <code>tools/tailwindcss.exe</code> (Windows); CI/skip via <code>-p:CI=true</code> using committed pre-built CSS.</li><li>Reference build environment is WSL-on-Windows using the Windows dotnet; no hot-reload (build + restart).</li><li>The library has no backend/DB/auth; any such concern is the consumer's.</li></ul>
+<ul>
+<li>Apache 2.0 license; the NOTICE file (original <em>Blazor Blueprint</em> attribution) MUST ship with any distribution.
+</li>
+<li>Distribution is via GitHub Packages under <code>techierathore</code>; consumers need a PAT with <code>read:packages</code>.
+</li>
+<li>Build relies on the standalone <code>tools/tailwindcss.exe</code> (Windows); CI/skip via <code>-p:CI=true</code> using committed pre-built CSS.
+</li>
+<li>Reference build environment is WSL-on-Windows using the Windows dotnet; no hot-reload (build + restart).
+</li>
+<li>The library has no backend/DB/auth; any such concern is the consumer's.
+</li>
+</ul>
 <h2 id="success-metrics">13. Success metrics<a class="anchor-link" href="#success-metrics">#</a></h2>
-<ul><li>A new consumer can install and render a themed, accessible component in under ~10 minutes following the README.</li><li>Zero runtime attribute-splatting crashes in consumer apps.</li><li>Clean Release build: 0 warnings / 0 errors under warnings-as-errors.</li><li>All 5 packages publish successfully on each master push.</li><li>Consumer-reported issues resolved and tracked (5/5 + 5/5 from the two reports already fixed).</li></ul>
+<ul>
+<li>A new consumer can install and render a themed, accessible component in under ~10 minutes following the README.
+</li>
+<li>Zero runtime attribute-splatting crashes in consumer apps.
+</li>
+<li>Clean Release build: 0 warnings / 0 errors under warnings-as-errors.
+</li>
+<li>All 5 packages publish successfully on each master push.
+</li>
+<li>Consumer-reported issues resolved and tracked (5/5 + 5/5 from the two reports already fixed).
+</li>
+</ul>
 <h2 id="risks">14. Risks<a class="anchor-link" href="#risks">#</a></h2>
 <table>
 <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
@@ -469,11 +718,35 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>MAUI WebView2 overlay limitations surprise consumers</td><td>Medium</td><td>Medium</td><td>Document <code>&lt;Select&gt;</code>-in-overlay guidance (already in known limitations)</td></tr>
 <tr><td>Third-party dependency drift (ApexCharts/Quill/Markdig)</td><td>Low</td><td>Medium</td><td>Pin versions; validate on upgrade</td></tr>
 <tr><td>GitHub Packages PAT friction for consumers</td><td>Medium</td><td>Low</td><td>Clear README setup + CI token guidance</td></tr>
-</tbody></table>
+</tbody>
+</table>
 <h2 id="glossary">15. Glossary<a class="anchor-link" href="#glossary">#</a></h2>
-<ul><li><strong>TrBlazeUI</strong> — this Blazor component library (renamed fork of Blazor Blueprint).</li><li><strong>Primitive</strong> — a headless, unstyled, accessible component (behavior only).</li><li><strong>Styled component</strong> — a pre-styled component built on a primitive, matching shadcn/ui.</li><li><strong>Portal / PortalHost</strong> — mechanism that renders overlay DOM at a portal root.</li><li><strong>AsChild</strong> — pattern letting a trigger use a custom element instead of a default button.</li><li><strong>OKLCH</strong> — perceptually-uniform color space used for theme variables.</li><li><strong>MinVer</strong> — git-tag-driven semantic versioning tool.</li><li><strong>TechieRag</strong> — a <em>consumer</em> app (RAG sample); not a dependency of this library.</li><li><strong>REQ-UI-* / REQ-FN-* / REQ-NFR-</strong>* — requirement prefixes used in <code>docs/TrBlazeUI-Checklist.md</code>.</li></ul>
+<ul>
+<li><strong>TrBlazeUI</strong> — this Blazor component library (renamed fork of Blazor Blueprint).
+</li>
+<li><strong>Primitive</strong> — a headless, unstyled, accessible component (behavior only).
+</li>
+<li><strong>Styled component</strong> — a pre-styled component built on a primitive, matching shadcn/ui.
+</li>
+<li><strong>Portal / PortalHost</strong> — mechanism that renders overlay DOM at a portal root.
+</li>
+<li><strong>AsChild</strong> — pattern letting a trigger use a custom element instead of a default button.
+</li>
+<li><strong>OKLCH</strong> — perceptually-uniform color space used for theme variables.
+</li>
+<li><strong>MinVer</strong> — a tag-driven semantic versioning tool. Evaluated for per-package versioning and <strong>rejected on 2026-08-31</strong>; not used by this repo (BRD-43).
+</li>
+<li><strong>TechieRag</strong> — a <em>consumer</em> app (RAG sample); not a dependency of this library.
+</li>
+<li><strong>REQ-UI-* / REQ-FN-* / REQ-NFR-</strong>* — requirement prefixes used in <code>docs/TrBlazeUI-Checklist.md</code>.
+</li>
+</ul>
 <hr>
-<p>Last updated: 2026-06-30 Highest BRD ID: BRD-53 Sources harvested: docs/TrBlazeUI-Doc.md, docs/TrBlazeUI-Update-plan.md, docs/toolbarplan.md, docs/OldDocs/TrBlazeUI-Issues-Report-1.md, docs/OldDocs/trblazeui-issues-report-2.md, README.md, THEMING.md Custom instructions applied: none Drafted from reverse-doc — review and edit. New BRDs may be added (append-only); do not renumber.</p>
+<p>Last updated: 2026-06-30
+Highest BRD ID: BRD-53
+Sources harvested: docs/TrBlazeUI-Doc.md, docs/TrBlazeUI-Update-plan.md, docs/toolbarplan.md, docs/OldDocs/TrBlazeUI-Issues-Report-1.md, docs/OldDocs/trblazeui-issues-report-2.md, README.md, THEMING.md
+Custom instructions applied: none
+Drafted from reverse-doc — review and edit. New BRDs may be added (append-only); do not renumber.</p>
   </main>
 </div>
 
@@ -498,7 +771,11 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   });
 })();
 
-// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`.
+// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`:
+// mermaid reads the <pre>'s textContent as the diagram source, so a button
+// appended here glues "copy" onto the last line and breaks the parse
+// (flowcharts → "Syntax error"; sequence diagrams silently absorb it).
+// Mermaid blocks get copy/export from their own .diagram toolbar instead.
 document.querySelectorAll('pre:not(.mermaid)').forEach(pre => {
   const btn = document.createElement('button');
   btn.className = 'copy';
@@ -519,6 +796,7 @@ if (window.mermaid) {
   mermaid.initialize({ startOnLoad: true, theme: mermaidTheme, securityLevel: 'loose' });
 }
 
+// Mermaid toolbar wiring — run after mermaid renders
 function wireMermaidToolbars() {
   document.querySelectorAll('.diagram').forEach(dia => {
     if (dia.dataset.wired) return;
@@ -562,6 +840,7 @@ function wireMermaidToolbars() {
     };
     function escFs(e) { if (e.key === 'Escape') { dia.classList.remove('fs'); document.removeEventListener('keydown', escFs); } }
     dia.querySelector('[data-pop]').onclick = () => openInNewTab(svg);
+    // Ctrl+wheel zoom
     merm.addEventListener('wheel', (e) => {
       if (!e.ctrlKey) return;
       e.preventDefault();
@@ -626,9 +905,10 @@ function openInNewTab(svg) {
   w.document.close();
 }
 
+// Run wiring after mermaid finishes (it renders async)
 if (window.mermaid) {
   setTimeout(wireMermaidToolbars, 400);
-  setTimeout(wireMermaidToolbars, 1200);
+  setTimeout(wireMermaidToolbars, 1200);  // safety re-run for slow renders
 }
 </script>
 </body>

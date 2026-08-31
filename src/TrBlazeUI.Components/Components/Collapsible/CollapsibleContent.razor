@@ -1,6 +1,15 @@
 @namespace TrBlazeUI.Components.Collapsible
 
-<TrBlazeUI.Primitives.Collapsible.CollapsibleContent ForceMount="true" class="@GridCssClass" @attributes="AdditionalAttributes">
+@*
+    TR-018: the root carries `hidden` + an inline display:none while collapsed, so a closed panel
+    contributes NO layout box at all. grid-rows-[0fr] plus overflow:hidden only clips paint - the
+    descendants keep their natural boxes and overlap whatever follows in the document.
+    See CollapsibleContent.razor.cs for the open/close transition sequencing.
+*@
+
+<TrBlazeUI.Primitives.Collapsible.CollapsibleContent ForceMount="@(!Unmount)"
+                                                     class="@GridCssClass"
+                                                     @attributes="GetRootAttributes()">
     <div class="overflow-hidden min-h-0">
         <div class="@Class">
             @ChildContent

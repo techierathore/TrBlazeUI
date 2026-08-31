@@ -1,12 +1,13 @@
 @namespace TrBlazeUI.Components.Tabs
 @using TrBlazeUI.Primitives.Tabs
+@using TrBlazeUI.Components.Utilities
 
 @*
     Styled Tabs component wrapper.
     Wraps the Tabs primitive with shadcn/ui styling.
 *@
 
-<div class="@Class" @attributes="AdditionalAttributes">
+<div class="@CssClass" @attributes="AdditionalAttributes">
     <TrBlazeUI.Primitives.Tabs.Tabs Value="@Value"
                                    ValueChanged="@ValueChanged"
                                    DefaultValue="@DefaultValue"
@@ -68,8 +69,17 @@
     /// <summary>
     /// Additional CSS classes to apply to the tabs container.
     /// </summary>
+    /// <remarks>
+    /// This targets the outer wrapper only. To restyle the trigger track - its height, padding
+    /// or background - put the classes on <c>TabsList.Class</c>, which merges them over its own
+    /// defaults (TR-024).
+    /// </remarks>
     [Parameter]
     public string? Class { get; set; }
+
+    // Null (not "") when no classes are supplied, so Blazor omits the attribute exactly as the
+    // previous class="@Class" binding did.
+    private string? CssClass => string.IsNullOrWhiteSpace(Class) ? null : ClassNames.cn(Class);
 
     /// <summary>
     /// Additional attributes to apply to the tabs container.

@@ -94,6 +94,13 @@ public static class TailwindMerge
         ["flex-col"] = "flex-direction",
         ["flex-col-reverse"] = "flex-direction",
 
+        // Flex Wrap - a separate axis from flex-direction. Without this group,
+        // "flex-wrap flex-nowrap" left both classes live and the cascade (not the caller)
+        // picked the winner, so a nowrap override was silently inert (TR-027).
+        ["flex-wrap"] = "flex-wrap",
+        ["flex-nowrap"] = "flex-wrap",
+        ["flex-wrap-reverse"] = "flex-wrap",
+
         // Justify Content
         ["justify-start"] = "justify-content",
         ["justify-end"] = "justify-content",

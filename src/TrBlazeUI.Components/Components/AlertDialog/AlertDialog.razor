@@ -4,7 +4,9 @@
 @*
     Alert Dialog component - a modal requiring acknowledgement.
     Wraps the Dialog primitive with specific accessibility for confirmations.
-    Prevents dismissal via click-outside or Escape by default.
+    Modal="true" leaves light dismissal enabled at the primitive level; AlertDialogContent then
+    turns off the overlay click (a confirmation is answered, not clicked away) while keeping
+    Escape as the cancel affordance. Both are overridable on AlertDialogContent.
 *@
 
 <TrBlazeUI.Primitives.Dialog.Dialog Open="@Open"

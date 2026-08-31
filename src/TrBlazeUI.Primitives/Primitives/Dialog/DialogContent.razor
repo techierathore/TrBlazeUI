@@ -44,6 +44,12 @@
     /// Whether pressing Escape should close the dialog.
     /// Default is true.
     /// </summary>
+    /// <remarks>
+    /// Escape is observed on the document, not on the panel element, so it keeps working after
+    /// the dialog body re-renders and focus falls back to the document body. An open nested
+    /// floating layer (Select, Combobox, DropdownMenu, Popover) consumes Escape first, and the
+    /// Dialog root's <c>Modal="false"</c> disables dismissal regardless of this value.
+    /// </remarks>
     [Parameter]
     public bool CloseOnEscape { get; set; } = true;
 
@@ -67,11 +73,22 @@
     [Parameter]
     public EventCallback<KeyboardEventArgs> OnEscapeKeyDown { get; set; }
 
+    /// <summary>
+    /// Selector for a transient floating layer (Select, Combobox, DropdownMenu, Popover, ...).
+    /// While one of those is open it owns Escape, so the document-level listener stands down and
+    /// only closes the dialog once the inner layer has gone.
+    /// </summary>
+    private const string NestedLayerSelector = "[data-portal-content=\"true\"]";
+
     private ElementReference objContentRef;
     private IAsyncDisposable? objFocusTrap;
     private IJSObjectReference? objPortalModule;
     private IJSObjectReference? objScrollLockCleanup;
+    private IJSObjectReference? objClickOutsideModule;
+    private IJSObjectReference? objEscapeCleanup;
+    private DotNetObjectReference<DialogContent>? objDotNetRef;
     private bool objIsInitialized = false;
+    private bool objDisposed = false;
 
     protected override void OnInitialized()
     {
@@ -105,6 +122,14 @@
                 }
             }
 
+            // Escape must keep working after the body re-renders (TR-014). The element-scoped
+            // @onkeydown above only fires while document.activeElement is the panel or one of
+            // its descendants; when a re-render replaces the focused child, focus falls back to
+            // <body> and the panel never sees the key again. A document-level listener is
+            // immune to that, so it is the real registration and the element handler is just a
+            // fast path.
+            await SetupEscapeListenerAsync();
+
             // Lock body scroll
             if (LockScroll)
             {
@@ -130,13 +155,61 @@
     {
         if (!Context.IsOpen && objIsInitialized)
         {
-            // Dialog closed, clean up
-            _ = Task.Run(async () =>
+            // Dialog closed, clean up. This runs on the renderer's dispatcher rather than a
+            // pool thread (the old Task.Run) so it cannot race the OnAfterRenderAsync teardown
+            // path and double-dispose the JS listener handles.
+            _ = InvokeAsync(async () =>
             {
                 await CleanupAsync();
+                StateHasChanged();
             });
+
+            return;
         }
 
+        StateHasChanged();
+    }
+
+    private async Task SetupEscapeListenerAsync()
+    {
+        try
+        {
+            objClickOutsideModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/TrBlazeUI.Primitives/js/primitives/click-outside.js");
+
+            objDotNetRef ??= DotNetObjectReference.Create(this);
+
+            objEscapeCleanup = await objClickOutsideModule.InvokeAsync<IJSObjectReference>(
+                "onEscapeKey",
+                objDotNetRef,
+                nameof(HandleDocumentEscape),
+                Context.ContentId,
+                NestedLayerSelector);
+        }
+        catch (JSDisconnectedException)
+        {
+            // Circuit is gone - nothing to listen for.
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to set up escape listener: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Invoked from the document-level Escape listener. Public because it is a JS interop target.
+    /// </summary>
+    /// <returns>A task that completes when the Escape handling has run.</returns>
+    [JSInvokable]
+    public async Task HandleDocumentEscape()
+    {
+        // Guard against callbacks that land after teardown or after another part closed us.
+        if (objDisposed || Context == null || !Context.IsOpen)
+        {
+            return;
+        }
+
+        await HandleEscapeAsync(new KeyboardEventArgs { Key = "Escape" });
         StateHasChanged();
     }
 
@@ -144,27 +217,61 @@
     {
         if (args.Key == "Escape")
         {
-            // Invoke custom handler if provided
-            if (OnEscapeKeyDown.HasDelegate)
-            {
-                await OnEscapeKeyDown.InvokeAsync(args);
-            }
+            await HandleEscapeAsync(args);
+        }
+    }
 
-            // Close dialog if configured
-            if (CloseOnEscape)
-            {
-                Context.Close();
-            }
+    private async Task HandleEscapeAsync(KeyboardEventArgs args)
+    {
+        // Invoke custom handler if provided
+        if (OnEscapeKeyDown.HasDelegate)
+        {
+            await OnEscapeKeyDown.InvokeAsync(args);
+        }
+
+        // Close dialog if configured, unless the root opted out of light dismissal.
+        if (CloseOnEscape && Context.Modal)
+        {
+            Context.Close();
         }
     }
 
     private async Task CleanupAsync()
     {
         // Dispose focus trap
-        if (objFocusTrap != null)
+        var vFocusTrap = objFocusTrap;
+        objFocusTrap = null;
+        if (vFocusTrap != null)
         {
-            await objFocusTrap.DisposeAsync();
-            objFocusTrap = null;
+            try
+            {
+                await vFocusTrap.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit already torn down - the trap died with it.
+            }
+        }
+
+        // Remove the document-level Escape listener. The JS side is idempotent, but the
+        // reference is nulled first so a concurrent close cannot dispose it twice.
+        var vEscapeCleanup = objEscapeCleanup;
+        objEscapeCleanup = null;
+        if (vEscapeCleanup != null)
+        {
+            try
+            {
+                await vEscapeCleanup.InvokeVoidAsync("dispose");
+                await vEscapeCleanup.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit already torn down - the listener died with it.
+            }
+            catch
+            {
+                // Cleanup may already be disposed
+            }
         }
 
         // Unlock body scroll
@@ -184,14 +291,49 @@
         objIsInitialized = false;
     }
 
+    /// <summary>
+    /// Releases the focus trap, the document-level Escape listener, the scroll lock and the
+    /// imported JS modules.
+    /// </summary>
+    /// <returns>A task that completes when teardown has finished.</returns>
     public async ValueTask DisposeAsync()
     {
+        // Set the disposed flag first so a JSInvokable callback that is already in flight
+        // returns without touching the context.
+        objDisposed = true;
+
         await CleanupAsync();
 
         if (objPortalModule != null)
         {
-            await objPortalModule.DisposeAsync();
+            try
+            {
+                await objPortalModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit already gone.
+            }
+
+            objPortalModule = null;
         }
+
+        if (objClickOutsideModule != null)
+        {
+            try
+            {
+                await objClickOutsideModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit already gone.
+            }
+
+            objClickOutsideModule = null;
+        }
+
+        objDotNetRef?.Dispose();
+        objDotNetRef = null;
 
         if (Context != null)
         {

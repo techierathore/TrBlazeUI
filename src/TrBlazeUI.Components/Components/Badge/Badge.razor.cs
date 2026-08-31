@@ -13,7 +13,7 @@ namespace TrBlazeUI.Components.Badge;
 /// </para>
 /// <para>
 /// Features:
-/// - 4 visual variants (Default, Secondary, Destructive, Outline)
+/// - 7 visual variants (Default, Secondary, Destructive, Outline, Success, Info, Warning)
 /// - Compact, inline-friendly design
 /// - Accessible with semantic HTML
 /// - RTL (Right-to-Left) support
@@ -86,6 +86,17 @@ public partial class Badge : ComponentBase
             BadgeVariant.Secondary => "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
             BadgeVariant.Destructive => "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
             BadgeVariant.Outline => "text-foreground",
+            // Status variants reuse the Alert palette pairing exactly (tinted --alert-*-bg
+            // surface, --alert-*-foreground text, --alert-*/30 border) so a badge and the alert
+            // that explains it read as the same status (TR-016).
+            // NOT bg-alert-* + text-alert-*-foreground: unlike --destructive-foreground, the
+            // --alert-*-foreground tokens are a DARKER shade of the same hue meant for text on
+            // the tint, so painting them on the solid fill leaves roughly 1.4:1 contrast.
+            // hover:opacity-80 stands in for the /80 colour-mix hover used above; the shipped
+            // stylesheet emits no hover:bg-alert-*/80 utility.
+            BadgeVariant.Success => "border-alert-success/30 bg-alert-success-bg text-alert-success-foreground hover:opacity-80",
+            BadgeVariant.Info => "border-alert-info/30 bg-alert-info-bg text-alert-info-foreground hover:opacity-80",
+            BadgeVariant.Warning => "border-alert-warning/30 bg-alert-warning-bg text-alert-warning-foreground hover:opacity-80",
             _ => "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
         },
         // Custom classes (if provided)

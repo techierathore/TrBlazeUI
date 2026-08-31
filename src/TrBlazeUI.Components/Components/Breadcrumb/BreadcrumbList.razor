@@ -14,6 +14,18 @@
     public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
+    /// Gets or sets additional CSS classes applied to the list element.
+    /// </summary>
+    /// <remarks>
+    /// Forwarded to the parent Breadcrumb's <c>&lt;ol&gt;</c> and merged over its defaults with
+    /// <c>ClassNames.cn</c>. Prefer this over a raw lowercase <c>class</c> attribute: before
+    /// TR-027 that attribute was splatted after the built-in class string and replaced it
+    /// wholesale, so the list silently lost flex, alignment, gap, text size and colour.
+    /// </remarks>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
     /// Gets or sets additional HTML attributes.
     /// </summary>
     /// <remarks>
@@ -24,5 +36,5 @@
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     /// <inheritdoc />
-    protected override void OnParametersSet() => objBreadcrumb?.ApplyListAttributes(AdditionalAttributes);
+    protected override void OnParametersSet() => objBreadcrumb?.ApplyListAttributes(AdditionalAttributes, Class);
 }

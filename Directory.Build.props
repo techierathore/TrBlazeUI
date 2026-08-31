@@ -15,7 +15,12 @@
          2.0.0: DataTable.ShowToolbar default flipped true -> false (breaking); see CHANGELOG.md.
          2.1.0: TechieBlog feedback sweep - catalog-wide attribute splatting, accessibility
          corrections (Rating/Tabs/NavigationMenu/Item), Blazor Server text-entry fix, full
-         Tailwind utility layer, retuned contrast tokens, 12 new components. See CHANGELOG.md. -->
+         Tailwind utility layer, retuned contrast tokens, 12 new components. See CHANGELOG.md.
+         All five packages SHARE this one number (BRD-43). Bump it only when cutting a release,
+         never as part of ordinary feature or fix work: what actually ships is the release tag,
+         which the publish workflows resolve and pass as -p:Version=. This value is the
+         local-build base and the stem the CI pre-release feed suffixes (e.g. 2.1.1-ci.42).
+         See RELEASE.md. -->
     <Version>2.1.0</Version>
 
     <!-- SourceLink. The .NET 8+ SDK bundles Microsoft.SourceLink.GitHub, so no PackageReference

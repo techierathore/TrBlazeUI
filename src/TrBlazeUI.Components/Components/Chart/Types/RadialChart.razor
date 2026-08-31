@@ -2,12 +2,35 @@
 @typeparam TItem where TItem : class
 @inherits ChartBase<TItem>
 
-<div class="@ContainerCssClass" data-slot="radial-chart" @attributes="AdditionalAttributes" @attributes="AdditionalAttributes">
-    <ApexChart TItem="TItem"
-               Title="@Title"
-               Options="@objOptions"
-               Height="@Height"
-               Width="@Width">
-        @ChildContent
-    </ApexChart>
+<div class="@ContainerCssClass" data-slot="radial-chart" @attributes="AdditionalAttributes">
+    @if (ChildContent is null && !CanRenderDefaultSeries)
+    {
+        @* No child series and no Items/XValue/YValue triplet: show why instead of an
+           indistinguishable empty box (TR-011a). *@
+        <div class="@EmptyStateCssClass" style="@EmptyStateStyle" data-slot="chart-empty" role="status">
+            @EmptyStateText
+        </div>
+    }
+    else
+    {
+        <ApexChart TItem="TItem"
+                   Title="@Title"
+                   Options="@objOptions"
+                   Height="@Height"
+                   Width="@Width">
+            @if (ChildContent is not null)
+            {
+                @ChildContent
+            }
+            else
+            {
+                <ApexPointSeries TItem="TItem"
+                                 Items="@DefaultItems"
+                                 Name="@DefaultSeriesName"
+                                 SeriesType="SeriesType.RadialBar"
+                                 XValue="@DefaultXValue"
+                                 YValue="@DefaultYValue" />
+            }
+        </ApexChart>
+    }
 </div>

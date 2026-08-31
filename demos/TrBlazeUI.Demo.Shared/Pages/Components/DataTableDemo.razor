@@ -86,7 +86,9 @@
                 Use custom templates to render cells with badges, buttons, and other components.
             </p>
         </div>
-        <DataTable TData="Person" Data="@people" ShowPagination="false">
+        @* ShowPagination="false" now renders EVERY row (TR-009), so this example is bound to a
+           short list rather than all 500 mock records. *@
+        <DataTable TData="Person" Data="@objAllRows" ShowPagination="false">
             <Columns>
                 <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" Sortable />
                 <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Status)" Header="Status" Sortable>
@@ -318,7 +320,19 @@
                         <code class="bg-muted px-1 rounded text-sm">ShowPagination</code>
                         <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> bool</p>
                         <p class="text-sm text-muted-foreground"><strong>Default:</strong> true</p>
-                        <p class="text-sm text-muted-foreground">Allows pagination controls to render. The bar auto-suppresses when all rows fit on one page; set false to suppress it unconditionally.</p>
+                        <p class="text-sm text-muted-foreground">Whether the grid paginates. When true the bar still auto-suppresses if all rows fit on one page. When false the grid renders <strong>every</strong> filtered row and shows no pager.</p>
+                    </div>
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">ShowHeader</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> bool</p>
+                        <p class="text-sm text-muted-foreground"><strong>Default:</strong> true</p>
+                        <p class="text-sm text-muted-foreground">Whether the header row renders. Set false for key/value tables. Column metadata, sorting and filtering are unaffected.</p>
+                    </div>
+                    <div>
+                        <code class="bg-muted px-1 rounded text-sm">Density</code>
+                        <p class="text-sm text-muted-foreground mt-1"><strong>Type:</strong> DataTableDensity</p>
+                        <p class="text-sm text-muted-foreground"><strong>Default:</strong> Comfortable</p>
+                        <p class="text-sm text-muted-foreground">Cell padding density. Compact trims header cells to h-9 px-2.5 and body cells to px-2.5 py-2. A column's CellClass/HeaderClass still overrides it.</p>
                     </div>
                     <div>
                         <code class="bg-muted px-1 rounded text-sm">IsLoading</code>
@@ -437,6 +451,85 @@
         </div>
     </div>
 
+    <!-- ShowPagination / ShowHeader / Density -->
+    <div class="space-y-4 rounded-lg border border-alert-success bg-alert-success-bg p-6">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold text-alert-success-foreground">ShowPagination, ShowHeader and Density</h2>
+            <p class="text-sm text-alert-success-foreground">
+                <code>ShowPagination</code> is a data switch, not just pager chrome: with it off the grid renders
+                every row instead of silently truncating to the page size. <code>ShowHeader</code> suppresses the
+                header strip for key/value tables. <code>Density</code> trims the cell padding, which matters a lot
+                on a narrow grid.
+            </p>
+        </div>
+        <div class="space-y-6">
+            <div class="space-y-2">
+                <p class="text-sm font-medium">ShowPagination="false" renders every row</p>
+                <p class="text-sm text-muted-foreground">
+                    All @objAllRows.Count rows below are in the DOM even though <code>InitialPageSize</code> is 5,
+                    and there is no pager. Previously only the first 5 rows rendered, with nothing to reveal the loss.
+                </p>
+                <DataTable TData="Person" Data="@objAllRows" ShowPagination="false" data-testid="tr009-all-rows">
+                    <Columns>
+                        <DataTableColumn TData="Person" TValue="int" Property="@(p => p.Id)" Header="ID" />
+                        <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" />
+                        <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Role)" Header="Role" />
+                    </Columns>
+                </DataTable>
+            </div>
+
+            <div class="space-y-2">
+                <p class="text-sm font-medium">ShowHeader="false" as a key/value table</p>
+                <p class="text-sm text-muted-foreground">
+                    No <code>thead</code> is rendered, so no <code>::deep thead { display:none }</code> workaround is
+                    needed. The columns are still registered, so sorting and filtering keep working.
+                </p>
+                <DataTable TData="SettingRow" Data="@objSettings" ShowHeader="false" ShowPagination="false"
+                           data-testid="tr012-no-header">
+                    <Columns>
+                        <DataTableColumn TData="SettingRow" TValue="string" Property="@(r => r.Name)" Header="Setting"
+                                         CellClass="font-medium" Width="180px" />
+                        <DataTableColumn TData="SettingRow" TValue="string" Property="@(r => r.Value)" Header="Value" />
+                    </Columns>
+                </DataTable>
+            </div>
+
+            <div class="space-y-2">
+                <p class="text-sm font-medium">Density="DataTableDensity.Compact"</p>
+                <p class="text-sm text-muted-foreground">
+                    Both grids are the same width. Compact drops header cells to <code>h-9 px-2.5</code> and body
+                    cells to <code>px-2.5 py-2</code>, handing the reclaimed pixels back to the content.
+                </p>
+                <div class="grid gap-6 md:grid-cols-2">
+                    <div class="space-y-2">
+                        <p class="text-xs font-mono text-muted-foreground">Comfortable (default)</p>
+                        <div class="max-w-md">
+                            <DataTable TData="SettingRow" Data="@objSettings" ShowPagination="false"
+                                       data-testid="tr025-comfortable">
+                                <Columns>
+                                    <DataTableColumn TData="SettingRow" TValue="string" Property="@(r => r.Name)" Header="Setting" />
+                                    <DataTableColumn TData="SettingRow" TValue="string" Property="@(r => r.Value)" Header="Value" />
+                                </Columns>
+                            </DataTable>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-xs font-mono text-muted-foreground">Compact</p>
+                        <div class="max-w-md">
+                            <DataTable TData="SettingRow" Data="@objSettings" ShowPagination="false"
+                                       Density="DataTableDensity.Compact" data-testid="tr025-compact">
+                                <Columns>
+                                    <DataTableColumn TData="SettingRow" TValue="string" Property="@(r => r.Name)" Header="Setting" />
+                                    <DataTableColumn TData="SettingRow" TValue="string" Property="@(r => r.Value)" Header="Value" />
+                                </Columns>
+                            </DataTable>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @code {
@@ -476,6 +569,30 @@
         objModerationGrid?.Refresh();
     }
 
+    /// <summary>A single name/value pair, for the ShowHeader and Density examples.</summary>
+    public sealed class SettingRow
+    {
+        /// <summary>Gets or sets the setting name.</summary>
+        public string Name { get; set; } = "";
+
+        /// <summary>Gets or sets the setting value.</summary>
+        public string Value { get; set; } = "";
+    }
+
+    private readonly List<SettingRow> objSettings =
+    [
+        new() { Name = "Theme", Value = "System" },
+        new() { Name = "Density", Value = "Comfortable" },
+        new() { Name = "Page size", Value = "25" },
+        new() { Name = "Time zone", Value = "UTC+05:30" },
+        new() { Name = "Locale", Value = "en-IN" },
+        new() { Name = "Telemetry", Value = "Disabled" },
+    ];
+
+    // Deliberately larger than InitialPageSize (5) so the ShowPagination="false" example proves
+    // the grid renders the whole sequence rather than the first page.
+    private List<Person> objAllRows = new();
+
     private List<Person> people = new();
     private List<Person> emptyPeople = new();
     private IReadOnlyCollection<Person> selectedPeople = Array.Empty<Person>();
@@ -486,6 +603,7 @@
     {
         // Generate 500 sample records using MockDataService
         people = MockDataService.GeneratePersons(500);
+        objAllRows = people.Take(12).ToList();
     }
 
     private void ShowDetails(Person person)

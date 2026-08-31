@@ -49,7 +49,9 @@
   </ItemGroup>
 
   <!-- $(Version) - not a literal - so this path honours the single shared version in
-       Directory.Build.props (and any -p:Version= override) instead of drifting behind it. -->
+       Directory.Build.props (and any -p:Version= override) instead of drifting behind it.
+       This works because all five packages share one version (see RELEASE.md): a caller passing
+       -p:Version= sets an MSBuild GLOBAL property, which is visible here at evaluation time. -->
   <ItemGroup Condition="'$(UsePackageReferences)' == 'true'">
     <PackageReference Include="TrBlazeUI.Icons.Lucide" Version="$(Version)" />
     <PackageReference Include="TrBlazeUI.Primitives" Version="$(Version)" />

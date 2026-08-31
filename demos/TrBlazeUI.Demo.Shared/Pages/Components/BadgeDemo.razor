@@ -20,7 +20,7 @@
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">Variants</h2>
             <p class="text-sm text-muted-foreground">
-                Four badge variants for different use cases.
+                Seven badge variants for different use cases.
             </p>
         </div>
         <div class="flex flex-wrap gap-4">
@@ -28,6 +28,39 @@
             <Badge Variant="BadgeVariant.Secondary">Secondary</Badge>
             <Badge Variant="BadgeVariant.Destructive">Destructive</Badge>
             <Badge Variant="BadgeVariant.Outline">Outline</Badge>
+            <Badge Variant="BadgeVariant.Success">Success</Badge>
+            <Badge Variant="BadgeVariant.Info">Info</Badge>
+            <Badge Variant="BadgeVariant.Warning">Warning</Badge>
+        </div>
+    </div>
+
+    <!-- TR-016: semantic status variants -->
+    <div class="space-y-4" data-testid="tr016-badge-semantics">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Semantic Status (TR-016)</h2>
+            <p class="text-sm text-muted-foreground">
+                Healthy, needs-attention and broken each get their own colour, so a warning no
+                longer has to borrow Destructive (reads as an error) or Secondary (reads as
+                neutral). The palette is shared with Alert.
+            </p>
+        </div>
+        <div class="flex flex-wrap gap-4 items-center">
+            <div class="flex items-center gap-2">
+                <span class="text-sm">Healthy:</span>
+                <Badge Variant="BadgeVariant.Success" data-testid="tr016-badge-success">Healthy</Badge>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm">Informational:</span>
+                <Badge Variant="BadgeVariant.Info" data-testid="tr016-badge-info">Syncing</Badge>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm">Needs attention:</span>
+                <Badge Variant="BadgeVariant.Warning" data-testid="tr016-badge-warning">Needs attention</Badge>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm">Broken:</span>
+                <Badge Variant="BadgeVariant.Destructive" data-testid="tr016-badge-destructive">Broken</Badge>
+            </div>
         </div>
     </div>
 

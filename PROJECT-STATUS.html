@@ -106,31 +106,124 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Status</h1>
-    <div class="sub">Last rendered: 2026-08-25</div>
+    <div class="sub">Last rendered: 2026-08-31</div>
     <div class="group">Contents</div>
     <ol>
-      <li><a href="#where-i-am">Where I am</a></li>
-      <li><a href="#next-command-to-run">Next command to run</a></li>
-      <li><a href="#open-requirements">Open requirements</a></li>
-      <li><a href="#known-blockers">Known blockers</a></li>
-      <li><a href="#verification-log">Verification log</a></li>
-      <li><a href="#library-feedback-summary">Library feedback summary</a></li>
-      <li><a href="#standards-compliance-last-verifier-check">Standards compliance (last verifier check)</a></li>
-      <li><a href="#deferred-future">Deferred / future</a></li>
+        <li><a href="#where-i-am">Where I am</a></li>
+        <li><a href="#next-command-to-run">Next command to run</a></li>
+        <li><a href="#open-requirements">Open requirements</a></li>
+        <li><a href="#known-blockers">Known blockers</a></li>
+        <li><a href="#verification-log">Verification log</a></li>
+        <li><a href="#library-feedback-summary">Library feedback summary</a></li>
+        <li><a href="#standards-compliance-last-verifier-check">Standards compliance (last verifier check)</a></li>
+        <li><a href="#deferred-future">Deferred / future</a></li>
     </ol>
   </nav>
   <main>
     <h1>TrBlazeUI — Status</h1>
-    <div class="subtitle"><strong>Project:</strong> TrBlazeUI &nbsp;·&nbsp; <strong>Stack:</strong> .NET 10 / Blazor (Server·WASM·Auto) / Tailwind CSS v4 / shadcn-compatible<br><strong>Last updated:</strong> 2026-08-25 &nbsp;·&nbsp; <strong>Phase:</strong> Handoff — targeted build and verification complete</div>
-    <div class="toc-inline"><div>Contents</div><ol><li><a href="#where-i-am">Where I am</a></li><li><a href="#next-command-to-run">Next command to run</a></li><li><a href="#open-requirements">Open requirements</a></li><li><a href="#known-blockers">Known blockers</a></li><li><a href="#verification-log">Verification log</a></li><li><a href="#library-feedback-summary">Library feedback summary</a></li><li><a href="#standards-compliance-last-verifier-check">Standards compliance (last verifier check)</a></li><li><a href="#deferred-future">Deferred / future</a></li></ol></div>
-    <h2 id="where-i-am">Where I am<a class="anchor-link" href="#where-i-am">#</a></h2><p>The four consumer-triage targets are implemented and runtime-verified. Release builds are clean; portal, component-feedback, attribute-forwarding, and Codex package-deployment gates all pass. Docs amended 2026-08-25: TechieBlog and TechieFlow hand-back documents now identify 2.0.3 and the remaining publish/consumer-refresh actions.</p>
-    <h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2><pre><code>*handoff-phase TrBlazeUI</code></pre>
-    <h2 id="open-requirements">Open requirements<a class="anchor-link" href="#open-requirements">#</a></h2><ul><li>REQ-NFR-001 — independent WCAG audit tail remains at 90% (<code>Done (pre-existing)</code>)</li></ul>
-    <h2 id="known-blockers">Known blockers<a class="anchor-link" href="#known-blockers">#</a></h2><ul><li>None. The open rows are build-tier defects, not environment blockers.</li></ul>
-    <h2 id="verification-log">Verification log<a class="anchor-link" href="#verification-log">#</a></h2><table><thead><tr><th>Date</th><th>Phase</th><th>Result</th><th>Status table</th></tr></thead><tbody><tr><td>2026-07-22</td><td>Fix-issues + verify</td><td>REQ-UI-014 and REQ-UI-016 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr><tr><td>2026-08-11</td><td>Fix-issues + verify</td><td>REQ-UI-017 Verified; Release 0/0; runtime suites passed</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr><tr><td>2026-08-25</td><td>Build + targeted verify</td><td>REQ-UI-004, REQ-UI-012, REQ-UI-018 and REQ-FN-010 Verified; Release 0/0</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr></tbody></table>
-    <h2 id="library-feedback-summary">Library feedback summary<a class="anchor-link" href="#library-feedback-summary">#</a></h2><ul><li>TechieBlog: TR-066…TR-074 resolved by verified REQ-UI-004/012/018 changes.</li><li>TechieFlow: TR-003 resolved by verified native Codex agent packaging.</li><li>Persona propagation confirms the Codex package contract and source locations.</li></ul>
-    <h2 id="standards-compliance-last-verifier-check">Standards compliance (last verifier check)<a class="anchor-link" href="#standards-compliance-last-verifier-check">#</a></h2><ul><li>Underscore instance fields: clean (2026-08-25)</li><li>Block-scoped namespaces: clean</li><li>XML docs and analyzer/style gates: clean; Release build 0 warnings / 0 errors on 2026-08-25</li></ul>
-    <h2 id="deferred-future">Deferred / future<a class="anchor-link" href="#deferred-future">#</a></h2><ul><li>Swallow <code>JSDisconnectedException</code> during Select circuit teardown.</li><li>Move HtmlSanitizer to stable 9.1.x when available.</li><li>Run the independent full axe audit for REQ-NFR-001.</li></ul>
+    <div class="subtitle">Rendered 2026-08-31 &middot; source <code>PROJECT-STATUS.md</code></div>
+    <div class="cta-next" style="padding:20px; background:var(--cta-bg); border:2px solid var(--accent); border-radius:10px; margin:20px 0;">
+      <div style="font-size:11px; color:var(--muted); letter-spacing:.5px;">NEXT COMMAND TO RUN</div>
+      <div style="font-family:var(--mono); font-size:18px; margin-top:6px;">*handoff-phase TrBlazeUI</div>
+    </div>
+<table>
+<tbody>
+<tr><th>project</th><td>TrBlazeUI</td></tr>
+<tr><th>stack</th><td>.NET 10 / Blazor (Server·WASM·Auto) / Tailwind CSS v4 / shadcn-compatible</td></tr>
+<tr><th>last_updated</th><td>2026-08-31</td></tr>
+<tr><th>current_phase</th><td>Build — NuGet publish pipeline fixed, awaiting a real release run</td></tr>
+<tr><th>last_verified_build</th><td>PASS (Release 0 errors / 0 warnings, 2026-08-31; Windows rung #4)</td></tr>
+<tr><th>last_verified_date</th><td>2026-08-31</td></tr>
+</tbody>
+</table>
+    <div class="toc-inline">
+      <div>Contents</div>
+      <ol>
+        <li><a href="#where-i-am">Where I am</a></li>
+        <li><a href="#next-command-to-run">Next command to run</a></li>
+        <li><a href="#open-requirements">Open requirements</a></li>
+        <li><a href="#known-blockers">Known blockers</a></li>
+        <li><a href="#verification-log">Verification log</a></li>
+        <li><a href="#library-feedback-summary">Library feedback summary</a></li>
+        <li><a href="#standards-compliance-last-verifier-check">Standards compliance (last verifier check)</a></li>
+        <li><a href="#deferred-future">Deferred / future</a></li>
+      </ol>
+    </div>
+<h2 id="where-i-am">Where I am<a class="anchor-link" href="#where-i-am">#</a></h2>
+<p>The TfLens consumer feedback is <strong>triaged, fixed and verified</strong> (2026-08-31, <code>*triage-issues</code> → <code>*fix-issues</code> under <strong>REQ-UI-019</strong>). Release build <strong>0 warnings / 0 errors</strong>; <strong>44/44</strong> new headless-Chromium checks (<code>tests/verify/ui-tflens.spec.js</code>) with every existing suite still green — <code>ui-ui016</code> 23/23, <code>ui-ui014</code> 8/8, <code>ui-ui004</code> PASS, <code>ui-techieblog</code> 76/76, <code>ui-demo-2-1-0</code> 15/15, i.e. <strong>166/166</strong> executed checks, 0 console errors and 0 horizontal overflow across 8 routes at 1280 and 390. <strong>No version was bumped</strong> — the release number comes from the release tag when the owner cuts it; <code>Directory.Build.props</code> stays at the local-build fallback (2.1.0).</p>
+<p><strong>The headline is the version gap.</strong> TfLens built against <strong>2.0.0</strong> while the library was already at <strong>2.1.0</strong>, so <strong>5 of the 24 entries were already fixed</strong> and needed no change — measured, not assumed: the stylesheet they describe as having "no responsive variants at all" carries <strong>21 <code>@media</code> rules and 4,934 escaped responsive selectors</strong>. That is the third consumer report in this repo (after AstroLyfe 1.0.6 and their 2.0.0 re-file) where the fix already existed and the real action was <em>publish/upgrade</em>. The remaining 19 were genuinely open and are now closed.</p>
+<p><strong>Three defects were reproduced live before any code was touched</strong>, and one was live in this library's own demo: <code>/components/datatable</code> bound 500 records with <code>ShowPagination="false"</code> and rendered <strong>5 rows with no pager</strong> — the demo was relying on the bug. <code>/components/dropdown-menu</code> had been shipping an invisible <code>check-circle</code> icon.</p>
+<p><strong>Four of TfLens's own diagnoses were wrong, and the corrections mattered.</strong> <code>AlertDialog</code> <em>is</em> built on the Dialog primitive (the defect was a hard-coded <code>CloseOnEscape="false"</code>); the ApexCharts runtime <em>is</em> loaded and there is no reflection inference (<code>ChartBase.Items</code> was a parameter nothing read); a Lucide question glyph <em>does</em> exist; and the missing icon names were never missing from the package — the <em>code generator</em> only read one of <code>lucide.json</code>'s two maps. Fixing the generator rather than the symptom resolved all 212 aliases at once.</p>
+<p><strong>The AI reference was the single largest source of their build problems</strong> — §1's imports block was missing 30 real namespaces, three components had no parameter table at all, and the icon guidance forbade an API that works.</p>
+<h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2>
+<pre><code>*handoff-phase TrBlazeUI</code></pre>
+<p><strong>Owner action first — commit these workflow + versioning changes, then run <code>publish-nuget.yml</code> with <code>dry_run: true</code></strong> against a real release tag and confirm the log line <code>Publishing version: &lt;tag&gt;   (source: release event tag ...)</code>. The commit matters: Actions runs the workflow from the remote ref, so an uncommitted fix cannot be exercised. The resolver and the pack/verify steps are already proven locally.</p>
+<h2 id="open-requirements">Open requirements<a class="anchor-link" href="#open-requirements">#</a></h2>
+<ul>
+<li>[ ] REQ-FN-004 — nuget.org publish now resolves the version from the release tag; needs one real pipeline run to confirm end-to-end (<code>Implemented</code>, 75%)
+</li>
+<li>[ ] REQ-NFR-001 — independent WCAG audit tail remains at 90% (<code>Done (pre-existing)</code>)
+</li>
+</ul>
+<h2 id="known-blockers">Known blockers<a class="anchor-link" href="#known-blockers">#</a></h2>
+<ul>
+<li><strong>REQ-FN-004 cannot be closed from this session.</strong> A local dry run (2026-08-31) drove the shipped resolver verbatim under <code>pwsh 7.6.5</code> with <code>git</code> stubbed: all 7 resolution paths correct, and a real pack at <code>-p:Version=2.1.1</code> produced all five <code>&lt;id&gt;.2.1.1.nupkg</code> with none at any other version. <strong>A GitHub dispatch would not have tested the fix</strong> — Actions runs the workflow from the remote ref and these edits are uncommitted, so it would have executed the old resolver. What remains unproven is GitHub's own wiring (<code>github.event.release.tag_name</code> populating, Trusted Publishing authenticating). One owner-run dispatch with <strong><code>dry_run: true</code></strong> closes it.
+</li>
+<li><strong>Versioning is settled: SHARED, from the release tag</strong> (owner decision 2026-08-31). BRD-43 was amended to say so, ADR-005 superseded by ADR-008, and MinVer — implemented earlier the same day — was removed. <strong>No tags to create, no new process, and local builds are back to a clean <code>2.1.0</code>.</strong> The decisive finding: MinVer assigns the version in an MSBuild target, which makes <code>-p:Version=</code> silently ignored — an invisible way for the release version to break, in a repo that had just been bitten by exactly that.
+</li>
+</ul>
+<h2 id="verification-log">Verification log<a class="anchor-link" href="#verification-log">#</a></h2>
+<table>
+<thead><tr><th>Date</th><th>Phase</th><th>Result</th><th>Status table</th></tr></thead>
+<tbody>
+<tr><td>2026-07-22</td><td>Fix-issues + verify</td><td>REQ-UI-014 and REQ-UI-016 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-08-11</td><td>Fix-issues + verify</td><td>REQ-UI-017 Verified; Release 0/0; runtime suites passed</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-08-25</td><td>Build + targeted verify</td><td>REQ-UI-004, REQ-UI-012, REQ-UI-018 and REQ-FN-010 Verified; Release 0/0</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-08-31</td><td>Triage (analyze-only)</td><td>TfLens feedback: 5 stale · 4 residual · 15 open. REQ-UI-019 added; findings logged against REQ-UI-001/004/005/009 + REQ-FN-006. No verify pass — no verdicts promoted</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-08-31</td><td>Fix-issues + verify</td><td>REQ-UI-019 Verified; REQ-UI-001/004/005/009 + REQ-FN-006 re-verified. Release 0/0; 166/166 checks across 6 suites</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-08-31</td><td>Fix-issues (CI/CD)</td><td>REQ-FN-004 → Implemented (nuget publish now tag-driven; proven locally, pipeline run pending). REQ-FN-005 → PARTIAL (MinVer never implemented). Release 0/0</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-08-31</td><td>Build + verify (versioning)</td><td>REQ-FN-005 Verified — per-package MinVer implemented, measured, then <strong>removed</strong> on the owner's decision to keep shared versioning; BRD-43 amended, ADR-005 superseded by ADR-008. Release 0/0; assemblies back to clean 2.1.0; package-deployment smoke PASS; 166/166 browser checks green</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+</tbody>
+</table>
+<h2 id="library-feedback-summary">Library feedback summary<a class="anchor-link" href="#library-feedback-summary">#</a></h2>
+<ul>
+<li>TechieBlog: TR-066…TR-074 resolved by verified REQ-UI-004/012/018 changes.
+</li>
+<li>TechieFlow: TR-003 resolved by verified native Codex agent packaging.
+</li>
+<li><strong>Versioning correction 2026-08-31:</strong> during the TfLens fix pass this agent bumped <code>Directory.Build.props</code> to a speculative <code>2.2.0</code> and propagated that number into five documents. The owner caught it. The version is assigned from the <strong>release tag</strong> at release time, and props is only the local-build fallback — <code>RELEASE.md:37</code> already said so. Reverted to <code>2.1.0</code>, all five documents corrected, and logged as <code>MISS-TrBlazeUI-20260831-09</code> (<code>scope-creep</code> / <code>instruction-ignored</code>).
+</li>
+<li>TfLens: 24 entries triaged 2026-08-31 — <strong>5 stale</strong> (already fixed in 2.1.0; action is upgrade), <strong>19 fixed and verified</strong> under REQ-UI-019 (unreleased). A resolution header was written into <code>docs/TfLens-TrBlazeUI-Feedback.md</code> for the consumer, including corrections to four of their diagnoses.
+</li>
+<li>Persona propagation: confirms the Codex package contract and source-of-truth locations.
+</li>
+</ul>
+<h2 id="standards-compliance-last-verifier-check">Standards compliance (last verifier check)<a class="anchor-link" href="#standards-compliance-last-verifier-check">#</a></h2>
+<ul>
+<li>Underscore instance fields: clean (2026-08-31)
+</li>
+<li>Block-scoped namespaces: clean
+</li>
+<li>XML docs and analyzer/style gates: clean; Release build 0 warnings / 0 errors on 2026-08-31 (one CA1859 was caught by the build and fixed in both the generated file and its generator, so a regeneration cannot reintroduce it)
+</li>
+</ul>
+<h2 id="deferred-future">Deferred / future<a class="anchor-link" href="#deferred-future">#</a></h2>
+<ul>
+<li>Swallow <code>JSDisconnectedException</code> during Select circuit teardown.
+</li>
+<li>Move HtmlSanitizer to stable 9.1.x when available.
+</li>
+<li>Run the independent full axe audit for REQ-NFR-001.
+</li>
+<li><strong><code>tests/verify/ui-trstudio.spec.js</code> is broken and was already broken</strong> — it targets <code>/verify-trstudio</code>, and no <code>VerifyTrStudio.razor</code> harness page exists in the repo. Pre-existing, unrelated to this work; either restore the page or retire the spec.
+</li>
+<li><strong><code>Primitives.Sheet</code> has its own Dialog-like tree</strong> and did not receive the TR-014 Escape fix; its <code>Modal</code> may be equally dead. Worth checking before the next consumer finds it.
+</li>
+<li><code>focus-trap.js</code> still handles Tab only. A <code>focusin</code> guard was deliberately NOT added: it would yank focus out of a Select/Combobox listbox portalled outside the dialog. A correct fix needs a portal-aware trap.
+</li>
+<li>Styled <code>TabsList</code>/<code>TabsTrigger</code>/<code>TabsContent</code> still splat <code>AdditionalAttributes</code> after <code>class="@CssClass"</code>, so a raw lowercase <code>class</code> wipes the built-ins — the same footgun that was closed on <code>BreadcrumbList</code>.
+</li>
+</ul>
   </main>
 </div>
 
@@ -155,7 +248,11 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   });
 })();
 
-// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`.
+// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`:
+// mermaid reads the <pre>'s textContent as the diagram source, so a button
+// appended here glues "copy" onto the last line and breaks the parse
+// (flowcharts → "Syntax error"; sequence diagrams silently absorb it).
+// Mermaid blocks get copy/export from their own .diagram toolbar instead.
 document.querySelectorAll('pre:not(.mermaid)').forEach(pre => {
   const btn = document.createElement('button');
   btn.className = 'copy';
@@ -176,6 +273,7 @@ if (window.mermaid) {
   mermaid.initialize({ startOnLoad: true, theme: mermaidTheme, securityLevel: 'loose' });
 }
 
+// Mermaid toolbar wiring — run after mermaid renders
 function wireMermaidToolbars() {
   document.querySelectorAll('.diagram').forEach(dia => {
     if (dia.dataset.wired) return;
@@ -219,6 +317,7 @@ function wireMermaidToolbars() {
     };
     function escFs(e) { if (e.key === 'Escape') { dia.classList.remove('fs'); document.removeEventListener('keydown', escFs); } }
     dia.querySelector('[data-pop]').onclick = () => openInNewTab(svg);
+    // Ctrl+wheel zoom
     merm.addEventListener('wheel', (e) => {
       if (!e.ctrlKey) return;
       e.preventDefault();
@@ -283,9 +382,10 @@ function openInNewTab(svg) {
   w.document.close();
 }
 
+// Run wiring after mermaid finishes (it renders async)
 if (window.mermaid) {
   setTimeout(wireMermaidToolbars, 400);
-  setTimeout(wireMermaidToolbars, 1200);
+  setTimeout(wireMermaidToolbars, 1200);  // safety re-run for slow renders
 }
 </script>
 </body>

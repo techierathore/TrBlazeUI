@@ -477,11 +477,97 @@
         </Dialog>
     </div>
 
+    <!-- TR-014: Escape after the dialog body re-renders -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Escape After a Body Re-render</h2>
+        <p class="text-sm text-muted-foreground">
+            Open the dialog, press <strong>Validate</strong> so the body re-renders and replaces the
+            element that had focus, then press <strong>Escape</strong>. Escape is observed on the
+            document, so it still closes the dialog even though focus has fallen back to the page body.
+        </p>
+
+        <Dialog @bind-Open="objRerenderOpen" OnOpenChange="@HandleRerenderOpenChange">
+            <DialogTrigger AsChild>
+                <Button data-testid="tr014-dialog-rerender-open">Open re-render dialog</Button>
+            </DialogTrigger>
+            <DialogContent data-testid="tr014-dialog-rerender">
+                <DialogHeader>
+                    <DialogTitle>Validate then press Escape</DialogTitle>
+                    <DialogDescription>
+                        The validation result below is swapped in on every press.
+                    </DialogDescription>
+                </DialogHeader>
+
+                @* The Validate button lives inside the branch, so pressing it removes the very
+                   element that had focus - the exact shape TfLens reported. Focus then falls back
+                   to the document body and an element-scoped keydown handler would never see
+                   Escape again. *@
+                @if (objValidationRuns == 0)
+                {
+                    <DialogFooter>
+                        <Button data-testid="tr014-dialog-rerender-validate"
+                                @onclick="@(() => objValidationRuns++)">
+                            Validate
+                        </Button>
+                    </DialogFooter>
+                }
+                else
+                {
+                    <p class="text-sm text-alert-success-foreground" data-testid="tr014-dialog-rerender-result">
+                        Validation run @objValidationRuns completed — the button that had focus is gone.
+                        Press Escape.
+                    </p>
+                }
+            </DialogContent>
+        </Dialog>
+    </div>
+
+    <!-- TR-019: pinned header/footer with a scrolling DialogBody -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Scrolling Body with Pinned Header and Footer</h2>
+        <p class="text-sm text-muted-foreground">
+            Wrap the middle of a tall dialog in <code class="text-xs bg-muted px-1 py-0.5 rounded">DialogBody</code>
+            and only that region scrolls: DialogHeader, DialogFooter and the close button stay put.
+            Without a DialogBody the panel itself scrolls, which is the previous behaviour and still
+            keeps the footer reachable.
+        </p>
+
+        <Dialog>
+            <DialogTrigger AsChild>
+                <Button data-testid="tr019-scroll-body-open">Open tall dialog</Button>
+            </DialogTrigger>
+            <DialogContent data-testid="tr019-scroll-body" MaxHeight="max-h-[70vh]">
+                <DialogHeader data-testid="tr019-scroll-body-header">
+                    <DialogTitle>Terms of service</DialogTitle>
+                    <DialogDescription>Scroll the body — this header does not move.</DialogDescription>
+                </DialogHeader>
+
+                <DialogBody data-testid="tr019-scroll-body-body" Class="space-y-3 text-sm text-muted-foreground">
+                    @for (var i = 1; i <= 40; i++)
+                    {
+                        <p>Clause @i — this paragraph exists purely to overflow the panel.</p>
+                    }
+                </DialogBody>
+
+                <DialogFooter data-testid="tr019-scroll-body-footer">
+                    <DialogClose AsChild>
+                        <Button Variant="ButtonVariant.Outline">Decline</Button>
+                    </DialogClose>
+                    <DialogClose AsChild>
+                        <Button data-testid="tr019-scroll-body-accept">Accept</Button>
+                    </DialogClose>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    </div>
+
 </div>
 
 @code {
     private bool objStackOuter;
     private bool objStackInner;
+    private bool objRerenderOpen;
+    private int objValidationRuns;
     private string? objPicked;
     private string? objReleaseChannel;
 
@@ -498,6 +584,17 @@
         new ComboboxFramework { Value = "nextjs", Label = "Next.js" },
         new ComboboxFramework { Value = "nuxt", Label = "Nuxt" }
     };
+
+    /// <summary>
+    /// Resets the TR-014 re-render fixture each time its dialog is opened.
+    /// </summary>
+    private void HandleRerenderOpenChange(bool aOpen)
+    {
+        if (aOpen)
+        {
+            objValidationRuns = 0;
+        }
+    }
 
     private void HandleSave()
     {

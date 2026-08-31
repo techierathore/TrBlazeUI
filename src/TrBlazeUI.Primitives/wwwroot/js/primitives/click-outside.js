@@ -88,13 +88,33 @@ export function onClickOutside(element, dotNetRef, methodName = 'HandleClickOuts
     };
 }
 
+// Ordered stack of live Escape subscriptions. A document-level keydown listener is
+// deliberately NOT scoped to the focused element (that is exactly the TR-014 bug: a
+// re-render drops focus to <body> and an element handler stops firing), so ownership of
+// the key has to be arbitrated here instead. Only the most recently registered
+// subscription reacts, which makes a nested dialog close before the one that opened it.
+const escapeStack = [];
+
 /**
- * Sets up Escape key detection.
+ * Sets up Escape key detection on the document.
+ *
+ * Unlike an element-scoped keydown handler this keeps working after the surface
+ * re-renders and focus falls back to <body>. Ownership rules:
+ *  - only the top-most (most recently registered) subscription reacts;
+ *  - an event another handler already consumed (defaultPrevented) is ignored;
+ *  - if `deferToSelector` matches a layer that does not contain the scope element, a
+ *    transient layer (Select / Combobox / DropdownMenu / Popover content) is open on top
+ *    and owns the key;
+ *  - if `scopeElementId` is given and that element is gone, the surface is already
+ *    torn down and the callback is skipped.
+ *
  * @param {Object} dotNetRef - DotNet object reference for callback
  * @param {string} methodName - The method name to invoke on Escape
+ * @param {string} scopeElementId - Optional id of the surface this subscription belongs to
+ * @param {string} deferToSelector - Optional selector; when it matches, Escape is left to that layer
  * @returns {Object} Disposable object with dispose() method to remove listener
  */
-export function onEscapeKey(dotNetRef, methodName = 'HandleEscape') {
+export function onEscapeKey(dotNetRef, methodName = 'HandleEscape', scopeElementId = null, deferToSelector = null) {
     if (!dotNetRef) {
         console.warn('escape-key: dotNetRef is null');
         return {
@@ -103,23 +123,62 @@ export function onEscapeKey(dotNetRef, methodName = 'HandleEscape') {
         };
     }
 
+    const entry = { dotNetRef, methodName };
+
     const handleKeyDown = (e) => {
-        if (e.key === 'Escape') {
-            try {
-                if (dotNetRef && !dotNetRef._disposed) {
-                    dotNetRef.invokeMethodAsync(methodName);
+        if (e.key !== 'Escape' || e.defaultPrevented) {
+            return;
+        }
+
+        // Only the top-most surface owns the key.
+        if (escapeStack.length === 0 || escapeStack[escapeStack.length - 1] !== entry) {
+            return;
+        }
+
+        const scopeElement = scopeElementId ? document.getElementById(scopeElementId) : null;
+
+        // The surface is already gone from the DOM - nothing to close.
+        if (scopeElementId && !scopeElement) {
+            return;
+        }
+
+        // A popup opened from inside this surface consumes Escape first. A layer that CONTAINS
+        // this surface is skipped: a dialog declared inside a popover renders into that
+        // popover's portal, and treating its own host as an inner layer would deadlock Escape.
+        if (deferToSelector) {
+            const layers = document.querySelectorAll(deferToSelector);
+            for (const layer of layers) {
+                if (!scopeElement || !layer.contains(scopeElement)) {
+                    return;
                 }
-            } catch (error) {
-                console.error('escape-key callback error:', error);
             }
+        }
+
+        try {
+            if (!dotNetRef._disposed) {
+                dotNetRef.invokeMethodAsync(methodName);
+            }
+        } catch (error) {
+            console.error('escape-key callback error:', error);
         }
     };
 
+    escapeStack.push(entry);
     document.addEventListener('keydown', handleKeyDown);
 
-    // Store cleanup function in registry
+    // Store cleanup function in registry. Guarded so a double dispose (Blazor can call
+    // both the explicit cleanup path and DisposeAsync) removes the listener exactly once.
+    let isTornDown = false;
     const cleanupFunc = () => {
+        if (isTornDown) {
+            return;
+        }
+        isTornDown = true;
         document.removeEventListener('keydown', handleKeyDown);
+        const index = escapeStack.indexOf(entry);
+        if (index !== -1) {
+            escapeStack.splice(index, 1);
+        }
     };
 
     const id = cleanupIdCounter++;

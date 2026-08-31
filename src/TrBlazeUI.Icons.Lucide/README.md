@@ -115,7 +115,7 @@ Add to `_Imports.razor`:
 
 ## Icon Names
 
-All 1,640+ Lucide icons are available. Icon names use kebab-case and match the official Lucide icon names:
+All 1,665 Lucide icons are available. Icon names use kebab-case and match the official Lucide icon names:
 
 - `camera`
 - `home`
@@ -132,6 +132,23 @@ All 1,640+ Lucide icons are available. Icon names use kebab-case and match the o
 - ... and 1,600+ more
 
 **Browse all icons:** [lucide.dev/icons](https://lucide.dev/icons/)
+
+### Old and alternate names
+
+Lucide renamed a large batch of icons (`check-circle` became `circle-check-big`, `alert-triangle`
+became `triangle-alert`, and so on). All 212 of those older spellings are accepted and resolve to
+the canonical icon, so `<LucideIcon Name="check-circle" />` renders the same glyph as
+`<LucideIcon Name="circle-check-big" />`.
+
+`LucideIconData.GetAvailableIcons()` and `LucideIconData.IconCount` deliberately list the 1,665
+canonical names only, so an icon browser built on them does not show the same glyph several times.
+Use `LucideIconData.GetAliases()` for the old-name map and `LucideIconData.ResolveName(name)` to
+turn any accepted spelling into its canonical one.
+
+A name that matches neither an icon nor an alias renders an empty, size-preserving placeholder and
+logs a one-time warning naming the bad id (with a "did you mean" suggestion when a real icon uses
+the same words in a different order). The full icon and alias data also ships inside the package at
+`content/lucide.json` if you would rather look a name up offline.
 
 ## Styling
 

@@ -38,6 +38,11 @@
     /// Whether clicking the overlay should close the dialog.
     /// Default is true.
     /// </summary>
+    /// <remarks>
+    /// The Dialog root's <c>Modal</c> parameter (cascaded as <see cref="DialogContext.Modal"/>)
+    /// is a master switch over this: with <c>Modal="false"</c> the overlay never dismisses,
+    /// whatever this is set to.
+    /// </remarks>
     [Parameter]
     public bool CloseOnClick { get; set; } = true;
 
@@ -67,8 +72,8 @@
             await OnClick.InvokeAsync(args);
         }
 
-        // Close dialog if configured
-        if (CloseOnClick)
+        // Close dialog if configured, unless the root opted out of light dismissal.
+        if (CloseOnClick && Context.Modal)
         {
             Context.Close();
         }

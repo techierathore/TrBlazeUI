@@ -58,26 +58,87 @@ jobs:
         id: version
         shell: pwsh
         run: |
-          # Single source of truth: Directory.Build.props. This workflow deliberately does NOT
-          # synthesise or override a version - a public release ships exactly the version that is
-          # committed, and all five packages share it.
-          [xml]$props = Get-Content "Directory.Build.props"
-          $ver = ($props.Project.PropertyGroup.Version | Where-Object { $_ }) -as [string]
+          # THE RELEASE TAG IS THE VERSION. Fixed 2026-08-31.
+          #
+          # This step used to read <Version> from Directory.Build.props and stated that it
+          # "deliberately does NOT synthesise or override a version". That was the bug: props
+          # carries the LOCAL-BUILD FALLBACK, it is not bumped as part of ordinary work, and the
+          # value there had gone stale - so every public release shipped whatever number happened
+          # to be committed rather than the version actually being released. nuget.org sat on
+          # 2.0.0 through two release cycles because of it. publish-github-packages.yml already
+          # resolved from the tag; this workflow now matches it.
+          #
+          # Resolution order (first hit wins):
+          #   1. release event      -> github.event.release.tag_name
+          #   2. inputs.ref is a version tag (v2.1.1 / 2.1.1 / 2.1.1-beta.1)
+          #   3. nearest tag reachable from the checked-out ref (git describe)
+          #   4. Directory.Build.props  -- FALLBACK ONLY, and it BLOCKS a real push (see below)
+          $ver = $null
+          $source = $null
+          $fromTag = $false
+
+          $releaseTag = "${{ github.event.release.tag_name }}"
+          $inputRef   = "${{ inputs.ref }}"
+
+          if (-not [string]::IsNullOrWhiteSpace($releaseTag)) {
+            $ver = $releaseTag; $source = "release event tag '$releaseTag'"; $fromTag = $true
+          }
+          elseif ($inputRef -match '^v?\d+\.\d+(\.\d+)?(-[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*)?$') {
+            $ver = $inputRef; $source = "workflow ref '$inputRef' (a version tag)"; $fromTag = $true
+          }
+          else {
+            # The ref is a branch or a SHA. Use the newest release tag reachable from it - that is
+            # "the release tag of the branch selected for the pipeline".
+            $described = (git describe --tags --abbrev=0 2>$null)
+            if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($described)) {
+              $ver = $described.Trim()
+              $source = "nearest tag reachable from '$inputRef' ($ver)"
+              $fromTag = $true
+            }
+          }
+
+          if (-not $fromTag) {
+            [xml]$props = Get-Content "Directory.Build.props"
+            $ver = ($props.Project.PropertyGroup.Version | Where-Object { $_ }) -as [string]
+            $source = "Directory.Build.props FALLBACK (no release tag found)"
+            Write-Host "::warning::No release tag could be resolved for ref '$inputRef'. Falling back to Directory.Build.props, which is the local-build fallback and is NOT a release version."
+          }
+
           if ([string]::IsNullOrWhiteSpace($ver)) {
-            throw "Could not read <Version> from Directory.Build.props"
+            throw "Could not resolve a package version from a release tag, the workflow ref, or Directory.Build.props."
           }
-          $ver = $ver.Trim()
+
+          $ver = $ver.Trim() -replace '^v', ''
+          # Normalise a two-part tag (v2.1 -> 2.1.0); NuGet requires three parts.
+          if ($ver -match '^\d+\.\d+$') {
+            Write-Host "Tag has only two version parts; normalising to '$ver.0'"
+            $ver = "$ver.0"
+          }
           if ($ver -notmatch '^\d+\.\d+\.\d+(-[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*)?$') {
-            throw "Invalid semver version '$ver' in Directory.Build.props"
+            throw "Invalid semver version '$ver' (from $source). Expected MAJOR.MINOR.PATCH with an optional pre-release suffix, e.g. 2.1.1 or v2.1.1-beta.1"
           }
-          Write-Host "Publishing version: $ver"
+
+          Write-Host "Publishing version: $ver   (source: $source)"
           echo "PACKAGE_VERSION=$ver" >> $env:GITHUB_OUTPUT
+          echo "VERSION_FROM_TAG=$($fromTag.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+          echo "VERSION_SOURCE=$source" >> $env:GITHUB_OUTPUT
+
+      - name: Refuse to publish a non-tag version
+        if: ${{ inputs.dry_run == false && steps.version.outputs.VERSION_FROM_TAG != 'true' }}
+        shell: pwsh
+        run: |
+          # A real push must be traceable to a release tag. Falling back to the committed
+          # Directory.Build.props value is exactly how nuget.org got stuck on 2.0.0, so a
+          # non-dry-run publish without a tag is stopped here rather than shipped.
+          throw "Refusing to push to nuget.org: version came from $($env:SRC) instead of a release tag. Create the release/tag first, then re-run this workflow with that tag as the ref. (A dry_run is still allowed without a tag.)"
+        env:
+          SRC: ${{ steps.version.outputs.VERSION_SOURCE }}
 
       - name: Restore dependencies
         run: dotnet restore TrBlazeUI.sln
 
       - name: Build solution
-        run: dotnet build TrBlazeUI.sln -c Release --no-restore -p:CI=true
+        run: dotnet build TrBlazeUI.sln -c Release --no-restore -p:CI=true -p:Version=${{ steps.version.outputs.PACKAGE_VERSION }}
 
       - name: Run tests
         shell: pwsh
@@ -119,7 +180,11 @@ jobs:
             Write-Host "Packing $($project.Path)..."
             $extraArgs = @()
             if ($project.NoWarn) { $extraArgs += "-p:NoWarn=$($project.NoWarn)" }
-            dotnet pack $project.Path -c Release --no-restore -o ./nupkgs -p:CI=true @extraArgs
+            # -p:Version is REQUIRED here. Without it dotnet pack falls back to the committed
+            # Directory.Build.props value regardless of what the version step resolved, which is
+            # the other half of the "nuget.org is stuck on 2.0.0" bug. The verify step below is
+            # what catches a regression of this line.
+            dotnet pack $project.Path -c Release --no-restore -o ./nupkgs -p:CI=true -p:Version=${{ steps.version.outputs.PACKAGE_VERSION }} @extraArgs
             if ($LASTEXITCODE -ne 0) { throw "dotnet pack failed for $($project.Path) with exit code $LASTEXITCODE" }
           }
 

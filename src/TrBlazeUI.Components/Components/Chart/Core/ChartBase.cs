@@ -22,11 +22,60 @@ public abstract class ChartBase<TItem> : ComponentBase where TItem : class
     /// Gets or sets the data items to display in the chart.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// The collection of data objects that will be visualized.
     /// Each item typically contains X-axis values and one or more Y-axis values.
+    /// </para>
+    /// <para>
+    /// Supply <see cref="XValue"/> and <see cref="YValue"/> alongside this to get a single
+    /// built-in series without writing any child markup. For two or more series, nest
+    /// <c>ApexPointSeries</c> children instead - child content always wins over the built-in
+    /// series. Before TR-011a this parameter was read by nothing at all, so a chart given only
+    /// <c>Items</c> painted a silent empty box.
+    /// </para>
     /// </remarks>
     [Parameter]
     public IEnumerable<TItem>? Items { get; set; }
+
+    /// <summary>
+    /// Gets or sets the accessor that produces the X-axis value (the category) for an item.
+    /// </summary>
+    /// <remarks>
+    /// Only used for the built-in single series built from <see cref="Items"/>; ignored when
+    /// the chart has child content.
+    /// </remarks>
+    [Parameter]
+    public Func<TItem, object>? XValue { get; set; }
+
+    /// <summary>
+    /// Gets or sets the accessor that produces the Y-axis value for an item.
+    /// </summary>
+    /// <remarks>
+    /// Only used for the built-in single series built from <see cref="Items"/>; ignored when
+    /// the chart has child content.
+    /// </remarks>
+    [Parameter]
+    public Func<TItem, decimal?>? YValue { get; set; }
+
+    /// <summary>
+    /// Gets or sets the legend name of the built-in series.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <see cref="Title"/> when set, otherwise to "Series".
+    /// </remarks>
+    [Parameter]
+    public string? SeriesName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the message shown when the chart has nothing to draw.
+    /// </summary>
+    /// <remarks>
+    /// Rendered in place of the (otherwise blank) chart canvas when there is neither child
+    /// content nor a complete <see cref="Items"/> / <see cref="XValue"/> / <see cref="YValue"/>
+    /// triplet, so a misconfigured chart is visible instead of silent (TR-011a).
+    /// </remarks>
+    [Parameter]
+    public string? EmptyText { get; set; }
 
     /// <summary>
     /// Gets or sets the chart configuration for series labels and colors.
@@ -125,6 +174,67 @@ public abstract class ChartBase<TItem> : ComponentBase where TItem : class
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Gets a value indicating whether a built-in single series can be produced from
+    /// <see cref="Items"/>, <see cref="XValue"/> and <see cref="YValue"/>.
+    /// </summary>
+    protected bool CanRenderDefaultSeries =>
+        Items is not null && XValue is not null && YValue is not null;
+
+    /// <summary>
+    /// Gets the item source for the built-in series.
+    /// </summary>
+    /// <remarks>
+    /// Only read from markup that is already guarded by <see cref="CanRenderDefaultSeries"/>,
+    /// where <see cref="Items"/> is known to be non-null.
+    /// </remarks>
+    protected IEnumerable<TItem> DefaultItems => Items!;
+
+    /// <summary>
+    /// Gets the X accessor for the built-in series.
+    /// </summary>
+    /// <remarks>
+    /// Only read from markup that is already guarded by <see cref="CanRenderDefaultSeries"/>,
+    /// where <see cref="XValue"/> is known to be non-null.
+    /// </remarks>
+    protected Func<TItem, object> DefaultXValue => XValue!;
+
+    /// <summary>
+    /// Gets the Y accessor for the built-in series.
+    /// </summary>
+    /// <remarks>
+    /// Only read from markup that is already guarded by <see cref="CanRenderDefaultSeries"/>,
+    /// where <see cref="YValue"/> is known to be non-null.
+    /// </remarks>
+    protected Func<TItem, decimal?> DefaultYValue => YValue!;
+
+    /// <summary>
+    /// Gets the legend name used for the built-in series.
+    /// </summary>
+    protected string DefaultSeriesName =>
+        !string.IsNullOrWhiteSpace(SeriesName) ? SeriesName
+        : !string.IsNullOrWhiteSpace(Title) ? Title
+        : "Series";
+
+    /// <summary>
+    /// Gets the message rendered in place of an empty chart canvas.
+    /// </summary>
+    protected string EmptyStateText =>
+        !string.IsNullOrWhiteSpace(EmptyText)
+            ? EmptyText
+            : "No chart series. Supply Items together with XValue and YValue, or nest ApexPointSeries children.";
+
+    /// <summary>
+    /// Gets the CSS classes for the empty-state placeholder.
+    /// </summary>
+    protected string EmptyStateCssClass =>
+        "flex w-full items-center justify-center rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground";
+
+    /// <summary>
+    /// Gets the inline style that gives the empty-state placeholder the chart's own footprint.
+    /// </summary>
+    protected string EmptyStateStyle => $"height:{Height};width:{Width}";
 
     /// <summary>
     /// Gets the colors array for the chart series.
