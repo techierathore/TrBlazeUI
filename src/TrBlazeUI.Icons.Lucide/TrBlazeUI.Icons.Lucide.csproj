@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -9,7 +9,7 @@
     <PackageId>TrBlazeUI.Icons.Lucide</PackageId>
     <RootNamespace>TrBlazeUI.Icons.Lucide</RootNamespace>
     <AssemblyName>TrBlazeUI.Icons.Lucide</AssemblyName>
-    <Description>Lucide icon library for TrBlazeUI - 1,640+ beautiful, consistent SVG icons for Blazor applications.</Description>
+    <Description>Lucide icon library for TrBlazeUI - 1,665 beautiful, consistent SVG icons for Blazor applications, plus the 212 pre-rename and alternate names that resolve to them.</Description>
     <PackageTags>blazor;icons;lucide;shadcn;svg;ui;components;blazor-components</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <!-- <PackageIcon>icon.png</PackageIcon> -->
@@ -29,6 +29,20 @@
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
+    <!-- lucide.json is deliberately NOT listed here. The Razor SDK's default Content glob already
+         packs it to content/lucide.json (and contentFiles/), which is the path consumers and
+         coding agents are told to grep to settle an icon name:
+         ~/.nuget/packages/trblazeui.icons.lucide/<version>/content/lucide.json
+         It carries both maps - `icons` and `aliases` - so an old spelling can be traced to the
+         canonical icon it now resolves to.
+         Adding an explicit <None Include="lucide.json" Pack="true" PackagePath="content\" /> here
+         is a DUPLICATE and fails the pack with NU5118 ("File ... is not added because the package
+         already contains file 'content\lucide.json'"), which is an ERROR under
+         TreatWarningsAsErrors. `dotnet build` does not pack, so it does not catch this - only
+         `dotnet pack` does. Verified 2026-08-31 by inspecting the produced nupkg. -->
+
+    <!-- 2026-08-31: verified that the packed nupkg contains content/lucide.json with no explicit
+         rule, so the earlier report that "lucide.json is no longer packed" was incorrect. -->
   </ItemGroup>
 
 </Project>

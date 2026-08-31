@@ -24,23 +24,30 @@ namespace TrBlazeUI.Components.Chart;
 /// </para>
 /// </remarks>
 /// <example>
+/// Single series, no child markup - the chart builds the series from Items:
 /// <code>
 /// &lt;BarChart TItem="SalesData"
 ///           Items="@salesData"
-///           XValue="@(item => item.Month)"
+///           XValue="@(item =&gt; item.Month)"
+///           YValue="@(item =&gt; (decimal)item.Desktop)"
+///           Height="240px" /&gt;
+/// </code>
+/// Two or more series - nest ApexPointSeries children, which take over from Items:
+/// <code>
+/// &lt;BarChart TItem="SalesData"
 ///           Variant="BarChartVariant.Stacked"&gt;
 ///     &lt;ApexPointSeries TItem="SalesData"
 ///                       Items="@salesData"
 ///                       Name="Desktop"
 ///                       SeriesType="SeriesType.Bar"
-///                       XValue="@(item => item.Month)"
-///                       YValue="@(item => item.Desktop)" /&gt;
+///                       XValue="@(item =&gt; item.Month)"
+///                       YValue="@(item =&gt; (decimal)item.Desktop)" /&gt;
 ///     &lt;ApexPointSeries TItem="SalesData"
 ///                       Items="@salesData"
 ///                       Name="Mobile"
 ///                       SeriesType="SeriesType.Bar"
-///                       XValue="@(item => item.Month)"
-///                       YValue="@(item => item.Mobile)" /&gt;
+///                       XValue="@(item =&gt; item.Month)"
+///                       YValue="@(item =&gt; (decimal)item.Mobile)" /&gt;
 /// &lt;/BarChart&gt;
 /// </code>
 /// </example>

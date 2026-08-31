@@ -58,6 +58,18 @@ public class DialogContext : PrimitiveContextWithEvents<DialogState>
     public bool IsOpen => State.IsOpen;
 
     /// <summary>
+    /// Gets or sets whether the dialog may be dismissed by light interaction - clicking the
+    /// overlay or pressing Escape. Default is <c>true</c>.
+    /// </summary>
+    /// <remarks>
+    /// Set from the Dialog root's <c>Modal</c> parameter. <see cref="DialogOverlay"/> and
+    /// <see cref="DialogContent"/> both consult this, so <c>Modal="false"</c> makes the dialog
+    /// closable only through an explicit DialogClose / programmatic close. It is a master switch:
+    /// it can only take dismissal away, never add it back where a part opted out locally.
+    /// </remarks>
+    public bool Modal { get; set; } = true;
+
+    /// <summary>
     /// Opens the dialog.
     /// </summary>
     /// <param name="triggerElement">Optional element that triggered the dialog.</param>

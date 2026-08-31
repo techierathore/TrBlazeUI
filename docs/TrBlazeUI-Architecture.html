@@ -106,42 +106,69 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Architecture</h1>
-    <div class="sub">Last rendered: 2026-08-11</div>
+    <div class="sub">Last rendered: 2026-08-31</div>
     <div class="group">Contents</div>
     <ol>
-      <li><a href="#tech-stack">1. Tech stack</a></li>
-      <li><a href="#component-map">2. Component map</a></li>
-      <li><a href="#data-flow-primary-path">3. Data flow — primary path</a></li>
-      <li><a href="#module-responsibilities">4. Module responsibilities</a></li>
-      <li class="h3"><a href="#render-mode-hosting-flow">Render-mode hosting flow</a></li>
-      <li><a href="#cross-cutting-concerns">5. Cross-cutting concerns</a></li>
-      <li><a href="#deployment-architecture">6. Deployment architecture</a></li>
-      <li><a href="#architectural-decisions-adr-style-log">7. Architectural decisions (ADR-style log)</a></li>
-      <li><a href="#target-architecture">8. Target architecture</a></li>
-      <li><a href="#open-questions-risks">9. Open questions / risks</a></li>
-      <li><a href="#sources-harvested">10. Sources harvested</a></li>
+        <li><a href="#table-of-contents">Table of Contents</a></li>
+        <li><a href="#tech-stack">1. Tech stack</a></li>
+        <li><a href="#component-map">2. Component map</a></li>
+        <li><a href="#data-flow-primary-path">3. Data flow — primary path</a></li>
+        <li><a href="#module-responsibilities">4. Module responsibilities</a></li>
+        <li class="h3"><a href="#render-mode-hosting-flow">Render-mode hosting flow</a></li>
+        <li><a href="#cross-cutting-concerns">5. Cross-cutting concerns</a></li>
+        <li><a href="#deployment-architecture">6. Deployment architecture</a></li>
+        <li><a href="#architectural-decisions-adr-style-log">7. Architectural decisions (ADR-style log)</a></li>
+        <li><a href="#target-architecture">8. Target architecture</a></li>
+        <li><a href="#open-questions-risks">9. Open questions / risks</a></li>
+        <li><a href="#sources-harvested">10. Sources harvested</a></li>
     </ol>
   </nav>
   <main>
     <h1>TrBlazeUI — Architecture</h1>
+    <div class="subtitle">Rendered 2026-08-31 &middot; source <code>TrBlazeUI-Architecture.md</code></div>
 
-<p><strong>Last updated:</strong> 2026-08-11 (handoff — as-built at 2.1.0) <strong>Status:</strong> Current (post-implementation). No structural change since the 2026-06-30 brownfield capture; the deltas are additive — 9 new component families (79 total), the full Tailwind utility scale in the shipped bundle, and two new verification tools (<code>tools/splat-audit</code>, <code>tools/token-contrast.py</code>) that turn previously-asserted invariants into measured ones.</p>
-<div class="toc-inline">
-  <div>Contents</div>
-  <ol>
-    <li><a href="#tech-stack">1. Tech stack</a></li>
-    <li><a href="#component-map">2. Component map</a></li>
-    <li><a href="#data-flow-primary-path">3. Data flow — primary path</a></li>
-    <li><a href="#module-responsibilities">4. Module responsibilities</a></li>
-    <li class="h3"><a href="#render-mode-hosting-flow">Render-mode hosting flow</a></li>
-    <li><a href="#cross-cutting-concerns">5. Cross-cutting concerns</a></li>
-    <li><a href="#deployment-architecture">6. Deployment architecture</a></li>
-    <li><a href="#architectural-decisions-adr-style-log">7. Architectural decisions (ADR-style log)</a></li>
-    <li><a href="#target-architecture">8. Target architecture</a></li>
-    <li><a href="#open-questions-risks">9. Open questions / risks</a></li>
-    <li><a href="#sources-harvested">10. Sources harvested</a></li>
-  </ol>
-</div>
+    <div class="toc-inline">
+      <div>Contents</div>
+      <ol>
+        <li><a href="#table-of-contents">Table of Contents</a></li>
+        <li><a href="#tech-stack">1. Tech stack</a></li>
+        <li><a href="#component-map">2. Component map</a></li>
+        <li><a href="#data-flow-primary-path">3. Data flow — primary path</a></li>
+        <li><a href="#module-responsibilities">4. Module responsibilities</a></li>
+        <li class="h3"><a href="#render-mode-hosting-flow">Render-mode hosting flow</a></li>
+        <li><a href="#cross-cutting-concerns">5. Cross-cutting concerns</a></li>
+        <li><a href="#deployment-architecture">6. Deployment architecture</a></li>
+        <li><a href="#architectural-decisions-adr-style-log">7. Architectural decisions (ADR-style log)</a></li>
+        <li><a href="#target-architecture">8. Target architecture</a></li>
+        <li><a href="#open-questions-risks">9. Open questions / risks</a></li>
+        <li><a href="#sources-harvested">10. Sources harvested</a></li>
+      </ol>
+    </div>
+<p><strong>Last updated:</strong> 2026-08-11 (handoff — as-built at 2.1.0)
+<strong>Status:</strong> Current (post-implementation). No structural change since the 2026-06-30 brownfield capture; the deltas are additive — 9 new component families (79 total), the full Tailwind utility scale in the shipped bundle, and two new verification tools (<code>tools/splat-audit</code>, <code>tools/token-contrast.py</code>) that turn previously-asserted invariants into measured ones.</p>
+<h2 id="table-of-contents">Table of Contents<a class="anchor-link" href="#table-of-contents">#</a></h2>
+<ol>
+<li><a href="#tech-stack">Tech stack</a>
+</li>
+<li><a href="#component-map">Component map</a>
+</li>
+<li><a href="#data-flow-primary-path">Data flow — primary path</a>
+</li>
+<li><a href="#module-responsibilities">Module responsibilities</a>
+</li>
+<li><a href="#cross-cutting-concerns">Cross-cutting concerns</a>
+</li>
+<li><a href="#deployment-architecture">Deployment architecture</a>
+</li>
+<li><a href="#architectural-decisions-adr-style-log">Architectural decisions (ADR-style log)</a>
+</li>
+<li><a href="#target-architecture">Target architecture</a>
+</li>
+<li><a href="#open-questions-risks">Open questions / risks</a>
+</li>
+<li><a href="#sources-harvested">Sources harvested</a>
+</li>
+</ol>
 <h2 id="tech-stack">1. Tech stack<a class="anchor-link" href="#tech-stack">#</a></h2>
 <p>TrBlazeUI is a <strong>Blazor UI component library</strong> (not an application) — a renamed fork of the open-source <em>Blazor Blueprint</em> project (original author Mathew Taylor), distributed as NuGet packages and licensed Apache 2.0. It is styled with Tailwind CSS v4 and follows the shadcn/ui design system. There is <strong>no database, no server backend, no authentication, and no AI/RAG layer</strong> — the only runtime artifacts are the library assemblies and three demo host applications.</p>
 <table>
@@ -156,12 +183,13 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>Charts</td><td>Blazor-ApexCharts</td><td>6.1.0</td><td>Wraps ApexCharts.js for the Chart component</td></tr>
 <tr><td>Markdown</td><td>Markdig</td><td>0.44.0</td><td>Powers MarkdownEditor</td></tr>
 <tr><td>HTML sanitization</td><td>HtmlSanitizer</td><td>9.0.892</td><td>Security layer for RichTextEditor output</td></tr>
-<tr><td>Versioning</td><td>MinVer</td><td>7.0.0</td><td>Per-library semantic versioning from git tag prefixes</td></tr>
+<tr><td>Versioning</td><td>(none - MSBuild property)</td><td>-</td><td>Shared version for all 5 packages, taken from the release tag and passed as <code>-p:Version=</code>; <code>Directory.Build.props</code> holds the local base (BRD-43)</td></tr>
 <tr><td>Blazor packages</td><td>Microsoft.AspNetCore.Components.*</td><td>10.0.2</td><td><code>.Web</code>, <code>.WebAssembly</code>, <code>.WebAssembly.DevServer</code>, <code>.WebAssembly.Server</code></td></tr>
 <tr><td>Distribution</td><td>GitHub Packages (NuGet)</td><td>—</td><td><code>nuget.pkg.github.com/techierathore</code></td></tr>
 <tr><td>AI tooling</td><td>TrBlazeUI agent skills</td><td>—</td><td><code>/trblazeui</code> Claude Code + OpenCode skills in <code>docs/skills/</code></td></tr>
-</tbody></table>
-<p><strong>Build environment:</strong> the reference machine is WSL-on-Windows; builds run via the Windows dotnet (<code>cmd.exe /c &quot;dotnet build ...&quot;</code>) with <code>-p:CI=true</code> to skip the Tailwind step (pre-built CSS is committed). This application does <strong>not</strong> support hot-reload — build and restart to test changes.</p>
+</tbody>
+</table>
+<p><strong>Build environment:</strong> the reference machine is WSL-on-Windows; builds run via the Windows dotnet (<code>cmd.exe /c "dotnet build ..."</code>) with <code>-p:CI=true</code> to skip the Tailwind step (pre-built CSS is committed). This application does <strong>not</strong> support hot-reload — build and restart to test changes.</p>
 <h2 id="component-map">2. Component map<a class="anchor-link" href="#component-map">#</a></h2>
 <p>The solution is a <strong>two-layer library</strong> (headless Primitives → styled Components) plus three pluggable Icon packages, consumed by a shared demo Razor Class Library that is hosted in three render-mode-specific demo apps.</p>
 <div class="diagram">
@@ -171,34 +199,34 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
     <button data-zin title="Zoom in">+</button>
     <button data-fit title="Fit to width">Fit</button>
     <button data-one title="Actual size">1:1</button>
-    <button data-fs title="Fullscreen">&#9974;</button>
+    <button data-fs title="Fullscreen">&#9166;</button>
     <button data-pop title="Open in new tab">&#8599;</button>
   </div>
   <pre class="mermaid">flowchart TB
   subgraph Libraries["Library packages (src/)"]
-    Prim["TrBlazeUI.Primitives<br/>(16 headless primitives + services)"]
-    Comp["TrBlazeUI.Components<br/>(79 styled component families)"]
-    Lucide["TrBlazeUI.Icons.Lucide<br/>(1,640+ icons)"]
-    Hero["TrBlazeUI.Icons.Heroicons<br/>(1,288 icons, 4 variants)"]
-    Feather["TrBlazeUI.Icons.Feather<br/>(286 icons)"]
+    Prim["TrBlazeUI.Primitives&lt;br/&gt;(16 headless primitives + services)"]
+    Comp["TrBlazeUI.Components&lt;br/&gt;(79 styled component families)"]
+    Lucide["TrBlazeUI.Icons.Lucide&lt;br/&gt;(1,640+ icons)"]
+    Hero["TrBlazeUI.Icons.Heroicons&lt;br/&gt;(1,288 icons, 4 variants)"]
+    Feather["TrBlazeUI.Icons.Feather&lt;br/&gt;(286 icons)"]
   end
   subgraph Demos["Demo apps (demos/)"]
-    Shared["TrBlazeUI.Demo.Shared<br/>(pages, layout, demo services)"]
-    Server["TrBlazeUI.Demo.Server<br/>(InteractiveServer)"]
-    Wasm["TrBlazeUI.Demo.Wasm<br/>(WebAssembly)"]
-    Auto["TrBlazeUI.Demo.Auto<br/>(InteractiveAuto host)"]
-    AutoClient["TrBlazeUI.Demo.Auto.Client<br/>(WASM client)"]
+    Shared["TrBlazeUI.Demo.Shared&lt;br/&gt;(pages, layout, demo services)"]
+    Server["TrBlazeUI.Demo.Server&lt;br/&gt;(InteractiveServer)"]
+    Wasm["TrBlazeUI.Demo.Wasm&lt;br/&gt;(WebAssembly)"]
+    Auto["TrBlazeUI.Demo.Auto&lt;br/&gt;(InteractiveAuto host)"]
+    AutoClient["TrBlazeUI.Demo.Auto.Client&lt;br/&gt;(WASM client)"]
   end
-  Comp --> Prim
-  Shared --> Comp
-  Shared --> Lucide
-  Shared --> Hero
-  Shared --> Feather
-  Server --> Shared
-  Wasm --> Shared
-  Auto --> Shared
-  Auto --> AutoClient
-  AutoClient --> Shared</pre>
+  Comp --&gt; Prim
+  Shared --&gt; Comp
+  Shared --&gt; Lucide
+  Shared --&gt; Hero
+  Shared --&gt; Feather
+  Server --&gt; Shared
+  Wasm --&gt; Shared
+  Auto --&gt; Shared
+  Auto --&gt; AutoClient
+  AutoClient --&gt; Shared</pre>
 </div>
 <h2 id="data-flow-primary-path">3. Data flow — primary path<a class="anchor-link" href="#data-flow-primary-path">#</a></h2>
 <p>A component library has no request/response data path; its "primary path" is the <strong>interaction + portal-rendering flow</strong> for an overlay component (Dialog, Sheet, Popover, DropdownMenu). The portal mechanism — and the reactive-refresh fix applied after the AppStudio consumer report — is the single most architecturally significant runtime flow.</p>
@@ -209,7 +237,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
     <button data-zin title="Zoom in">+</button>
     <button data-fit title="Fit to width">Fit</button>
     <button data-one title="Actual size">1:1</button>
-    <button data-fs title="Fullscreen">&#9974;</button>
+    <button data-fs title="Fullscreen">&#9166;</button>
     <button data-pop title="Open in new tab">&#8599;</button>
   </div>
   <pre class="mermaid">sequenceDiagram
@@ -219,16 +247,16 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   participant Portal as "PortalService"
   participant Host as "PortalHost (sibling in layout)"
   participant JS as "portal.js (JS interop)"
-  U->>Trig: "click"
-  Trig->>Ctx: "set Open = true"
-  Ctx->>Portal: "register portal content"
-  Portal->>Host: "OnPortalsChanged event"
-  Host->>JS: "appendChild moves DOM to portal root"
-  JS-->>U: "overlay rendered, focus trapped"
-  U->>Ctx: "interact inside dialog (toggle, select)"
-  Ctx->>Portal: "RefreshPortal(id)"
-  Portal->>Host: "OnPortalsChanged → InvokeAsync(StateHasChanged)"
-  Host-->>U: "portal content re-renders (fix for Issue #1)"</pre>
+  U-&gt;&gt;Trig: "click"
+  Trig-&gt;&gt;Ctx: "set Open = true"
+  Ctx-&gt;&gt;Portal: "register portal content"
+  Portal-&gt;&gt;Host: "OnPortalsChanged event"
+  Host-&gt;&gt;JS: "appendChild moves DOM to portal root"
+  JS--&gt;&gt;U: "overlay rendered, focus trapped"
+  U-&gt;&gt;Ctx: "interact inside dialog (toggle, select)"
+  Ctx-&gt;&gt;Portal: "RefreshPortal(id)"
+  Portal-&gt;&gt;Host: "OnPortalsChanged → InvokeAsync(StateHasChanged)"
+  Host--&gt;&gt;U: "portal content re-renders (fix for Issue #1)"</pre>
 </div>
 <h2 id="module-responsibilities">4. Module responsibilities<a class="anchor-link" href="#module-responsibilities">#</a></h2>
 <table>
@@ -244,7 +272,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td><code>demos/TrBlazeUI.Demo.Wasm</code></td><td>Standalone WebAssembly host</td><td>Demo.Shared</td></tr>
 <tr><td><code>demos/TrBlazeUI.Demo.Auto</code></td><td>Auto render-mode host (server-first, WASM after download)</td><td>Demo.Shared, Demo.Auto.Client</td></tr>
 <tr><td><code>demos/TrBlazeUI.Demo.Auto.Client</code></td><td>WASM client entry point for the Auto host</td><td>Demo.Shared</td></tr>
-</tbody></table>
+</tbody>
+</table>
 <p><strong><code>TrBlazeUI.Primitives</code> — the behavior layer.</strong> This project contains the 16 headless primitives (Accordion, Checkbox, Collapsible, Dialog, DropdownMenu, Floating, HoverCard, Label, Popover, RadioGroup, Select, Sheet, Switch, Table, Tabs, Tooltip), each implementing WCAG 2.1 AA keyboard navigation and ARIA semantics with <strong>zero styling</strong>. Alongside the components it ships the cross-cutting services registered by <code>AddTrBlazeUIPrimitives()</code>: <code>IPortalService</code>/<code>PortalService</code> (moves overlay DOM to a portal root and — post-fix — raises <code>OnPortalsChanged</code> so <code>PortalHost</code> re-renders on internal state changes), <code>IPositioningService</code>/<code>PositioningService</code> (Floating-UI-style anchor positioning), <code>IFocusManager</code>/<code>FocusManager</code> (focus trapping for modals), <code>IKeyboardShortcutService</code>/<code>KeyboardShortcutService</code> (global shortcut registration, e.g. Ctrl/Cmd+B), and <code>DropdownManagerService</code> (single-open-dropdown coordination). State flows parent→child through ~13 cascading context types. Behavior that needs the DOM is delegated to ~10 JS utility files under <code>wwwroot/js/primitives/</code> (click-outside, focus-trap, keyboard-nav, portal, positioning, etc.).</p>
 <p><strong><code>TrBlazeUI.Components</code> — the styled layer.</strong> <strong>79 component families</strong> (69 through 2.0.1 — 68 catalogued in the structure doc plus the later-added <strong>Toolbar</strong> family — plus the nine added in 2.1.0: <code>Prose</code>, <code>Stat</code>, <code>Timeline</code>, <code>Stepper</code>, <code>AnchorNav</code>, <code>SortableList</code>, <code>PasswordStrength</code>, <code>CodeBlock</code>, <code>CenteredPanel</code>; 344 public component types in total) compose the primitives and add Tailwind-based styling driven entirely by CSS variables, so any shadcn/ui or tweakcn theme works unmodified. Components follow a feature-folder layout (each component in its own folder with <code>.razor</code> markup, <code>.razor.cs</code> logic, and enum/config classes) and a code-behind pattern. Multi-part components compose many sub-components (Dialog = 8 parts, Sidebar = 22, Sheet/DropdownMenu/AlertDialog/Command ≈ 8–9 each). The project bundles the pre-built <code>trblazeui.css</code> (~906 KB minified / ~97 KB gzipped as of 2.1.0, compiled by the standalone Tailwind binary from <code>trblazeui-input.css</code>) so consumers need no Tailwind toolchain. As of 2.1.0 that bundle carries the <strong>standard Tailwind utility scale with responsive variants</strong>, not only the utilities the library's own components reference — a tree-shaken bundle made the library's own "style application markup with utility classes" guidance silently false for consumers (TechieBlog TR-019). Rich-content components pull in third-party engines: Chart → Blazor-ApexCharts, MarkdownEditor → Markdig, RichTextEditor → Quill.js (via JS interop) with HtmlSanitizer guarding the HTML output. A key cross-cutting invariant — surfaced by three consumer issue reports and completed in 2.1.0 — is that <strong>every</strong> public component implements <code>[Parameter(CaptureUnmatchedValues = true)]</code> attribute splatting so arbitrary HTML attributes and event handlers (<code>id</code>, <code>style</code>, <code>@onkeydown</code>, …) pass through to the rendered element rather than throwing at runtime. This is now measured rather than asserted: <code>tools/splat-audit</code> reflects over the built assemblies and reports 344/344 in Components and 59/59 in Primitives. Components that own no element of their own (the cascading-context roots and the config-only <code>DataTableColumn</code>) accept the attributes without rendering them; that exception list is published in the AI reference.</p>
 <p><strong>Icon packages.</strong> Three independent, separately-versioned packages each expose one Razor component (<code>LucideIcon</code>, <code>HeroIcon</code>, <code>FeatherIcon</code>) backed by an auto-generated <code>*IconData.cs</code> of SVG path data. They depend only on <code>Microsoft.AspNetCore.Components.Web</code> and are regenerated via the Node/PowerShell scripts under <code>tools/icon-generation/</code> (only needed when refreshing the source icon sets).</p>
@@ -258,24 +287,41 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
     <button data-zin title="Zoom in">+</button>
     <button data-fit title="Fit to width">Fit</button>
     <button data-one title="Actual size">1:1</button>
-    <button data-fs title="Fullscreen">&#9974;</button>
+    <button data-fs title="Fullscreen">&#9166;</button>
     <button data-pop title="Open in new tab">&#8599;</button>
   </div>
   <pre class="mermaid">flowchart LR
   subgraph Hosts["Demo hosts"]
-    S["Demo.Server<br/>(InteractiveServer · 5183/7172)"]
-    W["Demo.Wasm<br/>(WebAssembly · 5184/7173)"]
-    A["Demo.Auto<br/>(InteractiveAuto · 5185/7174)"]
+    S["Demo.Server&lt;br/&gt;(InteractiveServer · 5183/7172)"]
+    W["Demo.Wasm&lt;br/&gt;(WebAssembly · 5184/7173)"]
+    A["Demo.Auto&lt;br/&gt;(InteractiveAuto · 5185/7174)"]
   end
-  RCL["Demo.Shared (RCL):<br/>Routes, MainLayout, all pages"]
-  S --> RCL
-  W --> RCL
-  A --> RCL
-  A --> AC["Demo.Auto.Client (WASM)"]
-  AC --> RCL</pre>
+  RCL["Demo.Shared (RCL):&lt;br/&gt;Routes, MainLayout, all pages"]
+  S --&gt; RCL
+  W --&gt; RCL
+  A --&gt; RCL
+  A --&gt; AC["Demo.Auto.Client (WASM)"]
+  AC --&gt; RCL</pre>
 </div>
 <h2 id="cross-cutting-concerns">5. Cross-cutting concerns<a class="anchor-link" href="#cross-cutting-concerns">#</a></h2>
-<ul><li><strong>Accessibility (primary cross-cutting concern)</strong> — WCAG 2.1 AA across all primitives/components: keyboard navigation, ARIA roles/states, focus management, focus trapping for overlays. Realized via <code>AriaBuilder</code>, <code>KeyboardNavigator</code>, <code>IdGenerator</code> utilities in Primitives and the <code>FocusManager</code> service.</li><li><strong>Theming</strong> — CSS custom properties (shadcn/ui variable set) in OKLCH color space; light/dark via the <code>.dark</code> class on <code>&lt;html&gt;</code>; consumers supply a <code>theme.css</code> loaded <em>before</em> <code>trblazeui.css</code>.</li><li><strong>Portal / overlay management</strong> — <code>PortalService</code> + <code>PortalHost</code> + <code>portal.js</code> move overlay DOM to a portal root; reactive refresh added so internal state changes propagate (consumer-reported fix).</li><li><strong>JS interop</strong> — ~12 component JS files (file-upload, markdown-editor, masked-input, multiselect, navigation-menu, quill-interop, range-slider, resizable, responsive-nav, sidebar, slider, virtualization-scroll) + ~10 primitive JS files (click-outside, element-utils, focus-trap, keyboard-nav, keyboard-shortcuts, match-trigger-width, portal, positioning, select, table-row-nav).</li><li><strong>Attribute splatting</strong> — <code>CaptureUnmatchedValues</code> on (now) essentially all components so HTML attributes/events forward through (standard Blazor library pattern; retrofitted after consumer reports).</li><li><strong>Logging / error handling / telemetry</strong> — none beyond Blazor defaults; this is a UI library, not a service. Error handling follows the standards (specific catches, <code>throw;</code>, no bare catch).</li><li><strong>Versioning</strong> — MinVer per-package from git tag prefixes (<code>components/v</code>, <code>primitives/v</code>, <code>icons-lucide/v</code>, <code>icons-heroicons/v</code>, <code>icons-feather/v</code>).</li><li><strong>Code quality enforcement</strong> — <code>TreatWarningsAsErrors</code>, <code>EnforceCodeStyleInBuild</code>, <code>AnalysisLevel=latest-recommended</code>, <code>GenerateDocumentationFile=true</code>, nullable enabled — solution-wide via <code>Directory.Build.props</code>.</li></ul>
+<ul>
+<li><strong>Accessibility (primary cross-cutting concern)</strong> — WCAG 2.1 AA across all primitives/components: keyboard navigation, ARIA roles/states, focus management, focus trapping for overlays. Realized via <code>AriaBuilder</code>, <code>KeyboardNavigator</code>, <code>IdGenerator</code> utilities in Primitives and the <code>FocusManager</code> service.
+</li>
+<li><strong>Theming</strong> — CSS custom properties (shadcn/ui variable set) in OKLCH color space; light/dark via the <code>.dark</code> class on <code>&lt;html&gt;</code>; consumers supply a <code>theme.css</code> loaded <em>before</em> <code>trblazeui.css</code>.
+</li>
+<li><strong>Portal / overlay management</strong> — <code>PortalService</code> + <code>PortalHost</code> + <code>portal.js</code> move overlay DOM to a portal root; reactive refresh added so internal state changes propagate (consumer-reported fix).
+</li>
+<li><strong>JS interop</strong> — ~12 component JS files (file-upload, markdown-editor, masked-input, multiselect, navigation-menu, quill-interop, range-slider, resizable, responsive-nav, sidebar, slider, virtualization-scroll) + ~10 primitive JS files (click-outside, element-utils, focus-trap, keyboard-nav, keyboard-shortcuts, match-trigger-width, portal, positioning, select, table-row-nav).
+</li>
+<li><strong>Attribute splatting</strong> — <code>CaptureUnmatchedValues</code> on (now) essentially all components so HTML attributes/events forward through (standard Blazor library pattern; retrofitted after consumer reports).
+</li>
+<li><strong>Logging / error handling / telemetry</strong> — none beyond Blazor defaults; this is a UI library, not a service. Error handling follows the standards (specific catches, <code>throw;</code>, no bare catch).
+</li>
+<li><strong>Versioning</strong> — shared across all five packages. The publish workflow resolves the version from the release tag and passes <code>-p:Version=</code> to <code>dotnet build</code> and <code>dotnet pack</code>; <code>Directory.Build.props</code> carries only the local-build base. No versioning tool is used (BRD-43, amended 2026-08-31).
+</li>
+<li><strong>Code quality enforcement</strong> — <code>TreatWarningsAsErrors</code>, <code>EnforceCodeStyleInBuild</code>, <code>AnalysisLevel=latest-recommended</code>, <code>GenerateDocumentationFile=true</code>, nullable enabled — solution-wide via <code>Directory.Build.props</code>.
+</li>
+</ul>
 <h2 id="deployment-architecture">6. Deployment architecture<a class="anchor-link" href="#deployment-architecture">#</a></h2>
 <p>There is no server deployment. "Deployment" means <strong>publishing NuGet packages</strong> to GitHub Packages via GitHub Actions, plus running the demo apps locally.</p>
 <div class="diagram">
@@ -285,26 +331,82 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
     <button data-zin title="Zoom in">+</button>
     <button data-fit title="Fit to width">Fit</button>
     <button data-one title="Actual size">1:1</button>
-    <button data-fs title="Fullscreen">&#9974;</button>
+    <button data-fs title="Fullscreen">&#9166;</button>
     <button data-pop title="Open in new tab">&#8599;</button>
   </div>
   <pre class="mermaid">flowchart LR
-  Dev["Dev push"] --> Branch{"branch?"}
-  Branch -->|"non-master / PR"| BuildWF["build.yml<br/>(validate build)"]
-  Branch -->|"master"| PubWF["publish-nuget.yml<br/>(pack + push)"]
-  PubWF --> Pkgs["5 NuGet packages<br/>(MinVer-versioned)"]
-  Pkgs --> GHP["GitHub Packages<br/>(nuget.pkg.github.com/techierathore)"]
-  GHP --> Consumer["Consumer Blazor apps<br/>(dotnet add package)"]</pre>
+  Dev["Dev push"] --&gt; Branch{"branch?"}
+  Branch --&gt;|"non-master / PR"| BuildWF["build.yml&lt;br/&gt;(validate build)"]
+  Branch --&gt;|"master"| PubWF["publish-nuget.yml&lt;br/&gt;(pack + push)"]
+  PubWF --&gt; Pkgs["5 NuGet packages&lt;br/&gt;(shared version from the release tag)"]
+  Pkgs --&gt; GHP["GitHub Packages&lt;br/&gt;(nuget.pkg.github.com/techierathore)"]
+  GHP --&gt; Consumer["Consumer Blazor apps&lt;br/&gt;(dotnet add package)"]</pre>
 </div>
-<ul><li><strong><code>publish-nuget.yml</code></strong> — on push to <code>master</code>, on <code>windows-latest</code>, full git history for MinVer, builds Release with <code>-p:CI=true</code>, packs all 5 library projects, pushes with <code>--skip-duplicate</code> using <code>GITHUB_TOKEN</code>.</li><li><strong><code>build.yml</code></strong> — validation build on non-master pushes and PRs to master.</li><li><strong>Local run</strong> — <code>./scripts/run-demo.sh [server|wasm|auto]</code> or <code>dotnet run --project demos/TrBlazeUI.Demo.&lt;mode&gt;</code>. Per-package release scripts live under <code>scripts/</code> (<code>release-components.sh</code>, <code>release-primitives.sh</code>, <code>release-icons-*.sh</code>).</li></ul>
+<ul>
+<li><strong><code>publish-github-packages.yml</code></strong> — on push to <code>master</code> and on a published Release, on <code>windows-latest</code>, builds Release with <code>-p:CI=true -p:Version=&lt;resolved&gt;</code>, packs all 5 library projects, pushes with <code>--skip-duplicate</code> using <code>GITHUB_TOKEN</code>. A release uses the tag; a push uses <code>&lt;base&gt;-ci.&lt;run_number&gt;</code>.
+</li>
+<li><strong><code>publish-nuget.yml</code></strong> — manually dispatched public release to NuGet.org via Trusted Publishing (OIDC). Resolves the version from the release tag (or a version-shaped ref, or the nearest reachable tag) and <strong>refuses a non-dry-run push</strong> when it can only fall back to <code>Directory.Build.props</code> — the failure that had pinned NuGet.org at 2.0.0.
+</li>
+<li><strong><code>build.yml</code></strong> — validation build on non-master pushes and PRs to master.
+</li>
+<li><strong>Local run</strong> — <code>./scripts/run-demo.sh [server|wasm|auto]</code> or <code>dotnet run --project demos/TrBlazeUI.Demo.&lt;mode&gt;</code>. Per-package release scripts live under <code>scripts/</code> (<code>release-components.sh</code>, <code>release-primitives.sh</code>, <code>release-icons-*.sh</code>).
+</li>
+</ul>
 <h2 id="architectural-decisions-adr-style-log">7. Architectural decisions (ADR-style log)<a class="anchor-link" href="#architectural-decisions-adr-style-log">#</a></h2>
-<ul><li><strong>ADR-001 — Current stack as-is (reverse-doc baseline).</strong> .NET 10 / Blazor / Tailwind v4 / shadcn-compatible CSS-variable theming, distributed as NuGet packages. Established by the original fork and the modernization pass.</li><li><strong>ADR-002 — Two-layer headless + styled architecture.</strong> Primitives provide behavior + accessibility; Components add styling. Lets consumers either drop in styled components or build custom UIs on headless primitives. Reason: mirror Radix UI / shadcn/ui separation of concerns.</li><li><strong>ADR-003 — Ship pre-built CSS, not a Tailwind dependency.</strong> The standalone Tailwind binary compiles <code>trblazeui.css</code> at build time and the output is committed/packaged, so consumers need zero Tailwind/Node tooling ("zero configuration"). <code>-p:CI=true</code> skips the compile when the binary is unavailable.</li><li><strong>ADR-004 — CSS-variable theming over baked-in colors.</strong> All colors/spacing via CSS custom properties so any shadcn/ui or tweakcn theme works unmodified, with runtime light/dark switching.</li><li><strong>ADR-005 — Per-package independent MinVer versioning.</strong> Each library version is derived from its own git tag prefix, so icon packages and core libraries release independently.</li><li><strong>ADR-006 — Universal attribute splatting (<code>CaptureUnmatchedValues</code>).</strong> Retrofitted across components after consumer apps hit runtime <code>InvalidOperationException</code> passing standard HTML attributes; completed catalog-wide in 2.1.0 and enforced by <code>tools/splat-audit</code>, which fails if any public component lacks it.</li><li><strong>ADR-007 — Reactive portal refresh.</strong> <code>PortalService.RefreshPortal</code> + <code>OnPortalsChanged</code> so <code>PortalHost</code> (a layout sibling, not a descendant) re-renders on internal overlay state changes. Reason: fix the AppStudio-reported "static dialog" blocker.</li><li><strong>ADR-008 — GitHub Packages distribution under <code>techierathore</code>.</strong> Chosen over nuget.org for the rename/beta phase; consumers configure a PAT-authenticated source.</li><li><strong>ADR-009 — Rename BlazorUI/BlazorBlueprint → TrBlazeUI.</strong> Namespaces, package names, CSS file, and service-registration method all renamed for the v2.0 fork; NOTICE retains original attribution per Apache 2.0.</li></ul>
+<ul>
+<li><strong>ADR-001 — Current stack as-is (reverse-doc baseline).</strong> .NET 10 / Blazor / Tailwind v4 / shadcn-compatible CSS-variable theming, distributed as NuGet packages. Established by the original fork and the modernization pass.
+</li>
+<li><strong>ADR-002 — Two-layer headless + styled architecture.</strong> Primitives provide behavior + accessibility; Components add styling. Lets consumers either drop in styled components or build custom UIs on headless primitives. Reason: mirror Radix UI / shadcn/ui separation of concerns.
+</li>
+<li><strong>ADR-003 — Ship pre-built CSS, not a Tailwind dependency.</strong> The standalone Tailwind binary compiles <code>trblazeui.css</code> at build time and the output is committed/packaged, so consumers need zero Tailwind/Node tooling ("zero configuration"). <code>-p:CI=true</code> skips the compile when the binary is unavailable.
+</li>
+<li><strong>ADR-004 — CSS-variable theming over baked-in colors.</strong> All colors/spacing via CSS custom properties so any shadcn/ui or tweakcn theme works unmodified, with runtime light/dark switching.
+</li>
+<li><strong>ADR-005 — Per-package independent MinVer versioning. <s>Accepted</s> SUPERSEDED 2026-08-31 by ADR-008.</strong> Recorded the intent that each library derive its version from its own tag prefix so icon packages and core libraries could release independently. It was never implemented; when it finally was, it was removed the same day (see ADR-008). Kept for the record.
+</li>
+<li><strong>ADR-008 — Shared versioning from the release tag (2026-08-31).</strong> All five packages share one version, resolved by the publish workflows from the release tag and applied with <code>-p:Version=</code>. <em>Why MinVer was rejected after being built:</em> every publish path already resolves exactly one explicit version, so MinVer's derivation could never reach a published package — and because MinVer assigns the version in an MSBuild <strong>target</strong>, its presence makes a command-line <code>-p:Version=</code> <strong>silently ignored</strong>. That would have introduced an invisible way for the release version to stop working, which is the same class of defect that had already frozen NuGet.org at 2.0.0. The measured precedence is recorded in <code>RELEASE.md</code>. Consequence: <code>scripts/release-*.sh</code> and their <code>&lt;package&gt;/v</code> tag prefixes correspond to nothing in the build and are dead code.
+</li>
+<li><strong>ADR-006 — Universal attribute splatting (<code>CaptureUnmatchedValues</code>).</strong> Retrofitted across components after consumer apps hit runtime <code>InvalidOperationException</code> passing standard HTML attributes; completed catalog-wide in 2.1.0 and enforced by <code>tools/splat-audit</code>, which fails if any public component lacks it.
+</li>
+<li><strong>ADR-007 — Reactive portal refresh.</strong> <code>PortalService.RefreshPortal</code> + <code>OnPortalsChanged</code> so <code>PortalHost</code> (a layout sibling, not a descendant) re-renders on internal overlay state changes. Reason: fix the AppStudio-reported "static dialog" blocker.
+</li>
+<li><strong>ADR-008 — GitHub Packages distribution under <code>techierathore</code>.</strong> Chosen over nuget.org for the rename/beta phase; consumers configure a PAT-authenticated source.
+</li>
+<li><strong>ADR-009 — Rename BlazorUI/BlazorBlueprint → TrBlazeUI.</strong> Namespaces, package names, CSS file, and service-registration method all renamed for the v2.0 fork; NOTICE retains original attribution per Apache 2.0.
+</li>
+</ul>
 <h2 id="target-architecture">8. Target architecture<a class="anchor-link" href="#target-architecture">#</a></h2>
 <p>No structural change is in flight. The library is feature-complete for its current scope; future work is incremental (new components, broader XML-doc coverage, consumer-feedback fixes) rather than re-architecture. If a documentation/runtime change is later proposed, capture it here as a delta with a diagram.</p>
 <h2 id="open-questions-risks">9. Open questions / risks<a class="anchor-link" href="#open-questions-risks">#</a></h2>
-<ul><li><strong>XML-documentation coverage — RESOLVED (2026-06-30).</strong> Coverage is now 100%: all public members (including enums, DTOs, demo services, and Blazor lifecycle overrides) are documented, and the <code>CS1591</code> suppression has been removed from <code>Directory.Build.props</code>, so missing docs now fail the build. No remaining standards-debt on docs.</li><li><strong>Field-prefix convention — RESOLVED.</strong> Static analysis confirms the <code>obj</code>-prefix instance-field style dominates (<code>objLogger</code>, <code>objJsRuntime</code>, <code>objModule</code>, …) and the modernization pass reports 0 underscore-prefixed fields remaining. §4 / Coding Standards adopt <code>obj</code> prefix. No drift remediation needed.</li><li><strong>NativeSelect inside MAUI Blazor Hybrid overlays.</strong> A genuine WebView2/MAUI <em>platform</em> limitation (native <code>&lt;select&gt;</code> popup clipped in <code>position: fixed</code> overlays) — no library fix possible; guidance is to use <code>&lt;Select&gt;</code> instead. Carries forward as a documented known limitation, not a defect.</li><li><strong><code>.NET 8</code> vs <code>.NET 10</code> references in older docs.</strong> The reverse-doc baseline is .NET 10 (modernization complete). Any lingering <code>.NET 8</code> mention in harvested source docs is stale; the canonical answer is .NET 10 / C# 14.</li><li><strong>MinVer tag warnings.</strong> Expected when building without git tags present; not a defect.</li><li><strong>Demo data is mock-only.</strong> DataTable/Chart demos use <code>MockDataService</code>; there is no persistence layer to reason about.</li></ul>
+<ul>
+<li><strong>XML-documentation coverage — RESOLVED (2026-06-30).</strong> Coverage is now 100%: all public members (including enums, DTOs, demo services, and Blazor lifecycle overrides) are documented, and the <code>CS1591</code> suppression has been removed from <code>Directory.Build.props</code>, so missing docs now fail the build. No remaining standards-debt on docs.
+</li>
+<li><strong>Field-prefix convention — RESOLVED.</strong> Static analysis confirms the <code>obj</code>-prefix instance-field style dominates (<code>objLogger</code>, <code>objJsRuntime</code>, <code>objModule</code>, …) and the modernization pass reports 0 underscore-prefixed fields remaining. §4 / Coding Standards adopt <code>obj</code> prefix. No drift remediation needed.
+</li>
+<li><strong>NativeSelect inside MAUI Blazor Hybrid overlays.</strong> A genuine WebView2/MAUI <em>platform</em> limitation (native <code>&lt;select&gt;</code> popup clipped in <code>position: fixed</code> overlays) — no library fix possible; guidance is to use <code>&lt;Select&gt;</code> instead. Carries forward as a documented known limitation, not a defect.
+</li>
+<li><strong><code>.NET 8</code> vs <code>.NET 10</code> references in older docs.</strong> The reverse-doc baseline is .NET 10 (modernization complete). Any lingering <code>.NET 8</code> mention in harvested source docs is stale; the canonical answer is .NET 10 / C# 14.
+</li>
+<li><s><strong>MinVer tag warnings.</strong></s> No longer applicable - MinVer is not used (ADR-008).
+</li>
+<li><strong>Demo data is mock-only.</strong> DataTable/Chart demos use <code>MockDataService</code>; there is no persistence layer to reason about.
+</li>
+</ul>
 <h2 id="sources-harvested">10. Sources harvested<a class="anchor-link" href="#sources-harvested">#</a></h2>
-<ul><li><code>docs/TrBlazeUI-Doc.md</code> — overview, solution structure, tech-stack tables, project tree, service registration.</li><li><code>docs/TrBlazeUI-Update-plan.md</code> — modernization work streams (.NET 10 upgrade, CI/CD, AI reference, skills), completion statuses.</li><li><code>docs/toolbarplan.md</code> — Toolbar component design (now implemented).</li><li><code>docs/OldDocs/TrBlazeUI-Issues-Report-1.md</code>, <code>docs/OldDocs/trblazeui-issues-report-2.md</code> — consumer-reported bugs (portal refresh, attribute splatting, CSS path) and their fixes.</li><li><code>README.md</code>, <code>THEMING.md</code> — theming, installation, render-mode, AI-skill, and migration content.</li><li><code>docs/Coding-Standards.md</code> — naming/field conventions baseline.</li></ul>
+<ul>
+<li><code>docs/TrBlazeUI-Doc.md</code> — overview, solution structure, tech-stack tables, project tree, service registration.
+</li>
+<li><code>docs/TrBlazeUI-Update-plan.md</code> — modernization work streams (.NET 10 upgrade, CI/CD, AI reference, skills), completion statuses.
+</li>
+<li><code>docs/toolbarplan.md</code> — Toolbar component design (now implemented).
+</li>
+<li><code>docs/OldDocs/TrBlazeUI-Issues-Report-1.md</code>, <code>docs/OldDocs/trblazeui-issues-report-2.md</code> — consumer-reported bugs (portal refresh, attribute splatting, CSS path) and their fixes.
+</li>
+<li><code>README.md</code>, <code>THEMING.md</code> — theming, installation, render-mode, AI-skill, and migration content.
+</li>
+<li><code>docs/Coding-Standards.md</code> — naming/field conventions baseline.
+</li>
+</ul>
 <hr>
 <p>Last updated: 2026-06-30</p>
   </main>
@@ -331,7 +433,11 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   });
 })();
 
-// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`.
+// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`:
+// mermaid reads the <pre>'s textContent as the diagram source, so a button
+// appended here glues "copy" onto the last line and breaks the parse
+// (flowcharts → "Syntax error"; sequence diagrams silently absorb it).
+// Mermaid blocks get copy/export from their own .diagram toolbar instead.
 document.querySelectorAll('pre:not(.mermaid)').forEach(pre => {
   const btn = document.createElement('button');
   btn.className = 'copy';
@@ -352,6 +458,7 @@ if (window.mermaid) {
   mermaid.initialize({ startOnLoad: true, theme: mermaidTheme, securityLevel: 'loose' });
 }
 
+// Mermaid toolbar wiring — run after mermaid renders
 function wireMermaidToolbars() {
   document.querySelectorAll('.diagram').forEach(dia => {
     if (dia.dataset.wired) return;
@@ -395,6 +502,7 @@ function wireMermaidToolbars() {
     };
     function escFs(e) { if (e.key === 'Escape') { dia.classList.remove('fs'); document.removeEventListener('keydown', escFs); } }
     dia.querySelector('[data-pop]').onclick = () => openInNewTab(svg);
+    // Ctrl+wheel zoom
     merm.addEventListener('wheel', (e) => {
       if (!e.ctrlKey) return;
       e.preventDefault();
@@ -459,9 +567,10 @@ function openInNewTab(svg) {
   w.document.close();
 }
 
+// Run wiring after mermaid finishes (it renders async)
 if (window.mermaid) {
   setTimeout(wireMermaidToolbars, 400);
-  setTimeout(wireMermaidToolbars, 1200);
+  setTimeout(wireMermaidToolbars, 1200);  // safety re-run for slow renders
 }
 </script>
 </body>

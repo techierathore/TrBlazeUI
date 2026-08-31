@@ -51,11 +51,18 @@
     /// Whether the dialog can be dismissed by clicking outside or pressing Escape.
     /// Default is true.
     /// </summary>
+    /// <remarks>
+    /// Published onto <see cref="DialogContext.Modal"/> so DialogOverlay and DialogContent both
+    /// honour it. Setting it to <c>false</c> removes light dismissal entirely - the dialog can
+    /// then only be closed by a DialogClose element or by the owning code.
+    /// </remarks>
     [Parameter]
     public bool Modal { get; set; } = true;
 
     protected override void OnInitialized()
     {
+        objContext.Modal = Modal;
+
         // Initialize controllable state
         objState = new UseControllableState<bool>(DefaultOpen)
         {
@@ -73,6 +80,8 @@
 
     protected override void OnParametersSet()
     {
+        objContext.Modal = Modal;
+
         // Update controlled value if it changed
         if (objState.IsControlled && Open.HasValue)
         {

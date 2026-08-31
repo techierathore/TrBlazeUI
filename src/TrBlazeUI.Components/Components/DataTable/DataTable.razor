@@ -59,11 +59,15 @@
                                                  Class="@TableCssClass"
                                                  style="@TableStyle"
                                                  AriaLabel="@AriaLabel">
+                    @* ShowHeader only suppresses the rendered thead; objColumns comes from the
+                       cascaded DataTableColumn children, so column metadata is untouched (TR-012). *@
+                    @if (ShowHeader)
+                    {
                     <TableHeader>
                         <TableRow TData="TData" Class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                             @if (SelectionMode == DataTableSelectionMode.Multiple)
                             {
-                                <TableHeaderCell TData="TData" Class="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-12" role="columnheader">
+                                <TableHeaderCell TData="TData" Class="@ClassNames.cn(HeaderCellCssClass, "w-12")" role="columnheader">
                                     <div @onclick:stopPropagation="true">
                                         @if (ShouldShowSelectAllPrompt())
                                         {
@@ -108,7 +112,7 @@
                                     : (column.Sortable ? "none" : null);
 
                                 <TableHeaderCell TData="TData" ColumnId="@(column.Sortable ? column.Id : null)"
-                                                 Class="@ClassNames.cn("h-12 px-4 text-left align-middle font-medium text-muted-foreground", column.Sortable ? "cursor-pointer select-none" : "", column.HeaderClass)"
+                                                 Class="@ClassNames.cn(HeaderCellCssClass, column.Sortable ? "cursor-pointer select-none" : "", column.HeaderClass)"
                                                  style="@GetColumnWidthStyle(column)"
                                                  aria-sort="@ariaSortValue">
                                     <div class="flex items-center gap-2">
@@ -139,6 +143,7 @@
                             }
                         </TableRow>
                     </TableHeader>
+                    }
                     <TableBody>
                         @foreach (var item in objProcessedData)
                         {
@@ -146,7 +151,7 @@
                             <TableRow TData="TData" Item="@item" Class="@ClassNames.cn("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", isSelected ? "bg-muted" : "")">
                                 @if (SelectionMode == DataTableSelectionMode.Multiple)
                                 {
-                                    <TableCell Class="p-4 align-middle w-12" role="gridcell">
+                                    <TableCell Class="@ClassNames.cn(BodyCellCssClass, "w-12")" role="gridcell">
                                         <div @onclick:stopPropagation="true">
                                             <Checkbox Checked="@isSelected"
                                                       CheckedChanged="@(async (bool isChecked) => await HandleRowSelectionChanged(item, isChecked))"
@@ -156,7 +161,7 @@
                                 }
                                 @foreach (var column in objColumns.Where(c => c.Visible))
                                 {
-                                    <TableCell Class="@ClassNames.cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", column.CellClass)">
+                                    <TableCell Class="@ClassNames.cn(BodyCellCssClass, "[&:has([role=checkbox])]:pr-0", column.CellClass)">
                                         @if (column.CellTemplate != null)
                                         {
                                             @column.CellTemplate(item)

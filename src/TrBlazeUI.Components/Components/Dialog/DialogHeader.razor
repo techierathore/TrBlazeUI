@@ -27,6 +27,10 @@
         {
             "flex",
             "flex-col",
+            // TR-019: DialogContent is a column flex panel. Without shrink-0 the header would
+            // give up height (down to its min-content size) instead of the DialogBody scrolling,
+            // and the title would compress out of view on a short viewport.
+            "shrink-0",
             "space-y-1.5",
             "text-center",
             "sm:text-left"

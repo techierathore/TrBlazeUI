@@ -246,6 +246,49 @@
         </div>
     </div>
 
+    <!-- TR-024: the Class parameter really overrides the built-in track styles -->
+    <div class="space-y-4" data-testid="tr024-tabs-class-override">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Class override (TR-024)</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>TabsList</code>, <code>TabsTrigger</code> and <code>TabsContent</code> now merge
+                their <code>Class</code> with <code>cn()</code>, so a conflicting utility replaces the
+                built-in one instead of racing it in the stylesheet cascade. The compact track below
+                passes <code>Class="h-9 p-0"</code>: the rendered element keeps <code>h-9 p-0</code>
+                and drops <code>h-10 p-1</code> entirely.
+            </p>
+        </div>
+        <div class="space-y-6">
+            <div class="space-y-2">
+                <p class="text-sm font-medium">Default track — h-10, p-1</p>
+                <Tabs DefaultValue="one">
+                    <TabsList data-testid="tr024-tabs-list-default">
+                        <TabsTrigger Value="one">One</TabsTrigger>
+                        <TabsTrigger Value="two">Two</TabsTrigger>
+                    </TabsList>
+                    <TabsContent Value="one" Class="pt-3 text-sm">First panel.</TabsContent>
+                    <TabsContent Value="two" Class="pt-3 text-sm">Second panel.</TabsContent>
+                </Tabs>
+            </div>
+
+            <div class="space-y-2">
+                <p class="text-sm font-medium">Compact track — Class="h-9 p-0"</p>
+                <Tabs DefaultValue="one">
+                    <TabsList Class="h-9 p-0" data-testid="tr024-tabs-list-compact">
+                        <TabsTrigger Value="one" Class="px-2" data-testid="tr024-tabs-trigger-compact">One</TabsTrigger>
+                        <TabsTrigger Value="two" Class="px-2">Two</TabsTrigger>
+                    </TabsList>
+                    <TabsContent Value="one" Class="mt-0 pt-3 text-sm" data-testid="tr024-tabs-content-compact">
+                        First panel, with the default mt-2 replaced by mt-0.
+                    </TabsContent>
+                    <TabsContent Value="two" Class="mt-0 pt-3 text-sm">
+                        Second panel, with the default mt-2 replaced by mt-0.
+                    </TabsContent>
+                </Tabs>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @code {

@@ -4,15 +4,19 @@
 
 @*
     Alert Dialog Content - the modal content panel.
-    Does not allow dismissal via click-outside or Escape for confirmations.
+    Mirrors shadcn/ui's AlertDialog: the overlay is inert (a confirmation is answered with an
+    explicit action, not by clicking away) but Escape still cancels, and both halves are
+    overridable via the Modal / CloseOnEscape parameters.
 *@
 
 <DialogPortal>
-    <DialogOverlay class="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+    <DialogOverlay CloseOnClick="@(!Modal)"
+                   class="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
 
     <TrBlazeUI.Primitives.Dialog.DialogContent
         class="@GetClassNames()"
-        CloseOnEscape="false"
+        CloseOnEscape="@CloseOnEscape"
+        OnEscapeKeyDown="@OnEscapeKeyDown"
         TrapFocus="true"
         LockScroll="true"
         role="alertdialog"
@@ -27,6 +31,38 @@
     /// </summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Whether pressing Escape cancels the alert dialog.
+    /// Default is <c>true</c>, matching the shadcn/ui AlertDialog this mirrors.
+    /// </summary>
+    /// <remarks>
+    /// Escape is observed on the document, so it also works when the dialog body has re-rendered
+    /// (for example after a validation message appeared) and focus is no longer inside the panel.
+    /// Set to <c>false</c> for a confirmation that must be answered by an explicit action, but
+    /// then make sure a visible Cancel control is always reachable.
+    /// </remarks>
+    [Parameter]
+    public bool CloseOnEscape { get; set; } = true;
+
+    /// <summary>
+    /// Whether the alert dialog is modal with respect to the overlay: when <c>true</c> (the
+    /// default) clicking the dimmed backdrop does NOT dismiss it. Set to <c>false</c> to allow
+    /// outside-click dismissal.
+    /// </summary>
+    /// <remarks>
+    /// This covers overlay clicks only; Escape is controlled separately by
+    /// <see cref="CloseOnEscape"/>. It is distinct from the Dialog primitive's own
+    /// <c>Modal</c> parameter, which is a master switch over every form of light dismissal.
+    /// </remarks>
+    [Parameter]
+    public bool Modal { get; set; } = true;
+
+    /// <summary>
+    /// Event callback invoked when Escape is pressed, before any dismissal happens.
+    /// </summary>
+    [Parameter]
+    public EventCallback<KeyboardEventArgs> OnEscapeKeyDown { get; set; }
 
     /// <summary>
     /// Additional CSS classes to apply to the dialog content.

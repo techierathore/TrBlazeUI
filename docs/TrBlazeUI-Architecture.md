@@ -31,7 +31,7 @@ TrBlazeUI is a **Blazor UI component library** (not an application) — a rename
 | Charts | Blazor-ApexCharts | 6.1.0 | Wraps ApexCharts.js for the Chart component |
 | Markdown | Markdig | 0.44.0 | Powers MarkdownEditor |
 | HTML sanitization | HtmlSanitizer | 9.0.892 | Security layer for RichTextEditor output |
-| Versioning | MinVer | 7.0.0 | Per-library semantic versioning from git tag prefixes |
+| Versioning | (none - MSBuild property) | - | Shared version for all 5 packages, taken from the release tag and passed as `-p:Version=`; `Directory.Build.props` holds the local base (BRD-43) |
 | Blazor packages | Microsoft.AspNetCore.Components.* | 10.0.2 | `.Web`, `.WebAssembly`, `.WebAssembly.DevServer`, `.WebAssembly.Server` |
 | Distribution | GitHub Packages (NuGet) | — | `nuget.pkg.github.com/techierathore` |
 | AI tooling | TrBlazeUI agent skills | — | `/trblazeui` Claude Code + OpenCode skills in `docs/skills/` |
@@ -144,7 +144,7 @@ flowchart LR
 - **JS interop** — ~12 component JS files (file-upload, markdown-editor, masked-input, multiselect, navigation-menu, quill-interop, range-slider, resizable, responsive-nav, sidebar, slider, virtualization-scroll) + ~10 primitive JS files (click-outside, element-utils, focus-trap, keyboard-nav, keyboard-shortcuts, match-trigger-width, portal, positioning, select, table-row-nav).
 - **Attribute splatting** — `CaptureUnmatchedValues` on (now) essentially all components so HTML attributes/events forward through (standard Blazor library pattern; retrofitted after consumer reports).
 - **Logging / error handling / telemetry** — none beyond Blazor defaults; this is a UI library, not a service. Error handling follows the standards (specific catches, `throw;`, no bare catch).
-- **Versioning** — MinVer per-package from git tag prefixes (`components/v`, `primitives/v`, `icons-lucide/v`, `icons-heroicons/v`, `icons-feather/v`).
+- **Versioning** — shared across all five packages. The publish workflow resolves the version from the release tag and passes `-p:Version=` to `dotnet build` and `dotnet pack`; `Directory.Build.props` carries only the local-build base. No versioning tool is used (BRD-43, amended 2026-08-31).
 - **Code quality enforcement** — `TreatWarningsAsErrors`, `EnforceCodeStyleInBuild`, `AnalysisLevel=latest-recommended`, `GenerateDocumentationFile=true`, nullable enabled — solution-wide via `Directory.Build.props`.
 
 ## 6. Deployment architecture
@@ -156,12 +156,13 @@ flowchart LR
   Dev["Dev push"] --> Branch{"branch?"}
   Branch -->|"non-master / PR"| BuildWF["build.yml<br/>(validate build)"]
   Branch -->|"master"| PubWF["publish-nuget.yml<br/>(pack + push)"]
-  PubWF --> Pkgs["5 NuGet packages<br/>(MinVer-versioned)"]
+  PubWF --> Pkgs["5 NuGet packages<br/>(shared version from the release tag)"]
   Pkgs --> GHP["GitHub Packages<br/>(nuget.pkg.github.com/techierathore)"]
   GHP --> Consumer["Consumer Blazor apps<br/>(dotnet add package)"]
 ```
 
-- **`publish-nuget.yml`** — on push to `master`, on `windows-latest`, full git history for MinVer, builds Release with `-p:CI=true`, packs all 5 library projects, pushes with `--skip-duplicate` using `GITHUB_TOKEN`.
+- **`publish-github-packages.yml`** — on push to `master` and on a published Release, on `windows-latest`, builds Release with `-p:CI=true -p:Version=<resolved>`, packs all 5 library projects, pushes with `--skip-duplicate` using `GITHUB_TOKEN`. A release uses the tag; a push uses `<base>-ci.<run_number>`.
+- **`publish-nuget.yml`** — manually dispatched public release to NuGet.org via Trusted Publishing (OIDC). Resolves the version from the release tag (or a version-shaped ref, or the nearest reachable tag) and **refuses a non-dry-run push** when it can only fall back to `Directory.Build.props` — the failure that had pinned NuGet.org at 2.0.0.
 - **`build.yml`** — validation build on non-master pushes and PRs to master.
 - **Local run** — `./scripts/run-demo.sh [server|wasm|auto]` or `dotnet run --project demos/TrBlazeUI.Demo.<mode>`. Per-package release scripts live under `scripts/` (`release-components.sh`, `release-primitives.sh`, `release-icons-*.sh`).
 
@@ -171,7 +172,8 @@ flowchart LR
 - **ADR-002 — Two-layer headless + styled architecture.** Primitives provide behavior + accessibility; Components add styling. Lets consumers either drop in styled components or build custom UIs on headless primitives. Reason: mirror Radix UI / shadcn/ui separation of concerns.
 - **ADR-003 — Ship pre-built CSS, not a Tailwind dependency.** The standalone Tailwind binary compiles `trblazeui.css` at build time and the output is committed/packaged, so consumers need zero Tailwind/Node tooling ("zero configuration"). `-p:CI=true` skips the compile when the binary is unavailable.
 - **ADR-004 — CSS-variable theming over baked-in colors.** All colors/spacing via CSS custom properties so any shadcn/ui or tweakcn theme works unmodified, with runtime light/dark switching.
-- **ADR-005 — Per-package independent MinVer versioning.** Each library version is derived from its own git tag prefix, so icon packages and core libraries release independently.
+- **ADR-005 — Per-package independent MinVer versioning. ~~Accepted~~ SUPERSEDED 2026-08-31 by ADR-008.** Recorded the intent that each library derive its version from its own tag prefix so icon packages and core libraries could release independently. It was never implemented; when it finally was, it was removed the same day (see ADR-008). Kept for the record.
+- **ADR-008 — Shared versioning from the release tag (2026-08-31).** All five packages share one version, resolved by the publish workflows from the release tag and applied with `-p:Version=`. *Why MinVer was rejected after being built:* every publish path already resolves exactly one explicit version, so MinVer's derivation could never reach a published package — and because MinVer assigns the version in an MSBuild **target**, its presence makes a command-line `-p:Version=` **silently ignored**. That would have introduced an invisible way for the release version to stop working, which is the same class of defect that had already frozen NuGet.org at 2.0.0. The measured precedence is recorded in `RELEASE.md`. Consequence: `scripts/release-*.sh` and their `<package>/v` tag prefixes correspond to nothing in the build and are dead code.
 - **ADR-006 — Universal attribute splatting (`CaptureUnmatchedValues`).** Retrofitted across components after consumer apps hit runtime `InvalidOperationException` passing standard HTML attributes; completed catalog-wide in 2.1.0 and enforced by `tools/splat-audit`, which fails if any public component lacks it.
 - **ADR-007 — Reactive portal refresh.** `PortalService.RefreshPortal` + `OnPortalsChanged` so `PortalHost` (a layout sibling, not a descendant) re-renders on internal overlay state changes. Reason: fix the AppStudio-reported "static dialog" blocker.
 - **ADR-008 — GitHub Packages distribution under `techierathore`.** Chosen over nuget.org for the rename/beta phase; consumers configure a PAT-authenticated source.
@@ -187,7 +189,7 @@ No structural change is in flight. The library is feature-complete for its curre
 - **Field-prefix convention — RESOLVED.** Static analysis confirms the `obj`-prefix instance-field style dominates (`objLogger`, `objJsRuntime`, `objModule`, …) and the modernization pass reports 0 underscore-prefixed fields remaining. §4 / Coding Standards adopt `obj` prefix. No drift remediation needed.
 - **NativeSelect inside MAUI Blazor Hybrid overlays.** A genuine WebView2/MAUI *platform* limitation (native `<select>` popup clipped in `position: fixed` overlays) — no library fix possible; guidance is to use `<Select>` instead. Carries forward as a documented known limitation, not a defect.
 - **`.NET 8` vs `.NET 10` references in older docs.** The reverse-doc baseline is .NET 10 (modernization complete). Any lingering `.NET 8` mention in harvested source docs is stale; the canonical answer is .NET 10 / C# 14.
-- **MinVer tag warnings.** Expected when building without git tags present; not a defect.
+- ~~**MinVer tag warnings.**~~ No longer applicable - MinVer is not used (ADR-008).
 - **Demo data is mock-only.** DataTable/Chart demos use `MockDataService`; there is no persistence layer to reason about.
 
 ## 10. Sources harvested

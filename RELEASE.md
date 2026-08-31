@@ -34,7 +34,17 @@ This lets you test unreleased changes via the pre-release feed.
 
 ### Version Override Mechanism
 
-The workflow passes `-p:Version=<version>` to both `dotnet build` and `dotnet pack`, which overrides the `<Version>` property in `Directory.Build.props`. The value in `Directory.Build.props` serves as the base version for local development and CI pre-release suffixing.
+The workflow passes `-p:Version=<version>` to both `dotnet build` and `dotnet pack`, which
+overrides the `<Version>` property in `Directory.Build.props`. The value in
+`Directory.Build.props` is the base version for local development and CI pre-release suffixing.
+
+> **This is the single versioning mechanism — deliberately.** Per-package MinVer versioning was
+> evaluated on 2026-08-31 and **rejected** in favour of shared versioning (see `docs/TrBlazeUI-BRD.md`
+> BRD-43). It was implemented, measured and removed the same day for one decisive reason: MinVer
+> computes the version in an MSBuild **target**, so with MinVer present a command-line
+> `-p:Version=` is **silently ignored**. Every publish path here passes an explicit version, so
+> MinVer could never influence a published package — it would only have added an invisible way for
+> the version flag to stop working. **Do not reintroduce MinVer without changing BRD-43 first.**
 
 ## Quick Start
 
@@ -54,8 +64,12 @@ After a release, bump the version in `Directory.Build.props` for the next develo
 
 ```xml
 <!-- Base version for local builds. CI/CD overrides via -p:Version= -->
-<Version>1.0.5</Version>
+<Version>2.1.1</Version>
 ```
+
+**Bump this only when cutting a release**, not as part of ordinary feature or fix work. What
+actually ships is the release tag, which the workflow passes as `-p:Version=`; this value is the
+local-build base and the stem the CI pre-release feed suffixes (`2.1.1-ci.42`).
 
 ## GitHub Actions Workflow
 
@@ -101,7 +115,9 @@ Follow [Semantic Versioning](https://semver.org/):
 
 ### Package version always the same
 
-Ensure the GitHub Release tag is a new version. The `--skip-duplicate` flag on `dotnet nuget push` silently skips packages that already exist — if the version didn't change, nothing new gets published.
+**First check that the publish workflow resolved the version from the release tag**, not from `Directory.Build.props`. The job log prints `Publishing version: <ver>   (source: ...)`. A `source:` of *"Directory.Build.props FALLBACK"* means no tag was resolved — that is exactly how nuget.org stayed pinned at 2.0.0 across two release cycles, and a real push is now blocked in that case.
+
+Otherwise, ensure the GitHub Release tag is a new version. The `--skip-duplicate` flag on `dotnet nuget push` silently skips packages that already exist — if the version didn't change, nothing new gets published.
 
 ### Packages not appearing after release
 
@@ -111,8 +127,8 @@ Ensure the GitHub Release tag is a new version. The `--skip-duplicate` flag on `
 
 ### Local build version differs from CI
 
-This is expected. Local builds use the version from `Directory.Build.props` directly, while CI builds override it via `-p:Version=`.
+This is expected. Local builds use the version from `Directory.Build.props` directly, while CI overrides it via `-p:Version=` with the release tag (or the `-ci.<run>` pre-release stem).
 
 ## Legacy Scripts
 
-The `scripts/release-*.sh` files are legacy from a planned per-package MinVer-based release system that was never implemented. They are not currently used. All releases go through GitHub Releases as described above.
+The `scripts/release-*.sh` files are legacy from a planned per-package MinVer-based release system that was **never adopted** — MinVer was implemented and removed on 2026-08-31 when shared versioning was confirmed as the model (BRD-43). The per-package tag prefixes these scripts write (`components/v`, `primitives/v`, …) correspond to nothing in the build. They are not used; all releases go through GitHub Releases as described above. Treat them as dead code pending deletion.

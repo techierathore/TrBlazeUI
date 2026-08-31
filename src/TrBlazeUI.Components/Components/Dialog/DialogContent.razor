@@ -22,7 +22,11 @@
 
         @if (ShowClose)
         {
-            <TrBlazeUI.Primitives.Dialog.DialogClose class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+            @* Absolutely positioned against the panel (the panel is `fixed`, so it is the
+               containing block) and out of the flex flow, so it does not consume a row.
+               With a DialogBody present the panel itself never scrolls, so this stays pinned
+               to the panel's top-right; z-10 keeps it above scrolled body content. *@
+            <TrBlazeUI.Primitives.Dialog.DialogClose class="absolute right-4 top-4 z-10 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
                 <LucideIcon Name="x" Class="h-4 w-4" />
                 <span class="sr-only">Close</span>
             </TrBlazeUI.Primitives.Dialog.DialogClose>
@@ -84,6 +88,21 @@
     public EventCallback<KeyboardEventArgs> OnEscapeKeyDown { get; set; }
 
     /// <summary>
+    /// Tailwind max-height utility that caps the panel inside the viewport.
+    /// Defaults to <c>max-h-[calc(100vh-2rem)]</c>, which leaves a 1rem gutter top and bottom.
+    /// </summary>
+    /// <remarks>
+    /// The class must already exist in the library's pre-built stylesheet
+    /// (<c>_content/TrBlazeUI.Components/trblazeui.css</c>) - an arbitrary value that was never
+    /// emitted fails silently at runtime and the panel becomes unbounded. Utilities known to
+    /// ship include the <c>max-h-*</c> scale (for example <c>max-h-96</c>, <c>max-h-screen</c>)
+    /// plus the arbitrary values <c>max-h-[70vh]</c>, <c>max-h-[300px]</c>,
+    /// <c>max-h-[400px]</c> and the default above.
+    /// </remarks>
+    [Parameter]
+    public string MaxHeight { get; set; } = "max-h-[calc(100vh-2rem)]";
+
+    /// <summary>
     /// Gets the computed CSS classes for the dialog content.
     /// Uses the cn() utility for intelligent class merging and Tailwind conflict resolution.
     /// </summary>
@@ -95,10 +114,22 @@
         // offsets a consumer stylesheet (or a future refactor) contributes. This removes the
         // whole class of clipping bug AstroLyfe reported (transform + translate stacking),
         // rather than relying on there being exactly one offset for the height cap to absorb.
-        "fixed inset-0 z-50 m-auto grid h-fit w-full max-w-lg",
+        //
+        // TR-019: the panel is a COLUMN FLEX box, not a plain grid. That is what lets a
+        // DialogBody shrink (min-h-0) and scroll on its own while DialogHeader/DialogFooter
+        // (shrink-0) stay pinned. Flex is used rather than `grid-rows-[auto_1fr_auto]` for two
+        // reasons: that arbitrary utility is not in the pre-built stylesheet (it would fail
+        // silently), and fixed template rows misplace content whenever a consumer's panel has
+        // more or fewer than three children.
+        "fixed inset-0 z-50 m-auto flex flex-col h-fit w-full max-w-lg",
         // Clamp inside the visual viewport so a tall dialog scrolls internally instead of
         // overflowing; with auto-margin centering the top stays >= gutter at any height.
-        "max-h-[calc(100vh-2rem)] overflow-y-auto",
+        MaxHeight,
+        // Kept on the panel for backward compatibility: a DialogContent WITHOUT a DialogBody has
+        // nothing that can shrink, so the panel scrolls itself exactly as it did for REQ-UI-016
+        // and the footer stays reachable. With a DialogBody the body absorbs the overflow and
+        // this never engages.
+        "overflow-y-auto",
         "gap-4 border bg-background p-6 shadow-lg duration-200",
         // Enter/exit is zoom + fade only (no slide) — the slide utilities were built around
         // the old -50% translate base and are unnecessary for an auto-margin-centered box.

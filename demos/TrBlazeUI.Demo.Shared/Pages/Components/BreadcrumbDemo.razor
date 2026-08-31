@@ -87,6 +87,58 @@
         </Breadcrumb>
     </div>
 
+    <!-- TR-027: single-line trail in a fixed-height chrome -->
+    <div class="space-y-4" data-testid="tr027-breadcrumb-nowrap">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">No wrap (TR-027)</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>Wrap="false"</code> keeps the trail on one line, so a narrow header bar cannot
+                grow a second row when the path runs long. The row gap is also 0 now, so even a
+                wrapped trail adds no vertical padding of its own. Drag the browser narrower to
+                compare the two rails below.
+            </p>
+        </div>
+        <div class="space-y-6">
+            <div class="space-y-2">
+                <p class="text-sm font-medium">Wrap="false" — clipped, never taller</p>
+                <div class="w-64 overflow-hidden rounded-md border p-2">
+                    <Breadcrumb Wrap="false" data-testid="tr027-breadcrumb-nowrap-trail">
+                        <BreadcrumbItem>
+                            <BreadcrumbLink Href="/">Home</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbLink Href="/components">Components</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbPage>Breadcrumb navigation</BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </Breadcrumb>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <p class="text-sm font-medium">Default (Wrap="true") — wraps, but with no row gap</p>
+                <div class="w-64 overflow-hidden rounded-md border p-2">
+                    <Breadcrumb data-testid="tr027-breadcrumb-wrap-trail">
+                        <BreadcrumbItem>
+                            <BreadcrumbLink Href="/">Home</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbLink Href="/components">Components</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbPage>Breadcrumb navigation</BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </Breadcrumb>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- API Reference -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -102,6 +154,15 @@
                     <p><code class="bg-muted px-1 py-0.5 rounded">BreadcrumbPage</code> - Current page (non-clickable)</p>
                     <p><code class="bg-muted px-1 py-0.5 rounded">BreadcrumbSeparator</code> - Separator between items</p>
                     <p><code class="bg-muted px-1 py-0.5 rounded">BreadcrumbEllipsis</code> - Collapsed items indicator</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">BreadcrumbList</code> - Optional wrapper; its <code class="bg-muted px-1 py-0.5 rounded">Class</code> and attributes are forwarded onto the list element</p>
+                </div>
+            </div>
+            <div>
+                <h3 class="font-semibold mb-2">Breadcrumb parameters</h3>
+                <div class="space-y-2 text-sm">
+                    <p><code class="bg-muted px-1 py-0.5 rounded">Wrap</code> - bool, default true. Set false for a single-line trail in fixed-height chrome.</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">Class</code> - classes for the <code class="bg-muted px-1 py-0.5 rounded">nav</code> element</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">ListClass</code> - classes merged over the list element's defaults</p>
                 </div>
             </div>
         </div>

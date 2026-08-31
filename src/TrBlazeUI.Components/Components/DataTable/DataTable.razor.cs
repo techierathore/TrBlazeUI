@@ -132,6 +132,13 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     private int objRefreshVersion;
     private int objLastRefreshVersion;
 
+    // ShowPagination now decides how many rows are materialised (TR-009), and ShowHeader/Density
+    // change the rendered markup (TR-012/TR-025), so all three have to participate in ShouldRender.
+    // Without this a consumer toggling any of them at runtime would see nothing repaint.
+    private bool objLastShowPagination = true;
+    private bool objLastShowHeader = true;
+    private DataTableDensity objLastDensity = DataTableDensity.Comfortable;
+
     /// <summary>
     /// Gets or sets the data source for the table.
     /// </summary>
@@ -160,12 +167,44 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     public bool ShowToolbar { get; set; }
 
     /// <summary>
-    /// Gets or sets whether pagination controls are allowed to render.
-    /// Default is true, but the pagination bar auto-suppresses when every filtered row
-    /// fits on a single page; set to false to suppress it unconditionally.
+    /// Gets or sets whether the grid paginates at all.
+    /// Default is true, in which case the pagination bar still auto-suppresses when every
+    /// filtered row fits on a single page.
     /// </summary>
+    /// <remarks>
+    /// This is a data switch, not only a chrome switch: setting it to <c>false</c> renders the
+    /// ENTIRE filtered sequence and hides the pager. Previously the page window was applied
+    /// unconditionally, so a grid with pagination turned off silently rendered only the first
+    /// <see cref="InitialPageSize"/> rows with no pager and no row count to give the truncation
+    /// away (TR-009).
+    /// </remarks>
     [Parameter]
     public bool ShowPagination { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether the header row renders.
+    /// Default is true; set to false for key/value style tables that need no column headings.
+    /// </summary>
+    /// <remarks>
+    /// Only the rendered <c>thead</c> is suppressed. Column metadata comes from the cascaded
+    /// <c>DataTableColumn</c> children, so sorting, filtering and column registration are
+    /// unaffected — though with no header there is nothing left to click to sort (TR-012).
+    /// </remarks>
+    [Parameter]
+    public bool ShowHeader { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the cell padding density.
+    /// Default is <see cref="DataTableDensity.Comfortable"/>.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="DataTableDensity.Compact"/> trims header cells to <c>h-9 px-2.5</c> and body
+    /// cells to <c>px-2.5 py-2</c>, which reclaims a large share of the width on narrow grids
+    /// (TR-025). A column's own <c>CellClass</c>/<c>HeaderClass</c> still wins over the density
+    /// default, because it is merged last.
+    /// </remarks>
+    [Parameter]
+    public DataTableDensity Density { get; set; } = DataTableDensity.Comfortable;
 
     /// <summary>
     /// Gets or sets whether the table is in a loading state.
@@ -319,6 +358,26 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     );
 
     /// <summary>
+    /// Gets the density-driven base CSS classes for a header cell.
+    /// </summary>
+    /// <remarks>
+    /// Merged FIRST so a column's <c>HeaderClass</c> still overrides the padding (TR-025).
+    /// </remarks>
+    private string HeaderCellCssClass => Density == DataTableDensity.Compact
+        ? "h-9 px-2.5 text-left align-middle font-medium text-muted-foreground"
+        : "h-12 px-4 text-left align-middle font-medium text-muted-foreground";
+
+    /// <summary>
+    /// Gets the density-driven base CSS classes for a body cell.
+    /// </summary>
+    /// <remarks>
+    /// Merged FIRST so a column's <c>CellClass</c> still overrides the padding (TR-025).
+    /// </remarks>
+    private string BodyCellCssClass => Density == DataTableDensity.Compact
+        ? "px-2.5 py-2 align-middle"
+        : "p-4 align-middle";
+
+    /// <summary>
     /// Performs one-time initialization of the table state, seeding the pagination page size and
     /// current page from <see cref="InitialPageSize"/> and applying the configured selection mode.
     /// </summary>
@@ -406,11 +465,24 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         // 4. Update pagination total items BEFORE pagination
         objTableState.Pagination.TotalItems = sortedData.Count();
 
-        // 5. Apply pagination
-        objProcessedData = sortedData
-            .Skip(objTableState.Pagination.StartIndex)
-            .Take(objTableState.Pagination.PageSize)
-            .ToList();
+        // 5. Apply pagination — ONLY when the grid actually paginates.
+        //    ShowPagination gates the data, not just the pager chrome: applying the page window
+        //    unconditionally meant ShowPagination="false" rendered InitialPageSize rows and
+        //    dropped the rest with no pager and no count to reveal the loss (TR-009).
+        if (ShowPagination)
+        {
+            objProcessedData = sortedData
+                .Skip(objTableState.Pagination.StartIndex)
+                .Take(objTableState.Pagination.PageSize)
+                .ToList();
+        }
+        else
+        {
+            // Pagination is off: the whole filtered/sorted sequence is the rendered page.
+            // TotalItems (set above) therefore equals the rendered row count, which is what keeps
+            // ShouldShowSelectAllPrompt() from offering a "select all N" scope that does not exist.
+            objProcessedData = sortedData.ToList();
+        }
     }
 
     /// <summary>
@@ -568,7 +640,8 @@ public partial class DataTable<TData> : ComponentBase where TData : class
 
     /// <summary>
     /// Determines whether to show the select-all dropdown prompt.
-    /// Returns true when total items exceed the current page count.
+    /// Returns true when total items exceed the current page count — which is never the case
+    /// once <see cref="ShowPagination"/> is false, since every filtered row is then rendered.
     /// </summary>
     private bool ShouldShowSelectAllPrompt() =>
         objTableState.Pagination.TotalItems > objProcessedData.Count();
@@ -800,9 +873,15 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         var searchChanged = objLastGlobalSearchValue != objGlobalSearchValue;
         var selectionChanged = objLastSelectionVersion != objSelectionVersion;
         var paginationChanged = objLastPaginationVersion != objPaginationVersion;
+        var showPaginationChanged = objLastShowPagination != ShowPagination;
+        var showHeaderChanged = objLastShowHeader != ShowHeader;
+        var densityChanged = objLastDensity != Density;
 
-        if (refreshRequested || dataChanged || selectionModeChanged || loadingChanged || columnsChanged || searchChanged || selectionChanged || paginationChanged)
+        if (refreshRequested || dataChanged || selectionModeChanged || loadingChanged || columnsChanged || searchChanged || selectionChanged || paginationChanged || showPaginationChanged || showHeaderChanged || densityChanged)
         {
+            objLastShowPagination = ShowPagination;
+            objLastShowHeader = ShowHeader;
+            objLastDensity = Density;
             objLastRefreshVersion = objRefreshVersion;
             objLastData = Data;
             objLastSelectionMode = SelectionMode;

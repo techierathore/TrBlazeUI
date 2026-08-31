@@ -1,5 +1,6 @@
 @namespace TrBlazeUI.Components.Tabs
 @using TrBlazeUI.Primitives.Tabs
+@using TrBlazeUI.Components.Utilities
 
 @*
     Styled TabsContent component.
@@ -35,11 +36,16 @@
     /// <summary>
     /// Additional CSS classes to apply to the tab content.
     /// </summary>
+    /// <remarks>
+    /// Merged with <c>ClassNames.cn</c>, so <c>Class="mt-0"</c> genuinely removes the default
+    /// top margin instead of fighting it in the cascade (TR-024).
+    /// </remarks>
     [Parameter]
     public string? Class { get; set; }
 
-    private string CssClass =>
-        $"mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 {Class}".Trim();
+    private string CssClass => ClassNames.cn(
+        "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        Class);
 
     /// <summary>
     /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)

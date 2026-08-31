@@ -10,6 +10,7 @@
 
 @code {
     private Dictionary<string, object>? objListAttributes;
+    private string? objListChildClass;
 
     [Parameter]
     public string? Class { get; set; }
@@ -23,11 +24,28 @@
     [Parameter]
     public string? ListClass { get; set; }
 
+    /// <summary>
+    /// Gets or sets whether the trail may wrap onto a second line when it runs out of width.
+    /// </summary>
+    /// <remarks>
+    /// Default is <c>true</c>, matching the previous unconditional <c>flex-wrap</c>. Set to
+    /// <c>false</c> in a fixed-height chrome such as a header, where a wrapped trail would grow
+    /// the bar; the row keeps its height and the overflow is clipped by the container instead
+    /// (TR-027). <c>ListClass="flex-nowrap"</c> also works now that flex-wrap is a merge group.
+    /// </remarks>
+    [Parameter]
+    public bool Wrap { get; set; } = true;
+
     private string CssClass => Class ?? string.Empty;
 
     private string ListCssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
-        "flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5",
-        ListClass
+        // gap is split per axis: the row gap stays 0 so a wrapped trail adds no vertical
+        // padding to the row it sits in, which is what inflated a consumer's 64px header
+        // to 87px (TR-027). gap-x/gap-y are distinct merge groups, so both stay overridable.
+        "flex items-center gap-x-1.5 gap-y-0 break-words text-sm text-muted-foreground sm:gap-x-2.5",
+        Wrap ? "flex-wrap" : "flex-nowrap",
+        ListClass,
+        objListChildClass
     );
 
     /// <summary>
@@ -36,16 +54,33 @@
     /// <remarks>
     /// The <c>&lt;ol&gt;</c> belongs to Breadcrumb (BreadcrumbList is optional), so a
     /// <c>data-testid</c> put on BreadcrumbList is forwarded here rather than dropped.
+    /// A <c>class</c> supplied on the child - either as its <c>Class</c> parameter or as a raw
+    /// lowercase attribute - is merged into the list class string instead of being splatted
+    /// after it, where it would have wiped every built-in list style (TR-027).
     /// </remarks>
     /// <param name="aAttributes">The attributes captured by the child BreadcrumbList.</param>
-    internal void ApplyListAttributes(Dictionary<string, object>? aAttributes)
+    /// <param name="aClass">The value of the child BreadcrumbList's Class parameter.</param>
+    internal void ApplyListAttributes(Dictionary<string, object>? aAttributes, string? aClass)
     {
-        if (AttributesEqual(objListAttributes, aAttributes))
+        var vAttributes = aAttributes;
+        var vClass = aClass;
+
+        if (aAttributes is not null && aAttributes.TryGetValue("class", out var vRawClass))
+        {
+            vAttributes = aAttributes
+                .Where(pair => !string.Equals(pair.Key, "class", StringComparison.OrdinalIgnoreCase))
+                .ToDictionary(pair => pair.Key, pair => pair.Value);
+            vClass = TrBlazeUI.Components.Utilities.ClassNames.cn(vClass, vRawClass?.ToString());
+        }
+
+        if (AttributesEqual(objListAttributes, vAttributes)
+            && string.Equals(objListChildClass, vClass, StringComparison.Ordinal))
         {
             return;
         }
 
-        objListAttributes = aAttributes;
+        objListAttributes = vAttributes;
+        objListChildClass = vClass;
         StateHasChanged();
     }
 

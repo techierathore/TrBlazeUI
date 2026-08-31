@@ -13,7 +13,9 @@ public partial class LucideIcon : ComponentBase
 {
     /// <summary>
     /// The name of the icon to render (e.g., "camera", "home", "user").
-    /// Names are case-insensitive.
+    /// Names are case-insensitive. Lucide's deprecated and alternate spellings
+    /// (e.g. "check-circle", "alert-triangle") are accepted too and resolve to the
+    /// canonical icon they were renamed to.
     /// </summary>
     [Parameter, EditorRequired]
     public string Name { get; set; } = string.Empty;
@@ -68,7 +70,8 @@ public partial class LucideIcon : ComponentBase
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     /// <summary>
-    /// Gets the SVG content for the icon from the LucideIconData dictionary.
+    /// Gets the SVG content for the icon from the LucideIconData dictionary, which also
+    /// resolves Lucide's deprecated and alternate names through its alias table.
     /// Returns null if the icon is not found.
     /// Removes hardcoded stroke and fill attributes to allow parameters to take effect.
     /// </summary>
@@ -131,13 +134,16 @@ public partial class LucideIcon : ComponentBase
 
     /// <summary>
     /// Cached LoggerMessage delegate for the unknown-icon-name warning (CA1848).
+    /// The second argument carries a ready-formatted " Did you mean '...'?" hint, or an
+    /// empty string when nothing close enough was found - a blank placeholder is invisible
+    /// on screen, so the name of the icon that was meant is the only usable diagnostic.
     /// </summary>
-    private static readonly Action<ILogger, string, Exception?> LogUnknownIconName =
-        LoggerMessage.Define<string>(
+    private static readonly Action<ILogger, string, string, Exception?> LogUnknownIconName =
+        LoggerMessage.Define<string, string>(
             LogLevel.Warning,
             new EventId(1, "TrBlazeUIUnknownIconName"),
             "TrBlazeUI LucideIcon: unknown icon name '{IconName}'. An empty placeholder is rendered instead. " +
-            "Check the Lucide icon id.");
+            "Check the Lucide icon id.{Suggestion}");
 
     [Inject]
     private ILogger<LucideIcon> Logger { get; set; } = default!;
@@ -157,7 +163,10 @@ public partial class LucideIcon : ComponentBase
     {
         if (SvgContent == null && WarnedUnknownNames.TryAdd(Name, 0))
         {
-            LogUnknownIconName(Logger, Name, null);
+            var suggestion = LucideIconData.FindSimilarIcon(Name);
+            var hint = suggestion == null ? string.Empty : $" Did you mean '{suggestion}'?";
+
+            LogUnknownIconName(Logger, Name, hint, null);
         }
     }
 }

@@ -110,6 +110,69 @@
         </AlertDialog>
     </div>
 
+    <!-- TR-014: Escape cancels an alert dialog -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Escape Cancels</h2>
+            <p class="text-sm text-muted-foreground">
+                Escape cancels an alert dialog by default, the same as shadcn/ui. Clicking the
+                backdrop does not. Set <code class="text-xs bg-muted px-1 py-0.5 rounded">CloseOnEscape="false"</code>
+                on AlertDialogContent for a confirmation that must be answered explicitly, or
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">Modal="false"</code> to also allow
+                outside-click dismissal.
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-4">
+            <AlertDialog>
+                <AlertDialogTrigger>
+                    <Button data-testid="tr014-alert-escape-open" Variant="ButtonVariant.Outline">
+                        Escape closes this
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent data-testid="tr014-alert-escape">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Discard draft?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Press Escape to cancel — no button click required.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>
+                            <Button Variant="ButtonVariant.Outline">Keep editing</Button>
+                        </AlertDialogCancel>
+                        <AlertDialogAction>
+                            <Button Variant="ButtonVariant.Destructive">Discard</Button>
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog>
+                <AlertDialogTrigger>
+                    <Button data-testid="tr014-alert-noescape-open" Variant="ButtonVariant.Outline">
+                        Escape does nothing
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent data-testid="tr014-alert-noescape" CloseOnEscape="false">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Confirm irreversible action</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This one opted out of Escape — answer it with a button.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>
+                            <Button Variant="ButtonVariant.Outline">Cancel</Button>
+                        </AlertDialogCancel>
+                        <AlertDialogAction>
+                            <Button Variant="ButtonVariant.Destructive">Proceed</Button>
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </div>
+    </div>
+
     <!-- Key Differences from Dialog -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -123,9 +186,9 @@
                 <strong>Alert Dialog:</strong>
             </p>
             <ul class="text-sm space-y-2 ml-4">
-                <li>• Cannot be dismissed by clicking outside</li>
-                <li>• Cannot be dismissed by pressing Escape</li>
-                <li>• Must be acknowledged with an action button</li>
+                <li>• Cannot be dismissed by clicking outside (override with Modal="false")</li>
+                <li>• Escape cancels by default (override with CloseOnEscape="false")</li>
+                <li>• Has no close (X) button — it is answered with an action button</li>
                 <li>• Uses role="alertdialog" for accessibility</li>
                 <li>• Use for destructive or critical confirmations</li>
             </ul>

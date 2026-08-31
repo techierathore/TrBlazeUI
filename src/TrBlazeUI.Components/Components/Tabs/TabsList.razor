@@ -1,5 +1,6 @@
 @namespace TrBlazeUI.Components.Tabs
 @using TrBlazeUI.Primitives.Tabs
+@using TrBlazeUI.Components.Utilities
 
 @*
     Styled TabsList component.
@@ -21,11 +22,17 @@
     /// <summary>
     /// Additional CSS classes to apply to the tabs list.
     /// </summary>
+    /// <remarks>
+    /// Merged with <c>ClassNames.cn</c>, so a conflicting utility supplied here replaces the
+    /// built-in one instead of racing it in the cascade - <c>Class="h-9 p-0"</c> really does
+    /// shrink the track (TR-024).
+    /// </remarks>
     [Parameter]
     public string? Class { get; set; }
 
-    private string CssClass =>
-        $"inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground {Class}".Trim();
+    private string CssClass => ClassNames.cn(
+        "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
+        Class);
 
     /// <summary>
     /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)

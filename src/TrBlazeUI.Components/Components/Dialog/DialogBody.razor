@@ -1,0 +1,49 @@
+@namespace TrBlazeUI.Components.Dialog
+@using TrBlazeUI.Components.Utilities
+
+@*
+    DialogBody is the scrolling middle region of a DialogContent panel (TR-019).
+
+    DialogContent is a column flex panel capped with a max-height. Header and footer keep their
+    natural size (they carry shrink-0), while this region is allowed to shrink below its content
+    (min-h-0 defeats the flex `min-height: auto` floor) and scrolls internally. The panel itself
+    therefore never has to scroll, so DialogHeader, DialogFooter and the close button stay pinned.
+
+    Omitting DialogBody is still valid: without it nothing in the panel can shrink, the panel's own
+    overflow-y-auto takes over and the pre-existing REQ-UI-016 behaviour is unchanged.
+*@
+
+<div class="@GetClassNames()" @attributes="AdditionalAttributes">
+    @ChildContent
+</div>
+
+@code {
+    /// <summary>
+    /// The scrollable content of the dialog, between the header and the footer.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Additional CSS classes to apply to the body container.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Gets the computed CSS classes for the dialog body.
+    /// </summary>
+    private string GetClassNames() => ClassNames.cn(
+        // min-h-0 removes the automatic minimum size a column flex item gets, which is what
+        // otherwise forces the whole panel to grow and scroll instead of this region.
+        "min-h-0 overflow-y-auto",
+        Class
+    );
+}

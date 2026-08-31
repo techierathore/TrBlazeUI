@@ -90,7 +90,7 @@ This document captures, for the product owner, what TrBlazeUI delivers today (th
 | F-THEME: Theming & dark mode | Pre-existing | Done | 100 | CSS variables, OKLCH, shadcn/tweakcn compatible, `.dark` toggle. 2.1.0: full Tailwind utility scale shipped, contrast-validated token matrix, new `--success` / `--alert-*` / `--chart-*` / `--sidebar*` defaults (REQ-UI-017) |
 | F-A11Y: Accessibility | Pre-existing | Done | 100 | WCAG 2.1 AA patterns library-wide; consumer axe findings resolved + verified (REQ-UI-014/016/017 — keyboard-operable Rating, literal ARIA state serialisation, list semantics, tablist parents); still not independently audited |
 | F-DEMO: Demo applications | Pre-existing | Done | 100 | 100+ pages across Server / WASM / Auto; 2.1.0 added 9 component pages plus a `/whats-new` release page, gated by `tests/verify/ui-demo-2-1-0.spec.js` |
-| F-DIST: Packaging & distribution | Pre-existing | Done | 100 | MinVer, 5 packages, GitHub Actions → GitHub Packages |
+| F-DIST: Packaging & distribution | Pre-existing | Done | 100 | Shared versioning from the release tag, 5 packages, GitHub Actions → GitHub Packages + NuGet.org (BRD-43 amended 2026-08-31: per-package MinVer evaluated and rejected) |
 | F-AI: AI agent skills | Pre-existing | Done | 100 | Claude Code + OpenCode skills + AI reference doc. 2.1.0: the false "all components splat" claim corrected in the reference and both personas, imports/chart API fixed (REQ-UI-017) |
 | (cross-cutting) XML documentation | Pre-existing | Done | 100 | All public members documented; CS1591 suppression removed (now build-enforced) |
 
@@ -336,7 +336,7 @@ A shared demo RCL (90+ pages) hosted in three render modes (Server 5183/7172, WA
 
 **Personas:** Maintainer · **Phase:** Pre-existing (Done)
 
-Five NuGet packages with per-package MinVer versioning, published to GitHub Packages (`techierathore`) by GitHub Actions (`publish-nuget.yml` on master; `build.yml` validates PRs). `Directory.Build.props` centralizes metadata, Apache-2.0 license, repo URLs, and strict build settings. NOTICE preserves original attribution.
+Five NuGet packages sharing a single version number taken from the release tag, published to GitHub Packages (`techierathore`) by GitHub Actions (`publish-github-packages.yml`; `build.yml` validates PRs) and to NuGet.org by the manually dispatched `publish-nuget.yml`. The publish workflows resolve the version from the release tag and pass it as `-p:Version=` to both `dotnet build` and `dotnet pack`; `Directory.Build.props` holds only the local-build base. `Directory.Build.props` centralizes metadata, Apache-2.0 license, repo URLs, and strict build settings. NOTICE preserves original attribution.
 
 **Requirements:** BRD-42, BRD-43, BRD-44 (see §10)
 
@@ -392,7 +392,7 @@ Claude Code (`/trblazeui`) and OpenCode agent skills (distributable copies in `d
 - **BRD-40** — A maintainer can run a demo app in Server, WASM, or Auto mode showing every component. *(F-DEMO)*
 - **BRD-41** — A user can switch the demo between horizontal and vertical navigation layouts. *(F-DEMO)*
 - **BRD-42** — A maintainer can publish all 5 packages to GitHub Packages via GitHub Actions on master. *(F-DIST)*
-- **BRD-43** — Each package is versioned independently from its own git tag prefix (MinVer). *(F-DIST)*
+- **BRD-43** — All five packages share a single version number, taken from the release tag. *(F-DIST)* **Amended 2026-08-31 (owner decision).** This previously read *"Each package is versioned independently from its own git tag prefix (MinVer)"* — a requirement that was never implemented and, when it finally was, proved to be the wrong fit. Per-package MinVer was built, measured and removed the same day: every publish path already resolves one explicit version (the release tag, or `<base>-ci.<run>` for the pre-release feed) and passes it as `-p:Version=`, so MinVer could never influence a published package. Worse, MinVer sets the version in an MSBuild **target**, which makes a command-line `-p:Version=` **silently ignored** — it would have added an invisible way for the release version to stop working, the same class of defect that had already frozen nuget.org at 2.0.0. Shared versioning is now the specified behaviour, matching `RELEASE.md` and `CHANGELOG.md`, which had described it all along.
 - **BRD-44** — A consumer can install packages from the `techierathore` GitHub Packages source with a PAT. *(F-DIST)*
 - **BRD-45** — An AI agent can be activated as `/trblazeui` (Claude Code) or the OpenCode equivalent. *(F-AI)*
 - **BRD-46** — The AI agent can integrate TrBlazeUI into an app and generate pages/forms/dashboards/components/services/themes. *(F-AI)*
@@ -449,7 +449,7 @@ Claude Code (`/trblazeui`) and OpenCode agent skills (distributable copies in `d
 - **Portal / PortalHost** — mechanism that renders overlay DOM at a portal root.
 - **AsChild** — pattern letting a trigger use a custom element instead of a default button.
 - **OKLCH** — perceptually-uniform color space used for theme variables.
-- **MinVer** — git-tag-driven semantic versioning tool.
+- **MinVer** — a tag-driven semantic versioning tool. Evaluated for per-package versioning and **rejected on 2026-08-31**; not used by this repo (BRD-43).
 - **TechieRag** — a *consumer* app (RAG sample); not a dependency of this library.
 - **REQ-UI-* / REQ-FN-* / REQ-NFR-*** — requirement prefixes used in `docs/TrBlazeUI-Checklist.md`.
 

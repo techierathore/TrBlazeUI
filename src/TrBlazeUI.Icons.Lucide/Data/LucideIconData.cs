@@ -1,11 +1,12 @@
 // This file is auto-generated. Do not edit manually.
-// Generated from lucide.json on 2025-11-02 15:28:14
+// Generated from lucide.json on 2026-08-31 16:58:26
 
 namespace TrBlazeUI.Icons.Lucide.Data;
 
 /// <summary>
 /// Provides access to Lucide icon SVG data.
-/// Contains 1 icons from the Lucide icon set.
+/// Contains 1665 icons from the Lucide icon set, plus 212 deprecated and
+/// alternate names that resolve to one of them.
 /// </summary>
 public static class LucideIconData
 {
@@ -1679,29 +1680,356 @@ public static class LucideIconData
     };
 
     /// <summary>
-    /// Retrieves the SVG content for the specified icon name.
+    /// Maps the deprecated and alternate Lucide icon names to the canonical icon each
+    /// one resolves to (for example "check-circle" to "circle-check-big"). Generated from
+    /// the "aliases" section of lucide.json; every value is guaranteed to be a key of
+    /// <see cref="Icons"/>, so a lookup through this map never dangles.
+    /// </summary>
+    private static readonly Dictionary<string, string> Aliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["activity-square"] = "square-activity",
+        ["alarm-check"] = "alarm-clock-check",
+        ["alarm-minus"] = "alarm-clock-minus",
+        ["alarm-plus"] = "alarm-clock-plus",
+        ["alert-circle"] = "circle-alert",
+        ["alert-octagon"] = "octagon-alert",
+        ["alert-triangle"] = "triangle-alert",
+        ["align-horizonal-distribute-center"] = "align-horizontal-distribute-center",
+        ["align-horizonal-distribute-end"] = "align-horizontal-distribute-end",
+        ["align-horizonal-distribute-start"] = "align-horizontal-distribute-start",
+        ["arrow-down-01"] = "arrow-down-0-1",
+        ["arrow-down-10"] = "arrow-down-1-0",
+        ["arrow-down-az"] = "arrow-down-a-z",
+        ["arrow-down-circle"] = "circle-arrow-down",
+        ["arrow-down-left-from-circle"] = "circle-arrow-out-down-left",
+        ["arrow-down-left-from-square"] = "square-arrow-out-down-left",
+        ["arrow-down-left-square"] = "square-arrow-down-left",
+        ["arrow-down-right-from-circle"] = "circle-arrow-out-down-right",
+        ["arrow-down-right-from-square"] = "square-arrow-out-down-right",
+        ["arrow-down-right-square"] = "square-arrow-down-right",
+        ["arrow-down-square"] = "square-arrow-down",
+        ["arrow-down-za"] = "arrow-down-z-a",
+        ["arrow-left-circle"] = "circle-arrow-left",
+        ["arrow-left-square"] = "square-arrow-left",
+        ["arrow-right-circle"] = "circle-arrow-right",
+        ["arrow-right-square"] = "square-arrow-right",
+        ["arrow-up-01"] = "arrow-up-0-1",
+        ["arrow-up-10"] = "arrow-up-1-0",
+        ["arrow-up-az"] = "arrow-up-a-z",
+        ["arrow-up-circle"] = "circle-arrow-up",
+        ["arrow-up-left-from-circle"] = "circle-arrow-out-up-left",
+        ["arrow-up-left-from-square"] = "square-arrow-out-up-left",
+        ["arrow-up-left-square"] = "square-arrow-up-left",
+        ["arrow-up-right-from-circle"] = "circle-arrow-out-up-right",
+        ["arrow-up-right-from-square"] = "square-arrow-out-up-right",
+        ["arrow-up-right-square"] = "square-arrow-up-right",
+        ["arrow-up-square"] = "square-arrow-up",
+        ["arrow-up-za"] = "arrow-up-z-a",
+        ["asterisk-square"] = "square-asterisk",
+        ["axis-3-d"] = "axis-3d",
+        ["badge-help"] = "badge-question-mark",
+        ["bar-chart"] = "chart-no-axes-column-increasing",
+        ["bar-chart-2"] = "chart-no-axes-column",
+        ["between-horizonal-end"] = "between-horizontal-end",
+        ["between-horizonal-start"] = "between-horizontal-start",
+        ["book-template"] = "book-dashed",
+        ["box-select"] = "square-dashed",
+        ["check-circle"] = "circle-check-big",
+        ["check-circle-2"] = "circle-check",
+        ["check-square"] = "square-check-big",
+        ["check-square-2"] = "square-check",
+        ["chevron-down-circle"] = "circle-chevron-down",
+        ["chevron-down-square"] = "square-chevron-down",
+        ["chevron-left-circle"] = "circle-chevron-left",
+        ["chevron-left-square"] = "square-chevron-left",
+        ["chevron-right-circle"] = "circle-chevron-right",
+        ["chevron-right-square"] = "square-chevron-right",
+        ["chevron-up-circle"] = "circle-chevron-up",
+        ["chevron-up-square"] = "square-chevron-up",
+        ["circle-help"] = "circle-question-mark",
+        ["circle-slashed"] = "circle-slash-2",
+        ["clipboard-edit"] = "clipboard-pen",
+        ["clipboard-signature"] = "clipboard-pen-line",
+        ["code-2"] = "code-xml",
+        ["code-square"] = "square-code",
+        ["columns"] = "columns-2",
+        ["columns-settings"] = "columns-3-cog",
+        ["contact-2"] = "contact-round",
+        ["curly-braces"] = "braces",
+        ["divide-circle"] = "circle-divide",
+        ["divide-square"] = "square-divide",
+        ["dot-square"] = "square-dot",
+        ["download-cloud"] = "cloud-download",
+        ["edit"] = "square-pen",
+        ["edit-2"] = "pen",
+        ["edit-3"] = "pen-line",
+        ["equal-square"] = "square-equal",
+        ["file-axis-3-d"] = "file-axis-3d",
+        ["file-bar-chart"] = "file-chart-column-increasing",
+        ["file-bar-chart-2"] = "file-chart-column",
+        ["file-cog-2"] = "file-cog",
+        ["file-edit"] = "file-pen",
+        ["file-line-chart"] = "file-chart-line",
+        ["file-question"] = "file-question-mark",
+        ["file-signature"] = "file-pen-line",
+        ["file-video"] = "file-play",
+        ["file-video-2"] = "file-video-camera",
+        ["folder-cog-2"] = "folder-cog",
+        ["folder-edit"] = "folder-pen",
+        ["fork-knife"] = "utensils",
+        ["fork-knife-crossed"] = "utensils-crossed",
+        ["form-input"] = "rectangle-ellipsis",
+        ["function-square"] = "square-function",
+        ["gantt-chart"] = "chart-no-axes-gantt",
+        ["gantt-chart-square"] = "square-chart-gantt",
+        ["gauge-circle"] = "circle-gauge",
+        ["git-commit"] = "git-commit-horizontal",
+        ["globe-2"] = "earth",
+        ["grab"] = "hand-grab",
+        ["grid"] = "grid-3x3",
+        ["grid-2-x-2"] = "grid-2x2",
+        ["grid-2-x-2-check"] = "grid-2x2-check",
+        ["grid-2-x-2-plus"] = "grid-2x2-plus",
+        ["grid-2-x-2-x"] = "grid-2x2-x",
+        ["grid-3-x-3"] = "grid-3x3",
+        ["help-circle"] = "circle-question-mark",
+        ["helping-hand"] = "hand-helping",
+        ["home"] = "house",
+        ["ice-cream"] = "ice-cream-cone",
+        ["ice-cream-2"] = "ice-cream-bowl",
+        ["indent"] = "indent-increase",
+        ["inspect"] = "square-mouse-pointer",
+        ["jersey-pound"] = "japanese-yen",
+        ["kanban-square"] = "square-kanban",
+        ["kanban-square-dashed"] = "square-dashed-kanban",
+        ["laptop-2"] = "laptop-minimal",
+        ["layout"] = "panels-top-left",
+        ["library-square"] = "square-library",
+        ["loader-2"] = "loader-circle",
+        ["location-edit"] = "map-pin-pen",
+        ["mail-question"] = "mail-question-mark",
+        ["menu-square"] = "square-menu",
+        ["message-circle-question"] = "message-circle-question-mark",
+        ["mic-2"] = "mic-vocal",
+        ["minus-circle"] = "circle-minus",
+        ["minus-square"] = "square-minus",
+        ["more-horizontal"] = "ellipsis",
+        ["more-vertical"] = "ellipsis-vertical",
+        ["mouse-pointer-square"] = "square-mouse-pointer",
+        ["mouse-pointer-square-dashed"] = "square-dashed-mouse-pointer",
+        ["move-3-d"] = "move-3d",
+        ["m-square"] = "square-m",
+        ["outdent"] = "indent-decrease",
+        ["paintbrush-2"] = "paintbrush-vertical",
+        ["palmtree"] = "tree-palm",
+        ["panel-bottom-inactive"] = "panel-bottom-dashed",
+        ["panel-left-inactive"] = "panel-left-dashed",
+        ["panel-right-inactive"] = "panel-right-dashed",
+        ["panels-left-right"] = "columns-3",
+        ["panels-top-bottom"] = "rows-3",
+        ["panel-top-inactive"] = "panel-top-dashed",
+        ["parking-circle"] = "circle-parking",
+        ["parking-circle-off"] = "circle-parking-off",
+        ["parking-square"] = "square-parking",
+        ["parking-square-off"] = "square-parking-off",
+        ["pause-circle"] = "circle-pause",
+        ["pause-octagon"] = "octagon-pause",
+        ["pen-box"] = "square-pen",
+        ["pen-square"] = "square-pen",
+        ["percent-circle"] = "circle-percent",
+        ["percent-diamond"] = "diamond-percent",
+        ["percent-square"] = "square-percent",
+        ["pilcrow-square"] = "square-pilcrow",
+        ["pi-square"] = "square-pi",
+        ["play-circle"] = "circle-play",
+        ["play-square"] = "square-play",
+        ["plug-zap-2"] = "plug-zap",
+        ["plus-circle"] = "circle-plus",
+        ["plus-square"] = "square-plus",
+        ["power-circle"] = "circle-power",
+        ["power-square"] = "square-power",
+        ["rotate-3-d"] = "rotate-3d",
+        ["rows"] = "rows-2",
+        ["scale-3-d"] = "scale-3d",
+        ["school-2"] = "university",
+        ["scissors-square"] = "square-scissors",
+        ["scissors-square-dashed-bottom"] = "square-bottom-dashed-scissors",
+        ["send-horizonal"] = "send-horizontal",
+        ["shield-close"] = "shield-x",
+        ["shield-question"] = "shield-question-mark",
+        ["sidebar"] = "panel-left",
+        ["sidebar-close"] = "panel-left-close",
+        ["sidebar-open"] = "panel-left-open",
+        ["sigma-square"] = "square-sigma",
+        ["slash-square"] = "square-slash",
+        ["sliders"] = "sliders-vertical",
+        ["sort-asc"] = "arrow-up-narrow-wide",
+        ["sort-desc"] = "arrow-down-wide-narrow",
+        ["split-square-horizontal"] = "square-split-horizontal",
+        ["split-square-vertical"] = "square-split-vertical",
+        ["square-gantt"] = "square-chart-gantt",
+        ["square-gantt-chart"] = "square-chart-gantt",
+        ["square-kanban-dashed"] = "square-dashed-kanban",
+        ["stars"] = "sparkles",
+        ["stop-circle"] = "circle-stop",
+        ["subtitles"] = "captions",
+        ["table-config"] = "columns-3-cog",
+        ["terminal-square"] = "square-terminal",
+        ["test-tube-2"] = "test-tube-diagonal",
+        ["text-selection"] = "text-select",
+        ["train"] = "tram-front",
+        ["tv-2"] = "tv-minimal",
+        ["unlock"] = "lock-open",
+        ["unlock-keyhole"] = "lock-keyhole-open",
+        ["upload-cloud"] = "cloud-upload",
+        ["user-2"] = "user-round",
+        ["user-check-2"] = "user-round-check",
+        ["user-circle"] = "circle-user",
+        ["user-circle-2"] = "circle-user-round",
+        ["user-cog-2"] = "user-round-cog",
+        ["user-minus-2"] = "user-round-minus",
+        ["user-plus-2"] = "user-round-plus",
+        ["users-2"] = "users-round",
+        ["user-square"] = "square-user",
+        ["user-square-2"] = "square-user-round",
+        ["user-x-2"] = "user-round-x",
+        ["verified"] = "badge-check",
+        ["wallet-2"] = "wallet-minimal",
+        ["wand-2"] = "wand-sparkles",
+        ["x-circle"] = "circle-x",
+        ["x-octagon"] = "octagon-x",
+        ["x-square"] = "square-x"
+    };
+
+    /// <summary>
+    /// Index of canonical icon names keyed by their hyphen-separated words sorted
+    /// alphabetically, used to suggest a real icon for an unrecognised name whose words
+    /// match one in a different order. Built on first use, which for a healthy app is never.
+    /// </summary>
+    private static readonly Lazy<Dictionary<string, string>> WordKeyIndex =
+        new(BuildWordKeyIndex);
+
+    /// <summary>
+    /// Resolves an icon name to its canonical form, following the alias table when the name
+    /// is one of the deprecated or alternate spellings.
+    /// </summary>
+    /// <param name="name">The name of the icon (case-insensitive).</param>
+    /// <returns>The canonical icon name, or null when the name matches no icon and no alias.</returns>
+    public static string? ResolveName(string name)
+    {
+        if (Icons.ContainsKey(name))
+        {
+            return name;
+        }
+
+        return Aliases.TryGetValue(name, out var canonical) ? canonical : null;
+    }
+
+    /// <summary>
+    /// Retrieves the SVG content for the specified icon name. Deprecated and alternate
+    /// spellings resolve through the alias table to their canonical icon, so names such as
+    /// "check-circle" or "alert-triangle" render the icon they were renamed to instead of
+    /// silently rendering nothing.
     /// </summary>
     /// <param name="name">The name of the icon (case-insensitive).</param>
     /// <returns>The SVG path data for the icon, or null if not found.</returns>
-    public static string? GetIcon(string name) =>
-        Icons.TryGetValue(name, out var svg) ? svg : null;
+    public static string? GetIcon(string name)
+    {
+        if (Icons.TryGetValue(name, out var svg))
+        {
+            return svg;
+        }
+
+        return Aliases.TryGetValue(name, out var canonical) && Icons.TryGetValue(canonical, out var aliasSvg)
+            ? aliasSvg
+            : null;
+    }
 
     /// <summary>
-    /// Gets all available icon names.
+    /// Gets all available icon names. Canonical names only: the deprecated and alternate
+    /// spellings are accepted by <see cref="GetIcon"/> and <see cref="IconExists"/> but are
+    /// deliberately excluded here so that this enumeration (and <see cref="IconCount"/>)
+    /// stays a count of distinct icons rather than of spellings, and so that icon browsers
+    /// built on it do not show the same glyph several times under its old names.
+    /// Call <see cref="GetAliases"/> when the alternate spellings are wanted too.
     /// </summary>
-    /// <returns>An enumerable collection of icon names.</returns>
+    /// <returns>An enumerable collection of canonical icon names.</returns>
     public static IEnumerable<string> GetAvailableIcons() => Icons.Keys;
 
     /// <summary>
-    /// Checks if an icon with the specified name exists.
+    /// Gets the alias table: every deprecated or alternate icon name mapped to the canonical
+    /// icon it resolves to.
+    /// </summary>
+    /// <returns>A read-only view of the alias-to-canonical-name map.</returns>
+    public static IReadOnlyDictionary<string, string> GetAliases() => Aliases;
+
+    /// <summary>
+    /// Checks if an icon with the specified name exists, accepting the deprecated and
+    /// alternate spellings in the alias table as well as canonical names.
     /// </summary>
     /// <param name="name">The name of the icon (case-insensitive).</param>
     /// <returns>True if the icon exists, false otherwise.</returns>
-    public static bool IconExists(string name) => Icons.ContainsKey(name);
+    public static bool IconExists(string name) => Icons.ContainsKey(name) || Aliases.ContainsKey(name);
 
     /// <summary>
-    /// Gets the total number of available icons.
+    /// Gets the total number of available icons. Canonical icons only; the alternate
+    /// spellings counted by <see cref="AliasCount"/> are not included.
     /// </summary>
     public static int IconCount => Icons.Count;
+
+    /// <summary>
+    /// Gets the number of deprecated and alternate icon names that resolve to a canonical icon.
+    /// </summary>
+    public static int AliasCount => Aliases.Count;
+
+    /// <summary>
+    /// Suggests a real icon for a name that matches neither an icon nor an alias, by looking
+    /// for a canonical icon built from the same hyphen-separated words in a different order
+    /// (for example "check-big-circle" suggests "circle-check-big"). Intended for diagnostics
+    /// only, so that an unknown name is reported with a usable replacement instead of just
+    /// rendering a blank placeholder.
+    /// </summary>
+    /// <param name="name">The unrecognised icon name (case-insensitive).</param>
+    /// <returns>The suggested canonical icon name, or null when nothing close was found.</returns>
+    public static string? FindSimilarIcon(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return null;
+        }
+
+        return WordKeyIndex.Value.TryGetValue(BuildWordKey(name), out var suggestion) ? suggestion : null;
+    }
+
+    /// <summary>
+    /// Builds the word-order-insensitive lookup key for an icon name: its hyphen-separated
+    /// words sorted alphabetically and rejoined.
+    /// </summary>
+    /// <param name="name">The icon name to key.</param>
+    /// <returns>The normalised lookup key.</returns>
+    private static string BuildWordKey(string name)
+    {
+        var words = name.Split('-', StringSplitOptions.RemoveEmptyEntries);
+        Array.Sort(words, StringComparer.OrdinalIgnoreCase);
+        return string.Join('-', words);
+    }
+
+    /// <summary>
+    /// Builds the word-key index over every canonical icon name. A few icons share a key
+    /// (for example "area-chart" and "chart-area"); the first in the dictionary's alphabetical
+    /// order wins, which keeps the suggestion deterministic.
+    /// </summary>
+    /// <returns>The populated index.</returns>
+    private static Dictionary<string, string> BuildWordKeyIndex()
+    {
+        var index = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var iconName in Icons.Keys)
+        {
+            index.TryAdd(BuildWordKey(iconName), iconName);
+        }
+
+        return index;
+    }
 }
 

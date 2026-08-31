@@ -20,17 +20,19 @@ namespace TrBlazeUI.Primitives.Collapsible;
 /// <list type="bullet">
 /// <item>Semantic region role for screen readers</item>
 /// <item>aria-hidden attribute for proper screen reader behavior</item>
-/// <item>Conditional rendering via display: none</item>
 /// <item>data-state attribute for CSS styling hooks</item>
 /// </list>
 /// </para>
 /// <para>
-/// The component uses inline display: none for hiding content, which:
-/// <list type="bullet">
-/// <item>Prevents focus trap issues with hidden interactive elements</item>
-/// <item>Ensures screen readers don't navigate hidden content</item>
-/// <item>Allows CSS transitions when combined with data-state attribute</item>
-/// </list>
+/// This primitive applies NO hiding of its own. With the default
+/// <see cref="ForceMount"/> = <c>false</c> a closed region is simply not rendered; with
+/// <see cref="ForceMount"/> = <c>true</c> the subtree stays in the DOM in every state and the
+/// caller owns hiding it. A caller that force-mounts for animation purposes MUST take the closed
+/// region out of layout itself (an inline <c>display: none</c> plus <c>hidden</c>), because a
+/// <c>grid-rows-[0fr]</c> / <c>overflow: hidden</c> collapse only clips painting: the descendants
+/// keep their natural boxes and will overlap whatever follows the collapsible, which is invisible
+/// in a screenshot but real to hit-testing, geometry checks and the accessibility tree. The
+/// styled <c>TrBlazeUI.Components.Collapsible.CollapsibleContent</c> does exactly that.
 /// </para>
 /// </remarks>
 /// <example>
@@ -93,6 +95,11 @@ public partial class CollapsibleContent : ComponentBase
     /// When true, content remains mounted (useful for CSS animations when styled).
     /// When false (default), content is unmounted when closed.
     /// </summary>
+    /// <remarks>
+    /// Force-mounting keeps the region in the DOM but does not hide it - see the remarks on the
+    /// type. Anything that sets this to <c>true</c> is responsible for removing the closed region
+    /// from layout, or a closed panel will silently overlap the content beneath it.
+    /// </remarks>
     [Parameter]
     public bool ForceMount { get; set; } = false;
 

@@ -64,6 +64,38 @@ These rules are non-negotiable. Violating them produces broken or inconsistent U
   defaults are validated as a full contrast matrix (every foreground token against every surface
   token, not just `--background`); re-check your own palette with `tools/token-contrast.py`.
 
+### `Class` vs `class` — capital C or you silently lose the component's styling
+
+This distinction is **not cosmetic**. On any TrBlazeUI component the two spellings take different
+code paths and produce different DOM.
+
+| You write | Where it goes | Result |
+|-----------|---------------|--------|
+| `Class="pb-2"` | the `Class` parameter → `ClassNames.cn(...)` | **Merged.** Tailwind conflict resolution runs: your `pb-2` replaces the built-in `pb-6` and every non-conflicting built-in class survives. |
+| `class="pb-2"` | `AdditionalAttributes` → `@attributes` splat | **Replaced.** The component renders `class="@CssClass" @attributes="AdditionalAttributes"`; the splatted `class` lands *after* the explicit one and overwrites the whole string. Every built-in class is gone. |
+
+```razor
+@* BAD: lowercase class — CardHeader loses its entire base string, including p-6 padding *@
+<CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+
+@* GOOD: capital Class — merges through cn(), keeps p-6, replaces only the conflicting pb-* *@
+<CardHeader Class="flex flex-row items-center justify-between space-y-0 pb-2">
+```
+
+**ALWAYS use `Class` on a TrBlazeUI component.** Reserve lowercase `class` for raw HTML elements
+(`<div>`, `<span>`, `<header>`) — where it is the only correct spelling. The build does not warn:
+a lowercase `class` on a component is a perfectly legal splatted attribute, so the only symptom is
+a component that renders without its own padding, border, or layout.
+
+A handful of components own no element to splat onto and therefore **accept unmatched attributes
+and silently discard them** — the context roots and `DataTableColumn` listed under "Guarantees you
+can rely on" above. A `data-testid` or `class` placed there vanishes without an error; put it on
+the part that renders the visible element (`DialogContent`, `SheetContent`, …). `BreadcrumbList` is
+the one exception: it has no element either but forwards its attributes onto the `<ol>` that
+`Breadcrumb` renders — and, uniquely, a lowercase `class` there is now **merged** through `cn()`
+rather than splatted over the built-ins (see §Breadcrumb). Use `Class` anyway; it is the documented
+route and the one that is consistent across the library.
+
 ### Common Anti-Patterns (DO NOT copy these)
 
 ```razor
@@ -153,6 +185,9 @@ builder.Services.AddScoped<ToastService>();  // Required for Toast notifications
 >   `TrBlazeUI.Primitives.Services`. Never the other `Primitives.*` sub-namespaces.**
 > - `@using ApexCharts` is required by the chart family (see §8) — the charts are a
 >   Blazor-ApexCharts wrapper and the series types come from that package.
+> - The block below lists **every one of the 79 `TrBlazeUI.Components.*` component namespaces
+>   in the 2.1.0 assembly.** Copy it whole. A partial copy is the single most common cause of a
+>   silently broken page — see the RZ10012 note under the block.
 
 ```razor
 @using TrBlazeUI.Components
@@ -208,13 +243,69 @@ builder.Services.AddScoped<ToastService>();  // Required for Toast notifications
 @using TrBlazeUI.Components.CodeBlock
 @using TrBlazeUI.Components.PasswordStrength
 @using TrBlazeUI.Components.SortableList
+@using TrBlazeUI.Components.Accordion
+@using TrBlazeUI.Components.AspectRatio
+@using TrBlazeUI.Components.ButtonGroup
+@using TrBlazeUI.Components.Calendar
+@using TrBlazeUI.Components.Chart
+@using TrBlazeUI.Components.ColorPicker
+@using TrBlazeUI.Components.CurrencyInput
+@using TrBlazeUI.Components.DatePicker
+@using TrBlazeUI.Components.DateRangePicker
+@using TrBlazeUI.Components.Empty
+@using TrBlazeUI.Components.FileUpload
+@using TrBlazeUI.Components.Grid
+@using TrBlazeUI.Components.InputGroup
+@using TrBlazeUI.Components.InputOTP
+@using TrBlazeUI.Components.Kbd
+@using TrBlazeUI.Components.MarkdownEditor
+@using TrBlazeUI.Components.MaskedInput
+@using TrBlazeUI.Components.Menubar
+@using TrBlazeUI.Components.MultiSelect
+@using TrBlazeUI.Components.NativeSelect
+@using TrBlazeUI.Components.NumericInput
+@using TrBlazeUI.Components.Pagination
+@using TrBlazeUI.Components.RangeSlider
+@using TrBlazeUI.Components.Resizable
+@using TrBlazeUI.Components.ResponsiveNav
+@using TrBlazeUI.Components.RichTextEditor
+@using TrBlazeUI.Components.ScrollArea
+@using TrBlazeUI.Components.TimePicker
+@using TrBlazeUI.Components.Toggle
+@using TrBlazeUI.Components.Toolbar
 @using TrBlazeUI.Icons.Lucide.Components
 @using TrBlazeUI.Icons.Lucide.Data
+
+@* Deliberately NOT imported — see the namespace rules above:
+   TrBlazeUI.Primitives.Sheet         — ships primitive Sheet/SheetContent that shadow the styled
+                                        TrBlazeUI.Components.Sheet family (CS0104). Fully qualify
+                                        SheetSide instead.
+   TrBlazeUI.Primitives.Checkbox / .Label / .Switch / .Select / .RadioGroup / .Collapsible /
+   .Accordion / .DropdownMenu / .Tabs / .Tooltip / .Dialog / .Popover / .HoverCard
+                                      — same CS0104 shadowing trap.
+   TrBlazeUI.Components.Utilities     — the ClassNames/TailwindMerge helper namespace. It contains
+                                        no components; import it only in a .cs/.razor file that
+                                        calls ClassNames.cn() directly. *@
 ```
 
 When upgrading, merge newly introduced component namespaces into the consumer's existing
 `_Imports.razor`. An unknown component tag can otherwise compile as a literal HTML element and fail
 silently at runtime; the compiler does not diagnose the missing namespace.
+
+> **Why a partial copy of this block is dangerous — read this before trimming it.**
+> A missing `@using` is **not** a compile error. Razor emits **RZ10012, a warning**, then treats
+> the unknown tag as a literal HTML element. `<Empty Title="No results found" />` becomes a literal
+> `<empty>` element: the page compiles, renders unstyled inline text (or nothing at all), and no
+> build step, test, or runtime check fails. The consumer sees a cosmetically wrong page with a
+> clean build log. Do not omit a namespace on the grounds that the page "does not use that
+> component" — a later edit that adds the component will fail the same silent way.
+>
+> **This list must be regenerated from the assembly, not hand-maintained.** A previous hand-edited
+> revision of this document listed 49 of the 79 namespaces; the 30 omissions (including
+> `TrBlazeUI.Components.Empty`, whose component this very document documents in §6) reached
+> consumers and produced exactly the silent failure above. Regenerate with
+> `dotnet run --project tools/splat-audit -- <bin dir>`, which already reflects over the built
+> assemblies, and diff the result against this block whenever the library version changes.
 
 ### App.razor / MainLayout.razor Setup
 
@@ -527,6 +618,50 @@ Sub-components: `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `Ca
 
 ### Breadcrumb
 
+`Breadcrumb` owns the `<nav>` **and** the `<ol>`. `BreadcrumbList` is optional — items may be placed
+directly inside `Breadcrumb` — and when present it renders no element of its own; its `Class` and
+attributes are forwarded onto the parent's `<ol>`.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| Class | string? | null | Additional CSS classes on the `<nav>` |
+| ListClass | string? | null | Additional CSS classes merged (via `cn`) onto the `<ol>` |
+| Wrap | bool | true | **NEW.** `false` keeps the whole trail on one line under width pressure (`flex-nowrap`); the row keeps its height and the container clips the overflow |
+| ChildContent | RenderFragment? | null | `BreadcrumbList` or the items directly |
+| AdditionalAttributes | - | - | Unmatched attributes are splatted onto the `<nav>` |
+
+`BreadcrumbList` (optional):
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| Class | string? | null | **NEW.** Merged (via `cn`) onto the parent's `<ol>` |
+| ChildContent | RenderFragment? | null | `BreadcrumbItem` / `BreadcrumbSeparator` children |
+| AdditionalAttributes | - | - | Forwarded onto the parent's `<ol>` (e.g. `data-testid`). Ignored if used with no `Breadcrumb` parent |
+
+Sub-components: `BreadcrumbList`, `BreadcrumbItem`, `BreadcrumbLink`, `BreadcrumbPage`,
+`BreadcrumbSeparator`.
+
+> **BEHAVIOUR CHANGE — a lowercase `class` on `BreadcrumbList` is now MERGED, not clobbering.**
+> It used to be splatted onto the `<ol>` after the built-in class string and replaced it wholesale, so
+> the list silently lost `flex`, alignment, gap, text size and colour. It is now merged through
+> `ClassNames.cn` (whether supplied as the `Class` parameter or as a raw lowercase `class`), so the
+> built-ins survive. Prefer `Class` anyway — it is the documented route.
+
+> **Use `Wrap="false"` inside a fixed-height chrome.** The `<ol>`'s row gap is `gap-y-0`, so a wrapped
+> trail adds no vertical padding, but it still adds a second line and grows the bar. `Wrap="false"`
+> emits `flex-nowrap` instead of `flex-wrap`. `ListClass="flex-nowrap"` also works now that flex-wrap
+> is a merge group.
+>
+> ```razor
+> <Breadcrumb Wrap="false" Class="min-w-0 overflow-hidden">
+>     <BreadcrumbList Class="whitespace-nowrap">
+>         <BreadcrumbItem><BreadcrumbLink Href="/">Home</BreadcrumbLink></BreadcrumbItem>
+>         <BreadcrumbSeparator />
+>         <BreadcrumbItem><BreadcrumbPage>Current</BreadcrumbPage></BreadcrumbItem>
+>     </BreadcrumbList>
+> </Breadcrumb>
+> ```
+
 ```razor
 <Breadcrumb>
     <BreadcrumbList>
@@ -672,13 +807,26 @@ tables get pagination for free through `<DataTable>`, which embeds this internal
     <LucideIcon Name="settings" Size="16" />
 </Button>
 
-<!-- With icon: place the icon inline as the FIRST child (the button is inline-flex
-     with gap-2, so icon + label are spaced automatically). Do NOT use a <Button.Icon>
-     slot together with loose label text — mixing an explicit child-content fragment with
-     implicit content is a Razor compile error (RZ10012). -->
+<!-- With icon — THREE supported routes, all valid on 2.1.0. See the note below the block. -->
+
+<!-- 1. Positional: icon inline as the first loose child (button is inline-flex with gap-2). -->
 <Button>
     <LucideIcon Name="mail" Size="16" />
     Send Email
+</Button>
+
+<!-- 2. <ButtonIcon> wrapper — renders no element of its own, so it mixes freely with loose text. -->
+<Button>
+    <ButtonIcon><LucideIcon Name="mail" Size="16" /></ButtonIcon>
+    Send Email
+</Button>
+
+<!-- 3. Icon parameter + IconPosition. Because Icon is a named fragment, the label must be
+     wrapped in an explicit <ChildContent> tag — a named fragment cannot sit next to loose
+     content. This is legal Razor, not a workaround. -->
+<Button IconPosition="IconPosition.End">
+    <Icon><LucideIcon Name="mail" Size="16" /></Icon>
+    <ChildContent>Send Email</ChildContent>
 </Button>
 
 <!-- As link -->
@@ -687,6 +835,23 @@ tables get pagination for free through `<DataTable>`, which embeds this internal
 <!-- Submit -->
 <Button Type="ButtonType.Submit">Submit Form</Button>
 ```
+
+Sub-components: `ButtonIcon`
+
+> **Button icons — all three routes work on 2.1.0.** Earlier revisions of this document stated that
+> using the `Icon` fragment alongside label text was a Razor compile error (RZ10012). That is
+> **false**: `Icon` is a plain `RenderFragment?` parameter (`Button.razor.cs`) rendered inside a
+> spacing `<span>` at the start or end of the button according to `IconPosition`
+> (`Button.razor`). The RZ10012 error only occurs if you leave the label as *loose* content next to
+> the named `Icon` fragment — wrapping it in `<ChildContent>` is the fix, and is ordinary Razor.
+>
+> - **`<ButtonIcon>`** is the least fussy route. It renders `@ChildContent` with **no wrapper
+>   element at all** unless you supply attributes (in which case it wraps in a `<span>` so the
+>   attributes have somewhere to land), so it composes freely with loose label text.
+> - **The positional route** (icon as the first loose child) remains supported — the button is
+>   `inline-flex` with `gap-2`, so spacing is automatic.
+> - **`Icon` + `IconPosition`** is the route to use when you need the icon *after* the label
+>   (`IconPosition.End`); it is the only one of the three that can place a trailing icon.
 
 ### Input
 
@@ -1117,14 +1282,34 @@ Sub-components: `AvatarImage` (Source, Alt), `AvatarFallback`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| Variant | BadgeVariant | Default | Default, Secondary, Destructive, Outline |
+| Variant | BadgeVariant | Default | Default, Secondary, Destructive, Outline, **Success**, **Info**, **Warning** |
 | Class | string? | null | Additional CSS classes |
+
+**NEW: `Success`, `Info` and `Warning` were added to `BadgeVariant`** — seven variants now, not four.
+They deliberately mirror the matching `AlertVariant` members so status vocabulary is identical between
+a badge and the alert that explains it: each one paints the tinted `--alert-*-bg` surface with
+`--alert-*-foreground` text and an `--alert-*/30` border.
+
+| Variant | Emitted classes |
+|---------|-----------------|
+| Default | `border-transparent bg-primary text-primary-foreground hover:bg-primary/80` |
+| Secondary | `border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80` |
+| Destructive | `border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80` |
+| Outline | `text-foreground` |
+| Success | `border-alert-success/30 bg-alert-success-bg text-alert-success-foreground hover:opacity-80` |
+| Info | `border-alert-info/30 bg-alert-info-bg text-alert-info-foreground hover:opacity-80` |
+| Warning | `border-alert-warning/30 bg-alert-warning-bg text-alert-warning-foreground hover:opacity-80` |
+
+Use `Warning` for "needs attention" status; `Destructive` reads as a failure.
 
 ```razor
 <Badge>New</Badge>
 <Badge Variant="BadgeVariant.Secondary">Draft</Badge>
 <Badge Variant="BadgeVariant.Destructive">Error</Badge>
 <Badge Variant="BadgeVariant.Outline">Active</Badge>
+<Badge Variant="BadgeVariant.Success">Passed</Badge>
+<Badge Variant="BadgeVariant.Info">Queued</Badge>
+<Badge Variant="BadgeVariant.Warning">Degraded</Badge>
 ```
 
 ### DataTable (Generic)
@@ -1135,13 +1320,53 @@ Sub-components: `AvatarImage` (Source, Alt), `AvatarFallback`
 | Data | IEnumerable<TData> | required | Data source |
 | SelectionMode | DataTableSelectionMode | None | None, Single, Multiple |
 | ShowToolbar | bool | false | Opt in to the search / column-visibility toolbar |
-| ShowPagination | bool | true | Allow pagination; the bar auto-hides when all rows fit one page |
+| ShowPagination | bool | true | **Gates the data, not just the pager.** `true` → page window applied and the bar auto-hides when all rows fit one page. `false` → **every** row of the filtered/sorted sequence renders and `InitialPageSize` is ignored |
+| ShowHeader | bool | true | `false` renders no `<thead>` at all — for key/value style tables that need no column headings |
+| Density | DataTableDensity | Comfortable | `Comfortable` or `Compact`; controls header/body cell padding |
 | IsLoading | bool | false | Loading state |
 | InitialPageSize | int | 5 | Initial rows per page |
 | PageSizes | int[] | [5,10,20,50,100] | Page size options |
 | SelectedItems | IReadOnlyCollection<TData> | [] | Two-way: @bind-SelectedItems |
 | MinWidth | string? | null | CSS length, e.g. `"720px"`. Set it on wide tables: the grid's wrapper scrolls horizontally, but a `w-full` table with no minimum just shrinks and the right-hand columns are squeezed away with no scrollbar. |
 | Class | string? | null | Additional CSS classes |
+
+> **BEHAVIOUR CHANGE — `ShowPagination="false"` now renders every row.**
+> It was previously a chrome-only switch: the page window was applied unconditionally, so a grid with
+> pagination turned off silently rendered just the first `InitialPageSize` rows (5 by default) and
+> dropped the rest, with no pager and no row count to give the truncation away. It is now a **data**
+> switch — the whole filtered/sorted sequence is materialised and `InitialPageSize` is ignored. If you
+> set `ShowPagination="false"` over a large collection and were unknowingly relying on the old
+> truncation, you will now get the entire collection; cap it yourself (`Data="@items.Take(50)"`) or
+> leave pagination on.
+
+> **`ShowHeader="false"` suppresses only the rendered `<thead>`.** Column metadata comes from the
+> cascaded `Columns` fragment, so `DataTableColumn` registration, sorting, filtering and
+> column-visibility all continue to work exactly as before. The consequence worth knowing: with no
+> header rendered there is **no click target left for sorting**, so `Sortable` columns become
+> sortable only through code. Use it for key/value style tables.
+
+> **`Density`** (`DataTableDensity.Comfortable` | `DataTableDensity.Compact`) sets the cell padding:
+>
+> | Density | Header cell | Body cell |
+> |---------|-------------|-----------|
+> | `Comfortable` (default) | `h-12 px-4` | `p-4` |
+> | `Compact` | `h-9 px-2.5` | `px-2.5 py-2` |
+>
+> `Compact` reclaims a large share of the width on narrow grids. The density classes are merged
+> **first**, so a column's own `CellClass` / `HeaderClass` still overrides the density padding — they
+> are merged last and win.
+>
+> ```razor
+> <DataTable TData="Setting" Data="@settings" ShowHeader="false"
+>            Density="DataTableDensity.Compact" ShowPagination="false">
+>     <Columns>
+>         <DataTableColumn TData="Setting" TValue="string"
+>                          Property="@(s => s.Key)" Header="Key" CellClass="whitespace-nowrap font-medium" />
+>         <DataTableColumn TData="Setting" TValue="string"
+>                          Property="@(s => s.Value)" Header="Value" />
+>     </Columns>
+> </DataTable>
+> ```
 
 > **Mutating a row in place.** The grid skips re-rendering while its `Data` reference is unchanged,
 > which is what keeps a large table cheap. If you set a property on a bound item rather than
@@ -1156,6 +1381,52 @@ Sub-components: `AvatarImage` (Source, Alt), `AvatarFallback`
 > objGrid?.Refresh();
 > ```
 
+#### DataTableColumn
+
+Every one of these is honoured — the grid reads them when it registers and renders the column.
+`TData` must match the parent `DataTable`'s `TData`; `TValue` is the type `Property` returns.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| TData | type param | required | Data item type (`class`); must match the parent `DataTable` |
+| TValue | type param | required | Type returned by `Property` |
+| Id | string? | null | Stable column key. When null it is generated from `Header` (lower-cased, spaces → `-`). Set it explicitly if two columns could produce the same slug, or if you persist column-visibility state. |
+| Header | string | required | Header text (`EditorRequired`) |
+| Property | Func<TData, TValue?> | required | Type-safe value accessor (`EditorRequired`), e.g. `@(p => p.Name)` |
+| Format | string? | null | Format string applied to the cell value |
+| Sortable | bool | false | Enables click-to-sort on this column's header |
+| Filterable | bool | false | Includes this column in the toolbar's search filter |
+| Visible | bool | **true** | Initial visibility; the column-visibility toolbar toggles it |
+| Width | string? | null | CSS length for the column, e.g. `"200px"`, `"20%"`, `"auto"` |
+| MinWidth | string? | null | CSS length, e.g. `"120px"`. Emitted as an inline `min-width` on the column. |
+| MaxWidth | string? | null | CSS length, e.g. `"400px"`. Prevents an over-wide column. |
+| CellTemplate | RenderFragment<TData>? | null | Custom body-cell rendering; `context` is the row's `TData`. When null the value is rendered with `ToString()`. |
+| CellClass | string? | null | Extra CSS classes merged (via `cn`) onto every body cell in this column |
+| HeaderClass | string? | null | Extra CSS classes merged (via `cn`) onto this column's header cell |
+
+> **Identifier columns need `whitespace-nowrap`, or they soft-wrap with nothing to show for it.**
+> The grid renders its `<table>` as `w-full` inside its own `relative w-full overflow-x-auto`
+> wrapper. Because the table is `w-full` rather than intrinsically sized, CSS auto table-layout
+> **compresses a column below the natural width of its own text before the wrapper ever scrolls**.
+> A hyphenated or dotted identifier like `fix-issues` or `REQ-UI-007` is a legal break opportunity,
+> so it silently soft-wraps onto two lines. Nothing in the DOM, the build, or the console indicates
+> anything is wrong — the value is intact, it just reads as two words.
+>
+> The recipe for any identifier, code, SKU, or slug column:
+>
+> ```razor
+> <DataTableColumn TData="Issue" TValue="string"
+>                  Property="@(i => i.Key)" Header="Key" Sortable
+>                  CellClass="whitespace-nowrap" HeaderClass="whitespace-nowrap" />
+> ```
+>
+> `whitespace-nowrap` stops the break, which forces the column to its natural width, which finally
+> makes the wrapper's `overflow-x-auto` do its job. Pair it with **`DataTable.MinWidth`** (see the
+> `DataTable` table above) on grids of five columns or more: `MinWidth` gives the whole table a
+> floor so the *remaining* columns are not squeezed away, while `CellClass`/`HeaderClass` protect
+> the one column whose content must never break. Column-level `MinWidth` is the narrower tool when
+> only one column needs a floor.
+
 ```razor
 <DataTable TData="Person" Data="@people" SelectionMode="DataTableSelectionMode.Multiple">
     <Columns>
@@ -1164,13 +1435,22 @@ Sub-components: `AvatarImage` (Source, Alt), `AvatarFallback`
         <DataTableColumn TData="Person" TValue="int"
                          Property="@(p => p.Age)" Header="Age" Sortable />
         <DataTableColumn TData="Person" TValue="string"
-                         Property="@(p => p.Email)" Header="Email" Filterable />
+                         Property="@(p => p.Email)" Header="Email" Filterable
+                         CellClass="whitespace-nowrap" HeaderClass="whitespace-nowrap" />
+        <DataTableColumn TData="Person" TValue="string"
+                         Property="@(p => p.Status)" Header="Status" Width="120px">
+            <CellTemplate Context="person">
+                <Badge Variant="@(person.Status == "Active" ? BadgeVariant.Default : BadgeVariant.Destructive)">
+                    @person.Status
+                </Badge>
+            </CellTemplate>
+        </DataTableColumn>
     </Columns>
 </DataTable>
 
 @code {
-    record Person(string Name, int Age, string Email);
-    List<Person> people = new() { new("Alice", 30, "alice@test.com") };
+    record Person(string Name, int Age, string Email, string Status);
+    List<Person> people = new() { new("Alice", 30, "alice@test.com", "Active") };
 }
 ```
 
@@ -1296,7 +1576,7 @@ supply both an `Icon` fragment and action content, name **both** fragments expli
 | Icon | RenderFragment? | null | Icon content |
 | Class | string? | null | Additional CSS classes |
 
-Sub-components: `AlertTitle`, `AlertDescription`
+Sub-components: `AlertTitle`, `AlertDescription`, `AlertIcon`
 
 ```razor
 <Alert Variant="AlertVariant.Default">
@@ -1304,14 +1584,31 @@ Sub-components: `AlertTitle`, `AlertDescription`
     <AlertDescription>You can add components to your app.</AlertDescription>
 </Alert>
 
-<!-- With an icon: place the icon inline as the FIRST child. Alert's CSS positions the first
-     child <svg> automatically. Do NOT use an <Alert.Icon> slot alongside loose AlertTitle/
-     AlertDescription content — mixing an explicit fragment with implicit child content is a
-     Razor compile error (RZ10012). -->
+<!-- With an icon — THREE supported routes, all valid on 2.1.0. See the note below the block. -->
+
+<!-- 1. Positional: icon as the first loose child. Alert's CSS positions the first child <svg>. -->
 <Alert Variant="AlertVariant.Danger" AccentBorder="true">
     <LucideIcon Name="alert-circle" Size="16" />
     <AlertTitle>Error</AlertTitle>
     <AlertDescription>Something went wrong.</AlertDescription>
+</Alert>
+
+<!-- 2. <AlertIcon> wrapper — renders no element of its own, so it mixes freely with AlertTitle. -->
+<Alert Variant="AlertVariant.Info">
+    <AlertIcon><LucideIcon Name="info" Size="16" /></AlertIcon>
+    <AlertTitle>Heads up!</AlertTitle>
+    <AlertDescription>Important message.</AlertDescription>
+</Alert>
+
+<!-- 3. Icon parameter. Because Icon is a named fragment, the rest of the content must be
+     wrapped in an explicit <ChildContent> tag — a named fragment cannot sit next to loose
+     content. This is legal Razor, not a workaround. -->
+<Alert Variant="AlertVariant.Warning">
+    <Icon><LucideIcon Name="triangle-alert" Size="16" /></Icon>
+    <ChildContent>
+        <AlertTitle>Careful</AlertTitle>
+        <AlertDescription>This action affects billing.</AlertDescription>
+    </ChildContent>
 </Alert>
 
 <Alert Variant="AlertVariant.Success">
@@ -1320,7 +1617,29 @@ Sub-components: `AlertTitle`, `AlertDescription`
 </Alert>
 ```
 
+> **Alert icons — all three routes work on 2.1.0.** Earlier revisions of this document instructed
+> readers *not* to use an icon fragment alongside `AlertTitle`/`AlertDescription`, calling it an
+> RZ10012 compile error. That is **false**, and it contradicted this section's own parameter table,
+> which has always listed `Icon | RenderFragment?`. `Icon` is rendered immediately before
+> `ChildContent` inside the alert root (`Alert.razor`). The RZ10012 error only occurs if you leave
+> the title/description as *loose* content next to the named `Icon` fragment — wrapping them in
+> `<ChildContent>` is the fix.
+>
+> - **`<AlertIcon>`** is the least fussy route. It renders `@ChildContent` with **no wrapper element
+>   at all** unless you supply attributes (in which case it wraps in a `<span>` so the attributes
+>   have somewhere to land), so it composes freely with loose `AlertTitle`/`AlertDescription`.
+> - **The positional route** (icon as the first loose child) remains fully supported and is not
+>   deprecated: `Alert`'s class list always includes the icon-positioning rules
+>   (`[&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&:has(svg)]:pl-11`) specifically so that a
+>   loose `<svg>` in any position in the tree is placed correctly. Those rules are no-ops when no
+>   SVG is present, so they cost nothing on icon-less alerts.
+> - **The `Icon` parameter** gives the icon an explicit, named home — use it when the icon markup is
+>   generated in `@code` or shared across alerts.
+
 ### AlertDialog
+
+Sub-components: `AlertDialogTrigger`, `AlertDialogContent`, `AlertDialogHeader`, `AlertDialogTitle`,
+`AlertDialogDescription`, `AlertDialogFooter`, `AlertDialogCancel`, `AlertDialogAction`
 
 ```razor
 <AlertDialog>
@@ -1342,6 +1661,43 @@ Sub-components: `AlertTitle`, `AlertDescription`
 </AlertDialog>
 ```
 
+#### AlertDialogContent
+
+`AlertDialogContent` renders the visible panel (through `DialogPortal`, `role="alertdialog"`);
+`AlertDialog` itself renders no element, so `Class`, `id` and `data-*` belong here.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| ChildContent | RenderFragment? | null | Header / footer / body content |
+| CloseOnEscape | bool | **true** | **NEW.** Escape cancels the alert dialog |
+| Modal | bool | true | **NEW.** Overlay behaviour only: `true` = clicking the dimmed backdrop does **not** dismiss. Set `false` to allow outside-click dismissal |
+| OnEscapeKeyDown | EventCallback<KeyboardEventArgs> | - | **NEW.** Invoked when Escape is pressed, before any dismissal |
+| Class | string? | null | Merged via `cn()` over the built-in class list |
+| AdditionalAttributes | - | - | Unmatched attributes are splatted onto the panel |
+
+> **TWO BEHAVIOUR CHANGES — read before upgrading.**
+> 1. **AlertDialog now closes on Escape by default.** It previously never did, at any setting. If your
+>    confirmation must be answered by an explicit action, set `CloseOnEscape="false"` — and then make
+>    sure a visible `AlertDialogCancel` is always reachable.
+> 2. **AlertDialog no longer closes on an overlay click by default.** This matches shadcn/ui: a
+>    confirmation is answered, not clicked away. Opt back in with `Modal="false"`.
+>
+> The two switches are independent: `Modal` covers overlay clicks only, `CloseOnEscape` covers the key.
+> Escape is observed on the document, so it still fires after the body re-renders and focus has left
+> the panel (for example once a validation message appeared).
+>
+> ```razor
+> @* Cannot be dismissed by Escape or by clicking away — Cancel/Continue only *@
+> <AlertDialogContent CloseOnEscape="false">…</AlertDialogContent>
+>
+> @* Both light-dismissal routes enabled *@
+> <AlertDialogContent Modal="false">…</AlertDialogContent>
+> ```
+>
+> Note this `Modal` is **not** the same parameter as `Dialog.Modal`: `AlertDialog` pins the underlying
+> primitive to `Modal="true"` and `AlertDialogContent.Modal` governs the overlay alone, whereas
+> `Dialog.Modal` is a master switch over every form of light dismissal (see §Dialog).
+
 ### Dialog
 
 | Parameter | Type | Default | Description |
@@ -1349,26 +1705,117 @@ Sub-components: `AlertTitle`, `AlertDescription`
 | Open | bool? | null | Controlled open state |
 | OpenChanged | EventCallback<bool> | - | Two-way: @bind-Open |
 | DefaultOpen | bool | false | Default open (uncontrolled) |
-| Modal | bool | true | Dismiss on outside click/Escape |
+| Modal | bool | true | Master switch over light dismissal. **It can only remove dismissal, never add it** — see below |
 
-Sub-components: `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter`, `DialogClose`
+> **BEHAVIOUR CHANGE — `Dialog.Modal` is now live.** It used to be a dead parameter that nothing
+> read, so setting it had no effect at all. It is now published onto the dialog context and both
+> `DialogOverlay` and `DialogContent` consult it, as a **master switch that can only take dismissal
+> away**: `Modal="false"` disables outside-click **and** Escape outright (the dialog can then only be
+> closed by a `DialogClose` or by your own code), while the per-part `CloseOnClick` /
+> `CloseOnEscape` remain the local switches. Overlay click closes only when
+> `CloseOnClick && Modal`; Escape closes only when `CloseOnEscape && Modal`. So `Modal="false"` with
+> `CloseOnEscape="true"` still does **not** close on Escape. If you previously passed `Modal="false"`
+> expecting it to be ignored, the dialog will now stop light-dismissing.
+
+Sub-components: `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogBody`, `DialogFooter`, `DialogClose`
+
+#### DialogContent
+
+`DialogContent` is the part that renders the visible dialog box; `Dialog` itself renders no element
+(see "Guarantees you can rely on"), so `Class`, `id`, `data-*` and event handlers belong here.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| ChildContent | RenderFragment? | null | Dialog body content |
+| Class | string? | null | Merged via `cn()` over the built-in class list — see the width note below |
+| ShowClose | bool | true | Render the top-right X close button |
+| CloseOnEscape | bool | true | Escape closes the dialog |
+| TrapFocus | bool | true | Keep keyboard focus inside the dialog while open |
+| LockScroll | bool | true | Lock body scroll while open |
+| OnEscapeKeyDown | EventCallback<KeyboardEventArgs> | - | Invoked when Escape is pressed |
+| MaxHeight | string | `"max-h-[calc(100vh-2rem)]"` | **NEW.** Tailwind max-height utility capping the panel inside the viewport. The class **must already exist in the pre-built `trblazeui.css`** — an arbitrary value that was never emitted fails silently and the panel becomes unbounded. Known to ship: the `max-h-*` scale (`max-h-96`, `max-h-screen`, …) plus `max-h-[70vh]`, `max-h-[300px]`, `max-h-[400px]` and the default |
+| AdditionalAttributes | - | - | Unmatched attributes are splatted onto the dialog box |
+
+**Default width is `max-w-lg`**, inside `fixed inset-0 z-50 m-auto flex flex-col h-fit w-full` with
+`max-h-[calc(100vh-2rem)] overflow-y-auto` (a tall dialog scrolls internally rather than
+overflowing the viewport). The panel is a **column flex box**, which is what lets a `DialogBody`
+shrink and scroll while the header and footer stay pinned.
+
+#### DialogBody
+
+**NEW sub-component.** `DialogBody` is the scrolling middle region of the panel: put it between
+`DialogHeader` and `DialogFooter` and only that region scrolls, so the header, the footer and the
+top-right close button stay pinned while long content moves under them.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| ChildContent | RenderFragment? | null | The scrollable content, between the header and the footer |
+| Class | string? | null | Merged via `cn()` over the built-in `min-h-0 overflow-y-auto` |
+| AdditionalAttributes | - | - | Unmatched attributes are splatted onto the body `<div>` |
+
+> **Backward compatible — omitting `DialogBody` is still valid and unchanged.** Without one, nothing
+> in the panel can shrink, so `DialogContent`'s own `overflow-y-auto` takes over and **the whole panel
+> scrolls exactly as it did before** (header and footer scroll away with the content). Add
+> `DialogBody` only when you want the header/footer pinned. Pair it with `MaxHeight` to control where
+> the scrolling starts.
+>
+> ```razor
+> <DialogContent MaxHeight="max-h-[70vh]">
+>     <DialogHeader><DialogTitle>Terms</DialogTitle></DialogHeader>
+>     <DialogBody>
+>         @* long content — only this scrolls *@
+>     </DialogBody>
+>     <DialogFooter><Button>Accept</Button></DialogFooter>
+> </DialogContent>
+> ```
+
+> **To widen a dialog, pass a `max-w-*` through `Class` — it works.**
+> `DialogContent` composes its classes with `ClassNames.cn(...)` and `Class` is the **last**
+> argument. `TailwindMerge` puts every `max-w-*` utility in the same `max-width` conflict group, so
+> the caller's value **evicts** the built-in `max-w-lg` rather than fighting it on specificity.
+>
+> ```razor
+> <DialogContent Class="max-w-3xl">…</DialogContent>
+> ```
+>
+> The full wide scale — `max-w-xl`, `max-w-2xl`, `max-w-3xl`, `max-w-4xl`, `max-w-5xl`,
+> `max-w-6xl`, `max-w-7xl` — **ships in `trblazeui.css` as of 2.1.0.** It did **not** ship in
+> 2.0.0, which is why consumers on that version concluded the only available widths were the
+> `sm`/`md`/`lg`/none steps and gave up. Note this is `Class`, not lowercase `class`: lowercase
+> would splat past `cn()` and wipe out the positioning, padding, and animation classes as well
+> (see "`Class` vs `class`" near the top of this document).
+
+> **Scoped CSS and `::deep` can NEVER reach a dialog. This is by design and will not change.**
+> `DialogContent` renders through `<DialogPortal>` into `div.trblazeui-portal`, appended directly
+> under `<body>` by `PortalHost`. The dialog's DOM therefore lives **outside the calling
+> component's subtree**, so the calling component's scoped-CSS identifier (`b-xxxxxxxxxx`) is never
+> stamped on it and no rule in `MyPage.razor.css` can match it. **`::deep` does not help** — `::deep`
+> still requires an ancestor element that carries the component's scope identifier, and the portal
+> has none. Style a dialog through one of these instead:
+> - the `Class` parameter with Tailwind utilities (the normal route);
+> - a global stylesheet (`app.css` / `theme.css`), which has no scoping to defeat;
+> - a theme token override, since the dialog's colours come from CSS variables.
 
 ```razor
 <Dialog>
-    <DialogTrigger class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
-        Edit Profile
+    <DialogTrigger AsChild>
+        <Button>Edit Profile</Button>
     </DialogTrigger>
     <DialogContent>
         <DialogHeader>
             <DialogTitle>Edit profile</DialogTitle>
             <DialogDescription>Make changes to your profile.</DialogDescription>
         </DialogHeader>
-        <div class="grid gap-4 py-4">
-            <div class="grid grid-cols-4 items-center gap-4">
-                <Label For="name" Class="text-right">Name</Label>
-                <Input Id="name" @bind-Value="name" Class="col-span-3" />
+        @* DialogBody scrolls on its own; DialogHeader, DialogFooter and the X stay pinned.
+           Drop it and the panel scrolls as a whole instead — both forms are supported. *@
+        <DialogBody>
+            <div class="grid gap-4 py-4">
+                <div class="grid grid-cols-4 items-center gap-4">
+                    <Label For="name" Class="text-right">Name</Label>
+                    <Input Id="name" @bind-Value="name" Class="col-span-3" />
+                </div>
             </div>
-        </div>
+        </DialogBody>
         <DialogFooter>
             <DialogClose><Button Variant="ButtonVariant.Outline">Cancel</Button></DialogClose>
             <Button>Save changes</Button>
@@ -1696,14 +2143,14 @@ Sub-components: `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`
     <CarouselContent>
         <CarouselItem>
             <div class="p-1">
-                <Card><CardContent class="flex aspect-square items-center justify-center p-6">
+                <Card><CardContent Class="flex aspect-square items-center justify-center p-6">
                     <span class="text-4xl font-semibold">1</span>
                 </CardContent></Card>
             </div>
         </CarouselItem>
         <CarouselItem>
             <div class="p-1">
-                <Card><CardContent class="flex aspect-square items-center justify-center p-6">
+                <Card><CardContent Class="flex aspect-square items-center justify-center p-6">
                     <span class="text-4xl font-semibold">2</span>
                 </CardContent></Card>
             </div>
@@ -1719,21 +2166,72 @@ Sub-components: `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`
 Chart types: `AreaChart`, `BarChart`, `LineChart`, `PieChart`, `RadarChart`, `RadialChart`.
 
 The chart family wraps **Blazor-ApexCharts**, so `@using ApexCharts` is required (it is in the §1
-import block). The chart component itself takes `Items`, `Config`, `Height`, `Width`, `ShowLegend`,
-`LegendPosition`, `ShowDataLabels`, `ShowTooltip`, `Title`, `EnableAnimations` and `ChildContent` —
-there is **no `XValue`/`YValue` on the chart**. The series come from nested `ApexPointSeries`
-children, which is where `XValue`/`YValue` live. `ChartContainer` is optional.
+import block). `ChartContainer` is optional.
+
+All six types inherit `ChartBase<TItem> where TItem : class`:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| TItem | type param | required | Data item type (`class`) |
+| Items | IEnumerable<TItem>? | null | Data source for the built-in single series |
+| XValue | Func<TItem, object>? | null | **NEW.** X-axis (category) accessor for the built-in series |
+| YValue | Func<TItem, decimal?>? | null | **NEW.** Y-axis accessor for the built-in series |
+| SeriesName | string? | null | **NEW.** Legend name of the built-in series; falls back to `Title`, then to `"Series"` |
+| EmptyText | string? | null | **NEW.** Message shown in place of an empty chart canvas |
+| Config | ChartConfig? | null | Series label / colour map |
+| Height | string | `"350px"` | Any CSS height |
+| Width | string | `"100%"` | Any CSS width |
+| Class | string? | null | Additional CSS classes on the container |
+| ShowLegend | bool | true | Show the legend |
+| LegendPosition | LegendPosition | Bottom | Top, Bottom, Left, Right, Hidden |
+| ShowDataLabels | bool | false | Draw values on the chart elements |
+| ShowTooltip | bool | true | Tooltip on hover |
+| Title | string? | null | Chart title |
+| EnableAnimations | bool | true | Set false for large datasets |
+| ChildContent | RenderFragment? | null | Nested `ApexPointSeries` children |
+
+**CORRECTION — there are now TWO supported forms.** Earlier revisions of this document said there is
+no chart-level `XValue`/`YValue` and that series come only from nested `ApexPointSeries` children.
+That is out of date:
+
+1. **`Items` + `XValue` + `YValue` shorthand (single series)** — no child markup at all. Before this
+   fix `Items` was read by nothing, so a chart given only `Items` painted a silent empty box.
+2. **Nested `ApexPointSeries` children (multi-series)** — the existing form, unchanged.
+
+**Children win.** When `ChildContent` is present the chart renders it and ignores `XValue`, `YValue`
+and `SeriesName` entirely. The shorthand is used only when there is no child content **and** all three
+of `Items`, `XValue`, `YValue` are non-null.
+
+**Neither form → a visible empty state, not a blank box.** With no child content and an incomplete
+`Items`/`XValue`/`YValue` triplet, every chart type renders a dashed placeholder
+(`data-slot="chart-empty"`, `role="status"`) sized to the chart's own `Height`/`Width`, carrying
+`EmptyText` or the default *"No chart series. Supply Items together with XValue and YValue, or nest
+ApexPointSeries children."* A misconfigured chart is therefore visible rather than silent.
 
 ```razor
 @using ApexCharts
 
-<BarChart TItem="SalesData" Items="@salesData" Height="280px" ShowLegend="false">
+@* Form 1 — shorthand, single series, no child markup *@
+<BarChart TItem="SalesData" Items="@salesData" Height="280px" ShowLegend="false"
+          XValue="@(d => d.Month)"
+          YValue="@(d => (decimal?)d.Revenue)"
+          SeriesName="Revenue"
+          EmptyText="No sales in this period." />
+
+@* Form 2 — nested children, two or more series (children win if both are supplied) *@
+<BarChart TItem="SalesData" Items="@salesData" Height="280px">
     <ApexPointSeries TItem="SalesData"
                      Items="@salesData"
                      Name="Revenue"
                      SeriesType="SeriesType.Bar"
                      XValue="@(d => d.Month)"
                      YValue="@(d => (decimal?)d.Revenue)" />
+    <ApexPointSeries TItem="SalesData"
+                     Items="@salesData"
+                     Name="Cost"
+                     SeriesType="SeriesType.Bar"
+                     XValue="@(d => d.Month)"
+                     YValue="@(d => (decimal?)d.Cost)" />
 </BarChart>
 ```
 
@@ -1925,8 +2423,8 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
         @foreach (var stat in stats)
         {
             <Card>
-                <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle class="text-sm font-medium">@stat.Title</CardTitle>
+                <CardHeader Class="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle Class="text-sm font-medium">@stat.Title</CardTitle>
                     <LucideIcon Name="@stat.Icon" Size="16" Class="text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -2086,7 +2584,7 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
                 </div>
             </div>
         </CardContent>
-        <CardFooter class="flex justify-between">
+        <CardFooter Class="flex justify-between">
             <Button Variant="ButtonVariant.Outline" OnClick="HandleCancel">Cancel</Button>
             <Button OnClick="HandleSave" Disabled="@isSaving">
                 @if (isSaving)
@@ -2323,7 +2821,7 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
                     <CardTitle>General Settings</CardTitle>
                     <CardDescription>Basic application configuration.</CardDescription>
                 </CardHeader>
-                <CardContent class="space-y-4">
+                <CardContent Class="space-y-4">
                     <Field>
                         <FieldLabel>Application Name</FieldLabel>
                         <FieldContent><Input @bind-Value="appName" /></FieldContent>
@@ -2352,7 +2850,7 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
                     <CardTitle>Notification Preferences</CardTitle>
                     <CardDescription>Choose what notifications you receive.</CardDescription>
                 </CardHeader>
-                <CardContent class="space-y-4">
+                <CardContent Class="space-y-4">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium">Email Notifications</p>
@@ -2386,7 +2884,7 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
                     <CardTitle>Security</CardTitle>
                     <CardDescription>Manage security settings.</CardDescription>
                 </CardHeader>
-                <CardContent class="space-y-4">
+                <CardContent Class="space-y-4">
                     <Field>
                         <FieldLabel>Current Password</FieldLabel>
                         <FieldContent><Input Type="InputType.Password" @bind-Value="currentPwd" /></FieldContent>

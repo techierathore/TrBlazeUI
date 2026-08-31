@@ -295,6 +295,39 @@
         </div>
     </div>
 
+    <!-- TR-018: a closed panel must occupy no space -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Closed Panels Occupy No Space</h2>
+            <p class="text-sm text-muted-foreground">
+                While closed, the content region is marked hidden and taken out of layout, so
+                neither it nor any of its descendants reports a box. The sibling card below sits
+                flush against the collapsible instead of being overlapped by an invisible panel.
+            </p>
+        </div>
+        <div class="max-w-md space-y-2">
+            <Collapsible Class="border rounded-lg" data-testid="tr018-collapsible-closed">
+                <div class="px-4 py-3">
+                    <CollapsibleTrigger data-testid="tr018-collapsible-closed-trigger"
+                                        Class="flex w-full items-center justify-between rounded-md hover:bg-accent hover:text-accent-foreground [&_svg]:transition-transform [&_svg]:duration-200 data-[state=open]:[&_svg]:rotate-180">
+                        <span>Advanced options</span>
+                        <LucideIcon Name="chevron-down" Size="16" />
+                    </CollapsibleTrigger>
+                </div>
+                <CollapsibleContent Class="px-4 pb-4" data-testid="tr018-collapsible-closed-content">
+                    <div class="space-y-2 text-sm text-muted-foreground" data-testid="tr018-collapsible-closed-inner">
+                        <p>This paragraph must contribute a zero-size rect while closed.</p>
+                        <p>So must this one, and the wrapper around both.</p>
+                    </div>
+                </CollapsibleContent>
+            </Collapsible>
+
+            <div class="border rounded-lg px-4 py-3 text-sm" data-testid="tr018-collapsible-closed-sibling">
+                Sibling card — nothing from the closed panel above may overlap this.
+            </div>
+        </div>
+    </div>
+
     <!-- Accessibility Notes -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -387,14 +420,29 @@
             <!-- CollapsibleContent -->
             <div>
                 <h3 class="text-lg font-semibold mb-3">CollapsibleContent</h3>
-                <div>
-                    <p class="font-mono text-sm font-medium mb-1">Class</p>
-                    <p class="text-sm text-muted-foreground">
-                        Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">string?</code>
-                    </p>
-                    <p class="text-sm text-muted-foreground mt-1">
-                        Additional CSS classes for the content container.
-                    </p>
+                <div class="space-y-3">
+                    <div>
+                        <p class="font-mono text-sm font-medium mb-1">Class</p>
+                        <p class="text-sm text-muted-foreground">
+                            Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">string?</code>
+                        </p>
+                        <p class="text-sm text-muted-foreground mt-1">
+                            Additional CSS classes for the content container.
+                        </p>
+                    </div>
+                    <Separator />
+                    <div>
+                        <p class="font-mono text-sm font-medium mb-1">Unmount</p>
+                        <p class="text-sm text-muted-foreground">
+                            Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">bool</code> |
+                            Default: <code class="text-xs bg-muted px-1 py-0.5 rounded">false</code>
+                        </p>
+                        <p class="text-sm text-muted-foreground mt-1">
+                            Removes the content subtree from the DOM while closed instead of
+                            keeping it mounted and hidden. Drops the expand/collapse animation.
+                            Either way a closed panel contributes no layout box.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

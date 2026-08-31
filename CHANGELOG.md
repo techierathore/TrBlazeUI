@@ -9,6 +9,122 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ---
 
+## [Unreleased]
+
+> The version number for this section is assigned by the owner when the release is cut — it comes
+> from the **release tag**, not from `Directory.Build.props` (which is only the local-build
+> fallback). Do not write a number here speculatively.
+
+Consumer-feedback release closing the TfLens findings in `docs/TfLens-TrBlazeUI-Feedback.md`.
+Verified 2026-08-31: Release build 0 warnings / 0 errors; **44/44** headless-Chromium checks
+(`tests/verify/ui-tflens.spec.js`), with every regression suite still green —
+`ui-ui016` 23/23, `ui-ui014` 8/8, `ui-ui004` PASS, `ui-techieblog` 76/76, `ui-demo-2-1-0` 15/15
+(**166/166** executed checks), 0 console errors and 0 horizontal overflow across 8 routes at
+1280 and 390.
+
+> **Five of TfLens's 24 findings were already fixed in 2.1.0** (TR-002, TR-003, TR-013, TR-020,
+> TR-023) — they were reported against **2.0.0**. Nothing was changed for those; the action there
+> is to upgrade.
+
+### ⚠ Behaviour changes to review before upgrading
+
+- **`DataTable ShowPagination="false"` now renders every row.** It previously still applied
+  `InitialPageSize` (default **5**) to the data while hiding the pager, so a grid with pagination
+  turned off was silently truncated with no pager, no count and no warning — the page looked
+  complete. `ShowPagination` is now a data switch, not only a chrome switch. **A page that looked
+  correct at 5 rows will now paint the whole collection**, so check any grid you turned pagination
+  off over. This library's own demo was relying on the bug (500 records bound with
+  `ShowPagination="false"`) and has been rebound.
+- **`AlertDialog` now closes on Escape by default.** It previously had no Escape handling at all
+  and no parameter to opt in — `AlertDialogContent` passed a hard-coded `CloseOnEscape="false"`
+  to the Dialog primitive. Opt out with `CloseOnEscape="false"` on `AlertDialogContent`.
+- **`AlertDialog` no longer closes on overlay click by default.** It previously did, which
+  contradicted its own documentation and the shadcn/ui AlertDialog it mirrors. Opt back in with
+  `Modal="false"` on `AlertDialogContent`.
+- **`Dialog.Modal` is now live.** It was declared and read by nothing while the AI reference
+  documented it as "Dismiss on outside click/Escape". It is now a master switch that can only
+  *remove* dismissal: `Modal="false"` disables both overlay-click and Escape. Nothing in this repo
+  passed `false`, but a consumer who set it expecting Radix's "blocking" semantics will now get
+  "not dismissible".
+- **A closed `CollapsibleContent` no longer contributes a layout box.** It now carries `hidden`
+  plus an inline `display:none` while collapsed. Previously the children stayed in normal flow
+  inside a zero-height `overflow:hidden` wrapper, so they still reported their full height and
+  overlapped whatever followed — invisible in a screenshot, real to hit-testing, geometry gates
+  and the accessibility tree. Any layout that had absorbed that phantom box will shift.
+- **`DialogContent` is a flex column, not a grid**, and `DialogHeader`/`DialogFooter` now carry
+  `shrink-0`. A consumer relying on grid-specific placement inside the panel is affected.
+- **The `Tabs` family now merges `Class` through `ClassNames.cn`** instead of appending it to a
+  raw string. A caller's conflicting utility now genuinely wins by conflict-deletion rather than
+  losing to stylesheet source order. Any `Class` you passed to `Tabs`/`TabsList`/`TabsTrigger`/
+  `TabsContent` that was previously inert **will now take effect**.
+
+### Fixed
+
+- **`DataTable` row truncation (TR-009)** — `ProcessDataAsync` gates the page window on
+  `ShowPagination`; `ShouldRender()` also tracks the new parameters so a runtime toggle is not
+  suppressed.
+- **Lucide alias names (TR-008)** — `check-circle`, `check-circle-2`, `alert-circle`,
+  `alert-triangle`, `x-circle`, `help-circle` and `circle-help` rendered **nothing**: a
+  `data-trblazeui-missing-icon` placeholder that occupied the box and drew nothing, with no build
+  or runtime error. The names were never missing from the package — `lucide.json` ships an
+  `aliases` map of 212 entries alongside its 1,665 `icons`, and `GenerateIconData.ps1` only ever
+  read `icons`, so the generated C# had no map to fall back to. The generator now emits an
+  `Aliases` dictionary and `GetIcon`/`IconExists` resolve through it. `GetAvailableIcons()` and
+  `IconCount` stay canonical-only by design; `GetAliases()` and `AliasCount` expose the alias side.
+  A missing name now also suggests the closest match in its warning. (`lucide.json` was already
+  being packed to `content/lucide.json` by the SDK's default Content glob — an earlier claim that
+  it had stopped being packed was incorrect and no packaging change was needed.)
+- **Escape lost after a dialog re-renders (TR-014)** — Escape was an *element* handler on the
+  panel, so it stopped working as soon as a re-render replaced the focused child and focus fell
+  back to `<body>`. A document-level listener (`click-outside.js onEscapeKey`, which had shipped
+  with zero call sites) is now wired, with a stack so nested dialogs close inner-first and a guard
+  that defers to an open floating layer.
+- **`DialogContent` scrolled its header and footer away (TR-019)** — new `DialogBody` is the
+  scrolling region; header and footer are pinned. New `DialogContent.MaxHeight`. Omitting
+  `DialogBody` keeps the previous behaviour.
+- **`Badge` had no status semantics (TR-016)** — `Success`, `Info` and `Warning` added, measured
+  at 13.00:1 / 13.53:1 / 11.50:1 contrast.
+- **`Breadcrumb` always wrapped (TR-027)** — `flex-wrap`/`flex-nowrap`/`flex-wrap-reverse` were in
+  no `TailwindMerge` conflict group, so `flex-nowrap` could not be applied through any public
+  parameter; they are now, `Breadcrumb.Wrap` is exposed, and the two-axis `gap` is split so a
+  wrapped row no longer pays its column spacing again vertically.
+- **Charts rendered a silent empty box (TR-011a)** — `ChartBase.Items` was a parameter nothing
+  read, so passing data without nested `ApexPointSeries` children produced a legal, empty chart.
+  `Items` is now wired, with `XValue`/`YValue`/`SeriesName`; a chart with no series renders a
+  visible placeholder. The duplicated `@attributes` splat on all six chart types is removed.
+- **Missing font tokens and safelist holes (TR-001, TR-021 residual)** — `--font-sans`,
+  `--font-serif` and `--font-mono` were referenced by the base reset and never defined. The
+  `p-*`/`m-*`/`gap-x`/`gap-y`/`size-*`/`space-*` safelist enumerations, which stopped short of the
+  scale `w-*`/`h-*` already covered, are brought level. Bundle 956 KB → ~1,013 KB.
+
+### Added
+
+- `DataTable.ShowHeader`, `DataTable.Density` + `DataTableDensity` enum (TR-012, TR-025).
+- `DialogBody`; `DialogContent.MaxHeight`.
+- `AlertDialogContent.CloseOnEscape` / `.Modal` / `.OnEscapeKeyDown`.
+- `CollapsibleContent.Unmount`.
+- `BadgeVariant.Success` / `.Info` / `.Warning`.
+- `Breadcrumb.Wrap`; `BreadcrumbList.Class`.
+- `ChartBase.XValue` / `.YValue` / `.SeriesName` / `.EmptyText`.
+- `LucideIconData.GetAliases()` / `.AliasCount` / `.ResolveName()`.
+
+### Documentation
+
+- The AI reference's §1 `_Imports.razor` block was missing **30** real component namespaces,
+  including `TrBlazeUI.Components.Empty` while the same file documented `<Empty>`. Following the
+  reference verbatim produced an RZ10012 *warning* and a literal `<empty>` element — the page
+  compiled, rendered unstyled text and never failed. All 30 added; the block is now the full 79.
+- New parameter tables for `DataTableColumn`, `DialogContent` and `AlertDialogContent`, none of
+  which had one. `CellClass`/`HeaderClass` had zero mentions in the entire reference.
+- The `Alert`/`Button` icon guidance told readers a named `Icon` slot was a compile error. It is
+  not, and `AlertIcon`/`ButtonIcon` were undocumented. All three working routes are now described.
+- New rule documenting `Class` (merged via `cn`, conflict-aware) versus a raw lowercase `class`
+  (splatted after, overwriting the component's own classes). Nine occurrences of the latter in the
+  reference's own examples — including the KPI-card recipe, which silently lost its padding — were
+  corrected.
+
+---
+
 ## [2.1.0] — unreleased
 
 Consumer-feedback release closing the TechieBlog findings recorded in
