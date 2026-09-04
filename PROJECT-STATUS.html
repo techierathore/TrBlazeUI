@@ -157,7 +157,15 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <p><strong>The AI reference was the single largest source of their build problems</strong> — §1's imports block was missing 30 real namespaces, three components had no parameter table at all, and the icon guidance forbade an API that works.</p>
 <h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2>
 <pre><code>*handoff-phase TrBlazeUI</code></pre>
-<p><strong>Owner action first — commit these workflow + versioning changes, then run <code>publish-nuget.yml</code> with <code>dry_run: true</code></strong> against a real release tag and confirm the log line <code>Publishing version: &lt;tag&gt;   (source: release event tag ...)</code>. The commit matters: Actions runs the workflow from the remote ref, so an uncommitted fix cannot be exercised. The resolver and the pack/verify steps are already proven locally.</p>
+<p><strong>Owner action, in this order:</strong></p>
+<ol>
+<li><strong>Commit the workflow changes.</strong> Actions runs the workflow from the remote ref — the 2026-08-31 14:21 run (33402118891) used the OLD resolver, and any re-run still would.
+</li>
+<li><strong>Dispatch from Actions → "Run workflow"</strong> (NOT "Re-run jobs" — that button skips the input form entirely and silently replays the previous run's inputs, which is the most likely reason no <code>dry_run</code> control was visible). Set ref <strong><code>2.0.3</code></strong> and mode <strong>publish</strong>. The old boolean checkbox has been replaced by a required dropdown that names both outcomes. Pinning <code>2.0.3</code> matters: the remote's <code>Directory.Build.props</code> says 2.1.0, so publishing without a tag would put 2.1.0 on NuGet.org and skip 2.0.1/2.0.2/2.0.3, leaving the feeds misaligned.
+</li>
+<li>The new <code>Confirm the version is live on nuget.org</code> step will fail the job if the packages do not actually appear, so a green run now means they shipped.
+</li>
+</ol>
 <h2 id="open-requirements">Open requirements<a class="anchor-link" href="#open-requirements">#</a></h2>
 <ul>
 <li>[ ] REQ-FN-004 — nuget.org publish now resolves the version from the release tag; needs one real pipeline run to confirm end-to-end (<code>Implemented</code>, 75%)
@@ -167,6 +175,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </ul>
 <h2 id="known-blockers">Known blockers<a class="anchor-link" href="#known-blockers">#</a></h2>
 <ul>
+<li><strong>NuGet.org is at 2.0.0 (8/9/2026); GitHub Packages is at 2.0.3.</strong> Verified against the public NuGet.org profile on 2026-08-31. The gap is the bug: <code>publish-github-packages.yml</code> resolved from the release tag and kept moving, <code>publish-nuget.yml</code> read <code>Directory.Build.props</code> and froze. Both now resolve from the tag.
+</li>
 <li><strong>REQ-FN-004 cannot be closed from this session.</strong> A local dry run (2026-08-31) drove the shipped resolver verbatim under <code>pwsh 7.6.5</code> with <code>git</code> stubbed: all 7 resolution paths correct, and a real pack at <code>-p:Version=2.1.1</code> produced all five <code>&lt;id&gt;.2.1.1.nupkg</code> with none at any other version. <strong>A GitHub dispatch would not have tested the fix</strong> — Actions runs the workflow from the remote ref and these edits are uncommitted, so it would have executed the old resolver. What remains unproven is GitHub's own wiring (<code>github.event.release.tag_name</code> populating, Trusted Publishing authenticating). One owner-run dispatch with <strong><code>dry_run: true</code></strong> closes it.
 </li>
 <li><strong>Versioning is settled: SHARED, from the release tag</strong> (owner decision 2026-08-31). BRD-43 was amended to say so, ADR-005 superseded by ADR-008, and MinVer — implemented earlier the same day — was removed. <strong>No tags to create, no new process, and local builds are back to a clean <code>2.1.0</code>.</strong> The decisive finding: MinVer assigns the version in an MSBuild target, which makes <code>-p:Version=</code> silently ignored — an invisible way for the release version to break, in a repo that had just been bitten by exactly that.

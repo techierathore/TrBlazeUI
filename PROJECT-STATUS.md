@@ -24,13 +24,17 @@ The TfLens consumer feedback is **triaged, fixed and verified** (2026-08-31, `*t
 ```
 *handoff-phase TrBlazeUI
 ```
-**Owner action first — commit these workflow + versioning changes, then run `publish-nuget.yml` with `dry_run: true`** against a real release tag and confirm the log line `Publishing version: <tag>   (source: release event tag ...)`. The commit matters: Actions runs the workflow from the remote ref, so an uncommitted fix cannot be exercised. The resolver and the pack/verify steps are already proven locally.
+**Owner action, in this order:**
+1. **Commit the workflow changes.** Actions runs the workflow from the remote ref — the 2026-08-31 14:21 run (33402118891) used the OLD resolver, and any re-run still would.
+2. **Dispatch from Actions → "Run workflow"** (NOT "Re-run jobs" — that button skips the input form entirely and silently replays the previous run's inputs, which is the most likely reason no `dry_run` control was visible). Set ref **`2.0.3`** and mode **publish**. The old boolean checkbox has been replaced by a required dropdown that names both outcomes. Pinning `2.0.3` matters: the remote's `Directory.Build.props` says 2.1.0, so publishing without a tag would put 2.1.0 on NuGet.org and skip 2.0.1/2.0.2/2.0.3, leaving the feeds misaligned.
+3. The new `Confirm the version is live on nuget.org` step will fail the job if the packages do not actually appear, so a green run now means they shipped.
 
 ## Open requirements
 - [ ] REQ-FN-004 — nuget.org publish now resolves the version from the release tag; needs one real pipeline run to confirm end-to-end (`Implemented`, 75%)
 - [ ] REQ-NFR-001 — independent WCAG audit tail remains at 90% (`Done (pre-existing)`)
 
 ## Known blockers
+- **NuGet.org is at 2.0.0 (8/9/2026); GitHub Packages is at 2.0.3.** Verified against the public NuGet.org profile on 2026-08-31. The gap is the bug: `publish-github-packages.yml` resolved from the release tag and kept moving, `publish-nuget.yml` read `Directory.Build.props` and froze. Both now resolve from the tag.
 - **REQ-FN-004 cannot be closed from this session.** A local dry run (2026-08-31) drove the shipped resolver verbatim under `pwsh 7.6.5` with `git` stubbed: all 7 resolution paths correct, and a real pack at `-p:Version=2.1.1` produced all five `<id>.2.1.1.nupkg` with none at any other version. **A GitHub dispatch would not have tested the fix** — Actions runs the workflow from the remote ref and these edits are uncommitted, so it would have executed the old resolver. What remains unproven is GitHub's own wiring (`github.event.release.tag_name` populating, Trusted Publishing authenticating). One owner-run dispatch with **`dry_run: true`** closes it.
 - **Versioning is settled: SHARED, from the release tag** (owner decision 2026-08-31). BRD-43 was amended to say so, ADR-005 superseded by ADR-008, and MinVer — implemented earlier the same day — was removed. **No tags to create, no new process, and local builds are back to a clean `2.1.0`.** The decisive finding: MinVer assigns the version in an MSBuild target, which makes `-p:Version=` silently ignored — an invisible way for the release version to break, in a repo that had just been bitten by exactly that.
 
