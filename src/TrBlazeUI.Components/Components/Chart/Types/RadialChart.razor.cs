@@ -136,13 +136,13 @@ public partial class RadialChart<TItem> : ChartBase<TItem> where TItem : class
         objOptions = CreateBaseOptions();
 
         // Set colors from config or defaults
-        objOptions.Colors = ChartColor.DefaultColors.ToList();
+        objOptions.Colors ??= ChartColor.DefaultColors.ToList();
 
         // Get angles based on variant
         var (startAngle, endAngle) = GetAngles();
 
         // Configure radial bar specific options
-        objOptions.PlotOptions = new PlotOptions
+        objOptions.PlotOptions ??= new PlotOptions
         {
             RadialBar = new PlotOptionsRadialBar
             {
@@ -188,7 +188,7 @@ public partial class RadialChart<TItem> : ChartBase<TItem> where TItem : class
         // Configure fill based on variant
         if (Variant == RadialChartVariant.Gradient)
         {
-            objOptions.Fill = new Fill
+            objOptions.Fill ??= new Fill
             {
                 Type = FillType.Gradient,
                 Gradient = new FillGradient
@@ -205,10 +205,12 @@ public partial class RadialChart<TItem> : ChartBase<TItem> where TItem : class
         }
 
         // Stroke
-        objOptions.Stroke = new Stroke
+        objOptions.Stroke ??= new Stroke
         {
             LineCap = LineCap.Round
         };
+
+        objOptions = FinalizeOptions(objOptions);
     }
 
     private (int StartAngle, int EndAngle) GetAngles()

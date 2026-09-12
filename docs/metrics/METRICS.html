@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TrBlazeUI — development telemetry</title>
+<title>TrBlazeUI — Development Metrics</title>
 <script>
 /* Resolve the theme BEFORE first paint (no flash). Saved choice wins; otherwise
    pick by time of day — light 07:00–19:00 local, softened dark at night. */
@@ -105,28 +105,27 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <button id="themeToggle" class="theme-toggle" title="Toggle light / dark">&#9790; Dark</button>
 <div class="layout">
   <nav class="side">
-    <h1>TrBlazeUI — development telemetry</h1>
-    <div class="sub">Last rendered: 2026-08-31</div>
+    <h1>TrBlazeUI — Development Metrics</h1>
+    <div class="sub">Last rendered: 2026-09-12</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#first-pass-rate">1. First-pass rate</a></li>
         <li><a href="#gate-catch-distribution">2. Gate catch distribution</a></li>
         <li><a href="#escape-rate">3. Escape rate</a></li>
-        <li class="h3"><a href="#an-honest-discrepancy-on-this-page">An honest discrepancy on this page</a></li>
-        <li><a href="#misses-what-was-missed-who-missed-it-what-it-cost">4. Misses — what was missed, who missed it, what it cost</a></li>
-        <li class="h3"><a href="#what-was-missed">What was missed</a></li>
-        <li class="h3"><a href="#which-practice-let-them-through">Which practice let them through</a></li>
-        <li class="h3"><a href="#attribution-and-what-is-excluded">Attribution — and what is excluded</a></li>
-        <li class="h3"><a href="#rework-cost">Rework cost</a></li>
+        <li><a href="#miss-attribution-and-rework-cost">4. Miss attribution and rework cost</a></li>
+        <li class="h3"><a href="#counts-poolable">4.1 Counts — poolable</a></li>
+        <li class="h3"><a href="#whymissed-over-the-records-that-carry-the-field">4.2 why_missed — over the records that carry the field</a></li>
+        <li class="h3"><a href="#sort-whose-gap-it-was">4.3 sort — whose gap it was</a></li>
+        <li class="h3"><a href="#attribution-linked-records-only">4.4 Attribution — linked records only</a></li>
+        <li class="h3"><a href="#rework-cost">4.5 Rework cost</a></li>
         <li><a href="#effort-per-phase">5. Effort per phase</a></li>
-        <li><a href="#the-release-pipeline-a-defect-class-the-gates-cannot-see-at-all">6. The release pipeline — a defect class the gates cannot see at all</a></li>
-        <li><a href="#what-is-missing-and-why">7. What is missing, and why</a></li>
-        <li><a href="#the-one-thing-to-change">8. The one thing to change</a></li>
+        <li><a href="#poolable-figures">6. Poolable figures</a></li>
+        <li><a href="#what-is-missing">7. What is missing</a></li>
     </ol>
   </nav>
   <main>
-    <h1>TrBlazeUI — development telemetry</h1>
-    <div class="subtitle">Rendered 2026-08-31 &middot; source <code>METRICS.md</code></div>
+    <h1>TrBlazeUI — Development Metrics</h1>
+    <div class="subtitle">Rendered 2026-09-12 &middot; source <code>METRICS.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -134,269 +133,272 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#first-pass-rate">1. First-pass rate</a></li>
         <li><a href="#gate-catch-distribution">2. Gate catch distribution</a></li>
         <li><a href="#escape-rate">3. Escape rate</a></li>
-        <li class="h3"><a href="#an-honest-discrepancy-on-this-page">An honest discrepancy on this page</a></li>
-        <li><a href="#misses-what-was-missed-who-missed-it-what-it-cost">4. Misses — what was missed, who missed it, what it cost</a></li>
-        <li class="h3"><a href="#what-was-missed">What was missed</a></li>
-        <li class="h3"><a href="#which-practice-let-them-through">Which practice let them through</a></li>
-        <li class="h3"><a href="#attribution-and-what-is-excluded">Attribution — and what is excluded</a></li>
-        <li class="h3"><a href="#rework-cost">Rework cost</a></li>
+        <li><a href="#miss-attribution-and-rework-cost">4. Miss attribution and rework cost</a></li>
+        <li class="h3"><a href="#counts-poolable">4.1 Counts — poolable</a></li>
+        <li class="h3"><a href="#whymissed-over-the-records-that-carry-the-field">4.2 why_missed — over the records that carry the field</a></li>
+        <li class="h3"><a href="#sort-whose-gap-it-was">4.3 sort — whose gap it was</a></li>
+        <li class="h3"><a href="#attribution-linked-records-only">4.4 Attribution — linked records only</a></li>
+        <li class="h3"><a href="#rework-cost">4.5 Rework cost</a></li>
         <li><a href="#effort-per-phase">5. Effort per phase</a></li>
-        <li><a href="#the-release-pipeline-a-defect-class-the-gates-cannot-see-at-all">6. The release pipeline — a defect class the gates cannot see at all</a></li>
-        <li><a href="#what-is-missing-and-why">7. What is missing, and why</a></li>
-        <li><a href="#the-one-thing-to-change">8. The one thing to change</a></li>
+        <li><a href="#poolable-figures">6. Poolable figures</a></li>
+        <li><a href="#what-is-missing">7. What is missing</a></li>
       </ol>
     </div>
-<p><strong>Generated:</strong> 2026-08-31 · <strong>Project type:</strong> <code>library</code> · <strong>Source:</strong> <code>docs/metrics/*.jsonl</code>
-<strong>Figures computed by</strong> <code>.tfcore/telemetry/tf-metrics.sh --report</code> — nothing on this page is hand-arithmetic.</p>
+<p><strong>Snapshot as of 2026-09-12</strong> · project_type <code>library</code> · schema v1</p>
 <table>
-<thead><tr><th>Stream</th><th>Records</th></tr></thead>
+<thead><tr><th>Stream</th><th>Records</th><th>Span</th></tr></thead>
 <tbody>
-<tr><td><code>gates.jsonl</code></td><td>22 (0 backfilled)</td></tr>
-<tr><td><code>runs.jsonl</code></td><td>11</td></tr>
-<tr><td><code>misses.jsonl</code></td><td>9 <code>miss</code> + 8 <code>miss-fix</code></td></tr>
-<tr><td><code>sessions.jsonl</code></td><td>4</td></tr>
-<tr><td><code>commits.jsonl</code></td><td>52</td></tr>
+<tr><td><code>runs.jsonl</code></td><td>17</td><td>2026-08-11 → 2026-09-12</td></tr>
+<tr><td><code>gates.jsonl</code></td><td>37 (0 backfilled)</td><td>2026-08-25 → 2026-09-12</td></tr>
+<tr><td><code>sessions.jsonl</code></td><td>5</td><td>2026-08-09 → 2026-08-31</td></tr>
+<tr><td><code>commits.jsonl</code></td><td>55</td><td>2026-02-09 → 2026-09-04</td></tr>
+<tr><td><code>misses.jsonl</code></td><td>17 miss + 17 miss-fix</td><td>2026-08-31 → 2026-09-12</td></tr>
 </tbody>
 </table>
-<p><strong>Every record on this page is live and every one is <code>project_type: library</code>.</strong> There is no
-backfilled data in this repo and no second project type, so none of the figures below cross a
-provenance boundary. That is why they are printed at all — not because the sample is large.</p>
-<blockquote>
-<p><strong>Read the sample size before the number.</strong> The gate stream begins on <strong>2026-08-25</strong>. It covers
-two working days, not the project's history: TrBlazeUI's earlier work (REQ-UI-014 through
-REQ-UI-018, the whole 2.0.x/2.1.0 cycle) predates telemetry and is <strong>absent</strong>, not passing.
-Several figures below are therefore literally correct and easy to misread. Where that is the
-case it is said in the row.</p>
-</blockquote>
+<p>Every record on every stream was written live. <strong>Nothing here is backfilled</strong>, so no
+provenance column appears below — there is no reconstructed data to keep apart from
+recorded data.</p>
 <hr>
 <h2 id="first-pass-rate">1. First-pass rate<a class="anchor-link" href="#first-pass-rate">#</a></h2>
-<p><strong>0%</strong> — 0 of <strong>11</strong> REQs scored reached <code>Verified</code> on attempt 1.</p>
-<p><strong>This is an artifact of when recording started, not a quality finding, and it should not be
-quoted on its own.</strong> Every REQ in the stream entered it <em>because</em> something was already wrong:
-the 2026-08-25 records open with consumer-triage findings, and the 2026-08-31 records open with
-six <code>escaped</code> verdicts from the TfLens report. A REQ that was built correctly and verified once
-never generated a first attempt to score. The figure will only become meaningful once a phase is
-recorded from its build through its verify without a defect report in between.</p>
+<p><em>What fraction of REQs reach <code>Verified</code> on attempt 1.</em></p>
+<table>
+<thead><tr><th>Provenance</th><th>project_type</th><th>REQs scored</th><th>First-pass</th><th>Rate</th></tr></thead>
+<tbody>
+<tr><td><strong>Live</strong></td><td>library</td><td>16</td><td>0</td><td><strong>0%</strong></td></tr>
+</tbody>
+</table>
+<p><strong>Excluded from the live rate:</strong> none. No REQ carries backfilled history.</p>
+<p><strong>Read this figure for what it is.</strong> Gate records began on 2026-08-25, by which time
+the library was already at 2.1.0 with most of its catalogue built. Every REQ the
+stream has ever scored entered it through a consumer-feedback cycle — a defect
+report against shipped code — so there was never an attempt 1 for the stream to
+observe. <strong>0% here means "no REQ has been graded from a standing start since
+telemetry began", not "every requirement failed first time".</strong> The figure becomes
+meaningful only once a REQ is built and graded entirely inside the instrumented
+period.</p>
 <hr>
 <h2 id="gate-catch-distribution">2. Gate catch distribution<a class="anchor-link" href="#gate-catch-distribution">#</a></h2>
+<p><em>Of all failures, which gate caught them.</em></p>
 <table>
-<thead><tr><th>Gate that caught the failure</th><th>Count</th></tr></thead>
+<thead><tr><th>project_type</th><th>Gate</th><th>Failures</th><th>Share</th></tr></thead>
 <tbody>
-<tr><td><code>escaped</code> (no gate fired — a human or a consuming app found it)</td><td><strong>12</strong></td></tr>
-<tr><td>build · acceptance · render · visual · standards</td><td><strong>0</strong></td></tr>
+<tr><td><strong>library</strong></td><td>escaped — no gate caught it</td><td>18</td><td><strong>100%</strong></td></tr>
 </tbody>
 </table>
-<p>n = 12.</p>
-<p><strong>This is the figure worth acting on.</strong> Not one recorded defect in this repo was caught by a gate.
-All twelve were found downstream — by a consuming application, after release. The gates are not
-failing to run (the verify suites pass 166/166); they are running <em>after</em> the defects have already
-been introduced and shipped, and they assert what a previous cycle already fixed rather than what a
-consumer is about to hit.</p>
-<p>Late-gate coverage is zero across the board — <code>perf</code> (since 2026-08-10), <code>assets</code> and
-<code>mockup-parity</code> (both since 2026-08-31) have <strong>run 0 times</strong>. For a component library <code>assets</code> and
-<code>mockup-parity</code> are arguably not applicable; <code>perf</code> has simply never been exercised.</p>
+<p>Late-added gates, and what they have seen on this data:</p>
+<table>
+<thead><tr><th>Gate</th><th>Added</th><th>Runs</th><th>Caught</th></tr></thead>
+<tbody>
+<tr><td>perf</td><td>2026-08-10</td><td>0</td><td>0</td></tr>
+<tr><td>assets</td><td>2026-08-31</td><td>0</td><td>0</td></tr>
+<tr><td>mockup-parity</td><td>2026-08-31</td><td>0</td><td>0</td></tr>
+</tbody>
+</table>
+<p><strong>Why every failure is an escape, and why that is structural here.</strong> A gate can only
+catch a defect in work it was pointed at. All 18 failures arrived as consumer
+feedback about code that had already shipped — TfLens, TechieBlog, TrStudio,
+AstroLyfe building against published packages — so by definition no gate of this
+project's stood between the defect and the reporter. This is the one number on the
+page that would look different if the library's own demos had been graded before
+each release rather than after each report.</p>
+<p><strong>A library can never fail the visual-truth or mockup-parity gate</strong>, because it has
+no screens of its own to fail on: <code>tf-verify-list.sh</code> resolves 0 screens for every
+row. That is why <code>project_type</code> separation is enforced — pooling this distribution
+with an <code>app</code> project's would understate the visual gate everywhere.</p>
+<p>The assets gate did run in this session (7 routes, all OK), but it caught nothing,
+so it contributes no record to the distribution above.</p>
 <hr>
 <h2 id="escape-rate">3. Escape rate<a class="anchor-link" href="#escape-rate">#</a></h2>
-<p><strong>100%</strong> (12 of 12 failure records carry <code>gate: "escaped"</code>), n = 12.</p>
-<p>Same evidence as §2, stated as the headline it feeds. A library's defects reach a consumer because
-the library has no user of its own — the demo app is written by the same pass that writes the
-components, so it encodes the same assumptions and cannot act as an independent check. Three of
-today's defects were sitting <strong>in the library's own demo pages</strong> and had been rendering wrongly for
-weeks without anyone noticing:</p>
-<ul>
-<li><code>/components/datatable</code> bound 500 records with <code>ShowPagination="false"</code> and rendered <strong>5 rows</strong>; the demo was relying on the bug it was demonstrating.
-</li>
-<li><code>/components/dropdown-menu</code> and <code>/components/menubar</code> shipped <code>&lt;LucideIcon Name="check-circle"&gt;</code>, which rendered <strong>nothing</strong> — an invisible icon with no error.
-</li>
-</ul>
-<p>A screenshot gate would not have caught any of them, which is the substantive point: they are all
-"the page looks complete" defects.</p>
-<h3 id="an-honest-discrepancy-on-this-page">An honest discrepancy on this page<a class="anchor-link" href="#an-honest-discrepancy-on-this-page">#</a></h3>
-<p><strong>§3 says the escape rate is 100%. The miss stream's own escape share says 0%.</strong> Both are computed
-correctly and they are measuring different things:</p>
-<ul>
-<li><code>gates.jsonl</code> escape rate counts records with <code>gate: "escaped"</code> — all 10 of today's.
-</li>
-<li>Miss escape share counts misses with <code>found_by ∈ {owner, production}</code> — and today's six misses were recorded as <strong><code>found_by: "library-feedback"</code></strong>, which is the accurate value for a defect reported by a consuming application and is a real member of the SCHEMA §5.5.1 vocabulary.
-</li>
-</ul>
-<p>So a defect that escaped to a consumer is excluded from the metric named "escape share". For an
-<strong>app</strong> the two agree; for a <strong>library</strong>, whose defects escape to consuming projects by definition,
-<code>library-feedback</code> falls outside the boundary the share is drawn on. The value was chosen because
-it describes the channel truthfully, and the alternative — recording it as <code>owner</code> to make the
-number move — would have been fabricating the provenance to fit the metric. <strong>Flagged as a
-framework observation, not corrected in the data.</strong></p>
-<p>The stream now shows this cleanly: <code>found_by</code> is <strong><code>library-feedback</code> = 6, <code>owner</code> = 3</strong>, giving an
-escape share of <strong>33%</strong> — which counts only the three the owner reported directly and none of the
-six a consuming application hit in production. Both numbers are right; only one of them is named
-"escape".</p>
+<p>Two different questions, computed from two different streams. They are reported
+side by side and are never merged into one number.</p>
+<table>
+<thead><tr><th>Source</th><th>Definition</th><th>Rate</th></tr></thead>
+<tbody>
+<tr><td><code>gates.jsonl</code> (live, library)</td><td>of graded failures, the share no gate caught</td><td><strong>100%</strong> (18 of 18)</td></tr>
+<tr><td><code>misses.jsonl</code></td><td>of logged misses, the share that reached a consumer or the owner</td><td><strong>65%</strong></td></tr>
+</tbody>
+</table>
+<p>The two differ because they count different things: the gate stream counts <em>grading
+events</em>, the miss stream counts <em>defects</em>. One defect can produce several gate
+records, and a miss can be logged with no gate record behind it at all.</p>
 <hr>
-<h2 id="misses-what-was-missed-who-missed-it-what-it-cost">4. Misses — what was missed, who missed it, what it cost<a class="anchor-link" href="#misses-what-was-missed-who-missed-it-what-it-cost">#</a></h2>
-<p>9 misses, <strong>7 resolved, 2 open</strong>, 0 won't-fix, 0 orphan fixes.</p>
-<h3 id="what-was-missed">What was missed<a class="anchor-link" href="#what-was-missed">#</a></h3>
+<h2 id="miss-attribution-and-rework-cost">4. Miss attribution and rework cost<a class="anchor-link" href="#miss-attribution-and-rework-cost">#</a></h2>
+<h3 id="counts-poolable">4.1 Counts — poolable<a class="anchor-link" href="#counts-poolable">#</a></h3>
+<p>17 misses logged, 17 miss-fixes recorded, <strong>2 still open</strong>, 0 orphan fixes, 0
+won't-fix.</p>
 <table>
-<thead><tr><th><code>miss_class</code></th><th>Count</th></tr></thead>
+<thead><tr><th>Class</th><th>Count</th></tr></thead>
 <tbody>
-<tr><td><code>partial-implementation</code></td><td>3</td></tr>
-<tr><td><code>wrong-behaviour</code></td><td>3</td></tr>
-<tr><td><code>missed-requirement</code></td><td>1</td></tr>
-<tr><td><code>scope-creep</code></td><td>1</td></tr>
-<tr><td><code>unspecified-gap</code></td><td>1</td></tr>
+<tr><td>wrong-behaviour</td><td>9</td></tr>
+<tr><td>partial-implementation</td><td>3</td></tr>
+<tr><td>unspecified-gap</td><td>2</td></tr>
+<tr><td>missed-requirement</td><td>1</td></tr>
+<tr><td>regression</td><td>1</td></tr>
+<tr><td>scope-creep</td><td>1</td></tr>
 </tbody>
 </table>
-<p><strong>Design-miss share: 11%</strong> (1 of 9).</p>
-<p>The <code>scope-creep</code> record is this agent's own: during the fix pass it bumped <code>Directory.Build.props</code>
-to a version nobody had released and propagated that number into five documents. The owner caught
-it. It is logged like any other miss, and it is the one record on this page whose attribution came
-out <strong><code>linked</code></strong> with a real model — see below. The <code>unspecified-gap</code> is REQ-UI-019's cluster of things no
-requirement ever asked for — <code>Badge</code> status variants, <code>DataTable.ShowHeader</code>/<code>Density</code>,
-<code>Breadcrumb.Wrap</code>. Nobody specified them, so nobody built them, and no gate could have caught
-their absence. That is the one class of miss this framework was previously blind to.</p>
-<h3 id="which-practice-let-them-through">Which practice let them through<a class="anchor-link" href="#which-practice-let-them-through">#</a></h3>
 <table>
-<thead><tr><th><code>why_missed</code></th><th>Count</th></tr></thead>
+<thead><tr><th>Found by</th><th>Count</th></tr></thead>
 <tbody>
-<tr><td><code>insufficient-verify-method</code></td><td>5</td></tr>
-<tr><td><code>missing-checklist-item</code></td><td>3</td></tr>
-<tr><td><code>instruction-ignored</code></td><td>1</td></tr>
+<tr><td>owner</td><td>11</td></tr>
+<tr><td>library-feedback</td><td>6</td></tr>
 </tbody>
 </table>
-<p>n = 9 of 9 eligible; <strong>0 escapes are missing a <code>why_missed</code></strong>.</p>
-<p>Five of nine say the acceptance existed and <strong>no gate could have caught this class of defect</strong> —
-which matches §2 exactly. These are silent-failure defects: rows dropped with no pager, an icon
-that draws nothing, a collapsed panel that still occupies layout, a key rendered instead of a
-label. Each passes every "is it visible?" check. The verification method, not the specification, is
-the weak side here.</p>
-<h3 id="attribution-and-what-is-excluded">Attribution — and what is excluded<a class="anchor-link" href="#attribution-and-what-is-excluded">#</a></h3>
-<p><strong>Attributed: 2 of 9. Excluded: 7.</strong></p>
+<p><strong>Design-miss share: 12%.</strong> The rest are implementation defects, not specification
+defects — which is the expected shape for a component library whose requirements
+are its own published API.</p>
+<h3 id="whymissed-over-the-records-that-carry-the-field">4.2 <code>why_missed</code> — over the records that carry the field<a class="anchor-link" href="#whymissed-over-the-records-that-carry-the-field">#</a></h3>
+<p>17 of 17 eligible records carry it; <strong>0 predate the field</strong>, and 0 escapes are
+missing it.</p>
 <table>
-<thead><tr><th>Attributed by</th><th>Value</th></tr></thead>
+<thead><tr><th>why_missed</th><th>Count</th></tr></thead>
 <tbody>
-<tr><td><code>origin_phase</code></td><td><code>build-phase</code> = 1 · <code>fix-issues</code> = 1</td></tr>
-<tr><td><code>origin_agent</code></td><td><code>trblazeui</code> = 1 · <code>flow-master</code> = 1</td></tr>
-<tr><td><code>origin_model</code></td><td><code>claude-opus-5</code> = 1 · unresolved = 1</td></tr>
+<tr><td>insufficient-verify-method</td><td>12</td></tr>
+<tr><td>missing-checklist-item</td><td>4</td></tr>
+<tr><td>instruction-ignored</td><td>1</td></tr>
 </tbody>
 </table>
-<p>Only two records resolved to a run in <code>runs.jsonl</code>: <code>MISS-…-02</code> (REQ-UI-004, <code>build-phase</code>, agent
-<code>trblazeui</code>, 2026-08-25 — whose run recorded no model, so the model stays unresolved) and
-<code>MISS-…-09</code>, this agent's own version overreach, which linked cleanly to today's <code>fix-issues</code> run
-and therefore carries <code>claude-opus-5</code>.</p>
-<p>The other seven concern REQs migrated as <code>Done (pre-existing)</code> — no run record has ever touched
-them, so <code>origin_run_id</code> was <strong>deliberately omitted</strong> and the emitter marked them <code>inferred</code> and
-nulled the model.</p>
-<p><strong>No per-model miss figure is published.</strong> One resolved model out of nine records is not a rate,
-and the one that did resolve is the agent auditing itself. Publishing "claude-opus-5: 1 miss" as a
-per-model figure would be a routing decision made on a sample of one.</p>
-<h3 id="rework-cost">Rework cost<a class="anchor-link" href="#rework-cost">#</a></h3>
-<p><strong>No headline cost-per-miss figure can be published from this data.</strong></p>
+<p><strong>This is the most actionable table on the page.</strong> Twelve of seventeen misses were
+missed because <em>the check that existed could not have caught them</em> — not because a
+check was skipped. That matches what the fixes themselves keep finding: a parameter
+nothing read, a class silently deleted by a merge, a token declared and read by
+nothing. None of those fail a build, throw at runtime, or look wrong in a
+screenshot. The remedy is the kind of assertion this session added — measuring the
+computed style and the rendered element rather than the presence of markup.</p>
+<h3 id="sort-whose-gap-it-was">4.3 <code>sort</code> — whose gap it was<a class="anchor-link" href="#sort-whose-gap-it-was">#</a></h3>
+<p>6 of 17 records carry <code>sort</code>; <strong>11 predate the field</strong> and are outside the
+denominator.</p>
 <table>
-<thead><tr><th>Cost attribution</th><th>Count</th></tr></thead>
+<thead><tr><th>sort</th><th>Count</th></tr></thead>
 <tbody>
-<tr><td><code>sole</code></td><td><strong>0</strong></td></tr>
-<tr><td><code>shared:6</code></td><td>6</td></tr>
-<tr><td><code>shared:2</code></td><td>2</td></tr>
-<tr><td>unattributable</td><td>0</td></tr>
+<tr><td>weak-check</td><td>5</td></tr>
+<tr><td>spec</td><td>1</td></tr>
 </tbody>
 </table>
-<p>Every <code>miss-fix</code> on this stream is <code>shared</code> — six repaired by one <code>fix-issues</code> run touching six
-REQs, two by a second run touching two. Per SCHEMA §6 a shared cost never enters a headline cost
-figure, so <code>tokens_per_miss_measured</code> is correctly <code>null</code> (measured n = 0). What <em>can</em> be said, as
-run figures rather than per-miss ones: the TfLens repair cost <strong>322.5k output tokens over 42m20s</strong>,
-and the CI/CD repair <strong>50.8k over 6m39s</strong>. Dividing either by its REQ count would produce a number
-that looks precise and means nothing.</p>
+<h3 id="attribution-linked-records-only">4.4 Attribution — <code>linked</code> records only<a class="anchor-link" href="#attribution-linked-records-only">#</a></h3>
+<p><strong>4 of 17 misses are attributed; 13 are excluded</strong> because their
+<code>origin_confidence</code> is not <code>linked</code>. Every figure in this sub-section runs over
+those 4 records and no others.</p>
+<table>
+<thead><tr><th>Origin phase</th><th>Misses</th></tr></thead>
+<tbody>
+<tr><td>fix-issues</td><td>3</td></tr>
+<tr><td>build-phase</td><td>1</td></tr>
+</tbody>
+</table>
+<table>
+<thead><tr><th>Origin model</th><th>Misses</th></tr></thead>
+<tbody>
+<tr><td>claude-opus-5</td><td>3</td></tr>
+<tr><td>unrecorded</td><td>1</td></tr>
+</tbody>
+</table>
+<table>
+<thead><tr><th>Origin agent</th><th>Misses</th></tr></thead>
+<tbody>
+<tr><td>flow-master</td><td>2</td></tr>
+<tr><td>general-purpose</td><td>1</td></tr>
+<tr><td>trblazeui</td><td>1</td></tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>These rankings are observational, not causal.</strong> Which model and which agent get
+the hard work is not random — a phase that handles consumer-feedback defects will
+out-miss one that renders a document, whatever is driving it. A routing decision
+made on this table would be made on a confounded number. With n=4, it is also
+below this report's own three-record floor for a rate, which is why no percentage
+is printed beside any of these counts.</p>
+</blockquote>
+<h3 id="rework-cost">4.5 Rework cost<a class="anchor-link" href="#rework-cost">#</a></h3>
+<table>
+<thead><tr><th>Measure</th><th>Value</th><th>Records</th></tr></thead>
+<tbody>
+<tr><td>Tokens per miss — <strong>measured</strong> (<code>cost_attribution: sole</code>)</td><td>insufficient data (n=2)</td><td>2</td></tr>
+<tr><td>Tokens per miss — <em>apportioned</em> (<code>shared</code>)</td><td>46,665.9</td><td>8</td></tr>
+<tr><td>Unattributable</td><td>—</td><td>7</td></tr>
+</tbody>
+</table>
+<p><code>cost_usd</code> is <code>null</code> on every record here: all 17 were produced on Claude Code,
+which exposes no cost source, and inventing one would be an estimate presented as a
+measurement. <strong>Tokens are the measurement; dollars below are list price, never a
+bill.</strong></p>
+<p>Measured and apportioned are two columns and never one number: a fix run that
+repaired six misses has one token window, and dividing it six ways is arithmetic,
+not observation. This session is exactly that case — one <code>triage-and-fix</code> run
+closed six misses.</p>
 <hr>
 <h2 id="effort-per-phase">5. Effort per phase<a class="anchor-link" href="#effort-per-phase">#</a></h2>
-<p>Aggregated over live <code>runs.jsonl</code> by <code>cmd</code>. <strong>The unit is the run, never the feature</strong> (SCHEMA §0).
-Token-window coverage across the 9 runs: <code>tree</code> = 3, <code>none</code> = 4, absent = 2. <strong>The six unmeasured
-runs are excluded from every token figure rather than averaged in as zero</strong>, which is why the two
-largest wall-clock phases show no tokens.</p>
+<p><em>Time, tokens, model and fan-out, grouped by <code>cmd</code>. This is a fact about runs, not
+about tickets — there is no per-feature timing field and there will not be one.</em></p>
+<p>17 live run records. <strong>Token-window coverage: <code>tree</code> 9 · <code>main</code> 2 · <code>none</code> 4 ·
+absent 2.</strong> Only the 9 <code>tree</code> records ever read a subagent transcript, so fan-out
+figures cover those alone; a <code>0</code> on a <code>main</code> record means <em>not observed</em>, never
+<em>none ran</em>.</p>
 <table>
-<thead><tr><th>Phase</th><th>Runs</th><th>Wall clock</th><th>Tokens out</th><th>% of out</th><th>% of time</th></tr></thead>
+<thead><tr><th>Phase</th><th>Runs</th><th>Wall clock</th><th>Tokens out</th><th>Tokens in</th><th>% out</th><th>% time</th></tr></thead>
 <tbody>
-<tr><td><code>build-phase</code></td><td>1</td><td>5h07m</td><td><em>unmeasured</em></td><td>—</td><td>70%</td></tr>
-<tr><td><code>triage-issues</code></td><td>2</td><td>58m50s</td><td>126.7k</td><td>28%</td><td>13%</td></tr>
-<tr><td><code>fix-issues</code></td><td>1</td><td>42m20s</td><td><strong>322.5k</strong></td><td>71%</td><td>10%</td></tr>
-<tr><td><code>handoff-phase</code></td><td>1</td><td>12m56s</td><td><em>unmeasured</em></td><td>—</td><td>3%</td></tr>
-<tr><td><code>refresh-status</code></td><td>1</td><td>8m44s</td><td><em>unmeasured</em></td><td>—</td><td>2%</td></tr>
-<tr><td><code>verify-phase</code></td><td>1</td><td>6m44s</td><td><em>unmeasured</em></td><td>—</td><td>2%</td></tr>
-<tr><td><code>amend-docs</code></td><td>1</td><td>2m03s</td><td><em>unmeasured</em></td><td>—</td><td>0%</td></tr>
-<tr><td><code>log-miss</code></td><td>1</td><td>0m41s</td><td>6.6k</td><td>1%</td><td>0%</td></tr>
+<tr><td>build-phase</td><td>2</td><td>5h42m</td><td>80.9k</td><td>182</td><td>9%</td><td>57%</td></tr>
+<tr><td>triage-issues</td><td>2</td><td>58m50s</td><td>126.7k</td><td>544</td><td>14%</td><td>10%</td></tr>
+<tr><td><strong>triage-and-fix</strong></td><td><strong>1</strong></td><td><strong>48m01s</strong></td><td><strong>203.3k</strong></td><td><strong>582</strong></td><td><strong>22%</strong></td><td><strong>8%</strong></td></tr>
+<tr><td>amend-docs</td><td>2</td><td>32m03s</td><td>49.6k</td><td>68</td><td>5%</td><td>5%</td></tr>
+<tr><td>verify-phase</td><td>3</td><td>13m55s</td><td>33.2k</td><td>72</td><td>4%</td><td>2%</td></tr>
+<tr><td>handoff-phase</td><td>1</td><td>12m56s</td><td>0</td><td>0</td><td>0%</td><td>2%</td></tr>
+<tr><td>refresh-status</td><td>1</td><td>8m44s</td><td>0</td><td>0</td><td>0%</td><td>1%</td></tr>
+<tr><td>metrics-report</td><td>1</td><td>3m58s</td><td>27.1k</td><td>76</td><td>3%</td><td>1%</td></tr>
+<tr><td>log-miss</td><td>1</td><td>0m41s</td><td>6.6k</td><td>16</td><td>1%</td><td>0%</td></tr>
+<tr><td>fix-issues</td><td>3</td><td>1h13m</td><td>406.5k</td><td>1.9k</td><td>44%</td><td>12%</td></tr>
 </tbody>
 </table>
-<p><strong>Today's cycle, measured end to end</strong> (all three runs <code>tree</code>-scoped, so subagent transcripts were
-actually read rather than assumed):</p>
+<p><strong><code>*build-phase</code> costing more wall clock than <code>*log-miss</code> is a fact about what those
+phases are, not a finding about either.</strong> The same warning that governs §4.4 governs
+this table.</p>
+<p>The row worth reading is <code>fix-issues</code>: <strong>44% of all output tokens over 12% of the
+wall clock.</strong> Fixing consumer-reported defects is this project's dominant cost, and
+it is token-dense rather than time-dense — the work is reading code and reasoning
+about root causes, not waiting on builds.</p>
+<p><strong>List price by phase</strong> — the published rate applied to tokens actually measured, a
+price and not a bill:</p>
 <table>
-<thead><tr><th>Run</th><th>Wall clock</th><th>Tokens out</th><th>of which subagents</th><th>Fan-out</th></tr></thead>
+<thead><tr><th>Phase</th><th>Runs priced</th><th>List price</th></tr></thead>
 <tbody>
-<tr><td><code>triage-issues</code> (discovery)</td><td>13m21s</td><td>126.7k</td><td>43.9k (35%)</td><td>4</td></tr>
-<tr><td><code>log-miss</code> (recording)</td><td>0m41s</td><td>6.6k</td><td>—</td><td>0</td></tr>
-<tr><td><code>fix-issues</code> (repair + verify)</td><td>42m20s</td><td><strong>322.5k</strong></td><td>133.9k (42%)</td><td>6</td></tr>
+<tr><td>fix-issues</td><td>3</td><td>$112.06</td></tr>
+<tr><td>triage-and-fix</td><td>1</td><td>$38.43</td></tr>
+<tr><td>build-phase</td><td>1 of 2</td><td>$25.47</td></tr>
+<tr><td>triage-issues</td><td>1 of 2</td><td>$23.22</td></tr>
+<tr><td>verify-phase</td><td>2 of 3</td><td>$7.03</td></tr>
 </tbody>
 </table>
-<p><strong>Finding the 24 defects cost roughly 40% of what fixing them cost.</strong> Discovery is not the cheap
-part of this loop, and the four parallel read-only analysis agents were 35% of the discovery spend.
-That ratio is the argument for cheaper gates: every token in the triage column was spent
-establishing something a gate could have told us for free.</p>
-<p>Other pooled figures: <strong>665,649 total tokens</strong>, 9 runs, 4 sessions, <strong>52 commits over 20 active
-days (2.6/day)</strong>, median throughput 13.7 REQs/hour. Rework ratio: <strong>insufficient data</strong> (n = 1
-<code>build-phase</code> run) — reported as such rather than as a number.</p>
-<p><code>cost_usd</code> is <code>null</code> everywhere: no harness on this project reported a dollar figure, and one is
-never derived from token counts here.</p>
 <hr>
-<h2 id="the-release-pipeline-a-defect-class-the-gates-cannot-see-at-all">6. The release pipeline — a defect class the gates cannot see at all<a class="anchor-link" href="#the-release-pipeline-a-defect-class-the-gates-cannot-see-at-all">#</a></h2>
-<p>Three of today's nine misses came from the owner, not from a consuming app, and two of them are
-about <strong>release infrastructure</strong> rather than library code:</p>
+<h2 id="poolable-figures">6. Poolable figures<a class="anchor-link" href="#poolable-figures">#</a></h2>
+<p>Comparable across <code>project_type</code> and provenance.</p>
+<table>
+<thead><tr><th>Measure</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>Runs</td><td>17 — <code>fix-issues</code> 3 · <code>verify-phase</code> 3 · <code>amend-docs</code> 2 · <code>build-phase</code> 2 · <code>triage-issues</code> 2 · <code>handoff-phase</code> 1 · <code>log-miss</code> 1 · <code>metrics-report</code> 1 · <code>refresh-status</code> 1 · <code>triage-and-fix</code> 1</td></tr>
+<tr><td>Rework ratio</td><td>insufficient data (n=2 <code>build-phase</code> runs)</td></tr>
+<tr><td>Batch size</td><td>insufficient data (REQs per <code>build-phase</code> run)</td></tr>
+<tr><td>REQ throughput</td><td>12.49 REQs/hour (median across runs)</td></tr>
+<tr><td>Sessions / tokens</td><td>5 sessions, 1,359,504 tokens</td></tr>
+<tr><td>Tokens per <code>Verified</code> REQ</td><td>71,552.8</td></tr>
+<tr><td>List price</td><td>$223.56 over 11 priced runs</td></tr>
+<tr><td>List price per <code>Verified</code> REQ</td><td>$11.77</td></tr>
+<tr><td>Commit cadence</td><td>2.39 commits/active day (55 commits over 23 days)</td></tr>
+</tbody>
+</table>
+<hr>
+<h2 id="what-is-missing">7. What is missing<a class="anchor-link" href="#what-is-missing">#</a></h2>
 <ul>
-<li><strong><code>REQ-FN-004</code></strong> — <code>publish-nuget.yml</code> resolved the published version from <code>Directory.Build.props</code> instead of the release tag, and passed <code>-p:Version=</code> to neither <code>dotnet build</code> nor <code>dotnet pack</code>. nuget.org therefore published a frozen <strong>2.0.0</strong> across two release cycles. Its own <code>RELEASE.md:37</code> documented the correct behaviour, and the sibling <code>publish-github-packages.yml</code> implemented it correctly — so the repo contained both the spec and a working reference implementation while the workflow disagreed with both.
+<li><strong>Sessions stop at 2026-08-31</strong> while runs continue to 2026-09-12. The session stream is written by <code>.tfcore/hooks/metrics-session.sh</code>, never by an agent, so the gap is a hook that is not firing on this machine — the <code>tokens_total</code> and <code>tokens per Verified REQ</code> figures in §6 are understated for a reason unrelated to how the project is going. Re-running <code>update-framework.sh</code> on this repo is what reinstalls it.
 </li>
-<li><strong><code>REQ-FN-005</code></strong> — <code>MinVer</code> is referenced in the BRD (BRD-43), the checklist and the architecture, and exists in <strong>no</strong> <code>.csproj</code>, <code>.props</code> or <code>.targets</code>. <code>RELEASE.md:118</code> states plainly that it "was never implemented". The row was nevertheless marked <code>Done (pre-existing) 100%</code>. That absence is the root cause of the first bug: with no tag-driven versioning in the build, the workflow had nothing to read a version <em>from</em>.
+<li><strong>The commit hook is present</strong> (<code>commit_hook: true</code>), so commit telemetry is being written here and the cadence figure in §6 is sound.
+</li>
+<li><strong>4 run records measured no tokens at all</strong> (<code>none</code> scope) and <strong>2 carry no window at all</strong>. They are excluded from every token figure rather than averaged in as zero — which is why <code>handoff-phase</code> and <code>refresh-status</code> show <code>0</code> output above.
+</li>
+<li><strong>13 of 17 misses are unattributed.</strong> Until <code>origin_confidence: linked</code> is the norm, §4.4 cannot carry a rate, only counts.
+</li>
+<li><strong>No perf budget is declared on any row</strong>, so the perf gate has never run and cannot.
 </li>
 </ul>
-<p><strong>Why this matters for the numbers on this page:</strong> no gate in this framework runs against a
-release pipeline. Every gate — build, acceptance, render, visual, standards — inspects the library
-in a working tree. A workflow that publishes the wrong version is invisible to all of them, and it
-stays invisible until a human looks at nuget.org. That is a <strong>different</strong> blind spot from the
-"silent failure" class in §4, and it is not measured by the escape rate either, because a defect
-that never reaches a REQ verdict never produces a gate record at all.</p>
-<p>The third owner-found miss (<code>MISS-…-09</code>) is this agent's own version overreach, recorded with
-<code>why_missed: instruction-ignored</code> because <code>RELEASE.md</code> already stated the rule that was broken.</p>
-<hr>
-<h2 id="what-is-missing-and-why">7. What is missing, and why<a class="anchor-link" href="#what-is-missing-and-why">#</a></h2>
-<ul>
-<li><strong>The gate stream starts 2026-08-25.</strong> Everything before it — the AstroLyfe, TrStudio and TechieBlog cycles, and all of 2.0.x/2.1.0 — is absent. Absent is not passing. Backfilling it is owner-only (<code>tf-metrics.sh --backfill-gates</code>) and would land as <code>backfilled: true</code>, permanently segregated from these figures.
-</li>
-<li><strong>Six of nine runs measured no token window</strong> (<code>none</code>/absent), including both multi-hour <code>build-phase</code> and <code>handoff-phase</code> runs. The % -of-tokens column is therefore a share of what was measured, not of what was spent.
-</li>
-<li><strong>Five of six misses are <code>inferred</code></strong>, so per-phase/agent/model attribution rests on one record.
-</li>
-<li><strong>No <code>sole</code>-attributed fix</strong>, so there is no defensible cost-per-miss.
-</li>
-<li>The commit hook <strong>is</strong> installed on this machine (<code>commit_hook: true</code>), so the 52-commit figure is not understated for tooling reasons.
-</li>
-<li><code>tests/verify/ui-trstudio.spec.js</code> targets <code>/verify-trstudio</code>, a harness page that does not exist in the repo. It is a <strong>pre-existing</strong> broken spec, unrelated to this work, and it contributes nothing to these figures either way.
-</li>
-<li><strong><code>REQ-FN-004</code> cannot be closed from an agent session.</strong> Its <code>miss-fix</code> carries <code>verdict_after: "Needs re-verify"</code>, so it correctly counts as <strong>open</strong>: the fix is proven at the mechanism level locally, but confirming it end-to-end needs a GitHub Actions run against a real release tag, which only the owner can trigger.
-</li>
-<li><strong><code>REQ-FN-005</code> is open and deliberately unfixed.</strong> Adopting MinVer is an owner decision, not an agent one.
-</li>
-</ul>
-<hr>
-<h2 id="the-one-thing-to-change">8. The one thing to change<a class="anchor-link" href="#the-one-thing-to-change">#</a></h2>
-<p><strong>Not one defect in this stream was caught by a gate; every one reached a consuming application.</strong>
-The four <code>insufficient-verify-method</code> misses say why: they are all silent failures that look
-correct. The cheapest gates that would have caught today's set, none of which exist today:</p>
-<ol>
-<li><strong>A "class exists in the shipped CSS" check.</strong> Two of TfLens's entries and one of the fixes came down to a utility that was absent from the pre-built bundle and therefore did nothing, silently. The safelist is hand-maintained and its own comment admits the risk.
-</li>
-<li><strong>A rendered-vs-declared icon check.</strong> <code>data-trblazeui-missing-icon</code> is already emitted — nothing asserts it is absent. One assertion across the demo crawl would have caught TR-008 the day it landed, in the library's own pages.
-</li>
-<li><strong>A row-count assertion on any grid with pagination off.</strong> TR-009 was live in this repo's own demo, at 5 rows out of 500.
-</li>
-<li><strong>A geometry assertion on closed disclosure content.</strong> TR-018 is invisible to screenshots by construction and only a <code>getBoundingClientRect()</code> check finds it.
-</li>
-</ol>
-<p>Each is a few lines in the existing demo-crawl spec. Against a 100% escape rate, that is the
-highest-value work available.</p>
   </main>
 </div>
 

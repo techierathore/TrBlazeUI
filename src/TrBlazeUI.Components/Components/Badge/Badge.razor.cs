@@ -60,10 +60,75 @@ public partial class Badge : ComponentBase
     public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
+    /// Gets or sets the HTML element the badge renders.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>"span"</c> (the default) or <c>"div"</c>; any other value falls back to <c>"span"</c>.
+    /// A pill is an inline object — it sits inside a sentence, and a <c>&lt;div&gt;</c> cannot sit
+    /// inside a <c>&lt;p&gt;</c> without producing invalid HTML. The badge used to be a
+    /// <c>&lt;div&gt;</c> always, so a design that draws its pills as <c>&lt;span&gt;</c> could
+    /// never be matched element for element (TfLens TR-034). shadcn/ui's own Badge moved to
+    /// <c>&lt;span&gt;</c> for the same reason.
+    /// </para>
+    /// <para>
+    /// <b>Behaviour change.</b> The rendered element is now a <c>&lt;span&gt;</c> by default.
+    /// It is still <c>inline-flex</c>, so nothing about the appearance changes; set
+    /// <c>As="div"</c> where a selector, a test or a stylesheet depends on the old tag.
+    /// </para>
+    /// </remarks>
+    [Parameter]
+    public string As { get; set; } = "span";
+
+    /// <summary>
+    /// Gets or sets whether a label too long for one line wraps inside a pill that grows with it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Default <c>false</c>: the label is held on one line. A multi-word label used to wrap while
+    /// the pill kept its <c>rounded-full</c> geometry, so at a phone width the end caps became
+    /// deep half-ellipses that cut into the first and last lines and the badge read as two
+    /// overlapping shapes (TfLens TR-029). Set this to <c>true</c> for a pill that wraps properly:
+    /// the text is left-aligned and the radius drops to a corner radius the taller box can carry.
+    /// </para>
+    /// <para>
+    /// <b>Behaviour change.</b> A long label no longer wraps by default — it overflows its
+    /// container instead, which is visible rather than silent. Set <c>Wrap</c> or
+    /// <see cref="Truncate"/> to say which of the two a given badge should get.
+    /// </para>
+    /// </remarks>
+    [Parameter]
+    public bool Wrap { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether a label too long for its space is clipped with an ellipsis.
+    /// </summary>
+    /// <remarks>
+    /// Mutually exclusive with <see cref="Wrap"/>; when both are set, <c>Truncate</c> wins, since
+    /// it is the more specific instruction. Ignored for content that is not text.
+    /// </remarks>
+    [Parameter]
+    public bool Truncate { get; set; }
+
+    /// <summary>
     /// Gets or sets additional HTML attributes to apply to the element.
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Gets whether the badge renders a div rather than the default span.
+    /// </summary>
+    private bool RenderAsDiv =>
+        string.Equals(As, "div", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Gets the classes that decide what a label too long for one line does.
+    /// </summary>
+    private string OverflowClass =>
+        Truncate ? "max-w-full overflow-hidden text-ellipsis whitespace-nowrap"
+        : Wrap ? "whitespace-normal break-words text-start rounded-md"
+        : "whitespace-nowrap";
 
     /// <summary>
     /// Gets the computed CSS classes for the badge element.
@@ -99,6 +164,9 @@ public partial class Badge : ComponentBase
             BadgeVariant.Warning => "border-alert-warning/30 bg-alert-warning-bg text-alert-warning-foreground hover:opacity-80",
             _ => "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
         },
+        // Wrap / truncate treatment. Placed after rounded-full so that Wrap's own rounded-md wins
+        // the border-radius group in cn() - a 3-line pill with a 9999px radius is the TR-029 shape.
+        OverflowClass,
         // Custom classes (if provided)
         Class
     );

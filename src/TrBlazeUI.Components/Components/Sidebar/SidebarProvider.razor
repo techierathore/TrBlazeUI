@@ -9,7 +9,7 @@
 
 <TooltipProvider @attributes="AdditionalAttributes">
     <CascadingValue Value="@Context" IsFixed="false">
-        <div class="@($"flex w-full {HeightClass}")">
+        <div class="@($"flex w-full {HeightClass}")" style="@WidthStyle">
             @ChildContent
         </div>
     </CascadingValue>
@@ -55,4 +55,58 @@
     /// </summary>
     [Parameter]
     public string HeightClass { get; set; } = "min-h-screen";
+
+    /// <summary>
+    /// Width of the expanded desktop sidebar column, as any CSS length (for example "18rem").
+    /// Leave null to use the stylesheet's <c>--sidebar-width</c> (16rem).
+    /// </summary>
+    /// <remarks>
+    /// Sets <c>--sidebar-width</c> on the provider's own element, so it applies to this shell only
+    /// and a host that themes the token globally is unaffected (TfLens TR-035).
+    /// </remarks>
+    [Parameter]
+    public string? Width { get; set; }
+
+    /// <summary>
+    /// Width of the slid-out phone menu, as any CSS length (for example "20rem").
+    /// Leave null to use the stylesheet's <c>--sidebar-width-mobile</c> (18rem).
+    /// </summary>
+    [Parameter]
+    public string? MobileWidth { get; set; }
+
+    /// <summary>
+    /// Width of the collapsed icon rail, as any CSS length (for example "3.5rem").
+    /// Leave null to use the stylesheet's <c>--sidebar-width-icon</c> (3rem).
+    /// </summary>
+    [Parameter]
+    public string? IconWidth { get; set; }
+
+    /// <summary>
+    /// Gets the inline custom-property declarations for whichever widths the caller supplied.
+    /// Returns null when none were, so the element carries no style attribute at all.
+    /// </summary>
+    private string? WidthStyle
+    {
+        get
+        {
+            var vParts = new List<string>(3);
+
+            if (!string.IsNullOrWhiteSpace(Width))
+            {
+                vParts.Add($"--sidebar-width:{Width}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(MobileWidth))
+            {
+                vParts.Add($"--sidebar-width-mobile:{MobileWidth}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(IconWidth))
+            {
+                vParts.Add($"--sidebar-width-icon:{IconWidth}");
+            }
+
+            return vParts.Count == 0 ? null : string.Join(';', vParts);
+        }
+    }
 }

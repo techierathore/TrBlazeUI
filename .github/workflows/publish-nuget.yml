@@ -8,6 +8,14 @@ name: Publish to NuGet.org
 # The private GitHub Packages feed is published by publish-github-packages.yml and is entirely
 # independent of this workflow. See NUGET-PUBLISHING.md for the full procedure.
 
+# The run title states the outcome up front, because a dry run and a real publish otherwise look
+# identical in the Actions list: both are a green tick. That ambiguity cost a release cycle on
+# 2026-08-31 - a dry run succeeded and was reasonably read as "published", while nuget.org sat
+# unchanged at 2.0.0 from 8/9/2026.
+run-name: >-
+  ${{ startsWith(inputs.mode, 'publish') && 'PUBLISH to nuget.org' || 'DRY RUN (nothing published)' }}
+  - ref ${{ inputs.ref }}
+
 on:
   workflow_dispatch:
     inputs:
@@ -15,11 +23,19 @@ on:
         description: 'Git ref (branch, tag or SHA) to build and publish'
         required: true
         default: 'main'
-      dry_run:
-        description: 'Build, pack and inspect only - do NOT push to nuget.org'
-        type: boolean
+      mode:
+        # A `choice` renders as a REQUIRED DROPDOWN with both outcomes spelled out. This replaced a
+        # `type: boolean` on 2026-08-31: a checkbox defaulting to "on" is easy to overlook, gives no
+        # hint that leaving it alone means "publish nothing", and - critically - the "Re-run jobs"
+        # button never shows the input form at all, so a re-run silently repeats the previous
+        # choice. A run then succeeds, publishes nothing, and looks exactly like a release.
+        description: 'What to do'
+        type: choice
         required: true
-        default: true
+        default: 'dry-run  (build and verify only - publishes NOTHING)'
+        options:
+          - 'dry-run  (build and verify only - publishes NOTHING)'
+          - 'publish  (push all five packages to nuget.org)'
 
 env:
   DOTNET_VERSION: '10.0.x'
@@ -50,7 +66,7 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "ref      : ${{ inputs.ref }}"
-          Write-Host "dry_run  : ${{ inputs.dry_run }}"
+          Write-Host "mode     : ${{ inputs.mode }}"
           Write-Host "sha      : ${{ github.sha }}"
           dotnet --version
 
@@ -124,13 +140,13 @@ jobs:
           echo "VERSION_SOURCE=$source" >> $env:GITHUB_OUTPUT
 
       - name: Refuse to publish a non-tag version
-        if: ${{ inputs.dry_run == false && steps.version.outputs.VERSION_FROM_TAG != 'true' }}
+        if: ${{ startsWith(inputs.mode, 'publish') && steps.version.outputs.VERSION_FROM_TAG != 'true' }}
         shell: pwsh
         run: |
           # A real push must be traceable to a release tag. Falling back to the committed
           # Directory.Build.props value is exactly how nuget.org got stuck on 2.0.0, so a
           # non-dry-run publish without a tag is stopped here rather than shipped.
-          throw "Refusing to push to nuget.org: version came from $($env:SRC) instead of a release tag. Create the release/tag first, then re-run this workflow with that tag as the ref. (A dry_run is still allowed without a tag.)"
+          throw "Refusing to push to nuget.org: version came from $($env:SRC) instead of a release tag. Create the release/tag first, then re-run this workflow with that tag as the ref. (A dry-run is still allowed without a tag.)"
         env:
           SRC: ${{ steps.version.outputs.VERSION_SOURCE }}
 
@@ -267,20 +283,30 @@ jobs:
           Write-Host ""
           Write-Host "All five packages verified at version $expectedVersion."
 
-      - name: Dry run complete
-        if: ${{ inputs.dry_run }}
+      - name: Dry run complete - NOTHING WAS PUBLISHED
+        if: ${{ !startsWith(inputs.mode, 'publish') }}
         shell: pwsh
         run: |
-          Write-Host "dry_run = true - packages were built and verified but NOT pushed."
-          Write-Host "Re-run this workflow with dry_run = false to publish to nuget.org."
+          $ver = "${{ steps.version.outputs.PACKAGE_VERSION }}"
+          # ::warning:: surfaces in the run summary UI. A plain Write-Host does not, which is how a
+          # dry run ends up looking exactly like a successful publish (2026-08-31).
+          Write-Host "::warning title=DRY RUN - nothing was published::Packages were built and verified at $ver but NOT pushed to nuget.org. Re-run this workflow and choose mode = publish."
+          @(
+            "# :warning: DRY RUN - nothing was published"
+            ""
+            "Packages were built and verified at **$ver**, then **discarded**."
+            "nuget.org is unchanged."
+            ""
+            "To actually publish: run this workflow again and set **mode = `publish`**."
+          ) | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
 
       # ---------------------------------------------------------------------------------------
-      # Everything below this line is skipped when dry_run = true.
+      # Everything below this line runs ONLY when mode = publish.
       # ---------------------------------------------------------------------------------------
 
       - name: NuGet login (Trusted Publishing / OIDC)
         id: login
-        if: ${{ !inputs.dry_run }}
+        if: ${{ startsWith(inputs.mode, 'publish') }}
         uses: NuGet/login@v1
         with:
           # secrets.NUGET_USER is the nuget.org profile name that owns the trusted publishing
@@ -290,7 +316,7 @@ jobs:
           user: ${{ secrets.NUGET_USER }}
 
       - name: Push packages to nuget.org
-        if: ${{ !inputs.dry_run }}
+        if: ${{ startsWith(inputs.mode, 'publish') }}
         shell: pwsh
         run: |
           $version = "${{ steps.version.outputs.PACKAGE_VERSION }}"
@@ -322,3 +348,53 @@ jobs:
           Write-Host ""
           Write-Host "All five packages pushed at version $version."
           Write-Host "nuget.org validation and indexing typically completes within 15 minutes."
+
+      - name: Confirm the version is live on nuget.org
+        if: ${{ startsWith(inputs.mode, 'publish') }}
+        shell: pwsh
+        run: |
+          # `dotnet nuget push` exiting 0 only means nuget.org ACCEPTED the upload. With
+          # --skip-duplicate it also exits 0 when it did nothing at all. Neither proves the
+          # version is actually available, so poll the registration index until it appears.
+          # Without this, "the workflow was green" is not evidence that anything shipped -
+          # which is exactly how nuget.org sat at 2.0.0 from 8/9/2026 while runs looked fine.
+          $version = "${{ steps.version.outputs.PACKAGE_VERSION }}"
+          $ids = @('TrBlazeUI.Primitives','TrBlazeUI.Icons.Lucide','TrBlazeUI.Icons.Heroicons',
+                   'TrBlazeUI.Icons.Feather','TrBlazeUI.Components')
+          $deadline = (Get-Date).AddMinutes(20)
+          $pending  = [System.Collections.ArrayList]::new($ids)
+          $found    = @{}
+
+          while ($pending.Count -gt 0 -and (Get-Date) -lt $deadline) {
+            foreach ($id in @($pending)) {
+              $url = "https://api.nuget.org/v3-flatcontainer/$($id.ToLower())/index.json"
+              try {
+                $resp = Invoke-RestMethod -Uri $url -ErrorAction Stop
+                if ($resp.versions -contains $version) {
+                  Write-Host "LIVE  $id $version"
+                  $found[$id] = $true
+                  $pending.Remove($id)
+                }
+              } catch {
+                # 404 simply means nothing published yet for this id; keep waiting.
+              }
+            }
+            if ($pending.Count -gt 0) {
+              Write-Host "waiting for: $($pending -join ', ')  (validation can take ~15 min)"
+              Start-Sleep -Seconds 30
+            }
+          }
+
+          $liveList = ($ids | Where-Object { $found[$_] } | ForEach-Object { "- ``$_`` **$version** :white_check_mark:" }) -join "`n"
+          if ($pending.Count -gt 0) {
+            $missing = ($pending | ForEach-Object { "- ``$_`` **$version** :x: not visible" }) -join "`n"
+            @("# :x: Publish INCOMPLETE - $version", "", $liveList, $missing, "",
+              "Some packages were pushed but are not listed after 20 minutes. This may still be nuget.org validation lag - re-check the profile before re-running.")  |
+              Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            throw "Pushed, but these are not live on nuget.org after 20 minutes: $($pending -join ', ')"
+          }
+
+          @("# :rocket: Published to nuget.org - $version", "", $liveList, "",
+            "All five packages are live and restorable.") |
+            Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          Write-Host "All five packages confirmed live on nuget.org at $version."

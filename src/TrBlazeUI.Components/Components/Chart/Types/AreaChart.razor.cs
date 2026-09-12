@@ -98,14 +98,14 @@ public partial class AreaChart<TItem> : ChartBase<TItem> where TItem : class
         objOptions = CreateBaseOptions();
 
         // Configure stroke based on variant
-        objOptions.Stroke = new Stroke
+        objOptions.Stroke ??= new Stroke
         {
             Curve = GetCurveType(),
             Width = StrokeWidth
         };
 
         // Configure fill with gradient
-        objOptions.Fill = new Fill
+        objOptions.Fill ??= new Fill
         {
             Type = FillType.Gradient,
             Gradient = new FillGradient
@@ -125,17 +125,17 @@ public partial class AreaChart<TItem> : ChartBase<TItem> where TItem : class
         }
 
         // Set colors from config or defaults
-        objOptions.Colors = ChartColor.DefaultColors.ToList();
+        objOptions.Colors ??= ChartColor.DefaultColors.ToList();
 
         // Grid styling
-        objOptions.Grid = new ApexCharts.Grid
+        objOptions.Grid ??= new ApexCharts.Grid
         {
             BorderColor = "var(--border)",
             StrokeDashArray = 4
         };
 
         // X-Axis styling
-        objOptions.Xaxis = new XAxis
+        objOptions.Xaxis ??= new XAxis
         {
             Labels = new XAxisLabels
             {
@@ -155,7 +155,7 @@ public partial class AreaChart<TItem> : ChartBase<TItem> where TItem : class
         };
 
         // Y-Axis styling
-        objOptions.Yaxis =
+        objOptions.Yaxis ??=
         [
             new YAxis
             {
@@ -168,6 +168,8 @@ public partial class AreaChart<TItem> : ChartBase<TItem> where TItem : class
                 }
             }
         ];
+
+        objOptions = FinalizeOptions(objOptions);
     }
 
     private Curve GetCurveType()

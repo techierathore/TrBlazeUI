@@ -1,18 +1,33 @@
 @namespace TrBlazeUI.Primitives.Checkbox
 
-<button
-    id="@Id"
-    type="button"
-    role="checkbox"
-    aria-checked="@AriaCheckedValue"
-    aria-disabled="@Disabled.ToString().ToLower()"
-    aria-label="@AriaLabel"
-    data-state="@DataState"
-    disabled="@Disabled"
-    tabindex="@(Disabled ? -1 : 0)"
-    @onclick="HandleClick"
-    @onkeydown="HandleKeyDown"
-    @onkeydown:preventDefault="shouldPreventDefault"
-    @attributes="AdditionalAttributes">
-    @ChildContent
-</button>
+@if (Decorative)
+{
+    @* A picture of the state, not a control: no role, nothing focusable, hidden from assistive
+       technology. For a checkbox drawn inside something that already owns the click and the
+       accessible name - a menu trigger, a row that toggles itself. A `role="checkbox"` there would
+       be a control nested inside a control, which is announced unpredictably and puts focus where
+       assistive technology cannot address it. `tabindex="-1"` is NOT enough: an element with a
+       negative tabindex is still focusable, so the nesting rule still fails on it. *@
+    <span data-state="@DataState" aria-hidden="true" @attributes="AdditionalAttributes">
+        @ChildContent
+    </span>
+}
+else
+{
+    <button
+        id="@Id"
+        type="button"
+        role="checkbox"
+        aria-checked="@AriaCheckedValue"
+        aria-disabled="@Disabled.ToString().ToLower()"
+        aria-label="@AriaLabel"
+        data-state="@DataState"
+        disabled="@Disabled"
+        tabindex="@(Disabled ? -1 : 0)"
+        @onclick="HandleClick"
+        @onkeydown="HandleKeyDown"
+        @onkeydown:preventDefault="shouldPreventDefault"
+        @attributes="AdditionalAttributes">
+        @ChildContent
+    </button>
+}

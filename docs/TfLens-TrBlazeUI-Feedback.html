@@ -1,0 +1,1350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TfLens — TrBlazeUI feedback</title>
+<script>
+/* Resolve the theme BEFORE first paint (no flash). Saved choice wins; otherwise
+   pick by time of day — light 07:00–19:00 local, softened dark at night. */
+(function(){
+  try{
+    var t = localStorage.getItem('tf-theme');
+    if(t!=='light' && t!=='dark'){ var h = new Date().getHours(); t = (h>=7 && h<19) ? 'light' : 'dark'; }
+    document.documentElement.setAttribute('data-theme', t);
+  }catch(e){ document.documentElement.setAttribute('data-theme','light'); }
+})();
+</script>
+<style>
+/* LIGHT is the default theme — a warm off-white, easy on the eyes (never bright white). */
+:root{
+  --bg:#f4f1e9; --panel:#efe9db; --panel2:#e7e0cd; --line:#d8cfb6;
+  --ink:#2e2a22; --muted:#6f6857; --accent:#2f6f9f; --accent2:#3f7d54;
+  --warn:#9a6b15; --danger:#b03a52; --ok:#3f7d54;
+  --code-bg:#ece5d3; --code-ink:#332f26; --row-alt:#eae2cf;
+  --h3:#3a352b; --h4:#2f6f9f; --quote:#4a4537; --cta-bg:#e6eef5;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+/* DARK — softened near-black (warmer / less harsh than pure #0f1115). */
+html[data-theme="dark"]{
+  --bg:#11141a; --panel:#171b23; --panel2:#1e2430; --line:#2b3240;
+  --ink:#dfe3ea; --muted:#99a2b1; --accent:#7cc4ff; --accent2:#a6e3a1;
+  --warn:#f9c74f; --danger:#f38ba8; --ok:#a6e3a1;
+  --code-bg:#0c1016; --code-ink:#d8dde8; --row-alt:#141821;
+  --h3:#cfd5e3; --h4:#7cc4ff; --quote:#cfd5e3; --cta-bg:#0d2030;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;font-size:15px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--mono);font-size:13px;background:var(--code-bg);color:var(--code-ink);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+pre{font-family:var(--mono);font-size:12.5px;background:var(--code-bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow:auto;color:var(--code-ink);position:relative}
+pre code{background:none;border:none;padding:0}
+.copy{position:absolute;top:8px;right:8px;background:var(--panel2);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:11px;font-family:var(--sans);cursor:pointer}
+.copy:hover{color:var(--accent);border-color:var(--accent)}
+/* floating light/dark toggle (top-right) */
+.theme-toggle{position:fixed;top:12px;right:14px;z-index:10000;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:12.5px;font-family:var(--sans);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.layout.no-toc{grid-template-columns:1fr}
+nav.side{position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--line);background:var(--panel);padding:18px 14px}
+nav.side h1{font-size:14px;margin:0 0 4px;letter-spacing:.5px;color:var(--ink)}
+nav.side .sub{font-size:11.5px;color:var(--muted);margin-bottom:14px}
+nav.side ol,nav.side ul{list-style:none;padding:0;margin:0}
+nav.side li{font-size:13px;margin:2px 0}
+nav.side li a{display:block;padding:5px 8px;color:var(--ink);border-radius:6px}
+nav.side li a:hover{background:var(--panel2);text-decoration:none}
+nav.side li.h3 a{padding-left:22px;font-size:12.5px;color:var(--h3)}
+nav.side .group{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin:14px 8px 4px}
+
+main{padding:28px 40px 80px;max-width:1100px}
+.layout.no-toc main{margin:0 auto}
+
+h1{font-size:28px;margin:0 0 6px}
+h2{font-size:22px;margin:32px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
+h3{font-size:17px;margin:22px 0 6px;color:var(--h3);scroll-margin-top:16px}
+h4{font-size:14px;margin:14px 0 4px;color:var(--h4);scroll-margin-top:16px}
+.subtitle{color:var(--muted);font-size:14px;margin-top:-4px;margin-bottom:18px}
+p{margin:6px 0 10px}
+blockquote{border-left:3px solid var(--accent);background:var(--panel);margin:8px 0;padding:8px 14px;color:var(--quote)}
+ul,ol{padding-left:22px}
+li{margin:2px 0}
+
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin:8px 0}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);color:var(--h3);font-weight:600}
+tr:nth-child(even) td{background:var(--row-alt)}
+
+hr{border:none;border-top:1px solid var(--line);margin:24px 0}
+.anchor-link{color:var(--muted);font-weight:400;font-size:0.85em;margin-left:8px;opacity:0;transition:opacity .15s;text-decoration:none}
+h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
+
+/* inline TOC at top of main content */
+.toc-inline{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 16px;margin:14px 0 24px}
+.toc-inline > div{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.toc-inline ol,.toc-inline ul{margin:4px 0;padding-left:18px}
+.toc-inline li{font-size:13px;margin:1px 0}
+.toc-inline a{color:var(--h3)}
+
+/* mermaid diagram wrapper + toolbar */
+.diagram{position:relative;border:1px solid var(--line);border-radius:8px;background:var(--code-bg);margin:14px 0;overflow:hidden}
+.diagram .mermaid{padding:14px;margin:0;background:transparent;border:none;overflow:auto}
+.diagram .dt{display:flex;gap:6px;justify-content:flex-end;padding:6px 8px;background:var(--row-alt);border-bottom:1px solid var(--line)}
+.diagram .dt button{background:var(--panel2);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:3px 10px;font-size:12px;font-family:var(--sans);cursor:pointer;min-width:30px}
+.diagram .dt button:hover{color:var(--accent);border-color:var(--accent)}
+.diagram .dt .zlabel{padding:3px 6px;font-size:11px;color:var(--muted);font-family:var(--mono);align-self:center}
+.diagram.fs{position:fixed;inset:0;z-index:9999;border-radius:0;border:none}
+.diagram.fs .mermaid{height:calc(100vh - 40px);display:flex;align-items:center;justify-content:center}
+
+@media(max-width:900px){.layout{grid-template-columns:1fr}nav.side{position:static;height:auto}}
+</style>
+</head>
+<body>
+<button id="themeToggle" class="theme-toggle" title="Toggle light / dark">&#9790; Dark</button>
+<div class="layout">
+  <nav class="side">
+    <h1>TfLens — TrBlazeUI feedback</h1>
+    <div class="sub">Last rendered: 2026-09-12</div>
+    <div class="group">Contents</div>
+    <ol>
+        <li><a href="#summary">Summary</a></li>
+        <li class="h3"><a href="#what-changed-in-the-2026-08-28-consolidation">What changed in the 2026-08-28 consolidation</a></li>
+        <li class="h3"><a href="#known-stale-citations-elsewhere-not-fixable-from-this-file">Known-stale citations elsewhere (not fixable from this file)</a></li>
+        <li><a href="#tr-001-the-shipped-stylesheet-references-design-tokens-it-never-defines-alert-has-no-colour-bg-sidebar-is-transparent">TR-001 — The shipped stylesheet references design tokens it never defines (Alert has no colour, bg-sidebar is transparent)</a></li>
+        <li><a href="#tr-002-the-shipped-stylesheet-contains-no-responsive-variants-at-all">TR-002 — The shipped stylesheet contains no responsive variants at all</a></li>
+        <li><a href="#tr-009-datatable-showpagination-false-still-truncates-the-grid-to-initialpagesize">TR-009 — DataTable ShowPagination=&quot;false&quot; still truncates the grid to InitialPageSize</a></li>
+        <li><a href="#tr-011-barchart-renders-an-empty-the-apexcharts-runtime-is-never-loaded-and-a-portalled-dialogcontent-cannot-be-sized-by-the-consumer">TR-011 — BarChart renders an empty &amp;lt;div&amp;gt; (the ApexCharts runtime is never loaded), and a portalled DialogContent cannot be sized by the consumer</a></li>
+        <li><a href="#tr-021-the-shipped-stylesheet-s-spacing-sizing-scale-has-holes-w-20-mt-3-my-4-are-absent-so-a-control-sized-with-one-silently-collapses-to-zero">TR-021 — The shipped stylesheet&#x27;s spacing/sizing scale has holes (w-20, mt-3, my-4 are absent), so a control sized with one silently collapses to zero</a></li>
+        <li><a href="#tr-003-passwordstrength-centeredpanel-stattile-statgroup-and-codeblock-do-not-exist-in-2-0-0">TR-003 — PasswordStrength, CenteredPanel, StatTile / StatGroup and CodeBlock do not exist in 2.0.0</a></li>
+        <li><a href="#tr-005-the-chart-components-have-no-xvalue-yvalue-the-ai-reference-documents-an-api-that-does-not-exist">TR-005 — The chart components have no XValue / YValue; the AI reference documents an API that does not exist</a></li>
+        <li><a href="#tr-008-trblazeui-icons-lucide-2-0-0-does-not-resolve-the-pre-rename-lucide-names-so-every-circle-alert-name-renders-nothing">TR-008 — TrBlazeUI.Icons.Lucide 2.0.0 does not resolve the pre-rename Lucide names, so every *-circle / alert-* name renders nothing</a></li>
+        <li><a href="#tr-010-tabstrigger-tabscontent-tabslist-capture-no-unmatched-attributes-so-a-tab-cannot-carry-a-test-id">TR-010 — TabsTrigger / TabsContent / TabsList capture no unmatched attributes, so a tab cannot carry a test id</a></li>
+        <li><a href="#tr-014-alertdialog-has-no-escape-handling-at-all-and-no-closeonescape-modal-to-turn-it-on">TR-014 — AlertDialog has no Escape handling at all, and no CloseOnEscape / Modal to turn it on</a></li>
+        <li><a href="#tr-018-a-closed-collapsiblecontent-keeps-its-children-in-normal-flow-so-the-collapsed-panel-still-occupies-and-overlaps-the-space-below-it">TR-018 — A closed CollapsibleContent keeps its children in normal flow, so the collapsed panel still occupies (and overlaps) the space below it</a></li>
+        <li><a href="#tr-019-dialogcontent-never-scrolls-so-a-dialog-taller-than-the-viewport-is-simply-unreachable-below-the-fold">TR-019 — DialogContent never scrolls, so a dialog taller than the viewport is simply unreachable below the fold</a></li>
+        <li><a href="#tr-020-selectvalue-renders-the-raw-bound-value-until-selectcontent-has-rendered-once-so-a-closed-select-shows-its-key-rather-than-its-label">TR-020 — SelectValue renders the raw bound value until SelectContent has rendered once, so a closed select shows its key rather than its label</a></li>
+        <li><a href="#tr-004-alert-and-button-have-no-icon-slot-that-can-be-combined-with-child-content">TR-004 — Alert and Button have no icon slot that can be combined with child content</a></li>
+        <li><a href="#tr-012-datatable-cannot-hide-its-header-row-so-it-cannot-render-a-key-value-table">TR-012 — DataTable cannot hide its header row, so it cannot render a key/value table</a></li>
+        <li><a href="#tr-013-the-typography-components-drop-every-unmatched-attribute-so-they-cannot-carry-a-data-testid">TR-013 — The Typography* components drop every unmatched attribute, so they cannot carry a data-testid</a></li>
+        <li><a href="#tr-015-cardheader-is-a-css-grid-so-a-class-flex-on-it-cannot-lay-out-a-header-row">TR-015 — CardHeader is a CSS grid, so a Class=&quot;flex …&quot; on it cannot lay out a header row</a></li>
+        <li><a href="#tr-016-badge-has-no-success-warning-variant-so-a-status-badge-cannot-carry-its-own-semantics">TR-016 — Badge has no success/warning variant, so a status badge cannot carry its own semantics</a></li>
+        <li><a href="#tr-017-empty-lives-in-trblazeui-components-empty-which-the-reference-s-imports-list-omits">TR-017 — Empty lives in TrBlazeUI.Components.Empty, which the reference&#x27;s _Imports list omits</a></li>
+        <li><a href="#tr-022-merged-into-tr-008-lucideicon-does-not-resolve-lucide-json-aliases">TR-022 — merged into TR-008 (LucideIcon does not resolve lucide.json aliases)</a></li>
+        <li><a href="#tr-023-breadcrumblink-drops-every-unmatched-attribute-so-a-breadcrumb-cannot-carry-a-data-testid">TR-023 — BreadcrumbLink drops every unmatched attribute, so a breadcrumb cannot carry a data-testid</a></li>
+        <li><a href="#tr-024-tabslist-takes-no-unmatched-attributes-and-offers-no-density-variant-so-the-segmented-track-cannot-be-addressed">TR-024 — TabsList takes no unmatched attributes and offers no density variant, so the segmented track cannot be addressed</a></li>
+        <li><a href="#tr-026-datatablecolumn-has-width-and-per-cell-class-parameters-and-the-ai-reference-documents-none-of-them">TR-026 — DataTableColumn has width and per-cell class parameters, and the AI reference documents none of them</a></li>
+        <li><a href="#tr-025-datatable-has-no-density-option-so-160px-of-a-narrow-table-s-width-goes-to-cell-padding-and-only-deep-can-get-it-back">TR-025 — DataTable has no density option, so 160px of a narrow table&#x27;s width goes to cell padding and only ::deep can get it back</a></li>
+        <li><a href="#tr-027-breadcrumblist-hard-codes-a-two-axis-gap-and-always-wraps-so-a-two-item-trail-cannot-be-held-on-one-line">TR-027 — BreadcrumbList hard-codes a two-axis gap and always wraps, so a two-item trail cannot be held on one line</a></li>
+        <li><a href="#tr-028-barchart-exposes-no-axis-grid-or-data-label-control-and-no-route-to-apexchartoptions-so-a-chart-cannot-be-made-to-match-an-approved-design">TR-028 — BarChart exposes no axis, grid or data-label control and no route to ApexChartOptions, so a chart cannot be made to match an approved design</a></li>
+        <li><a href="#tr-029-badge-is-a-fixed-height-rounded-full-pill-with-no-wrapping-treatment-so-a-multi-word-label-collapses-into-an-unreadable-shape-on-a-phone">TR-029 — Badge is a fixed-height rounded-full pill with no wrapping treatment, so a multi-word label collapses into an unreadable shape on a phone</a></li>
+        <li><a href="#tr-030-collapsibletrigger-renders-an-inline-block-button-with-a-bare-class-group-so-a-disclosure-header-cannot-span-its-own-row">TR-030 — CollapsibleTrigger renders an inline-block button with a bare class=&quot;group&quot;, so a disclosure header cannot span its own row</a></li>
+        <li><a href="#tr-031-datatablecolumn-headerclass-text-right-does-not-right-align-the-header-because-the-label-sits-in-its-own-flex-box">TR-031 — DataTableColumn HeaderClass=&quot;text-right&quot; does not right-align the header, because the label sits in its own flex box</a></li>
+        <li><a href="#tr-032-nativeselect-renders-with-appearance-none-and-no-arrow-so-a-select-reads-as-a-text-box">TR-032 — NativeSelect renders with appearance-none and no arrow, so a select reads as a text box</a></li>
+        <li><a href="#tr-033-datatable-s-search-box-exists-only-inside-its-own-toolbar-so-a-design-that-puts-the-table-s-filter-in-the-card-header-cannot-be-built">TR-033 — DataTable&#x27;s search box exists only inside its own toolbar, so a design that puts the table&#x27;s filter in the card header cannot be built</a></li>
+        <li><a href="#tr-034-badge-always-renders-a-so-a-pill-cannot-sit-inside-a-sentence-and-cannot-match-a-design-that-draws-one-as-a">TR-034 — Badge always renders a &amp;lt;div&amp;gt;, so a pill cannot sit inside a sentence and cannot match a design that draws one as a &amp;lt;span&amp;gt;</a></li>
+        <li><a href="#tr-035-sidebarprovider-s-phone-menu-is-sized-with-sidebar-width-so-the-sidebar-width-mobile-the-stylesheet-defines-is-never-read">TR-035 — SidebarProvider&#x27;s phone menu is sized with --sidebar-width, so the --sidebar-width-mobile the stylesheet defines is never read</a></li>
+    </ol>
+  </nav>
+  <main>
+    <h1>TfLens — TrBlazeUI feedback</h1>
+    <div class="subtitle">Rendered 2026-09-12 &middot; source <code>TfLens-TrBlazeUI-Feedback.md</code></div>
+
+    <div class="toc-inline">
+      <div>Contents</div>
+      <ol>
+        <li><a href="#summary">Summary</a></li>
+        <li class="h3"><a href="#what-changed-in-the-2026-08-28-consolidation">What changed in the 2026-08-28 consolidation</a></li>
+        <li class="h3"><a href="#known-stale-citations-elsewhere-not-fixable-from-this-file">Known-stale citations elsewhere (not fixable from this file)</a></li>
+        <li><a href="#tr-001-the-shipped-stylesheet-references-design-tokens-it-never-defines-alert-has-no-colour-bg-sidebar-is-transparent">TR-001 — The shipped stylesheet references design tokens it never defines (Alert has no colour, bg-sidebar is transparent)</a></li>
+        <li><a href="#tr-002-the-shipped-stylesheet-contains-no-responsive-variants-at-all">TR-002 — The shipped stylesheet contains no responsive variants at all</a></li>
+        <li><a href="#tr-009-datatable-showpagination-false-still-truncates-the-grid-to-initialpagesize">TR-009 — DataTable ShowPagination=&quot;false&quot; still truncates the grid to InitialPageSize</a></li>
+        <li><a href="#tr-011-barchart-renders-an-empty-the-apexcharts-runtime-is-never-loaded-and-a-portalled-dialogcontent-cannot-be-sized-by-the-consumer">TR-011 — BarChart renders an empty &amp;lt;div&amp;gt; (the ApexCharts runtime is never loaded), and a portalled DialogContent cannot be sized by the consumer</a></li>
+        <li><a href="#tr-021-the-shipped-stylesheet-s-spacing-sizing-scale-has-holes-w-20-mt-3-my-4-are-absent-so-a-control-sized-with-one-silently-collapses-to-zero">TR-021 — The shipped stylesheet&#x27;s spacing/sizing scale has holes (w-20, mt-3, my-4 are absent), so a control sized with one silently collapses to zero</a></li>
+        <li><a href="#tr-003-passwordstrength-centeredpanel-stattile-statgroup-and-codeblock-do-not-exist-in-2-0-0">TR-003 — PasswordStrength, CenteredPanel, StatTile / StatGroup and CodeBlock do not exist in 2.0.0</a></li>
+        <li><a href="#tr-005-the-chart-components-have-no-xvalue-yvalue-the-ai-reference-documents-an-api-that-does-not-exist">TR-005 — The chart components have no XValue / YValue; the AI reference documents an API that does not exist</a></li>
+        <li><a href="#tr-008-trblazeui-icons-lucide-2-0-0-does-not-resolve-the-pre-rename-lucide-names-so-every-circle-alert-name-renders-nothing">TR-008 — TrBlazeUI.Icons.Lucide 2.0.0 does not resolve the pre-rename Lucide names, so every *-circle / alert-* name renders nothing</a></li>
+        <li><a href="#tr-010-tabstrigger-tabscontent-tabslist-capture-no-unmatched-attributes-so-a-tab-cannot-carry-a-test-id">TR-010 — TabsTrigger / TabsContent / TabsList capture no unmatched attributes, so a tab cannot carry a test id</a></li>
+        <li><a href="#tr-014-alertdialog-has-no-escape-handling-at-all-and-no-closeonescape-modal-to-turn-it-on">TR-014 — AlertDialog has no Escape handling at all, and no CloseOnEscape / Modal to turn it on</a></li>
+        <li><a href="#tr-018-a-closed-collapsiblecontent-keeps-its-children-in-normal-flow-so-the-collapsed-panel-still-occupies-and-overlaps-the-space-below-it">TR-018 — A closed CollapsibleContent keeps its children in normal flow, so the collapsed panel still occupies (and overlaps) the space below it</a></li>
+        <li><a href="#tr-019-dialogcontent-never-scrolls-so-a-dialog-taller-than-the-viewport-is-simply-unreachable-below-the-fold">TR-019 — DialogContent never scrolls, so a dialog taller than the viewport is simply unreachable below the fold</a></li>
+        <li><a href="#tr-020-selectvalue-renders-the-raw-bound-value-until-selectcontent-has-rendered-once-so-a-closed-select-shows-its-key-rather-than-its-label">TR-020 — SelectValue renders the raw bound value until SelectContent has rendered once, so a closed select shows its key rather than its label</a></li>
+        <li><a href="#tr-004-alert-and-button-have-no-icon-slot-that-can-be-combined-with-child-content">TR-004 — Alert and Button have no icon slot that can be combined with child content</a></li>
+        <li><a href="#tr-012-datatable-cannot-hide-its-header-row-so-it-cannot-render-a-key-value-table">TR-012 — DataTable cannot hide its header row, so it cannot render a key/value table</a></li>
+        <li><a href="#tr-013-the-typography-components-drop-every-unmatched-attribute-so-they-cannot-carry-a-data-testid">TR-013 — The Typography* components drop every unmatched attribute, so they cannot carry a data-testid</a></li>
+        <li><a href="#tr-015-cardheader-is-a-css-grid-so-a-class-flex-on-it-cannot-lay-out-a-header-row">TR-015 — CardHeader is a CSS grid, so a Class=&quot;flex …&quot; on it cannot lay out a header row</a></li>
+        <li><a href="#tr-016-badge-has-no-success-warning-variant-so-a-status-badge-cannot-carry-its-own-semantics">TR-016 — Badge has no success/warning variant, so a status badge cannot carry its own semantics</a></li>
+        <li><a href="#tr-017-empty-lives-in-trblazeui-components-empty-which-the-reference-s-imports-list-omits">TR-017 — Empty lives in TrBlazeUI.Components.Empty, which the reference&#x27;s _Imports list omits</a></li>
+        <li><a href="#tr-022-merged-into-tr-008-lucideicon-does-not-resolve-lucide-json-aliases">TR-022 — merged into TR-008 (LucideIcon does not resolve lucide.json aliases)</a></li>
+        <li><a href="#tr-023-breadcrumblink-drops-every-unmatched-attribute-so-a-breadcrumb-cannot-carry-a-data-testid">TR-023 — BreadcrumbLink drops every unmatched attribute, so a breadcrumb cannot carry a data-testid</a></li>
+        <li><a href="#tr-024-tabslist-takes-no-unmatched-attributes-and-offers-no-density-variant-so-the-segmented-track-cannot-be-addressed">TR-024 — TabsList takes no unmatched attributes and offers no density variant, so the segmented track cannot be addressed</a></li>
+        <li><a href="#tr-026-datatablecolumn-has-width-and-per-cell-class-parameters-and-the-ai-reference-documents-none-of-them">TR-026 — DataTableColumn has width and per-cell class parameters, and the AI reference documents none of them</a></li>
+        <li><a href="#tr-025-datatable-has-no-density-option-so-160px-of-a-narrow-table-s-width-goes-to-cell-padding-and-only-deep-can-get-it-back">TR-025 — DataTable has no density option, so 160px of a narrow table&#x27;s width goes to cell padding and only ::deep can get it back</a></li>
+        <li><a href="#tr-027-breadcrumblist-hard-codes-a-two-axis-gap-and-always-wraps-so-a-two-item-trail-cannot-be-held-on-one-line">TR-027 — BreadcrumbList hard-codes a two-axis gap and always wraps, so a two-item trail cannot be held on one line</a></li>
+        <li><a href="#tr-028-barchart-exposes-no-axis-grid-or-data-label-control-and-no-route-to-apexchartoptions-so-a-chart-cannot-be-made-to-match-an-approved-design">TR-028 — BarChart exposes no axis, grid or data-label control and no route to ApexChartOptions, so a chart cannot be made to match an approved design</a></li>
+        <li><a href="#tr-029-badge-is-a-fixed-height-rounded-full-pill-with-no-wrapping-treatment-so-a-multi-word-label-collapses-into-an-unreadable-shape-on-a-phone">TR-029 — Badge is a fixed-height rounded-full pill with no wrapping treatment, so a multi-word label collapses into an unreadable shape on a phone</a></li>
+        <li><a href="#tr-030-collapsibletrigger-renders-an-inline-block-button-with-a-bare-class-group-so-a-disclosure-header-cannot-span-its-own-row">TR-030 — CollapsibleTrigger renders an inline-block button with a bare class=&quot;group&quot;, so a disclosure header cannot span its own row</a></li>
+        <li><a href="#tr-031-datatablecolumn-headerclass-text-right-does-not-right-align-the-header-because-the-label-sits-in-its-own-flex-box">TR-031 — DataTableColumn HeaderClass=&quot;text-right&quot; does not right-align the header, because the label sits in its own flex box</a></li>
+        <li><a href="#tr-032-nativeselect-renders-with-appearance-none-and-no-arrow-so-a-select-reads-as-a-text-box">TR-032 — NativeSelect renders with appearance-none and no arrow, so a select reads as a text box</a></li>
+        <li><a href="#tr-033-datatable-s-search-box-exists-only-inside-its-own-toolbar-so-a-design-that-puts-the-table-s-filter-in-the-card-header-cannot-be-built">TR-033 — DataTable&#x27;s search box exists only inside its own toolbar, so a design that puts the table&#x27;s filter in the card header cannot be built</a></li>
+        <li><a href="#tr-034-badge-always-renders-a-so-a-pill-cannot-sit-inside-a-sentence-and-cannot-match-a-design-that-draws-one-as-a">TR-034 — Badge always renders a &amp;lt;div&amp;gt;, so a pill cannot sit inside a sentence and cannot match a design that draws one as a &amp;lt;span&amp;gt;</a></li>
+        <li><a href="#tr-035-sidebarprovider-s-phone-menu-is-sized-with-sidebar-width-so-the-sidebar-width-mobile-the-stylesheet-defines-is-never-read">TR-035 — SidebarProvider&#x27;s phone menu is sized with --sidebar-width, so the --sidebar-width-mobile the stylesheet defines is never read</a></li>
+      </ol>
+    </div>
+<table>
+<thead><tr><th></th><th></th></tr></thead>
+<tbody>
+<tr><td>App</td><td>TfLens</td></tr>
+<tr><td>Upstream</td><td>TrBlazeUI</td></tr>
+<tr><td>Updated</td><td>2026-09-12</td></tr>
+</tbody>
+</table>
+<blockquote>
+<h2 id="resolved-library-side-2026-09-12-tr-028-tr-035-the-eight-filed-after-the-reply-below">✅ RESOLVED LIBRARY-SIDE 2026-09-12 — TR-028 … TR-035, the eight filed after the reply below<a class="anchor-link" href="#resolved-library-side-2026-09-12-tr-028-tr-035-the-eight-filed-after-the-reply-below">#</a></h2>
+<p>Triaged and fixed against current source under <strong>REQ-UI-020</strong>. Release build <strong>0 warnings /
+0 errors</strong>; <strong>37/37</strong> new headless-Chromium checks (<code>tests/verify/ui-tflens-2.spec.js</code> on
+<code>/verify-tflens-2</code>) plus <strong>15/15</strong> row-mapped acceptance tests (<code>tests/verify/req-ui-020.spec.ts</code>),
+with every runnable regression suite still green — <code>ui-tflens</code> 44/44, <code>ui-techieblog</code> 76/76,
+<code>ui-ui016</code> 23/23, <code>ui-demo-2-1-0</code> 15/15, <code>ui-ui014</code> 8/8, <code>ui-ui004</code> PASS desktop+mobile. 0
+console/page errors and 0 horizontal overflow at 1280 and 390. Evidence:
+<code>docs/TrBlazeUI-Checklist.md</code> REQ-UI-020, ledger <code>docs/.last-verify.json</code>.</p>
+<p><strong>Seven were real and are fixed. One (TR-030) was already fixed and needs an upgrade, not a fix.</strong></p>
+<table>
+<thead><tr><th>Entry</th><th>What was actually wrong</th><th>What you get</th></tr></thead>
+<tbody>
+<tr><td><strong>TR-028</strong></td><td><code>BarChart</code> and its five siblings had no route to <code>ApexChartOptions</code> at all, and each type overwrote <code>Grid</code>/<code>Xaxis</code>/<code>Yaxis</code> unconditionally. <code>ChartContainer</code> painted a Card with no way off.</td><td><strong><code>Options</code></strong> (merged <em>over</em> the wrapper's defaults) and <strong><code>OptionsConfigurator</code></strong> (runs last, for formatters) on every chart type; <strong><code>ChartContainer.Bare</code></strong>. Measured: 5 gridlines / 2 borders / 5 y-labels → <strong>0/0/0</strong>, bars still drawn, and a chart passing no <code>Options</code> unchanged.</td></tr>
+<tr><td><strong>TR-029</strong></td><td>Confirmed. In a 180px box the label became 3 lines at 54px inside a <strong>33,554,432px</strong> radius — the end caps really were cutting into the text.</td><td><strong><code>Badge.Wrap</code></strong> (pill grows, left-aligned, 8px radius) and <strong><code>Badge.Truncate</code></strong>. ⚠ The default is now one line that overflows rather than a silent broken shape.</td></tr>
+<tr><td><strong>TR-030</strong></td><td><strong>Could not reproduce.</strong> <code>CollapsibleTrigger</code> has had a <code>Class</code> parameter since 2.1.0 — you filed against 2.0.0. Measured live: <code>Class="w-full text-left"</code> lands on the real <code>&lt;button&gt;</code>, which then fills its 502px row with the badge flush right.</td><td>Upgrade and drop the <code>::deep</code> rule. The shrink-to-fit default is kept deliberately (widening every existing trigger would break layouts silently); the row recipe is now in the reference.</td></tr>
+<tr><td><strong>TR-031</strong></td><td>Confirmed, and your diagnosis was exactly right — the label sits in <code>div.flex</code>, where <code>text-align</code> moves nothing.</td><td><strong><code>DataTableColumn.Align</code></strong> (<code>Start</code>/<code>Center</code>/<code>End</code>) reaches the <code>th</code>, the label's flex box and the cells together. <code>HeaderClass="text-right"</code> alone is still read as the same intent, so your existing markup works unchanged.</td></tr>
+<tr><td><strong>TR-032</strong></td><td><strong>The root cause is not <code>NativeSelect</code>.</strong> Your "the class merge appears to drop <code>bg-[url(…)]</code>, unconfirmed" was right, and here is the confirmation: <code>TailwindMerge.IsValidClassName</code> rejected <strong>any</strong> class containing <code>url(</code> as an injection guard, so <code>cn()</code> silently deleted the library's own chevron.</td><td>Arbitrary values (inside <code>[…]</code>) are now validated against their own charset; only executable payloads are rejected. <strong>This was eating your classes too</strong> — any <code>bg-[url(…)]</code> you passed anywhere vanished the same way.</td></tr>
+<tr><td><strong>TR-033</strong></td><td>Confirmed. <code>ShowToolbar</code> was all-or-nothing and exposed no filter state.</td><td><strong><code>@bind-SearchText</code></strong> — the same state the built-in box drives, so you can host the input in the card header and still get the grid's real filtering over <code>Filterable</code> columns — plus <strong><code>ShowColumnChooser</code></strong> to drop the <code>Columns</code> button on its own. Measured: 3 rows → 1 from a card-header input, no toolbar rendered.</td></tr>
+<tr><td><strong>TR-034</strong></td><td>Confirmed, and <code>&lt;span&gt;</code> was the right call.</td><td><strong><code>Badge.As</code></strong>, defaulting to <strong><code>"span"</code></strong>. Still <code>inline-flex</code>, so nothing looks different — your six permanent <code>mockup-parity</code> findings on <code>/effort</code> should now key correctly. <code>As="div"</code> is the escape hatch.</td></tr>
+<tr><td><strong>TR-035</strong></td><td>Confirmed exactly as filed: <code>--sidebar-width-mobile</code> was declared at 18rem and read by <strong>zero</strong> elements.</td><td>The phone sheet reads it. Measured at 390px: <strong>288px</strong>, was 256px. Also <strong><code>SidebarProvider.Width</code> / <code>.MobileWidth</code> / <code>.IconWidth</code></strong> if you want per-shell control. <strong>Drop your <code>:root { --sidebar-width: var(--sidebar-width-mobile) }</code> media-query rule</strong> or it will now compound.</td></tr>
+</tbody>
+</table>
+<p><strong>Read the CHANGELOG's "Behaviour changes to review before upgrading" before you take this.</strong> Five
+things change by design: <code>Badge</code> is a <code>&lt;span&gt;</code>, a long badge label no longer wraps unless asked,
+classes containing <code>url(</code> are no longer deleted (so classes that used to vanish now take effect),
+<code>text-left</code>/<code>text-center</code>/<code>text-right</code> no longer conflict with text <em>colour</em> in the merge, and the
+phone sidebar is 18rem.</p>
+<p><strong>Please re-test and reopen anything that still bites.</strong></p>
+</blockquote>
+<hr>
+<blockquote>
+<h2 id="resolved-library-side-2026-08-31-ships-in-the-next-release">✅ RESOLVED LIBRARY-SIDE 2026-08-31 — ships in the next release<a class="anchor-link" href="#resolved-library-side-2026-08-31-ships-in-the-next-release">#</a></h2>
+<p>Triaged (<code>*triage-issues</code>) and fixed (<code>*fix-issues</code>) against current source under <strong>REQ-UI-019</strong>.
+Release build 0 warnings / 0 errors; <strong>44/44</strong> new headless-Chromium checks
+(<code>tests/verify/ui-tflens.spec.js</code>) with every existing suite still green — <strong>166/166</strong> executed
+checks in total. Evidence: <code>docs/TrBlazeUI-Checklist.md</code> REQ-UI-019, ledger <code>docs/.last-verify.json</code>.</p>
+<p><strong>First, the version gap — it accounts for a quarter of this file.</strong> TfLens built against
+<strong>2.0.0</strong>; the library was already at <strong>2.1.0</strong> when this was filed. <strong>Five entries were already
+fixed</strong> and needed no library change at all:</p>
+<table>
+<thead><tr><th>Entry</th><th>Reported as</th><th>Reality on 2.1.0</th></tr></thead>
+<tbody>
+<tr><td><strong>TR-002</strong></td><td>"no responsive variants at all; 1 <code>@media</code> rule; 710 utilities"</td><td><strong>21</strong> <code>@media</code> rules, <strong>4,934</strong> escaped responsive selectors, ~10,477 class selectors. <code>.trblazeui-col-md-6</code> really does sit inside <code>@media (min-width:48rem)</code>.</td></tr>
+<tr><td><strong>TR-003</strong></td><td><code>PasswordStrength</code>/<code>CenteredPanel</code>/<code>StatTile</code>/<code>StatGroup</code>/<code>CodeBlock</code> absent</td><td>All present <strong>and documented</strong>.</td></tr>
+<tr><td><strong>TR-013</strong></td><td><code>Typography*</code> drops unmatched attributes</td><td>All 11 splat <code>CaptureUnmatchedValues</code>.</td></tr>
+<tr><td><strong>TR-020</strong></td><td><code>SelectValue</code> shows the raw key until the popover opens</td><td><code>SelectContent</code> instantiates items while closed; <code>DisplayTextSelector</code> also exists.</td></tr>
+<tr><td><strong>TR-023</strong></td><td><code>BreadcrumbLink</code> throws on <code>data-testid</code></td><td>Splats on both render branches.</td></tr>
+</tbody>
+</table>
+<p><strong>The action for those five is to upgrade and delete the workarounds</strong> — in particular the
+hand-written media queries in <code>AuthLayout.razor.css</code> / <code>Profile.razor.css</code>, and
+<code>PasswordStrengthMeter.razor</code>.</p>
+<p><strong>Everything else is now fixed.</strong> Highlights, with the root cause where it differed from the
+filed diagnosis:</p>
+<ul>
+<li><strong>TR-009</strong> — confirmed exactly as filed and it was live in this library's <em>own</em> demo (500 records with <code>ShowPagination="false"</code> rendering 5 rows). <code>ShowPagination</code> was a <em>chrome</em> flag; it now gates the data. ⚠ <strong>Breaking:</strong> a grid you turned pagination off over will now paint every row.
+</li>
+<li><strong>TR-008</strong> — your merged TR-022 root cause was <strong>exactly right</strong>. <code>lucide.json</code> ships 212 aliases; the <em>code generator</em> only ever read the <code>icons</code> map, so the C# had nothing to fall back to. Fixed at the generator. One correction: a question glyph <strong>does</strong> exist (<code>circle-help</code> → <code>circle-question-mark</code>), so the <code>list-checks</code> substitution is unnecessary. (<code>content/lucide.json</code> <strong>is</strong> in the nupkg and always was — an intermediate triage note claiming otherwise was wrong and has been retracted, so your name-lookup escape hatch works today.)
+</li>
+<li><strong>TR-014</strong> — your diagnosis ("AlertDialog is not built on <code>Primitives.Dialog</code>") was <strong>not</strong> the cause: it is built on the primitive. <code>AlertDialogContent</code> pinned <code>CloseOnEscape="false"</code> as a literal with no parameter to override, and <code>Dialog.Modal</code> was a parameter <strong>nothing read</strong> while the reference documented it. Both fixed. Your second observation — Escape dying after a re-render — was correct and subtle: Escape was an <em>element</em> handler, and a document-level helper had shipped with zero call sites.
+</li>
+<li><strong>TR-011a</strong> — the ApexCharts runtime <strong>is</strong> loaded (that part was wrong), and there is <strong>no reflection inference</strong> — so the property-order projection workaround was cargo-culting a mechanism that does not exist. <code>ChartBase.Items</code> was simply a parameter nothing read. It is now wired, and real <code>XValue</code>/<code>YValue</code> were added — which also closes <strong>TR-005</strong>'s original ask.
+</li>
+<li><strong>TR-018 / TR-019 / TR-016 / TR-012 / TR-024 / TR-025 / TR-027</strong> — all fixed; see the CHANGELOG.
+</li>
+<li><strong>TR-011b, TR-015, TR-026, TR-017, TR-004</strong> were <strong>documentation</strong> defects, and the reference was the single largest source of your build problems. §1's imports block was missing <strong>30</strong> namespaces (including <code>Empty</code>); <code>DataTableColumn</code>, <code>DialogContent</code> and <code>AlertDialogContent</code> had no parameter tables at all; the icon guidance forbade an API that works. All corrected.
+</li>
+<li><strong>TR-001 / TR-021</strong> were mostly closed in 2.1.0; the residual is fixed — <code>--font-sans</code>/<code>--font-mono</code> were referenced by the base reset and never defined, and the <code>p-*</code>/<code>m-*</code>/<code>gap-*</code>/<code>size-*</code>/<code>space-*</code> safelist stopped short of the scale <code>w-*</code>/<code>h-*</code> already covered. <strong>Arbitrary values (<code>p-[3px]</code>, <code>h-[34px]</code>) remain structurally unavailable</strong> in a pre-built stylesheet — that constraint is real and is now stated in the reference rather than left to be discovered.
+</li>
+</ul>
+<p><strong>Please re-test against the next published release and reopen anything that still bites.</strong> Read the CHANGELOG's
+"Behaviour changes to review before upgrading" first — several fixes change behaviour by design.</p>
+</blockquote>
+<p>Gaps found while building TfLens against <strong>TrBlazeUI.Components 2.0.0</strong> / <strong>TrBlazeUI.Icons.Lucide 2.0.0</strong>.
+Each entry is a real blocker or defect met during the build, with the workaround that shipped so the
+build never stopped for a library issue.</p>
+<blockquote>
+<p><strong>Numbering reconciled 2026-08-27.</strong> Concurrent build clusters had independently allocated the same
+TR numbers four times (<code>TR-010</code>, <code>TR-011</code>, <code>TR-012</code>, <code>TR-014</code> each appeared twice). The <strong>first</strong>
+occurrence of each kept its number — those are the ones cited from the checklist and the DevGuide —
+and the four later duplicates were renumbered to <code>TR-015</code>…<code>TR-018</code>. All entries were then unique and
+every citation elsewhere in <code>docs/</code> resolved. <code>TR-006</code> and <code>TR-007</code> were never allocated and are
+deliberately left free. <strong>Allocating a number: take the next free one, and never renumber an existing
+entry.</strong></p>
+<p><strong>Updated 2026-08-28 (handoff consolidation).</strong> <code>TR-019</code>…<code>TR-022</code> were added by the Phase 3 build, and
+<code>TR-022</code> turned out to duplicate <code>TR-008</code> (both are <code>LucideIcon</code> failing to resolve <code>lucide.json</code>
+aliases) — it was merged into <code>TR-008</code> and survives as a redirect stub, because other documents already
+cite it. <strong>The highest allocated number is <code>TR-022</code>; the next free one is <code>TR-023</code>.</strong> That leaves
+<strong>19 substantive entries</strong> across 20 headings. The three stale <code>TR-006</code> / <code>TR-007</code> comments that used
+to sit in <code>src/</code> were corrected the same day to the numbers they actually meant (<code>TR-009</code>, <code>TR-010</code>,
+<code>TR-013</code>), so no citation anywhere now points at an unallocated number.</p>
+<p><strong>Re-verified 2026-08-28.</strong> <code>TR-019</code>…<code>TR-022</code> were added since. Every ID in the file is unique, every
+in-file cross-reference resolves (<code>TR-002</code> ← TR-019/TR-021 · <code>TR-010</code> ← TR-019 · <code>TR-008</code> ⇄ <code>TR-022</code>),
+and no number was reused. <code>TR-006</code> and <code>TR-007</code> remain unallocated — see <em>Known-stale citations</em> below
+for the three <code>src/</code> comments that still name them. <strong>The next free number is <code>TR-023</code>.</strong></p>
+<p><strong>Allocated since (2026-08-30):</strong> <code>TR-023</code> (BreadcrumbLink passthrough), <code>TR-024</code> (TabsList
+passthrough + no track density), <code>TR-025</code> (DataTable has no density option) and <code>TR-026</code>
+(<code>DataTableColumn</code> width / per-cell class parameters undocumented). <strong>The next free number is
+<code>TR-028</code>.</strong> <code>TR-027</code> (BreadcrumbList always wraps) was added 2026-08-30 by the harness fix.</p>
+<p><strong>Collision corrected 2026-08-30.</strong> Two <code>*build-phase</code> sub-agents running in parallel both allocated
+<code>TR-024</code> — the <code>TabsList</code> entry and the <code>DataTableColumn</code> entry. <code>TR-024</code> was already registered above
+to <code>TabsList</code>, so it keeps the number; the <code>DataTableColumn</code> entry was renumbered to <strong><code>TR-026</code></strong>, and
+the one in-file citation of it (inside <code>TR-025</code>) was repointed with it. Every ID in the file is unique
+again. The lesson is recorded as a process note, not a library gap: concurrent writers to a
+single-counter file need the number assigned by the orchestrator, not chosen by the writer.</p>
+</blockquote>
+<hr>
+<h2 id="summary">Summary<a class="anchor-link" href="#summary">#</a></h2>
+<p>33 entries: <strong>0 blocking now, 0 filed and not blocking, 32 fixed upstream</strong>, 1 closed (TR-022,
+merged into TR-008). <strong>Nothing is blocked.</strong></p>
+<p>Two library replies cover all 32. The reply of <strong>2026-08-31</strong> answers 24 — TR-001 to TR-005, TR-008
+to TR-021, TR-023 to TR-027. The reply of <strong>2026-09-12</strong>, at the top of this file, answers the eight
+filed since: TR-028 to TR-035. Seven were fixed under REQ-UI-020; <strong>TR-030 could not be reproduced</strong>
+— the <code>Class</code> parameter it asks for has existed since 2.1.0, and TfLens filed against 2.0.0.</p>
+<p>TfLens still builds against <strong>2.0.0</strong>, so all 32 are re-checked after the upgrade, not before. Close
+each one with <code>bash .tfcore/utils/tf-feedback.sh TfLens --close &lt;ID&gt; "&lt;what you ran and what it
+showed&gt;"</code>; a bare <code>tf-feedback.sh TfLens</code> prints every entry's state. Never describe a fixed entry
+as an open problem.</p>
+<p><strong>Every workaround in TR-028 to TR-035 can be removed on upgrade</strong>, and the <code>--sidebar-width</code>
+media-query override for TR-035 <strong>must</strong> go or it will compound with the library's own fix.</p>
+<p>This file is the one log of library gaps for every phase; a gap met on any phase's screen is filed
+here as a new entry.</p>
+<h4 id="detail">Detail<a class="anchor-link" href="#detail">#</a></h4>
+<p>What the last eight entries affected, as filed:</p>
+<table>
+<thead><tr><th>Entry</th><th>What it affects</th><th>Blocks or breaks anything?</th></tr></thead>
+<tbody>
+<tr><td><strong>TR-028</strong> — the bar chart has no axis, grid or value-label settings</td><td>The token chart on the Harness page. TfLens draws it with the chart component underneath, which does take settings.</td><td>No. The chart matches its design.</td></tr>
+<tr><td><strong>TR-029</strong> — a long badge label spills out of its pill on a phone</td><td>The stream-health card on the Misses page. The label was shortened and the sentence moved into the card's text.</td><td>No.</td></tr>
+<tr><td><strong>TR-030</strong> — the button that opens a collapsible row does not fill the row</td><td>The per-phase rows on the Phase effort page. One style rule widens the button.</td><td>No.</td></tr>
+<tr><td><strong>TR-031</strong> — a table column's header cannot be right-aligned over its figures</td><td>The rate tables on the Price providers page. One style rule moves the header label right.</td><td>No.</td></tr>
+<tr><td><strong>TR-032</strong> — the native select shows no arrow</td><td>The Provider list in "Add or change a rate" on the Price providers page. One style rule gives the browser's own arrow back.</td><td>No.</td></tr>
+<tr><td><strong>TR-033</strong> — a data grid's search box can only sit in the grid's own toolbar</td><td>The per-miss table on the Misses page. The filter works; it sits above the table instead of in the card header, where the design draws it.</td><td>No.</td></tr>
+<tr><td><strong>TR-034</strong> — a pill is always a block element, so it cannot sit inside a sentence</td><td>The count pills on the Phase effort page. They render and read correctly; a design gate cannot pair them with the mockup's.</td><td>No.</td></tr>
+<tr><td><strong>TR-035</strong> — the phone menu ignores the mobile width the library itself defines</td><td>The slid-out menu on every screen below 768px. One rule in the app's stylesheet restores the designed 18rem.</td><td>No.</td></tr>
+</tbody>
+</table>
+<p><strong>Answered 2026-09-12</strong> — the request below was sent and has been worked. See the reply at the top
+of this file for what changed and what to review before upgrading. It is kept here as the record of
+what was asked.</p>
+<pre><code>Fix the TrBlazeUI problems TfLens filed after your reply of 2026-08-31. Work from
+docs/TfLens-TrBlazeUI-Feedback.md in the TfLens repo: entries TR-028, TR-029,
+TR-030, TR-031, TR-032, TR-033, TR-034 and TR-035. Each names the component, what TfLens saw, the
+workaround it shipped and a suggested fix.</code></pre>
+<ul>
+<li><strong>Corrected 2026-09-11.</strong> This Summary used to say "all 28 open. None is fixed upstream". It was written on 2026-09-02, after the reply at the top of the file, and never took the reply in. It now follows the entries.
+</li>
+<li><code>TR-006</code> and <code>TR-007</code> were never allocated; <code>TR-022</code> is the merge stub into <code>TR-008</code>.
+</li>
+</ul>
+<p><strong>Severity words used in the entries map to those counts as:</strong> <code>High</code> = blocker · <code>Medium</code> = major ·
+<code>Low</code> = minor. Nothing in this file is filed nice-to-have. The entry bodies keep their original
+<code>High</code>/<code>Medium</code>/<code>Low</code> wording — the mapping is stated here rather than applied to them, so no entry's
+recorded severity was silently reinterpreted.</p>
+<table>
+<thead><tr><th>Band</th><th>Count</th><th>Entries</th><th>State</th></tr></thead>
+<tbody>
+<tr><td><strong>Blocker</strong> (High)</td><td>6</td><td>TR-001 · TR-002 · TR-009 · TR-011 · TR-021 · TR-028</td><td>all six fixed upstream</td></tr>
+<tr><td><strong>Major</strong> (Medium)</td><td>12</td><td>TR-003 · TR-005 · TR-008 · TR-010 · TR-014 · TR-018 · TR-019 · TR-020 · TR-023 · TR-024 · TR-026 · TR-029</td><td>all twelve fixed upstream</td></tr>
+<tr><td><strong>Minor</strong> (Low)</td><td>14</td><td>TR-004 · TR-012 · TR-013 · TR-015 · TR-016 · TR-017 · TR-025 · TR-027 · TR-030 · TR-031 · TR-032 · TR-033 · TR-034 · TR-035</td><td>all fourteen fixed upstream (TR-030 was already fixed in 2.1.0 — upgrade, no library change)</td></tr>
+<tr><td>Nice-to-have</td><td>0</td><td>—</td><td>—</td></tr>
+</tbody>
+</table>
+<p>The table used to list 19 entries; TR-023 to TR-030 had been added since it was last rebuilt. With
+TR-022 closed as a merge, the 27 rows here and that one make the 28. TR-031 was added on 2026-09-11,
+which makes 29, TR-032 the same day, which makes 30, TR-033 the same day, which makes 31, and TR-034
+and TR-035 the same day — the fix-cycle-1 side-by-side comparisons — which makes 33. <strong>The next free
+number is <code>TR-036</code>.</strong></p>
+<p>Entries below are ordered <strong>blocker → major → minor</strong>, and by ID within a band. <strong>IDs are unchanged</strong> —
+the order is a reading aid, never a renumbering.</p>
+<h3 id="what-changed-in-the-2026-08-28-consolidation">What changed in the 2026-08-28 consolidation<a class="anchor-link" href="#what-changed-in-the-2026-08-28-consolidation">#</a></h3>
+<ol>
+<li><strong><code>TR-022</code> merged into <code>TR-008</code>.</strong> Same repro, same expected, same actual — one defect filed twice, the second time without re-reading the first. The lower ID keeps the entry; <code>TR-022</code> remains as a stub at the foot of the file so the citations in <code>docs/TfLens-DevGuide-Screens.md</code> and <code>PROJECT-STATUS.md</code> still resolve. TR-022's root-cause finding (the unread <code>aliases</code> map in <code>lucide.json</code>) is carried into TR-008 in full — it is the better half of the merge. <strong>This is why the file holds 19 entries, not 20.</strong>
+</li>
+<li><strong><code>TR-021</code> raised Medium → High.</strong> A silent zero-width render with no error and no console warning is the same failure class this file already grades High in TR-009 and TR-011(a), and it defeats the usual visibility checks besides. The reason is written into the entry itself.
+</li>
+<li><strong>No entry was renumbered, and no entry was deleted.</strong>
+</li>
+</ol>
+<h3 id="known-stale-citations-elsewhere-not-fixable-from-this-file">Known-stale citations elsewhere (not fixable from this file)<a class="anchor-link" href="#known-stale-citations-elsewhere-not-fixable-from-this-file">#</a></h3>
+<p><code>TR-006</code> and <code>TR-007</code> were <strong>never allocated</strong> here, but three source comments still cite them, having
+been written before the 2026-08-27 renumbering:</p>
+<table>
+<thead><tr><th>Citation</th><th>Cites</th><th>Actually means</th></tr></thead>
+<tbody>
+<tr><td><code>src/TfLens/Components/Pages/Harness.razor:99</code></td><td><code>TR-006</code></td><td><strong>TR-009</strong> (<code>ShowPagination="false"</code> still truncates to <code>InitialPageSize</code>)</td></tr>
+<tr><td><code>src/TfLens/Components/Pages/GateOutcomes.razor:92</code></td><td><code>TR-006</code></td><td><strong>TR-010</strong> (<code>TabsTrigger</code> captures no unmatched attributes)</td></tr>
+<tr><td><code>src/TfLens/Components/Pages/GateOutcomes.razor:22</code></td><td><code>TR-007</code></td><td><strong>TR-013</strong> (the <code>Typography*</code> family)</td></tr>
+</tbody>
+</table>
+<p>Left as-is deliberately: they are <code>src/</code> comments and this pass is documentation-only. Recorded here so
+the next reader is not sent looking for two entries that do not exist. <code>docs/TfLens-DevGuide-Screens.md</code>
+already lists its own <code>TR-007</code> mention under "stale comments to ignore".</p>
+<hr>
+<h2 id="tr-001-the-shipped-stylesheet-references-design-tokens-it-never-defines-alert-has-no-colour-bg-sidebar-is-transparent">TR-001 — The shipped stylesheet references design tokens it never defines (Alert has no colour, <code>bg-sidebar</code> is transparent)<a class="anchor-link" href="#tr-001-the-shipped-stylesheet-references-design-tokens-it-never-defines-alert-has-no-colour-bg-sidebar-is-transparent">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> High — every <code>Alert</code> variant renders colourless, and the whole sidebar/auth brand surface renders transparent.
+</li>
+<li><strong>Repro:</strong> Install <code>TrBlazeUI.Components</code> 2.0.0, link <code>_content/TrBlazeUI.Components/trblazeui.css</code>, render <code>&lt;Alert Variant="AlertVariant.Danger"&gt;&lt;AlertTitle&gt;Error&lt;/AlertTitle&gt;&lt;/Alert&gt;</code> or any element with <code>class="bg-sidebar"</code>.
+</li>
+<li><strong>Expected:</strong> The danger alert has a red tint, a red left accent and a red icon; <code>bg-sidebar</code> paints the sidebar surface.
+</li>
+<li><strong>Actual:</strong> <code>trblazeui.css</code> emits <code>.bg-alert-danger-bg{background-color:var(--alert-danger-bg)}</code>, <code>.border-l-alert-danger{border-left-color:var(--alert-danger)}</code>, <code>.bg-sidebar{background-color:var(--sidebar)}</code> … but <strong>defines none of those custom properties anywhere</strong> in the package. The full undefined set is: <code>--alert-success</code>, <code>--alert-success-bg</code>, <code>--alert-info</code>, <code>--alert-info-bg</code>, <code>--alert-warning</code>, <code>--alert-warning-bg</code>, <code>--alert-danger</code>, <code>--alert-danger-bg</code>, <code>--sidebar</code>, <code>--sidebar-foreground</code>, <code>--sidebar-border</code>, <code>--sidebar-accent</code>, <code>--sidebar-accent-foreground</code>, <code>--sidebar-ring</code>, <code>--font-sans</code>, <code>--font-mono</code>. The <code>:where(:root)</code> / <code>:where(.dark)</code> blocks define only the base shadcn tokens (<code>--background</code> … <code>--ring</code>, <code>--radius</code>).
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-001..005 (every auth screen's <code>Alert</code>, the auth brand panel's <code>bg-sidebar</code>).
+</li>
+<li><strong>Workaround:</strong> declare the missing custom properties on the page/layout root in the component's own scoped stylesheet (<code>AuthLayout.razor.css</code>, <code>Profile.razor.css</code>). Custom properties inherit, so every TrBlazeUI control rendered inside picks them up. This is per-page, not app-wide — the sidebar shell will need the same treatment.
+</li>
+<li><strong>Suggested fix:</strong> ship the <code>--alert-*</code> and <code>--sidebar*</code> token values in the same <code>:where(:root)</code> / <code>:where(.dark)</code> blocks that already carry <code>--background</code> and friends.
+</li>
+</ul>
+<hr>
+<h2 id="tr-002-the-shipped-stylesheet-contains-no-responsive-variants-at-all">TR-002 — The shipped stylesheet contains no responsive variants at all<a class="anchor-link" href="#tr-002-the-shipped-stylesheet-contains-no-responsive-variants-at-all">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> High — no breakpoint can be expressed in markup, so every responsive layout has to be hand-written CSS.
+</li>
+<li><strong>Repro:</strong> Search <code>trblazeui.css</code> (2.0.0) for any <code>md:</code>, <code>sm:</code> or <code>lg:</code> escaped class. There are none; the file contains exactly one <code>@media</code> rule (a <code>prefers-color-scheme</code>-independent one for the chart tooltip) and 710 utility classes total — only those the library itself uses.
+</li>
+<li><strong>Expected:</strong> Tailwind's standard responsive variants (<code>md:grid-cols-2</code>, <code>md:flex-row</code>, <code>sm:p-8</code>, …) are usable from the <code>Class</code> parameter, as every TrBlazeUI example and the AI reference's own snippets assume.
+</li>
+<li><strong>Actual:</strong> <code>md:grid-cols-2</code> etc. are absent, so <code>Class="grid gap-4 md:grid-cols-2"</code> renders a single column at every width. <code>grid-cols-2</code> itself is also absent (only <code>grid-cols-3</code> and <code>grid-cols-4</code> shipped). <code>.trblazeui-col-md-6</code> exists but is <strong>not</strong> wrapped in a media query — it is byte-identical to <code>.trblazeui-col-6</code>, so the "responsive" grid helper is not responsive either.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-001..004 (auth split layout), REQ-UI-005 (two profile cards stacking under <code>md</code>).
+</li>
+<li><strong>Workaround:</strong> hand-written media queries in Blazor scoped stylesheets (<code>AuthLayout.razor.css</code>, <code>Profile.razor.css</code>).
+</li>
+<li><strong>Suggested fix:</strong> either ship the full Tailwind utility surface, or document that consumers must run their own Tailwind build over their markup — and put the <code>trblazeui-col-{sm,md,lg,xl}-*</code> helpers inside real media queries.
+</li>
+</ul>
+<hr>
+<h2 id="tr-009-datatable-showpagination-false-still-truncates-the-grid-to-initialpagesize">TR-009 — <code>DataTable ShowPagination="false"</code> still truncates the grid to <code>InitialPageSize</code><a class="anchor-link" href="#tr-009-datatable-showpagination-false-still-truncates-the-grid-to-initialpagesize">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> High — the table silently drops rows with no pager, no count and no warning; the page looks complete.
+</li>
+<li><strong>Repro:</strong> <code>&lt;DataTable TData="GateRow" Data="@eightRows" ShowToolbar="false" ShowPagination="false"&gt;</code> with eight rows.
+</li>
+<li><strong>Expected:</strong> turning pagination off renders every row — that is the only reason to turn it off. The AI reference describes <code>ShowPagination</code> as "Allow pagination; the bar auto-hides when all rows fit one page", which reads as "no pager, all rows".
+</li>
+<li><strong>Actual:</strong> only the first <code>InitialPageSize</code> rows render (default <strong>5</strong>). With <code>ShowPagination="false"</code> there is no pager to reveal the rest, so rows six onwards are simply absent from the DOM. On <code>/gate-outcomes</code> this silently cut the <code>standards</code>, <strong><code>escaped</code></strong> and <code>unattributed</code> rows off the gate-catch distribution — the <code>escaped</code> row is the one row the requirement exists for.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-020 (<code>gate-dist-{type}</code>, eight fixed rows in the reference's gate order).
+</li>
+<li><strong>Workaround:</strong> set <code>InitialPageSize</code> above the row count (<code>InitialPageSize="32"</code>) whenever pagination is off.
+</li>
+<li><strong>Suggested fix:</strong> when <code>ShowPagination</code> is <code>false</code>, ignore <code>InitialPageSize</code> and render the whole <code>Data</code> sequence; or document loudly that <code>InitialPageSize</code> still applies.
+</li>
+</ul>
+<hr>
+<h2 id="tr-011-barchart-renders-an-empty-the-apexcharts-runtime-is-never-loaded-and-a-portalled-dialogcontent-cannot-be-sized-by-the-consumer">TR-011 — <code>BarChart</code> renders an empty <code>&lt;div&gt;</code> (the ApexCharts runtime is never loaded), and a portalled <code>DialogContent</code> cannot be sized by the consumer<a class="anchor-link" href="#tr-011-barchart-renders-an-empty-the-apexcharts-runtime-is-never-loaded-and-a-portalled-dialogcontent-cannot-be-sized-by-the-consumer">#</a></h2>
+<p>Two defects met on the same screen; both make a control unusable as shipped.</p>
+<p><strong>(a) The chart renders nothing.</strong></p>
+<ul>
+<li><strong>Severity:</strong> High — the component produces a blank box, with no error, no console warning and no fallback.
+</li>
+<li><strong>Repro:</strong> <code>&lt;ChartContainer&gt;&lt;BarChart TItem="Point" Items="@points" Height="240" /&gt;&lt;/ChartContainer&gt;</code> in a stock Blazor Server app that references <code>TrBlazeUI.Components</code> 2.0.0 and links <code>trblazeui.css</code>.
+</li>
+<li><strong>Expected:</strong> bars.
+</li>
+<li><strong>Actual:</strong> the rendered DOM is <code>&lt;div class="w-full" data-slot="bar-chart"&gt;&lt;div id="0e17…"&gt;&lt;/div&gt;&lt;/div&gt;</code> — the mount point is created and never filled. <code>Blazor-ApexCharts</code> is a package dependency, but no <code>apexcharts</code> script or JS module is loaded (the package's own <code>staticwebassets/js/</code> ships twelve interop files and none of them is a chart), and nothing in the component or the docs tells a consumer to add one.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-028 (tokens-by-model totals).
+</li>
+<li><strong>Workaround:</strong> the totals are drawn as a small CSS bar row in the page's scoped stylesheet, each bar labelled with the exact figure the table beside it states.
+</li>
+<li><strong>Suggested fix:</strong> load the ApexCharts asset from the component (or document the required script tag), and make an unrenderable chart show its data as a table rather than an empty box.
+</li>
+</ul>
+<p><strong>(b) A dialog cannot be widened.</strong></p>
+<ul>
+<li><strong>Severity:</strong> Medium.
+</li>
+<li><strong>Repro:</strong> <code>&lt;DialogContent Class="my-wide-dialog"&gt;</code> with <code>.my-wide-dialog { max-width: 44rem }</code> in the calling page's scoped stylesheet, with or without <code>::deep</code>.
+</li>
+<li><strong>Expected:</strong> the dialog is 44rem wide.
+</li>
+<li><strong>Actual:</strong> it stays at <code>max-w-lg</code> (512px). <code>DialogContent</code> is rendered into <code>div.trblazeui-portal</code> directly under <code>&lt;body&gt;</code>, outside the calling component's subtree, so a Blazor scoped stylesheet can never match it — <code>::deep</code> included, since that still requires an ancestor inside the component. The only escape hatches the shipped CSS offers are <code>max-w-sm</code> / <code>max-w-md</code> / <code>max-w-lg</code> / <code>max-w-none</code>, and <code>max-w-none</code> with the component's own <code>w-full</code> means edge-to-edge.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-030 (a five-column rate-card table in a 512px dialog).
+</li>
+<li><strong>Workaround:</strong> size the cells instead (<code>w-16 text-right</code> on each <code>Input</code>) and keep the table in an <code>overflow-x-auto</code> box.
+</li>
+<li><strong>Suggested fix:</strong> ship a <code>Size</code>/<code>MaxWidth</code> parameter on <code>DialogContent</code>, or a documented CSS custom property the portal honours.
+</li>
+</ul>
+<hr>
+<h2 id="tr-021-the-shipped-stylesheet-s-spacing-sizing-scale-has-holes-w-20-mt-3-my-4-are-absent-so-a-control-sized-with-one-silently-collapses-to-zero">TR-021 — The shipped stylesheet's spacing/sizing scale has holes (<code>w-20</code>, <code>mt-3</code>, <code>my-4</code> are absent), so a control sized with one silently collapses to zero<a class="anchor-link" href="#tr-021-the-shipped-stylesheet-s-spacing-sizing-scale-has-holes-w-20-mt-3-my-4-are-absent-so-a-control-sized-with-one-silently-collapses-to-zero">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> High — <strong>raised from Medium on 2026-08-28 consolidation.</strong> A component given <code>Class="w-20"</code> renders with <strong>zero width</strong>: no error, no warning, no console message, and a control that looks deliberately hidden rather than broken. That is the same failure class this file already grades High elsewhere — TR-009 (rows silently dropped, "the page looks complete") and TR-011(a) (an empty chart box, "no error, no console warning and no fallback") — and this one is worse than both, because the collapsed control still passes every "is it visible?" test. Filed Medium when it was written; nothing about the evidence supported that, so it is corrected here rather than left inconsistent with its own neighbours. <strong>This is the highest-value entry in the file:</strong> the whole utility surface is generated from the library's own internal usage, so the hole is unbounded and every consumer meets it eventually, on a different class each time.
+</li>
+<li><strong>Repro:</strong> <code>&lt;Progress Value="24" Class="w-20" /&gt;</code> in an app that links only <code>_content/TrBlazeUI.Components/trblazeui.css</code>. Then measure: <code>document.querySelector('[role="progressbar"]').getBoundingClientRect().width</code>.
+</li>
+<li><strong>Expected:</strong> 5rem. The class is part of the Tailwind scale the library's own markup and its AI reference use, and the neighbouring steps (<code>w-16</code>, <code>w-40</code>) are present.
+</li>
+<li><strong>Actual:</strong> <code>0</code>. <code>trblazeui.css</code> emits <code>.w-2 .w-3 .w-4 … .w-14 .w-16 .w-40 .w-64 .w-72</code> and stops — the file carries only the utilities the library's own components happen to use, so the scale reads as complete while several steps are missing. The same is true of <code>mt-3</code> and <code>my-4</code> (both <code>mt-2</code> and <code>mt-4</code> exist, so the gap is invisible until a build lands on the wrong step). This is the sibling of TR-002: there the responsive variants were byte-identical no-ops, here the base utilities are simply absent.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-037 — the failed-practice share bars on <code>/misses</code> (<code>miss-whymissed</code>), which rendered as a zero-width <code>Progress</code> beside a correct percentage; and the <code>Separator</code>s in the cost band.
+</li>
+<li><strong>Workaround:</strong> use a step the file actually ships (<code>w-16</code> here) or declare the rule in the page's own scoped CSS. Before shipping a screen, grep the class names used against <code>trblazeui.css</code> — a class the file does not define fails silently and geometry gates only catch it when the collapse causes an overlap.
+</li>
+<li><strong>Suggested fix:</strong> ship the full base scale for the utilities the components and the AI reference name, or document exactly which subset is supported so a consumer knows when to write their own rule.
+</li>
+</ul>
+<hr>
+<h2 id="tr-003-passwordstrength-centeredpanel-stattile-statgroup-and-codeblock-do-not-exist-in-2-0-0">TR-003 — <code>PasswordStrength</code>, <code>CenteredPanel</code>, <code>StatTile</code> / <code>StatGroup</code> and <code>CodeBlock</code> do not exist in 2.0.0<a class="anchor-link" href="#tr-003-passwordstrength-centeredpanel-stattile-statgroup-and-codeblock-do-not-exist-in-2-0-0">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Medium — the components the design spec was written against are not in the shipped package.
+</li>
+<li><strong>Repro:</strong> <code>TrBlazeUI.Components</code> 2.0.0 <code>lib/net10.0/TrBlazeUI.Components.dll</code> contains no <code>TrBlazeUI.Components.PasswordStrength</code>, <code>…CenteredPanel</code>, <code>…Stat</code>, or <code>…CodeBlock</code> namespace or type. The package's own <code>docs/TrBlazeUI-AI-Reference.md</code> does not document them either.
+</li>
+<li><strong>Expected:</strong> <code>docs/TfLens-UIDesign.md</code> §Library gaps records these as present in the GitHub repo at mockup time and mandates their use.
+</li>
+<li><strong>Actual:</strong> absent from the NuGet package the project consumes.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-002 / REQ-UI-004 / REQ-UI-005 (<code>PasswordStrength</code>), REQ-UI-001..004 (<code>CenteredPanel</code>).
+</li>
+<li><strong>Workaround:</strong> <code>PasswordStrengthMeter.razor</code> composes the meter from the library's own <code>Progress</code> (the fallback §Library gaps itself names); the auth card is centred by the layout's own flexbox instead of <code>CenteredPanel</code>.
+</li>
+<li><strong>Suggested fix:</strong> publish a NuGet build that carries the components already in the repo, or correct the reference doc to match what 2.0.0 actually ships.
+</li>
+</ul>
+<hr>
+<h2 id="tr-005-the-chart-components-have-no-xvalue-yvalue-the-ai-reference-documents-an-api-that-does-not-exist">TR-005 — The chart components have no <code>XValue</code> / <code>YValue</code>; the AI reference documents an API that does not exist<a class="anchor-link" href="#tr-005-the-chart-components-have-no-xvalue-yvalue-the-ai-reference-documents-an-api-that-does-not-exist">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Medium — every documented chart snippet fails to compile.
+</li>
+<li><strong>Repro:</strong> <code>&lt;BarChart TItem="Point" Items="@points" XValue="@(p =&gt; p.Label)" YValue="@(p =&gt; p.Total)" /&gt;</code>, copied verbatim from <code>TrBlazeUI-AI-Reference.md</code> §"Chart (ApexCharts wrapper)".
+</li>
+<li><strong>Expected:</strong> compiles, per the reference.
+</li>
+<li><strong>Actual:</strong> <code>error CS8917: The delegate type could not be inferred</code> — <code>BarChart&lt;TItem&gt;</code> (and every other chart type, all deriving from <code>ChartBase&lt;TItem&gt;</code>) exposes only <code>Items</code>, <code>Config</code> (<code>ChartConfig</code> → <code>ChartSeriesConfig { Label, Color }</code>), <code>Height</code>, <code>Width</code>, <code>Class</code>, <code>ShowLegend</code>, <code>LegendPosition</code>, <code>ShowDataLabels</code>, <code>ShowTooltip</code>, <code>Title</code>, <code>EnableAnimations</code>, plus the per-type <code>Variant</code>. Categories and series are inferred from <code>TItem</code>'s properties by reflection; there is no accessor pair at all, so a caller cannot say which property is the category and which is the value.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-028 (tokens-by-model totals chart).
+</li>
+<li><strong>Workaround:</strong> shape a purpose-built projection type whose property order matches what the reflection expects (<code>record ModelTotal(string Model, double Total)</code>) and pass only <code>Items</code>. Because the mapping is implicit and undocumented, TfLens also renders every charted value as text in the table beside the chart — which <code>docs/TfLens-UIDesign.md</code> §Library gaps already requires for a different reason.
+</li>
+<li><strong>Suggested fix:</strong> add <code>XValue</code> / <code>YValue</code> (or a <code>ChartSeries</code> child component) as the reference already claims, or correct the reference to document the reflection contract and its ordering rules.
+</li>
+</ul>
+<hr>
+<h2 id="tr-008-trblazeui-icons-lucide-2-0-0-does-not-resolve-the-pre-rename-lucide-names-so-every-circle-alert-name-renders-nothing">TR-008 — <code>TrBlazeUI.Icons.Lucide</code> 2.0.0 does not resolve the pre-rename Lucide names, so every <code>*-circle</code> / <code>alert-*</code> name renders nothing<a class="anchor-link" href="#tr-008-trblazeui-icons-lucide-2-0-0-does-not-resolve-the-pre-rename-lucide-names-so-every-circle-alert-name-renders-nothing">#</a></h2>
+<blockquote>
+<p><strong>Merged 2026-08-28.</strong> <code>TR-022</code> was filed on 2026-08-28 as a separate entry (<em>"<code>LucideIcon</code> does not
+resolve the aliases in its own <code>lucide.json</code>"</em>) before this entry was re-read. It carries the <strong>same
+repro</strong> (<code>&lt;LucideIcon Name="check-circle" Size="16" /&gt;</code>), the <strong>same expected</strong> (the circled check
+renders) and the <strong>same actual</strong> (nothing renders), so it is the same defect, not a second one — and
+<code>docs/TfLens-DevGuide-Screens.md:203</code> says as much: <em>"Confirmed again 2026-08-28 as <code>TR-022</code>"</em>.
+Per this file's numbering rule the lower ID wins, so the two are merged here under <strong>TR-008</strong> and
+<code>TR-022</code> is kept as a stub that points at this entry, because <code>docs/TfLens-DevGuide-Screens.md</code> and
+<code>PROJECT-STATUS.md</code> already cite it. <strong>TR-022's contribution is kept and it is the valuable part:</strong> it
+supplies the root cause this entry originally guessed at. The severity is TR-008's Medium (the higher
+of the two); TR-022 had been filed Low.</p>
+</blockquote>
+<ul>
+<li><strong>Severity:</strong> Medium — the icon silently disappears; there is no build error and no runtime error, only a <code>data-trblazeui-missing-icon</code> placeholder that occupies the right box and draws nothing.
+</li>
+<li><strong>Repro:</strong> <code>&lt;LucideIcon Name="check-circle" Size="16" /&gt;</code>, <code>&lt;LucideIcon Name="alert-triangle" Size="16" /&gt;</code>, <code>&lt;LucideIcon Name="help-circle" Size="16" /&gt;</code>, <code>&lt;LucideIcon Name="x-circle" Size="16" /&gt;</code>.
+</li>
+<li><strong>Expected:</strong> the icons render. These are the names the package's own <code>TrBlazeUI-AI-Reference.md</code> uses (<code>&lt;Alert Variant="AlertVariant.Danger"&gt;&lt;LucideIcon Name="alert-circle" …&gt;</code>), and the names <code>docs/TfLens-UIDesign.md</code> and every mockup were written against. They are also real Lucide names that are <strong>present in the package's own <code>content/lucide.json</code></strong>, under <code>aliases</code>.
+</li>
+<li><strong>Actual:</strong> nothing renders for any pre-rename spelling. Probed on the running app, <code>circle-check</code>, <code>circle-alert</code>, <code>triangle-alert</code>, <code>circle-x</code>, <code>badge-check</code>, <code>x</code>, <code>clock</code>, <code>percent</code>, <code>target</code>, <code>shield-check</code>, <code>ban</code>, <code>bug</code>, <code>list-checks</code>, <code>gauge</code>, <code>trending-up</code>, <code>trending-down</code>, <code>flag</code>, <code>zap</code>, <code>chart-bar</code> and <code>bar-chart-3</code> all render; <code>check-circle</code>, <code>check-circle-2</code>, <code>alert-circle</code>, <code>alert-triangle</code>, <code>x-circle</code>, <code>help-circle</code> and <code>circle-help</code> all render nothing. There is no <code>circle-help</code> under either name, so a "question" glyph is simply unavailable. This is already visible in the shipped shell: the sidebar's <strong>Gate outcomes</strong> item (<code>shield-check</code>; <code>help-circle</code> when this was logged) has no icon at all, and <code>Repos.razor</code>'s rate-limit and private-repo alerts (<code>alert-triangle</code>) have none either.
+</li>
+<li><strong>Root cause (from the merged TR-022, 2026-08-28):</strong> the names are <strong>not missing from the package</strong> — this entry's original reading ("2.0.0 carries only the post-rename names") was one layer short. <code>lucide.json</code> ships two maps, <code>icons</code> and <code>aliases</code>, and the aliased spellings are all present in <code>aliases</code>. The component looks the name up in <strong><code>icons</code> only</strong>, so every aliased spelling (<code>check-circle</code> → <code>circle-check</code>, and the rest of Lucide's renamed set) resolves to nothing. There is no warning and no fallback glyph, which is why a blank icon is indistinguishable from a deliberate one.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-018 (the three KPI tiles' icons and the empty state's icon on <code>/gate-outcomes</code>); and, as TR-022, REQ-UI-036 — the measured-USD tile's accent chip on <code>/misses</code> rendered as an empty coloured square.
+</li>
+<li><strong>Workaround:</strong> use the canonical name from the <code>icons</code> map — <code>circle-check</code>, <code>triangle-alert</code>, <code>x</code> — and substitute <code>list-checks</code> where no question glyph exists. A quick check against <code>~/.nuget/packages/trblazeui.icons.lucide/&lt;version&gt;/content/lucide.json</code> settles any name.
+</li>
+<li><strong>Suggested fix:</strong> <strong>fall back to the <code>aliases</code> map on a miss in <code>icons</code></strong> — the data is already in the package, only the lookup is one map short, so this is a small change that fixes every aliased name at once. Failing that, ship the pre-rename aliases into <code>icons</code> directly. Either way, emit a build-time or development-time warning naming the closest match for a name that resolves in neither map, and update <code>TrBlazeUI-AI-Reference.md</code> to the names the package actually carries.
+</li>
+</ul>
+<hr>
+<h2 id="tr-010-tabstrigger-tabscontent-tabslist-capture-no-unmatched-attributes-so-a-tab-cannot-carry-a-test-id">TR-010 — <code>TabsTrigger</code> / <code>TabsContent</code> / <code>TabsList</code> capture no unmatched attributes, so a tab cannot carry a test id<a class="anchor-link" href="#tr-010-tabstrigger-tabscontent-tabslist-capture-no-unmatched-attributes-so-a-tab-cannot-carry-a-test-id">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Medium — it makes the tab controls unaddressable from any test or analytics attribute, and it fails at <strong>runtime</strong>, not at compile time.
+</li>
+<li><strong>Repro:</strong> <code>&lt;TabsTrigger Value="drift" data-testid="routing-tab-drift"&gt;Routing drift&lt;/TabsTrigger&gt;</code>.
+</li>
+<li><strong>Expected:</strong> the attribute lands on the rendered trigger, as it does on <code>Tabs</code>, <code>Card</code>, <code>Badge</code>, <code>Button</code>, <code>Alert</code>, <code>DataTable</code>, <code>Empty</code> and every other component in the library.
+</li>
+<li><strong>Actual:</strong> <code>System.InvalidOperationException: Object of type 'TrBlazeUI.Components.Tabs.TabsTrigger' does not have a property matching the name 'data-testid'</code> — a 500 on the page, with nothing at build time to warn you. <code>TabsTrigger</code> exposes only <code>Value</code>, <code>Disabled</code>, <code>ChildContent</code>, <code>Class</code>; <code>TabsList</code> and <code>TabsContent</code> only <code>ChildContent</code>/<code>Class</code> (+<code>Value</code>/<code>ForceMount</code>). <code>Dialog</code>, <code>DialogHeader</code> and <code>DialogFooter</code> have the same gap.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-027 (the <code>routing-tab-{key}</code> ids the acceptance asserts literally).
+</li>
+<li><strong>Workaround:</strong> put the id on a <code>&lt;span&gt;</code> inside the trigger's <code>ChildContent</code> — a click on the span still activates the trigger, and the id is where a test can find it.
+</li>
+<li><strong>Suggested fix:</strong> add <code>[Parameter(CaptureUnmatchedValues = true)] Dictionary&lt;string, object&gt;? AdditionalAttributes</code> to <code>TabsList</code>, <code>TabsTrigger</code>, <code>TabsContent</code>, <code>DialogHeader</code> and <code>DialogFooter</code>, and splat it, as the rest of the library already does.
+</li>
+</ul>
+<hr>
+<h2 id="tr-014-alertdialog-has-no-escape-handling-at-all-and-no-closeonescape-modal-to-turn-it-on">TR-014 — <code>AlertDialog</code> has no Escape handling at all, and no <code>CloseOnEscape</code> / <code>Modal</code> to turn it on<a class="anchor-link" href="#tr-014-alertdialog-has-no-escape-handling-at-all-and-no-closeonescape-modal-to-turn-it-on">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Medium — a confirmation dialog that cannot be dismissed with Escape fails a plain accessibility expectation, and there is no parameter to opt in.
+</li>
+<li><strong>Repro:</strong> <code>&lt;AlertDialog @bind-Open="objIsRemoveOpen"&gt;&lt;AlertDialogContent&gt;…&lt;AlertDialogCancel&gt;…&lt;/AlertDialogCancel&gt; &lt;AlertDialogAction&gt;…&lt;/AlertDialogAction&gt;&lt;/AlertDialogContent&gt;&lt;/AlertDialog&gt;</code>, open it, press <strong>Escape</strong>.
+</li>
+<li><strong>Expected:</strong> Escape closes the alert dialog, the same way it closes <code>Dialog</code> and <code>Sheet</code> — the shadcn/ui AlertDialog this component mirrors closes on Escape by default, and the package's own <code>Dialog</code> documents <code>Modal</code> as "Dismiss on outside click/Escape".
+</li>
+<li><strong>Actual:</strong> nothing happens; only the <code>AlertDialogCancel</code> button closes it. <code>TrBlazeUI.Components.AlertDialog.AlertDialog</code> exposes only <code>ChildContent</code> / <code>Open</code> / <code>OpenChanged</code> / <code>DefaultOpen</code> / <code>OnOpenChange</code>, and <code>AlertDialogContent</code> only <code>ChildContent</code> / <code>Class</code> / <code>AdditionalAttributes</code> — there is no <code>Modal</code>, no <code>CloseOnEscape</code>, no <code>OnEscapeKeyDown</code>. Unlike <code>Dialog</code>, <code>AlertDialog</code> is not built on <code>TrBlazeUI.Primitives.Dialog.DialogContent</code> (there is no <code>AlertDialog</code> type in <code>TrBlazeUI.Primitives</code> at all), so it never inherits that primitive's <code>CloseOnEscape</code> / <code>TrapFocus</code> / <code>LockScroll</code> behaviour. Passing <code>CloseOnEscape="true"</code> through <code>AdditionalAttributes</code> only emits a stray HTML attribute.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-013 (the remove-repo confirmation on <code>/repos</code>), whose acceptance names Escape.
+</li>
+<li><strong>Related, same page:</strong> the Connect <code>Dialog</code> — which <em>does</em> have <code>CloseOnEscape</code> via the primitive — stopped honouring Escape once a validation result had re-rendered its content (REQ-UI-012's recorded observation). Both were cured by the same page-level listener below, which suggests the primitive's document <code>keydown</code> registration does not survive a content re-render.
+</li>
+<li><strong>Workaround:</strong> own the key in the page. <code>src/TfLens/Components/Pages/Repos.razor.js</code> adds one capture-phase <code>document</code> <code>keydown</code> listener and calls a <code>[JSInvokable]</code> method on the component, which sets the bound <code>Open</code> field to <code>false</code>; the listener ignores the press when an open <code>role="listbox"</code> popup (Select/Combobox) should consume it, and the page implements <code>IAsyncDisposable</code> to remove it. Costs an interop hop per Escape and has to be repeated on every page that uses <code>AlertDialog</code>.
+</li>
+<li><strong>Suggested fix:</strong> build <code>AlertDialog</code> on the same <code>Primitives.Dialog</code> layer <code>Dialog</code> uses, or at minimum add <code>Modal</code> / <code>CloseOnEscape</code> / <code>OnEscapeKeyDown</code> to <code>AlertDialogContent</code> with <code>CloseOnEscape</code> defaulting to true; and re-register the primitive's Escape listener on re-render so a dialog whose body changes keeps its key handling.
+</li>
+</ul>
+<hr>
+<h2 id="tr-018-a-closed-collapsiblecontent-keeps-its-children-in-normal-flow-so-the-collapsed-panel-still-occupies-and-overlaps-the-space-below-it">TR-018 — A closed <code>CollapsibleContent</code> keeps its children in normal flow, so the collapsed panel still occupies (and overlaps) the space below it<a class="anchor-link" href="#tr-018-a-closed-collapsiblecontent-keeps-its-children-in-normal-flow-so-the-collapsed-panel-still-occupies-and-overlaps-the-space-below-it">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Medium — a collapsed disclosure silently lands on top of whatever follows it in the page, and the collision is invisible in a screenshot (the text is clipped) but real to every geometry-based layout gate, to hit-testing, and to a screen reader walking the accessibility tree.
+</li>
+<li><strong>Repro:</strong> render a card whose body is <code>&lt;Collapsible @bind-Open="objIsOpen"&gt;&lt;CollapsibleTrigger&gt;…&lt;/CollapsibleTrigger&gt;&lt;CollapsibleContent&gt;&lt;div data-testid="body"&gt;…tall content…&lt;/div&gt;&lt;/CollapsibleContent&gt;&lt;/Collapsible&gt;</code> with <code>objIsOpen</code> <strong>false</strong>, and put a sibling element after the card. Then measure: <code>document.querySelector('[data-testid="body"]').getBoundingClientRect()</code>.
+</li>
+<li><strong>Expected:</strong> a closed <code>CollapsibleContent</code> contributes no box — either its children are not rendered at all, or the subtree is <code>display:none</code> / <code>hidden</code> so nothing inside it reports a non-zero rect. That is what the shadcn/ui Collapsible this component mirrors does (Radix sets <code>hidden</code> on closed content).
+</li>
+<li><strong>Actual:</strong> the children are rendered and laid out normally inside a zero-height, <code>overflow: hidden</code> wrapper. <code>overflow:hidden</code> clips the paint but does <strong>not</strong> clip layout, so the inner element still reports its full natural height — measured 45px of vertical overlap with the next sibling card on a 1280px viewport. <code>getComputedStyle</code> reports neither <code>display:none</code> nor <code>visibility:hidden</code>, so the usual "is it visible?" tests all say yes.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-034 — <code>Components/Shared/Playbook/PlaybookObservedFields.razor</code>, the "Observed fields" disclosure on the Coverage page's Playbook state. The visual gate in <code>tests/verify/ui-playbook-state.spec.ts</code> failed with <code>playbook-observed-fields overlaps pb-coverage-notes by 958x45px @1280</code>.
+</li>
+<li><strong>Workaround:</strong> guard the content in the component itself — <code>&lt;CollapsibleContent&gt;@if (objIsOpen) { &lt;div …&gt;…&lt;/div&gt; }&lt;/CollapsibleContent&gt;</code> — so the closed state has no subtree at all and therefore no phantom box. The disclosure also now opens by default, which is what the mockup shows. The cost is that the content is re-created on every open rather than merely revealed, so any transient state inside a collapsible has to live outside it.
+</li>
+<li><strong>Suggested fix:</strong> put <code>hidden</code> (or <code>display:none</code>) on <code>CollapsibleContent</code>'s root while closed, the way Radix's Collapsible does; if the animation needs the box to exist mid-transition, drop it once the transition ends rather than leaving it in flow indefinitely.
+</li>
+</ul>
+<hr>
+<h2 id="tr-019-dialogcontent-never-scrolls-so-a-dialog-taller-than-the-viewport-is-simply-unreachable-below-the-fold">TR-019 — <code>DialogContent</code> never scrolls, so a dialog taller than the viewport is simply unreachable below the fold<a class="anchor-link" href="#tr-019-dialogcontent-never-scrolls-so-a-dialog-taller-than-the-viewport-is-simply-unreachable-below-the-fold">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Medium — content and controls disappear off the bottom of the screen with no scrollbar and no indication that anything is missing, and the consumer has no parameter to turn a scroll on.
+</li>
+<li><strong>Repro:</strong> put ~900px of fields into <code>&lt;Dialog&gt;&lt;DialogContent&gt;…&lt;DialogFooter&gt;…&lt;/DialogFooter&gt;&lt;/DialogContent&gt;&lt;/Dialog&gt;</code> and open it at 1280x800 or 390x844.
+</li>
+<li><strong>Expected:</strong> either the content area between <code>DialogHeader</code> and <code>DialogFooter</code> scrolls (the shadcn/ui dialog this mirrors caps the panel at <code>max-h-[calc(100%-2rem)]</code> and lets the body scroll, keeping the header and the footer pinned), or a <code>MaxHeight</code> / <code>ScrollBody</code> parameter exists to opt in.
+</li>
+<li><strong>Actual:</strong> <code>DialogContent</code> renders a fixed, centred panel with no height cap and no <code>overflow</code> on any of its parts. The panel grows past the viewport, the overlay does not scroll, and the bottom of the dialog — including <code>DialogFooter</code> and its primary action — is unreachable. <code>DialogContent</code> exposes only <code>Class</code>, <code>ShowCloseButton</code> and <code>ChildContent</code>; there is no height, scroll or size parameter, and the same is true of <code>DialogHeader</code> / <code>DialogFooter</code> (which additionally capture no unmatched attributes, TR-010).
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-040 — the Add-source dialog on <code>/repos</code>, whose import mode carries a mode fork, four fields, a drop zone, a five-row preview table and a summary. At 390x844 the Import button was below the fold and could not be pressed.
+</li>
+<li><strong>Workaround:</strong> the page owns the scroll. Everything between the header and the footer is wrapped in a single <code>.tflens-dialog-body</code> (<code>Components/Pages/Repos.razor.css</code>) with <code>max-height: 68vh; overflow-y: auto</code>, which pins the header and the footer and scrolls the middle. <code>vh</code> and <code>max-h-*</code> are not in the shipped stylesheet either (TR-002), so the rule has to live in the page's scoped CSS rather than in a utility class. The cost is that a control scrolled out of the body still reports its true rect to a geometry check, so a naive overlap gate sees the clipped control colliding with the footer.
+</li>
+<li><strong>Suggested fix:</strong> cap <code>DialogContent</code> at the viewport and make the region between <code>DialogHeader</code> and <code>DialogFooter</code> <code>overflow-y: auto</code>, as shadcn/ui does; failing that, add a <code>MaxHeight</code> parameter and let the consumer choose.
+</li>
+</ul>
+<hr>
+<h2 id="tr-020-selectvalue-renders-the-raw-bound-value-until-selectcontent-has-rendered-once-so-a-closed-select-shows-its-key-rather-than-its-label">TR-020 — <code>SelectValue</code> renders the raw bound value until <code>SelectContent</code> has rendered once, so a closed select shows its key rather than its label<a class="anchor-link" href="#tr-020-selectvalue-renders-the-raw-bound-value-until-selectcontent-has-rendered-once-so-a-closed-select-shows-its-key-rather-than-its-label">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Medium — the control's resting state shows an internal identifier to the user; the correct label only appears after the popover has been opened once, which most readers never do.
+</li>
+<li><strong>Repro:</strong> <code>&lt;Select TValue="string" Value="@objPeriod" ValueChanged="…"&gt;&lt;SelectTrigger&gt;&lt;SelectValue Placeholder="All history (default)" /&gt;&lt;/SelectTrigger&gt;&lt;SelectContent&gt;&lt;SelectItem TValue="string" Value="all" Text="All history (default)"&gt;All history (default)&lt;/SelectItem&gt;…&lt;/SelectContent&gt;&lt;/Select&gt;</code> with <code>objPeriod = "all"</code>, and read the trigger without opening it.
+</li>
+<li><strong>Expected:</strong> the trigger shows the selected item's <code>Text</code> — that is the whole point of <code>SelectItem.Text</code> existing beside <code>Value</code>, and it is what the shadcn/ui Select this mirrors does.
+</li>
+<li><strong>Actual:</strong> the trigger renders the literal string <code>all</code>. <code>SelectItem</code> registers its <code>Text</code> with the parent only when it is rendered, and <code>SelectContent</code> renders nothing until the popover is opened, so at first paint the parent's value→text map is empty and <code>SelectValue</code> falls back to <code>Value.ToString()</code>. Opening the popover once fixes it for the rest of the circuit, which makes it look intermittent.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-035 — the period filter on <code>/misses</code> (<code>data-testid="misses-period"</code>), which must show <strong>All history</strong> on the first view (BRD-125). It showed <code>all</code>.
+</li>
+<li><strong>Workaround:</strong> pass <code>DisplayTextSelector</code> on <code>Select</code> — a <code>Func&lt;TValue, string&gt;</code> the component consults without waiting for the items to render. <code>Components/Pages/Misses.razor</code> maps the period key back to its option label there. The <code>Text</code> on each <code>SelectItem</code> is kept so the open popover is unaffected.
+</li>
+<li><strong>Suggested fix:</strong> let <code>SelectItem</code>s register eagerly (render <code>SelectContent</code>'s items into a hidden registration pass, or have <code>Select</code> collect its children's <code>Value</code>/<code>Text</code> at parameter-set time) so the closed trigger can resolve a label before the popover has ever been opened.
+</li>
+</ul>
+<hr>
+<h2 id="tr-004-alert-and-button-have-no-icon-slot-that-can-be-combined-with-child-content">TR-004 — <code>Alert</code> and <code>Button</code> have no icon slot that can be combined with child content<a class="anchor-link" href="#tr-004-alert-and-button-have-no-icon-slot-that-can-be-combined-with-child-content">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Low — documented, but it forces a positional convention rather than a named slot.
+</li>
+<li><strong>Repro:</strong> <code>&lt;Alert Variant="AlertVariant.Danger"&gt;&lt;Icon&gt;…&lt;/Icon&gt;&lt;AlertTitle&gt;…&lt;/AlertTitle&gt;&lt;/Alert&gt;</code>.
+</li>
+<li><strong>Expected:</strong> a named <code>Icon</code> fragment usable alongside <code>AlertTitle</code> / <code>AlertDescription</code>.
+</li>
+<li><strong>Actual:</strong> RZ10012 — mixing an explicit fragment with implicit child content is a Razor compile error, so the icon has to be the first loose child and the component's CSS positions it by position.
+</li>
+<li><strong>Encountered in:</strong> every alert and every icon button on REQ-UI-001..005.
+</li>
+<li><strong>Workaround:</strong> place <code>&lt;LucideIcon&gt;</code> as the first loose child, as the package's AI reference instructs.
+</li>
+<li><strong>Suggested fix:</strong> accept an <code>Icon</code> <code>RenderFragment</code> and render <code>ChildContent</code> beside it, so the two are independent.
+</li>
+</ul>
+<hr>
+<h2 id="tr-012-datatable-cannot-hide-its-header-row-so-it-cannot-render-a-key-value-table">TR-012 — <code>DataTable</code> cannot hide its header row, so it cannot render a key/value table<a class="anchor-link" href="#tr-012-datatable-cannot-hide-its-header-row-so-it-cannot-render-a-key-value-table">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Low — cosmetic, but it affects every small two-column table.
+</li>
+<li><strong>Repro:</strong> <code>&lt;DataTable ShowToolbar="false" ShowPagination="false"&gt;</code> with two columns.
+</li>
+<li><strong>Expected:</strong> a <code>ShowHeader</code> parameter beside <code>ShowToolbar</code> and <code>ShowPagination</code>, since the library ships no plain <code>Table</code> primitive and the docs direct key/value tables at <code>DataTable</code>.
+</li>
+<li><strong>Actual:</strong> the <code>&lt;thead&gt;</code> always renders. In a label/value table the left cell <em>is</em> the label, so the header repeats it and adds a strip the design does not have.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-023 (the ten-row key/value table inside each of the three harness columns).
+</li>
+<li><strong>Workaround:</strong> declare the headers anyway (the component needs them for its column metadata) and hide the row from the page's scoped stylesheet with <code>.tflens-kv ::deep thead { display: none; }</code>.
+</li>
+<li><strong>Suggested fix:</strong> add <code>ShowHeader</code> (default <code>true</code>), or ship the plain <code>Table</code> / <code>TableRow</code> / <code>TableCell</code> primitives the shadcn design language already defines.
+</li>
+</ul>
+<hr>
+<h2 id="tr-013-the-typography-components-drop-every-unmatched-attribute-so-they-cannot-carry-a-data-testid">TR-013 — The <code>Typography*</code> components drop every unmatched attribute, so they cannot carry a <code>data-testid</code><a class="anchor-link" href="#tr-013-the-typography-components-drop-every-unmatched-attribute-so-they-cannot-carry-a-data-testid">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Low — but it forces a wrapper element around every asserted line of prose.
+</li>
+<li><strong>Repro:</strong> <code>&lt;TypographyMuted data-testid="harness-null-footnote"&gt;…&lt;/TypographyMuted&gt;</code>.
+</li>
+<li><strong>Expected:</strong> the attribute lands on the rendered <code>&lt;p&gt;</code>, as it does on <code>Card</code>, <code>Alert</code>, <code>Badge</code> and <code>DataTable</code>.
+</li>
+<li><strong>Actual:</strong> <code>TypographyMuted</code> (and its siblings) declare only <code>ChildContent</code> and <code>Class</code> — there is no <code>[Parameter(CaptureUnmatchedValues = true)]</code>, so the attribute is a compile-time error rather than markup.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-026 (<code>data-testid="harness-null-footnote"</code> on the not-detected footnote line).
+</li>
+<li><strong>Workaround:</strong> wrap the typography in a plain <code>&lt;div&gt;</code> that carries the test id.
+</li>
+<li><strong>Suggested fix:</strong> add the unmatched-values parameter to the <code>Typography*</code> family, matching every other component in the package.
+</li>
+</ul>
+<hr>
+<h2 id="tr-015-cardheader-is-a-css-grid-so-a-class-flex-on-it-cannot-lay-out-a-header-row">TR-015 — <code>CardHeader</code> is a CSS grid, so a <code>Class="flex …"</code> on it cannot lay out a header row<a class="anchor-link" href="#tr-015-cardheader-is-a-css-grid-so-a-class-flex-on-it-cannot-lay-out-a-header-row">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Low — the documented shadcn KPI/card pattern does not reproduce without an extra wrapper.
+</li>
+<li><strong>Repro:</strong> <code>&lt;CardHeader Class="flex flex-row items-center justify-between gap-2"&gt;&lt;CardTitle&gt;…&lt;/CardTitle&gt;&lt;Badge&gt;…&lt;/Badge&gt;&lt;/CardHeader&gt;</code>.
+</li>
+<li><strong>Expected:</strong> title and badge on one row, badge pushed right — the composition the package's own AI reference prescribes for a KPI card ("<code>CardHeader class="flex flex-row items-center justify-between pb-2"</code>").
+</li>
+<li><strong>Actual:</strong> each child lands on its own grid row; <code>justify-between</code> does nothing. <code>CardHeader</code> renders with the shipped <code>data-slot="card-header"</code> grid rules, and the merged <code>flex</code> classes lose to them, so a card title, its two badges and its status badge stack into four lines.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-014 (repo cards) and REQ-UI-017 (the Rebuild card).
+</li>
+<li><strong>Workaround:</strong> give <code>CardHeader</code> a single child <code>&lt;div class="flex w-full flex-wrap items-center justify-between gap-2"&gt;</code> and put the real header content inside that.
+</li>
+<li><strong>Suggested fix:</strong> either honour a caller-supplied display class in the merge, or correct the AI reference so it stops prescribing a layout the component overrides.
+</li>
+</ul>
+<hr>
+<h2 id="tr-016-badge-has-no-success-warning-variant-so-a-status-badge-cannot-carry-its-own-semantics">TR-016 — <code>Badge</code> has no success/warning variant, so a status badge cannot carry its own semantics<a class="anchor-link" href="#tr-016-badge-has-no-success-warning-variant-so-a-status-badge-cannot-carry-its-own-semantics">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Low — but every "healthy / needs attention / broken" badge collapses to two colours.
+</li>
+<li><strong>Repro:</strong> <code>&lt;Badge Variant="BadgeVariant.Warning"&gt;2 streams stale&lt;/Badge&gt;</code>.
+</li>
+<li><strong>Expected:</strong> the four alert semantics <code>Alert</code> already ships (<code>Success</code>, <code>Info</code>, <code>Warning</code>, <code>Danger</code>) are available on <code>Badge</code> too; the approved mockups use a green "synced" badge and an amber "2 streams stale" badge.
+</li>
+<li><strong>Actual:</strong> <code>BadgeVariant</code> is <code>Default | Secondary | Destructive | Outline</code>. A warning has to borrow <code>Destructive</code>, which reads as an error, or <code>Secondary</code>, which reads as neutral.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-014 (per-repo status badge: synced / stale / sync error).
+</li>
+<li><strong>Workaround:</strong> <code>Secondary</code> for healthy and <code>Destructive</code> for both stale and failed, losing the distinction between "this needs attention" and "this is broken".
+</li>
+<li><strong>Suggested fix:</strong> add <code>Success</code>, <code>Info</code> and <code>Warning</code> to <code>BadgeVariant</code>, reusing the <code>--alert-*</code> tokens <code>Alert</code> already defines.
+</li>
+</ul>
+<hr>
+<h2 id="tr-017-empty-lives-in-trblazeui-components-empty-which-the-reference-s-imports-list-omits">TR-017 — <code>Empty</code> lives in <code>TrBlazeUI.Components.Empty</code>, which the reference's <code>_Imports</code> list omits<a class="anchor-link" href="#tr-017-empty-lives-in-trblazeui-components-empty-which-the-reference-s-imports-list-omits">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Low — silent, and the failure looks like working markup.
+</li>
+<li><strong>Repro:</strong> follow §1 "_Imports.razor" of the package's AI reference verbatim, then use <code>&lt;Empty Title="…"&gt;</code>.
+</li>
+<li><strong>Expected:</strong> the component resolves.
+</li>
+<li><strong>Actual:</strong> RZ10012 <em>warning</em> (not an error), and Razor emits a literal <code>&lt;empty&gt;</code> element: the page compiles, renders unstyled inline text, and nothing fails. The type is real — <code>TrBlazeUI.Components.Empty.Empty</code> — the reference's import list simply does not include its namespace, unlike <code>Alert</code>, <code>Badge</code>, <code>Card</code> and the rest.
+</li>
+<li><strong>Encountered in:</strong> REQ-UI-014 (the no-repos-on-this-framework state).
+</li>
+<li><strong>Workaround:</strong> <code>@using TrBlazeUI.Components.Empty</code> on the page. The same trap applies to any other namespace missing from that list.
+</li>
+<li><strong>Suggested fix:</strong> complete the <code>_Imports.razor</code> block in the reference, and ship a <code>_Imports</code> snippet generated from the assembly so it cannot drift.
+</li>
+</ul>
+<hr>
+<h2 id="tr-022-merged-into-tr-008-lucideicon-does-not-resolve-lucide-json-aliases">TR-022 — merged into TR-008 (<code>LucideIcon</code> does not resolve <code>lucide.json</code> aliases)<a class="anchor-link" href="#tr-022-merged-into-tr-008-lucideicon-does-not-resolve-lucide-json-aliases">#</a></h2>
+<blockquote>
+<p><strong>⇢ MERGED 2026-08-28 — see <a href="#tr-008--trblazeuiiconslucide-200-does-not-resolve-the-pre-rename-lucide-names-so-every--circle--alert--name-renders-nothing">TR-008</a>.</strong>
+Filed on 2026-08-28 as a fresh finding, it is the same defect as TR-008: same repro
+(<code>&lt;LucideIcon Name="check-circle" Size="16" /&gt;</code>), same expected, same actual. Per this file's numbering
+rule the lower ID keeps the entry. <strong>The number is retained as this stub, not deleted</strong>, because
+<code>docs/TfLens-DevGuide-Screens.md</code> (lines 203 and 1686) and <code>PROJECT-STATUS.md</code> cite <code>TR-022</code> and those
+citations must keep resolving. TR-022's substantive contribution — that <code>lucide.json</code> has an <code>aliases</code>
+map the component never consults, which is the <strong>root cause</strong> TR-008 had only guessed at — is carried
+into TR-008 in full, under "Root cause". Nothing was dropped in the merge.</p>
+<p><strong>Not counted</strong> in this file's severity totals; it is an alias, not an entry.</p>
+</blockquote>
+<hr>
+<hr>
+<h2 id="tr-023-breadcrumblink-drops-every-unmatched-attribute-so-a-breadcrumb-cannot-carry-a-data-testid">TR-023 — <code>BreadcrumbLink</code> drops every unmatched attribute, so a breadcrumb cannot carry a <code>data-testid</code><a class="anchor-link" href="#tr-023-breadcrumblink-drops-every-unmatched-attribute-so-a-breadcrumb-cannot-carry-a-data-testid">#</a></h2>
+<p><strong>Severity:</strong> Medium · <strong>Raised:</strong> 2026-08-28 · <strong>Status:</strong> open</p>
+<p><code>TrBlazeUI.Components.Breadcrumb.BreadcrumbLink</code> declares no
+<code>[Parameter(CaptureUnmatchedValues = true)]</code>, so any attribute it does not know about is not ignored
+— it <strong>throws</strong>:</p>
+<pre><code>InvalidOperationException: Object of type 'TrBlazeUI.Components.Breadcrumb.BreadcrumbLink'
+does not have a property matching the name 'data-testid'.</code></pre>
+<p>This is the third component in the same family — <code>TabsTrigger</code> (TR-010) and <code>Typography*</code> (TR-013)
+behave identically — which is what makes it worth raising as a pattern rather than a third one-off.
+The cost is not the workaround (a <code>&lt;span data-testid&gt;</code> inside the link, which is what TfLens does);
+it is that the failure is a <strong>runtime 500 on first render</strong>, not a compile error. Two new pages in
+this codebase shipped, built cleanly, and returned a Blazor error page the first time they were
+opened — twice, for two different components in the same family.</p>
+<p><strong>Ask:</strong> add <code>CaptureUnmatchedValues</code> to every leaf component that renders a real DOM element, or
+state in the reference which components accept passthrough attributes and which throw. A consumer
+cannot tell by looking, and the build will not tell them either.</p>
+<p><strong>Reproduce:</strong> <code>&lt;BreadcrumbLink Href="/x" data-testid="y"&gt;z&lt;/BreadcrumbLink&gt;</code> → 500 on render.</p>
+<hr>
+<h2 id="tr-024-tabslist-takes-no-unmatched-attributes-and-offers-no-density-variant-so-the-segmented-track-cannot-be-addressed">TR-024 — <code>TabsList</code> takes no unmatched attributes and offers no density variant, so the segmented track cannot be addressed<a class="anchor-link" href="#tr-024-tabslist-takes-no-unmatched-attributes-and-offers-no-density-variant-so-the-segmented-track-cannot-be-addressed">#</a></h2>
+<p><strong>Severity:</strong> Medium · <strong>Raised:</strong> 2026-08-30 · <strong>Status:</strong> open</p>
+<p><strong>Repro.</strong> A segmented control built from <code>Tabs</code> / <code>TabsList</code> / <code>TabsTrigger</code>, where the <em>track</em> — the
+node TrBlazeUI paints <code>inline-flex h-10 items-center justify-center rounded-md bg-muted p-1
+text-muted-foreground</code> on — needs to be identified by a test hook and sized to a design spec:</p>
+<pre><code class="language-razor">&lt;Tabs Value="@objValue" ValueChanged="OnChangedAsync"&gt;
+    &lt;TabsList data-testid="framework-switch"&gt;   @* does not compile *@
+        &lt;TabsTrigger Value="a"&gt;A&lt;/TabsTrigger&gt;
+    &lt;/TabsList&gt;
+&lt;/Tabs&gt;</code></pre>
+<p><strong>Expected.</strong> Either <code>TabsList</code> accepts passthrough attributes like <code>Tabs</code> does, or <code>Tabs</code> exposes the
+track's own density (a <code>Size</code> / <code>Density</code> variant, or a <code>ListClass</code>) so a consumer can reach it without
+one.</p>
+<p><strong>Actual.</strong> Two separate gaps that compound:</p>
+<ol>
+<li><code>TabsList</code> declares only <code>ChildContent</code> and <code>Class</code> — no <code>AdditionalAttributes</code>. The markup above fails with <code>Object of type 'TrBlazeUI.Components.Tabs.TabsList' does not have a property matching the name 'data-testid'</code>. This is the same family as TR-010 (<code>TabsTrigger</code>), TR-013 (<code>Typography*</code>) and TR-023 (<code>BreadcrumbLink</code>) — the fourth instance, and the second inside <code>Tabs</code> alone. Verified against <code>TrBlazeUI.Components.xml</code> 2.0.0, which lists <code>AdditionalAttributes</code> on <code>Tabs</code> and on nothing else in the family.
+</li>
+<li><code>Tabs</code> has no density variant. The track is fixed at <code>h-10</code> / <code>rounded-md</code> / <code>p-1</code> (40px, 6px, 4px). A compact header control — the shadcn/ui segmented control every dashboard mockup draws at ~34px — has no supported way to ask for that, and <code>Class</code> on <code>Tabs</code> lands on the <em>outer</em> element, not the track.
+</li>
+</ol>
+<p><strong>Encountered in.</strong> <code>src/TfLens/Components/Shared/FrameworkSwitch.razor</code> (REQ-UI-010), fixing a BRD-144
+mockup-parity finding that fired on all six report pages at both viewport widths: the parity gate reads
+chrome off the element carrying the <code>data-testid</code>, and that element could only be <code>Tabs</code> — which paints
+nothing — while the real track sat one level below on <code>TabsList</code>, out of reach.</p>
+<p><strong>Workaround.</strong> Move the ground UP: <code>bg-muted</code> goes on the <code>Tabs</code> root (which does take the testid), and
+<code>TabsList</code> is flattened back to a bare flex row (<code>background: transparent; height: auto; padding: 0;
+border-radius: 0</code>) from <code>ShellHeader.razor.css</code> via <code>::deep [role="tablist"]</code>, so exactly one track is
+painted. The 34px / 8px / 3px geometry is written as CSS rather than <code>Class</code> utilities because TR-002
+still bites — the pre-built <code>trblazeui.css</code> carries no arbitrary-value utilities, so <code>p-[3px]</code>,
+<code>h-[34px]</code> and <code>text-[13px]</code> are all absent at runtime and silently do nothing.</p>
+<p><strong>Suggested fix.</strong> Add <code>[Parameter(CaptureUnmatchedValues = true)]</code> to <code>TabsList</code> (and, per TR-023, to
+every leaf that renders a real DOM element), and expose the track density on <code>Tabs</code> — a <code>Size</code> enum, or
+at minimum a <code>ListClass</code> parameter that reaches the element the library actually styles.</p>
+<hr>
+<h2 id="tr-026-datatablecolumn-has-width-and-per-cell-class-parameters-and-the-ai-reference-documents-none-of-them">TR-026 — <code>DataTableColumn</code> has width and per-cell class parameters, and the AI reference documents none of them<a class="anchor-link" href="#tr-026-datatablecolumn-has-width-and-per-cell-class-parameters-and-the-ai-reference-documents-none-of-them">#</a></h2>
+<p><strong>Severity:</strong> Medium · <strong>Raised:</strong> 2026-08-30 · <strong>Status:</strong> open</p>
+<p><strong>Repro:</strong> A <code>DataTable</code> whose columns hold identifiers with hyphens in them — <code>fix-issues</code>,
+<code>claude-opus-5</code> — inside any container narrower than the table's preferred width.</p>
+<p><strong>Expected:</strong> the reference tells a consumer that a column's width can be constrained, or that a
+class can be put on the column's cells, so the id can be kept on one line.</p>
+<p><strong>Actual:</strong> <code>.trblazeui/TrBlazeUI-AI-Reference.md</code> §"DataTable (Generic)" has a parameter table for
+<code>DataTable</code> and <strong>no parameter table at all for <code>DataTableColumn</code></strong> — every example shows only
+<code>TData</code>/<code>TValue</code>/<code>Property</code>/<code>Header</code>/<code>Sortable</code>/<code>Filterable</code>/<code>CellTemplate</code>. The component in fact
+ships <code>Width</code>, <code>MinWidth</code>, <code>MaxWidth</code>, <code>CellClass</code>, <code>HeaderClass</code>, <code>Format</code>, <code>Visible</code> and <code>Id</code>,
+which is only discoverable by opening <code>lib/net10.0/TrBlazeUI.Components.xml</code> inside the NuGet
+package. <code>CellClass</code>/<code>HeaderClass</code> are exactly the right fix here and were found by decompiling
+rather than by reading the docs.</p>
+<p>The reason it matters more than a missing table usually would: the rendered table is <code>w-full</code>
+inside the component's own <code>overflow-auto</code> box, so CSS auto table layout <strong>compresses a column
+below its own text</strong> rather than letting the box scroll. A hyphen is a soft-wrap opportunity, so
+<code>fix-issues</code> silently became <code>fix-</code> / <code>issues</code> in a 54px cell that needed 65px, and
+<code>claude-opus-5</code> became two lines in an 89px cell that needed 99px. The value is still present and
+still not clipped, so nothing in the DOM says it is broken — only a human or a line-count check
+sees it. A consumer who cannot find <code>CellClass</code> in the reference has no obvious way out.</p>
+<p><strong>Encountered in:</strong> <code>src/TfLens/Components/Pages/Routing.razor</code>, the <code>drift-table</code> (REQ-UI-027),
+at 1280 and 390.</p>
+<p><strong>Workaround:</strong> <code>CellClass="whitespace-nowrap" HeaderClass="whitespace-nowrap"</code> on the <code>cmd</code>,
+<code>tier_model</code> and <code>observed model</code> columns. It works exactly as wanted — the class lands on the
+<code>th</code> and on every <code>td</code> of the column, the column's min-content rises to the whole token, and the
+overflow lands on the component's own scroll box instead of on the page.</p>
+<p><strong>Suggested fix:</strong> add a <code>DataTableColumn</code> parameter table to the AI reference covering <code>Width</code> /
+<code>MinWidth</code> / <code>MaxWidth</code> / <code>CellClass</code> / <code>HeaderClass</code> / <code>Format</code> / <code>Visible</code> / <code>Id</code>, and say in the
+<code>DataTable</code> section that the table is <code>w-full</code> inside a scroll box so columns compress before the
+box scrolls — with the nowrap recipe named as the way to hold an identifier column together.</p>
+<hr>
+<h2 id="tr-025-datatable-has-no-density-option-so-160px-of-a-narrow-table-s-width-goes-to-cell-padding-and-only-deep-can-get-it-back">TR-025 — <code>DataTable</code> has no density option, so 160px of a narrow table's width goes to cell padding and only <code>::deep</code> can get it back<a class="anchor-link" href="#tr-025-datatable-has-no-density-option-so-160px-of-a-narrow-table-s-width-goes-to-cell-padding-and-only-deep-can-get-it-back">#</a></h2>
+<p><strong>Severity:</strong> Low · <strong>Raised:</strong> 2026-08-30 · <strong>Status:</strong> open</p>
+<p><strong>Repro.</strong> A five-column <code>DataTable</code> inside a <code>Card</code> that is itself half of a two-column grid — the
+per-repo stream table on TfLens's Coverage page, one card per repository, <code>Stream</code> / <code>Records</code> /
+<code>Backfilled</code> / <code>Newest</code> / <code>Days since</code>.</p>
+<p><strong>Expected:</strong> a way to ask the component for a tighter table — a <code>Density</code> / <code>Compact</code> parameter,
+or a documented class hook on the cells — the way the same library's <code>Button</code> and <code>Badge</code> expose
+size variants.</p>
+<p><strong>Actual:</strong> cells are hard-coded to <code>px-4</code> (16px a side). Measured on the live app at 1280: the
+card gives the table a 420px box and the five columns wanted 432px, of which <strong>160px — 38% — was
+cell padding</strong>. There is no parameter for it. <code>DataTable</code> takes <code>Class</code>, and <code>DataTableColumn</code>
+takes <code>CellClass</code> / <code>HeaderClass</code> (TR-026), but a Tailwind <code>px-2.5</code> passed through <code>CellClass</code>
+loses to the component's own <code>px-4</code>: both are single-class selectors, so the winner is stylesheet
+order, and <code>trblazeui.css</code> emits <code>px-4</code> after <code>px-2.5</code>. Passing the smaller padding through the
+documented parameter therefore does nothing at all, silently.</p>
+<p><strong>Encountered in:</strong> <code>src/TfLens/Components/Pages/Coverage.razor</code>, <code>repo-streams-*</code> (REQ-UI-014 /
+BRD-144), at 1280 and 390.</p>
+<p><strong>Workaround:</strong> a scoped-CSS file, <code>Coverage.razor.css</code>, whose <code>.coverage-streams[b-xxxxx] th, td</code>
+selector outranks <code>.px-4</code> on specificity rather than on order:</p>
+<pre><code class="language-css">.coverage-streams ::deep th,
+.coverage-streams ::deep td { padding-left: 10px; padding-right: 10px; }</code></pre>
+<p>10px a side gave 60px back across the five columns, which was more than the widened date column
+needed, and every card's table then fit its box at 1280 instead of overflowing it.</p>
+<p><strong>Suggested fix:</strong> add a <code>Density</code> parameter to <code>DataTable</code> (<code>Comfortable</code> default, <code>Compact</code> at
+~8-10px) — a five-column table in a half-width card is an ordinary dashboard shape, not an edge
+case. Failing that, say in the reference that <code>CellClass</code> cannot override padding and name the
+<code>::deep</code> recipe, because the parameter appears to work and does not.</p>
+<hr>
+<h2 id="tr-027-breadcrumblist-hard-codes-a-two-axis-gap-and-always-wraps-so-a-two-item-trail-cannot-be-held-on-one-line">TR-027 — <code>BreadcrumbList</code> hard-codes a two-axis <code>gap</code> and always wraps, so a two-item trail cannot be held on one line<a class="anchor-link" href="#tr-027-breadcrumblist-hard-codes-a-two-axis-gap-and-always-wraps-so-a-two-item-trail-cannot-be-held-on-one-line">#</a></h2>
+<p><strong>Severity:</strong> Low · <strong>Raised:</strong> 2026-08-30 · <strong>Status:</strong> open</p>
+<p><strong>Repro.</strong> The app shell's header is one 64px row at desktop, ending in a fixed-width control cluster;
+the breadcrumb is the elastic item in the middle:</p>
+<pre><code class="language-razor">&lt;Breadcrumb&gt;
+    &lt;BreadcrumbList&gt;
+        &lt;BreadcrumbItem&gt;&lt;span&gt;Reports&lt;/span&gt;&lt;/BreadcrumbItem&gt;
+        &lt;BreadcrumbSeparator /&gt;
+        &lt;BreadcrumbItem&gt;&lt;BreadcrumbPage&gt;Harness comparison&lt;/BreadcrumbPage&gt;&lt;/BreadcrumbItem&gt;
+    &lt;/BreadcrumbList&gt;
+&lt;/Breadcrumb&gt;</code></pre>
+<p><code>BreadcrumbList</code> renders <code>&lt;ol class="flex flex-wrap items-center gap-2.5 …"&gt;</code>. Two things are fixed
+there and neither is a parameter:</p>
+<ul>
+<li><strong><code>flex-wrap</code> is always on.</strong> A two-item trail under width pressure therefore breaks <em>between the separator and the page name</em> — <code>Reports ›</code> on one line, <code>Harness comparison</code> on the next — which reads as two rows of chrome rather than one trail. There is no <code>Wrap</code> switch, and no <code>CaptureUnmatchedValues</code> on <code>BreadcrumbList</code> to pass <code>class="flex-nowrap"</code> either.
+</li>
+<li><strong><code>gap-2.5</code> applies to both axes.</strong> 10px is generous for a <code>›</code> separator (the approved mockup uses 6px) and, once the list <em>has</em> wrapped, it also inserts 10px of pure vertical padding between the two lines, which is what pushed this header from 64px to 87px before it was tracked down.
+</li>
+</ul>
+<p>The second point is the more general one: every <code>gap-N</code> in the library is a two-axis gap, so any
+wrapping row pays for its column spacing again on every extra row.</p>
+<p><strong>Encountered in:</strong> <code>src/TfLens/Components/Shared/ShellHeader.razor</code> (REQ-UI-010, REQ-UI-023), at 1280.</p>
+<p><strong>Workaround:</strong> scoped CSS reaching in with <code>::deep</code>, because the <code>ol</code> is the child component's own
+root and cannot carry this file's scope attribute:</p>
+<pre><code class="language-css">@media (min-width: 64rem) {
+    .tflens-header-crumb ::deep ol { flex-wrap: nowrap; column-gap: 4px; white-space: nowrap; }
+}</code></pre>
+<p><strong>Suggested fix:</strong> give <code>BreadcrumbList</code> a <code>Wrap</code> parameter (default <code>true</code>, so nothing changes) and
+split its gap into <code>gap-x-2.5 gap-y-0</code> — a breadcrumb's rows never want the column spacing between
+them. Adding <code>CaptureUnmatchedValues</code> would also do, and would settle TR-023's family of cases at the
+same time.</p>
+<h2 id="tr-028-barchart-exposes-no-axis-grid-or-data-label-control-and-no-route-to-apexchartoptions-so-a-chart-cannot-be-made-to-match-an-approved-design">TR-028 — <code>BarChart</code> exposes no axis, grid or data-label control and no route to <code>ApexChartOptions</code>, so a chart cannot be made to match an approved design<a class="anchor-link" href="#tr-028-barchart-exposes-no-axis-grid-or-data-label-control-and-no-route-to-apexchartoptions-so-a-chart-cannot-be-made-to-match-an-approved-design">#</a></h2>
+<p><strong>Severity:</strong> High · <strong>Raised:</strong> 2026-09-01 · <strong>Status:</strong> open</p>
+<p><strong>Repro.</strong> <code>docs/mockups/harness.html</code> draws <em>Total tokens by harness</em> the way a comparison chart is
+normally drawn when the values span orders of magnitude: <strong>no y axis, no gridlines, and the value
+printed above each bar</strong> (<code>68.6M</code>, <code>19.0M</code>, <code>0.61M</code>). The mockup's own card description names the
+components to build it with — <code>ChartContainer → BarChart</code>. So:</p>
+<pre><code class="language-razor">&lt;ChartContainer&gt;
+    &lt;BarChart TItem="HarnessTokenTotal" Items="@objChartRows" Height="260px" Width="100%"
+              ShowLegend="false" ShowTooltip="true"&gt;
+        &lt;ApexPointSeries TItem="HarnessTokenTotal" Items="@objChartRows" SeriesType="SeriesType.Bar"
+                         XValue="@(r =&gt; r.Harness)" YValue="@(r =&gt; (decimal)r.Tokens)"
+                         PointColor="@(r =&gt; ChartColourFor(r.Harness))" /&gt;
+    &lt;/BarChart&gt;
+&lt;/ChartContainer&gt;</code></pre>
+<p><code>BarChart</code>'s entire public surface for this is <code>ShowLegend</code>, <code>ShowTooltip</code>, <code>ShowDataLabels</code>,
+<code>Height</code>, <code>Width</code>, <code>BarWidth</code>. There is <strong>no</strong> <code>Options</code>, no <code>Xaxis</code>/<code>Yaxis</code>, no <code>Grid</code>, and no
+formatter — so ApexCharts' defaults are the only chart you can have. On this screen's real data
+(claude-code 3.2B, opencode 814k, codex 18.5M) the defaults produced:</p>
+<ul>
+<li>a linear y axis printing <strong>raw counts</strong> — <code>3000000000</code>, unscaled and unseparated;
+</li>
+<li>horizontal gridlines and a rounded plot border the design has none of;
+</li>
+<li><strong>no value labels at all</strong>, so with claude-code at 3.2B the other two bars were a 0–1px line with no figure anywhere near them.
+</li>
+</ul>
+<p>Two of the three numbers the card exists to compare were unreadable. This is not a cosmetic gap: on
+a product whose one claim is that its figures can be quoted, a chart that can only render an
+unscaled axis is a chart that cannot be shipped.</p>
+<p><strong>Encountered in:</strong> <code>src/TfLens/Components/Pages/Harness.razor</code> (REQ-UI-023), owner UAT 2026-08-30.</p>
+<p><strong>Workaround — drop the wrapper.</strong> <code>ApexChart&lt;T&gt;</code> (the component <code>BarChart</code> wraps) <em>does</em> take
+<code>Options</code>, so the fix was to stop using <code>BarChart</code>:</p>
+<pre><code class="language-razor">&lt;ChartContainer&gt;
+    &lt;ApexChart TItem="HarnessTokenTotal" Options="@objChartOptions" Height="260" Width="@("100%")"&gt;
+        &lt;ApexPointSeries … ShowDataLabels="true" /&gt;
+    &lt;/ApexChart&gt;
+&lt;/ChartContainer&gt;</code></pre>
+<p>with <code>Grid { Show = false }</code>, <code>Yaxis = [new YAxis { Show = false }]</code>, and a <code>DataLabels.Formatter</code>
+carrying the same compact notation the table cells use. That is the whole value of the wrapper
+given up to change three options.</p>
+<p><strong>A second, separable defect found in the same hour:</strong> <code>ChartContainer</code> renders its own
+<code>rounded-lg border bg-card shadow-sm p-6</code> surface. Placed inside a <code>Card</code> — which is where a chart
+almost always goes, and where both the mockup and the library's own reference put it — it draws a
+<strong>card inside a card</strong>: a second bordered, shadowed panel around the plot. There is no <code>Bare</code> or
+<code>Variant</code> switch, so the only way to get the design's flush chart is scoped CSS unpicking the
+container's own decoration:</p>
+<pre><code class="language-css">.tflens-chart ::deep &gt; div { border: 0; background: transparent; box-shadow: none; padding: 0; }</code></pre>
+<p><strong>Suggested fix:</strong> (1) give <code>BarChart</code> (and its siblings) an <code>Options</code> parameter merged over the
+wrapper's defaults — one parameter settles every case of this shape, rather than growing a
+<code>ShowYAxis</code> / <code>ShowGrid</code> / <code>LabelFormatter</code> surface one report at a time. (2) Give <code>ChartContainer</code> a
+<code>Bare</code> parameter, or drop the card chrome entirely and let the caller supply it — a <em>container</em> that
+paints a card is doing two jobs, and the second one is almost always already done.</p>
+<hr>
+<h2 id="tr-029-badge-is-a-fixed-height-rounded-full-pill-with-no-wrapping-treatment-so-a-multi-word-label-collapses-into-an-unreadable-shape-on-a-phone">TR-029 — <code>Badge</code> is a fixed-height <code>rounded-full</code> pill with no wrapping treatment, so a multi-word label collapses into an unreadable shape on a phone<a class="anchor-link" href="#tr-029-badge-is-a-fixed-height-rounded-full-pill-with-no-wrapping-treatment-so-a-multi-word-label-collapses-into-an-unreadable-shape-on-a-phone">#</a></h2>
+<p><strong>Severity:</strong> Medium · <strong>Raised:</strong> 2026-09-01 · <strong>Status:</strong> open</p>
+<p><strong>Repro.</strong> The Playbook stream-health card on <code>/misses</code> states each stream's state in a badge, exactly
+as <code>docs/mockups/misses-playbook.html</code> draws it — including the transient stream, whose state the
+mockup writes as a sentence:</p>
+<pre><code class="language-razor">&lt;Badge Variant="BadgeVariant.Outline"&gt;transient · best-effort, absence is not an error&lt;/Badge&gt;</code></pre>
+<p><strong>Expected:</strong> at 390px the label wraps to two or three lines inside a pill that grows with it — which
+is what the approved mockups do, in one rule they had to write by hand:</p>
+<pre><code class="language-css">@media (max-width: 700px) {
+  .badge { white-space: normal; height: auto; min-height: 22px; padding: 2px 8px; border-radius: 12px; text-align: left; }
+}</code></pre>
+<p><strong>Actual:</strong> the shipped badge is <code>inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs
+font-semibold …</code> — a <strong>fixed-height</strong> pill with a 999px radius and no <code>white-space</code> handling. The text
+wraps anyway, so at 390 the label spills past a pill that has not grown with it: measured in the
+browser, the four-line label overlapped its own rounded ends and the row beside it, and read as two
+overlapping shapes rather than one badge. There is no <code>Truncate</code>, <code>Wrap</code> or size parameter to say
+which of the two behaviours the caller wants.</p>
+<p><strong>Encountered in:</strong> <code>src/TfLens/Components/Shared/Playbook/PlaybookMissesSurface.razor</code> (REQ-UI-051),
+1280 and 390 smoke, 2026-09-01.</p>
+<p><strong>Workaround — shorten the label and move the sentence to prose.</strong> The badge now says <code>transient</code> and
+the card's footer carries "…is transient and best-effort — it is the exporter's input, rotates, and
+TfLens never stores it, so its absence is not an error." That is the better copy anyway, so the cost
+here was small; it will not be small on a screen whose badge text is data rather than an author's
+sentence, and the alternative — a <code>::deep</code> rule per component reaching a child's root element, since
+scoped CSS cannot reach it directly — is the shape TR-025 and TR-016 already document.</p>
+<p><strong>Suggested fix:</strong> drop the fixed height in favour of a <code>min-height</code> and let the pill grow (the
+mockups' own rule), or add a <code>Wrap</code> / <code>Truncate</code> parameter so the caller states which behaviour a long
+label should get. Either settles every case; neither needs a new variant.</p>
+<hr>
+<h2 id="tr-030-collapsibletrigger-renders-an-inline-block-button-with-a-bare-class-group-so-a-disclosure-header-cannot-span-its-own-row">TR-030 — <code>CollapsibleTrigger</code> renders an <code>inline-block</code> button with a bare <code>class="group"</code>, so a disclosure header cannot span its own row<a class="anchor-link" href="#tr-030-collapsibletrigger-renders-an-inline-block-button-with-a-bare-class-group-so-a-disclosure-header-cannot-span-its-own-row">#</a></h2>
+<p><strong>Severity:</strong> Low · <strong>Raised:</strong> 2026-09-01 · <strong>Status:</strong> open</p>
+<p><strong>Repro.</strong> The per-phase disclosures on <code>/effort</code> are drawn by <code>docs/mockups/effort.html</code> as one full
+width row: a chevron, the command, a muted summary, a spacer, and an observation badge flush right.</p>
+<pre><code class="language-razor">&lt;Collapsible Open="@vIsOpen" OpenChanged="…"&gt;
+    &lt;CollapsibleTrigger&gt;
+        &lt;span class="tflens-detail-trigger"&gt;
+            &lt;LucideIcon Name="chevron-down" Size="16" /&gt;
+            &lt;span class="font-mono"&gt;build-phase&lt;/span&gt;
+            &lt;span class="text-muted-foreground"&gt;— 24 runs · 21h 40m · 24.2M output&lt;/span&gt;
+            &lt;span class="tflens-spacer"&gt;&lt;/span&gt;
+            &lt;Badge Variant="BadgeVariant.Outline"&gt;6 of 24 observed&lt;/Badge&gt;
+        &lt;/span&gt;
+    &lt;/CollapsibleTrigger&gt;
+    …
+&lt;/Collapsible&gt;</code></pre>
+<p><strong>Expected:</strong> the trigger fills the row it is placed in — or exposes a parameter, a class hook or a
+documented <code>AsChild</code> so the caller can say so — the way <code>SidebarMenuButton</code> already does for exactly
+this layout.</p>
+<p><strong>Actual:</strong> the rendered element is <code>&lt;button class="group"&gt;</code>, <code>display: inline-block</code>, with no width
+and no other class. It shrinks to fit its content, so the spacer has nothing to push against and the
+badge sits immediately after the summary text rather than at the right edge. <code>CollapsibleTrigger</code>
+takes no <code>Class</code> parameter either, so the only way to reach the button is a <code>::deep</code> rule from an
+ancestor the consuming page owns — a page's own scoped CSS cannot match a child component's root,
+which is the same wall TR-016, TR-025 and TR-029 each end at.</p>
+<p><strong>Workaround:</strong></p>
+<pre><code class="language-css">.tflens-effort ::deep .tflens-detail button { width: 100%; }</code></pre>
+<p><strong>Suggested fix:</strong> add <code>Class</code> to <code>CollapsibleTrigger</code> (every other TrBlazeUI component that renders a
+box has one), or default the trigger to <code>w-full text-left</code> since a disclosure header is a row in every
+design that has one. The first is the smaller change and settles the general case.</p>
+<p><strong>Encountered in:</strong> <code>src/TfLens/Components/Pages/Effort.razor</code> (REQ-UI-048), 1280 and 390 smoke,
+2026-09-01.</p>
+<hr>
+<h2 id="tr-031-datatablecolumn-headerclass-text-right-does-not-right-align-the-header-because-the-label-sits-in-its-own-flex-box">TR-031 — <code>DataTableColumn</code> <code>HeaderClass="text-right"</code> does not right-align the header, because the label sits in its own flex box<a class="anchor-link" href="#tr-031-datatablecolumn-headerclass-text-right-does-not-right-align-the-header-because-the-label-sits-in-its-own-flex-box">#</a></h2>
+<p><strong>Severity:</strong> Low · <strong>Raised:</strong> 2026-09-11 · <strong>Status:</strong> open</p>
+<p><strong>Repro.</strong> A money column in a <code>DataTable</code>, right-aligned the way every figure column is:</p>
+<pre><code class="language-razor">&lt;DataTableColumn TData="PriceProviderModel" TValue="decimal"
+                 Property="@(aRate =&gt; aRate.InputPerMillion)" Header="Input"
+                 CellClass="text-right tabular-nums" HeaderClass="text-right"&gt;
+    &lt;CellTemplate Context="vRate"&gt;@Usd(vRate.InputPerMillion)&lt;/CellTemplate&gt;
+&lt;/DataTableColumn&gt;</code></pre>
+<p><strong>Expected:</strong> the header label sits over the right edge of its column, above the figures, the way
+<code>docs/mockups/prices.html</code> draws it (<code>th class="r"</code>). There is either a column alignment parameter
+(<code>Align="End"</code>) or <code>HeaderClass</code> reaches the label.</p>
+<p><strong>Actual:</strong> the cells right-align and the header does not. The th renders as
+<code>&lt;th class="h-12 px-4 align-middle … text-right"&gt;&lt;div class="flex items-center gap-2"&gt;&lt;span&gt;Input&lt;/span&gt;&lt;/div&gt;&lt;/th&gt;</code>.
+<code>text-right</code> sets <code>text-align</code> on the th, but the label is inside a <code>div.flex</code>, where <code>text-align</code>
+moves nothing. <code>DataTableColumn</code> has no <code>Align</code> and no <code>HeaderTemplate</code>, so no parameter reaches that
+div. The label stays at the left of its column while the figures sit at the right. On a phone the
+Input and Output headers then read as one run of words over nothing, which the verifier reported
+on REQ-UI-072 on 2026-09-11.</p>
+<p><strong>What TfLens did:</strong> one rule in the page's own scoped stylesheet carries the column's
+<code>text-right</code> one level in. It adds no control and no markup:</p>
+<pre><code class="language-css">.tflens-prices ::deep .tflens-prices-flush th.text-right &gt; div { justify-content: flex-end; }</code></pre>
+<p><strong>Suggested fix:</strong> when <code>HeaderClass</code> carries <code>text-right</code> (or <code>text-center</code>), put the matching
+<code>justify-end</code> (<code>justify-center</code>) on the label's flex box. Better, add <code>Align</code> (<code>Start</code>, <code>Center</code>, <code>End</code>)
+to <code>DataTableColumn</code> and apply it to the th, the label box and every cell together. Figure columns
+are right-aligned in every table that has figures.</p>
+<p><strong>Not affected:</strong> sorting, cell alignment (<code>CellClass="text-right"</code> works on the td), and left-aligned
+columns.</p>
+<p><strong>Encountered in:</strong> <code>src/TfLens/Components/Pages/Prices.razor</code> (REQ-UI-072), 1280 and 390 smoke,
+2026-09-11.</p>
+<hr>
+<h2 id="tr-032-nativeselect-renders-with-appearance-none-and-no-arrow-so-a-select-reads-as-a-text-box">TR-032 — <code>NativeSelect</code> renders with <code>appearance-none</code> and no arrow, so a select reads as a text box<a class="anchor-link" href="#tr-032-nativeselect-renders-with-appearance-none-and-no-arrow-so-a-select-reads-as-a-text-box">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Low (raised 2026-09-11, open)
+</li>
+<li><strong>Blocks:</strong> no. One scoped style rule turns the browser's arrow back on and the form works throughout.
+</li>
+<li><strong>Repro:</strong> the provider list in the Price providers page's rate form:
+</li>
+</ul>
+<pre><code class="language-razor">  &lt;NativeSelect @bind-Value="objRateProvider" id="prices-rate-provider"&gt;
+      &lt;option value="anthropic"&gt;Anthropic (Claude)&lt;/option&gt;
+      &lt;option value="openai"&gt;OpenAI&lt;/option&gt;
+  &lt;/NativeSelect&gt;</code></pre>
+<ul>
+<li><strong>Expected:</strong> a down arrow at the select's right edge, as <code>docs/mockups/prices.html</code> draws it and as the component intends: its 2.0.0 class list carries <code>appearance-none bg-no-repeat bg-[url('data:image/svg+xml;…m6 9 6 6 6-6…')] bg-[length:1rem] bg-[right_0.5rem_center] pr-8</code> — a chevron as a background image — and <code>trblazeui.css</code> ships a rule for that <code>bg-[url(…)]</code> class.
+</li>
+<li><strong>Actual:</strong> the rendered <code>&lt;select&gt;</code> carries all of those except <code>bg-[url(…)]</code>, so it has no background image: native arrow off, drawn arrow missing, no arrow at all. Beside five text inputs of the same size it reads as a sixth. Measured at 1280 and 390, headless Chromium, dark theme, 2026-09-11.
+</li>
+<li><strong>Encountered in:</strong> <code>src/TfLens/Components/Pages/Prices.razor</code> (REQ-UI-072), fix-cycle-1 side-by-side with the mockup, 2026-09-11.
+</li>
+<li><strong>Workaround:</strong> one rule in the page's own scoped stylesheet, adding no control and no markup: <code>.tflens-prices ::deep .tflens-prices-rates select { appearance: auto; }</code>.
+</li>
+<li><strong>Suggested fix:</strong> get the chevron class onto the rendered element — the class merge appears to drop <code>bg-[url(…)]</code>, unconfirmed. Safer still, draw it as an element: a <code>LucideIcon</code> <code>chevron-down</code> over the right edge, as shadcn's NativeSelect does.
+</li>
+</ul>
+<p><strong>What is NOT affected.</strong> Binding, keyboard use and the option list: a real <code>&lt;select&gt;</code> that works. Only the arrow is missing.</p>
+<hr>
+<h2 id="tr-033-datatable-s-search-box-exists-only-inside-its-own-toolbar-so-a-design-that-puts-the-table-s-filter-in-the-card-header-cannot-be-built">TR-033 — <code>DataTable</code>'s search box exists only inside its own toolbar, so a design that puts the table's filter in the card header cannot be built<a class="anchor-link" href="#tr-033-datatable-s-search-box-exists-only-inside-its-own-toolbar-so-a-design-that-puts-the-table-s-filter-in-the-card-header-cannot-be-built">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Low (raised 2026-09-11, open)
+</li>
+<li><strong>Blocks:</strong> no. The filter works, above the table rather than in the card header, with a <code>Columns</code> button the design lacks.
+</li>
+<li><strong>Repro:</strong> the per-miss table on <code>/misses</code>, filterable by REQ, class and whose gap:
+</li>
+</ul>
+<pre><code class="language-razor">  &lt;DataTable TData="MissRow" Data="@DetailRows" ShowToolbar="true" ShowPagination="true" …&gt;</code></pre>
+<ul>
+<li><strong>Expected:</strong> a way to put the grid's search box where the design puts it — <code>docs/mockups/misses.html</code> draws it in the card header opposite the title (<code>&lt;input class="input lead sm" placeholder="Filter by REQ, class or whose gap"&gt;</code>). A two-way <code>SearchText</code>, or a <code>ToolbarContent</code> slot, would settle it.
+</li>
+<li><strong>Actual:</strong> <code>ShowToolbar</code> is the only control and is all-or-nothing: <code>true</code> renders the library's toolbar — search input <em>and</em> column-visibility <code>Columns</code> dropdown — above the grid, inside its own box; <code>false</code> renders neither and exposes no filter state. Drawing the header filter needs a second hand-written filter over <code>DetailRows</code>, which the grid's <code>Filterable</code> columns would not feed.
+</li>
+<li><strong>Encountered in:</strong> <code>src/TfLens/Components/Pages/Misses.razor</code> (REQ-UI-038 / REQ-UI-053), fix-cycle-1 side-by-side with the mockup, 2026-09-11.
+</li>
+<li><strong>Workaround:</strong> none, deliberately. REQ-UI-052's test locates the search box <em>inside</em> <code>miss-detail-table</code> and asserts typing narrows the rows, so moving it would break that test or duplicate the filter. Recorded as a deviation in <code>tests/.artifacts/verify/misses-fix/findings-verdict.md</code>.
+</li>
+<li><strong>Suggested fix:</strong> add <code>@bind-SearchText</code> (and, separately, <code>ShowColumnChooser</code>) so a caller can host the search input anywhere and still drive the grid's filtering; a <code>ToolbarContent</code> slot would do as well.
+</li>
+</ul>
+<p><strong>What is NOT affected.</strong> The filtering itself, <code>Filterable</code> columns, sorting and pagination. Only where the search box can be drawn.</p>
+<hr>
+<h2 id="tr-034-badge-always-renders-a-so-a-pill-cannot-sit-inside-a-sentence-and-cannot-match-a-design-that-draws-one-as-a">TR-034 — <code>Badge</code> always renders a <code>&lt;div&gt;</code>, so a pill cannot sit inside a sentence and cannot match a design that draws one as a <code>&lt;span&gt;</code><a class="anchor-link" href="#tr-034-badge-always-renders-a-so-a-pill-cannot-sit-inside-a-sentence-and-cannot-match-a-design-that-draws-one-as-a">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Low (raised 2026-09-11, open)
+</li>
+<li><strong>Blocks:</strong> no. Every pill on <code>/effort</code> renders and reads correctly; the findings are adjudicated as tool artefacts.
+</li>
+<li><strong>Repro:</strong> any count pill in running text, e.g. the phase table's caption row on <code>/effort</code>:
+</li>
+</ul>
+<pre><code class="language-razor">  &lt;Badge Variant="BadgeVariant.Outline" Class="tflens-nowrap-badge"&gt;
+      @objPhases.Phases.Count phases · @objPhases.RunsLive runs
+  &lt;/Badge&gt;</code></pre>
+<ul>
+<li><strong>Expected:</strong> the element <code>Badge</code> renders can be inline — an <code>As</code>/<code>Element</code> parameter, or the <code>AsChild</code> pattern the triggers use (<code>&lt;Badge AsChild&gt;&lt;span&gt;…&lt;/span&gt;&lt;/Badge&gt;</code>) — because a pill is an inline object: <code>docs/mockups/effort.html</code> writes every one as <code>&lt;span class="badge …"&gt;</code>, and three of this page's pills sit next to inline text.
+</li>
+<li><strong>Actual:</strong> the markup is always <code>&lt;div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold …"&gt;</code>. <code>inline-flex</code> makes it look inline, but a <code>&lt;div&gt;</code> cannot sit inside a <code>&lt;p&gt;</code> without invalid HTML, and the mockups' <code>&lt;span class="badge"&gt;</code> can never be matched element-for-element. On <code>/effort</code> that is six permanent <code>mockup-parity</code> findings across two widths, on pills plainly on screen, because the gate keys elements by tag and index (<code>tests/.artifacts/verify/effort-fix/findings-verdict.md</code>, verdict 10).
+</li>
+<li><strong>Encountered in:</strong> <code>src/TfLens/Components/Pages/Effort.razor</code> (REQ-UI-045 … REQ-UI-049), fix cycle 1 side-by-side with <code>docs/mockups/effort.html</code>, 2026-09-11.
+</li>
+<li><strong>Workaround:</strong> none — there is no parameter to set. The pills are left as the library draws them.
+</li>
+<li><strong>Suggested fix:</strong> <code>AsChild</code> on <code>Badge</code> (as <code>DialogTrigger</code>, <code>SheetTrigger</code>, … have), or an <code>As="span"</code> parameter. <code>span</code> would be the better default: shadcn/ui's own Badge moved to <code>&lt;span&gt;</code> for this reason.
+</li>
+</ul>
+<p><strong>What is NOT affected.</strong> The variants, the colours, <code>Class</code>, and pills standing alone in a flex row — most of them.</p>
+<hr>
+<h2 id="tr-035-sidebarprovider-s-phone-menu-is-sized-with-sidebar-width-so-the-sidebar-width-mobile-the-stylesheet-defines-is-never-read">TR-035 — <code>SidebarProvider</code>'s phone menu is sized with <code>--sidebar-width</code>, so the <code>--sidebar-width-mobile</code> the stylesheet defines is never read<a class="anchor-link" href="#tr-035-sidebarprovider-s-phone-menu-is-sized-with-sidebar-width-so-the-sidebar-width-mobile-the-stylesheet-defines-is-never-read">#</a></h2>
+<ul>
+<li><strong>Severity:</strong> Low (raised 2026-09-11, open)
+</li>
+<li><strong>Blocks:</strong> no. The phone menu opens, paints and navigates; one <code>:root</code> rule restores the designed width.
+</li>
+<li><strong>Repro:</strong> any <code>SidebarProvider</code> / <code>Sidebar Collapsible="true"</code> shell opened below 768px, where the sidebar is the phone sheet:
+</li>
+</ul>
+<pre><code class="language-razor">  &lt;SidebarProvider DefaultOpen="true" HeightClass="h-screen" CookieKey="tflens:sidebar"&gt;
+      &lt;Sidebar Collapsible="true"&gt;…&lt;/Sidebar&gt;
+      &lt;SidebarInset&gt;…&lt;/SidebarInset&gt;
+  &lt;/SidebarProvider&gt;</code></pre>
+<ul>
+<li><strong>Expected:</strong> the slid-out menu is <code>--sidebar-width-mobile</code> wide — 18rem — the value <code>trblazeui.css</code> defines beside <code>--sidebar-width: 16rem</code> and <code>--sidebar-width-icon: 3rem</code>, and the width <code>docs/mockups/misses.html</code> draws it at (<code>@media (max-width:767px){.sidebar{width:18rem}}</code>).
+</li>
+<li><strong>Actual:</strong> the sheet renders as <code>&lt;div class="… sm:max-w-sm w-[var(--sidebar-width)] bg-sidebar p-0 flex flex-col" data-side="left"&gt;</code> — <code>--sidebar-width</code>, not <code>--sidebar-width-mobile</code>. Measured at 390px: 256px against the mockup's 288px. <code>--sidebar-width-mobile</code> is defined in <code>:root</code> and read by nothing in the stylesheet or the component set, and <code>SidebarProvider</code> exposes no width parameter.
+</li>
+<li><strong>Encountered in:</strong> <code>src/TfLens/Components/Layout/MainLayout.razor</code> (REQ-UI-006), fix cycle 1 side-by-side with <code>docs/mockups/{misses,effort,prices}.html</code> at 390px, 2026-09-11.
+</li>
+<li><strong>Workaround:</strong> one rule in the app's own stylesheet, in the band where the desktop sidebar is <code>display: none</code> and nothing else reads the token — the route already taken for TR-028 … TR-031:
+</li>
+</ul>
+<pre><code class="language-css">  @media (max-width: 47.999rem) {
+      :root { --sidebar-width: var(--sidebar-width-mobile); }
+  }</code></pre>
+<ul>
+<li><strong>Suggested fix:</strong> size the phone sheet with <code>w-[var(--sidebar-width-mobile)]</code> — a one-word change that makes the shipped token mean something — or expose <code>MobileWidth</code> / <code>Width</code> parameters on <code>SidebarProvider</code> so a consumer can state both.
+</li>
+</ul>
+<p><strong>What is NOT affected.</strong> The desktop column, the 3rem icon rail, the backdrop, the slide animation, and the controls inside the menu.
+Only the phone panel's width.</p>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+<script>
+// Light/dark toggle. The initial theme was already applied flash-free by the
+// <head> script (saved choice, else time-of-day). Clicking flips it, saves the
+// choice, and reloads so Mermaid re-renders in the matching theme.
+(function(){
+  var btn = document.getElementById('themeToggle');
+  if(!btn) return;
+  var relabel = function(){
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.textContent = dark ? '☀ Light' : '☾ Dark';
+  };
+  relabel();
+  btn.addEventListener('click', function(){
+    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    try{ localStorage.setItem('tf-theme', next); }catch(e){}
+    location.reload();
+  });
+})();
+
+// Copy buttons on every code <pre> — but NEVER on a `pre.mermaid`:
+// mermaid reads the <pre>'s textContent as the diagram source, so a button
+// appended here glues "copy" onto the last line and breaks the parse
+// (flowcharts → "Syntax error"; sequence diagrams silently absorb it).
+// Mermaid blocks get copy/export from their own .diagram toolbar instead.
+document.querySelectorAll('pre:not(.mermaid)').forEach(pre => {
+  const btn = document.createElement('button');
+  btn.className = 'copy';
+  btn.textContent = 'copy';
+  btn.addEventListener('click', () => {
+    const text = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'copied';
+      setTimeout(() => { btn.textContent = 'copy'; }, 1200);
+    });
+  });
+  pre.appendChild(btn);
+});
+
+// Mermaid init — theme follows the resolved light/dark theme
+if (window.mermaid) {
+  var mermaidTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default';
+  mermaid.initialize({ startOnLoad: true, theme: mermaidTheme, securityLevel: 'loose' });
+}
+
+// Mermaid toolbar wiring — run after mermaid renders
+function wireMermaidToolbars() {
+  document.querySelectorAll('.diagram').forEach(dia => {
+    if (dia.dataset.wired) return;
+    const merm = dia.querySelector('.mermaid');
+    const svg = merm && merm.querySelector('svg');
+    if (!svg) return;
+    dia.dataset.wired = '1';
+    let scale = 1;
+    const label = dia.querySelector('.zlabel');
+    const apply = () => {
+      svg.style.transform = `scale(${scale})`;
+      svg.style.transformOrigin = 'top left';
+      if (label) label.textContent = Math.round(scale * 100) + '%';
+    };
+    const setScale = (s) => { scale = Math.max(0.25, Math.min(4, s)); apply(); };
+    dia.querySelector('[data-zin]').onclick = () => setScale(scale * 1.2);
+    dia.querySelector('[data-zout]').onclick = () => setScale(scale / 1.2);
+    dia.querySelector('[data-fit]').onclick = () => {
+      svg.style.transform = '';
+      svg.removeAttribute('width');
+      svg.style.maxWidth = '100%';
+      svg.style.height = 'auto';
+      scale = 1;
+      if (label) label.textContent = 'Fit';
+    };
+    dia.querySelector('[data-one]').onclick = () => {
+      svg.style.transform = '';
+      svg.style.maxWidth = 'none';
+      svg.style.width = '';
+      svg.style.height = '';
+      scale = 1;
+      if (label) label.textContent = '100%';
+    };
+    dia.querySelector('[data-fs]').onclick = () => {
+      dia.classList.toggle('fs');
+      if (dia.classList.contains('fs')) {
+        document.addEventListener('keydown', escFs);
+      } else {
+        document.removeEventListener('keydown', escFs);
+      }
+    };
+    function escFs(e) { if (e.key === 'Escape') { dia.classList.remove('fs'); document.removeEventListener('keydown', escFs); } }
+    dia.querySelector('[data-pop]').onclick = () => openInNewTab(svg);
+    // Ctrl+wheel zoom
+    merm.addEventListener('wheel', (e) => {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      setScale(scale * (e.deltaY < 0 ? 1.1 : 1/1.1));
+    }, { passive: false });
+  });
+}
+
+function openInNewTab(svg) {
+  const svgSource = new XMLSerializer().serializeToString(svg);
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Diagram</title>
+<style>
+  html,body{margin:0;height:100%;background:#0f1115;color:#e6e8ee;font-family:system-ui,sans-serif}
+  .bar{position:fixed;top:0;left:0;right:0;padding:8px 12px;background:#161a22;border-bottom:1px solid #2a3142;display:flex;gap:8px;z-index:10}
+  .bar button{background:#1c2230;color:#9aa3b2;border:1px solid #2a3142;border-radius:6px;padding:5px 12px;font-size:13px;cursor:pointer}
+  .bar button:hover{color:#7cc4ff;border-color:#7cc4ff}
+  .bar .hint{margin-left:auto;color:#9aa3b2;font-size:11.5px;align-self:center}
+  #stage{position:absolute;top:42px;bottom:0;left:0;right:0;overflow:hidden}
+  #stage svg{width:100%;height:100%}
+</style>
+</head><body>
+<div class="bar">
+  <button onclick="zpz.zoomIn()">+</button>
+  <button onclick="zpz.zoomOut()">−</button>
+  <button onclick="zpz.fit();zpz.center()">Fit</button>
+  <button onclick="zpz.resetZoom();zpz.center()">1:1</button>
+  <button onclick="window.print()">Print</button>
+  <button onclick="dlPng()">PNG</button>
+  <button onclick="dlSvg()">SVG</button>
+  <span class="hint">Drag to pan · Ctrl+wheel to zoom · + / − keys</span>
+</div>
+<div id="stage">${svgSource}</div>
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"><\/script>
+<script>
+  const el = document.querySelector('#stage svg');
+  const zpz = svgPanZoom(el, { zoomScaleSensitivity: .3, minZoom: .2, maxZoom: 10, controlIconsEnabled: false, fit: true, center: true });
+  document.addEventListener('keydown', e => {
+    if (e.key === '+' || e.key === '=') zpz.zoomIn();
+    if (e.key === '-' || e.key === '_') zpz.zoomOut();
+    if (e.key === '0') { zpz.resetZoom(); zpz.center(); }
+  });
+  function dlSvg() {
+    const blob = new Blob([new XMLSerializer().serializeToString(el)], { type: 'image/svg+xml' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'diagram.svg'; a.click();
+  }
+  function dlPng() {
+    const src = new XMLSerializer().serializeToString(el);
+    const img = new Image();
+    const url = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(src)));
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = el.clientWidth * 2; c.height = el.clientHeight * 2;
+      const ctx = c.getContext('2d'); ctx.scale(2,2); ctx.drawImage(img, 0, 0);
+      c.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'diagram.png'; a.click(); });
+    };
+    img.src = url;
+  }
+<\/script>
+</body></html>`;
+  const w = window.open();
+  w.document.write(html);
+  w.document.close();
+}
+
+// Run wiring after mermaid finishes (it renders async)
+if (window.mermaid) {
+  setTimeout(wireMermaidToolbars, 400);
+  setTimeout(wireMermaidToolbars, 1200);  // safety re-run for slow renders
+}
+</script>
+</body>
+</html>

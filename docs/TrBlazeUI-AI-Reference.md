@@ -435,7 +435,16 @@ Root wrapper that manages sidebar state, persistence, and responsive behavior.
 | Side | SidebarSide | Left | Which side: Left, Right |
 | CookieKey | string? | "sidebar:state" | Cookie key for persistence (null disables) |
 | HeightClass | string | "min-h-screen" | Container height CSS class |
+| Width | string? | null | Width of the expanded desktop column, any CSS length. Null → the stylesheet's `--sidebar-width` (16rem) |
+| MobileWidth | string? | null | Width of the slid-out phone menu, any CSS length. Null → `--sidebar-width-mobile` (18rem) |
+| IconWidth | string? | null | Width of the collapsed icon rail, any CSS length. Null → `--sidebar-width-icon` (3rem) |
 | ChildContent | RenderFragment | - | Content (Sidebar + SidebarInset) |
+
+**Three widths, three tokens.** The desktop column is `--sidebar-width` (16rem), the collapsed rail
+`--sidebar-width-icon` (3rem), and the phone menu — the sheet that slides out below 768px —
+`--sidebar-width-mobile` (**18rem**, not 16rem). All three ship as `:root` declarations you can
+theme globally; the parameters above set them on this shell only, which is what you want when one
+layout differs from the rest of the app.
 
 ### Sidebar Component Hierarchy
 
@@ -611,6 +620,25 @@ Sub-components: `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `Ca
     </CollapsibleContent>
 </Collapsible>
 ```
+
+**A disclosure header that spans its row needs `Class="w-full"`.** `CollapsibleTrigger` renders a
+real `<button>` that shrinks to fit its content, like any button. `Class` lands on that button, so
+a spacer inside the trigger has something to push against:
+
+```razor
+<CollapsibleTrigger Class="w-full text-left">
+    <span class="flex w-full items-center gap-2">
+        <LucideIcon Name="chevron-down" Size="16" />
+        <span class="font-mono">build-phase</span>
+        <span class="text-muted-foreground">— 24 runs</span>
+        <span class="flex-1"></span>
+        <Badge Variant="BadgeVariant.Outline">6 of 24 observed</Badge>
+    </span>
+</CollapsibleTrigger>
+```
+
+`CollapsibleTrigger` also takes `AsChild` and splats unmatched attributes, so a `data-testid` or a
+custom component can be the trigger.
 
 ---
 
@@ -1218,6 +1246,9 @@ The shipped API is `Files` (`IReadOnlyList<FileUploadItem>?`) + `FilesChanged`
 </NativeSelect>
 ```
 
+The control turns the browser's own arrow off (`appearance-none`) and draws its own chevron as a
+background image, so it looks the same in every browser. Nothing is needed from you for that.
+
 ### Rating
 
 | Parameter | Type | Default | Description |
@@ -1283,6 +1314,9 @@ Sub-components: `AvatarImage` (Source, Alt), `AvatarFallback`
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | Variant | BadgeVariant | Default | Default, Secondary, Destructive, Outline, **Success**, **Info**, **Warning** |
+| As | string | `"span"` | The element rendered — `"span"` or `"div"`; anything else falls back to `"span"` |
+| Wrap | bool | false | `true` lets a long label wrap inside a pill that grows with it (left-aligned, corner radius) |
+| Truncate | bool | false | `true` clips a long label with an ellipsis on one line. Wins over `Wrap` if both are set |
 | Class | string? | null | Additional CSS classes |
 
 **NEW: `Success`, `Info` and `Warning` were added to `BadgeVariant`** — seven variants now, not four.
@@ -1312,6 +1346,28 @@ Use `Warning` for "needs attention" status; `Destructive` reads as a failure.
 <Badge Variant="BadgeVariant.Warning">Degraded</Badge>
 ```
 
+**A badge is an inline element.** It renders `<span>`, so a pill can sit inside a sentence or a
+`<p>` — a `<div>` there is invalid HTML the parser silently reshapes, and it also means a mockup
+that draws its pills as `<span class="badge">` can be matched element for element. Pass `As="div"`
+where a selector or a stylesheet depends on the old tag.
+
+**A long label does not wrap unless you ask it to.** By default the label is held on one line and
+overflows, which is visible. Say which behaviour you want:
+
+```razor
+@* one line, overflows - the default *@
+<Badge Variant="BadgeVariant.Outline">transient</Badge>
+
+@* wraps, and the pill grows with it: use this for a label that is a sentence *@
+<Badge Variant="BadgeVariant.Outline" Wrap="true">transient · best-effort, absence is not an error</Badge>
+
+@* one line, clipped with an ellipsis: use this for a label that is data *@
+<Badge Variant="BadgeVariant.Outline" Truncate="true">@objRow.Label</Badge>
+```
+
+`Wrap` also drops the `rounded-full` pill radius to a corner radius, because a 999px radius on a
+three-line box turns the end caps into deep arcs that cut into the first and last lines.
+
 ### DataTable (Generic)
 
 | Parameter | Type | Default | Description |
@@ -1319,7 +1375,9 @@ Use `Warning` for "needs attention" status; `Destructive` reads as a failure.
 | TData | type param | - | Data item type (class) |
 | Data | IEnumerable<TData> | required | Data source |
 | SelectionMode | DataTableSelectionMode | None | None, Single, Multiple |
-| ShowToolbar | bool | false | Opt in to the search / column-visibility toolbar |
+| ShowToolbar | bool | false | Opt in to the search / column-visibility toolbar. This decides where the grid's chrome is drawn, **not** whether filtering is available — see `SearchText` |
+| SearchText | string? | null | Two-way (`@bind-SearchText`): the grid's global search text. Bind it to host the filter input anywhere — a card header, a page filter bar — and still get the grid's own filtering over its `Filterable` columns. The built-in toolbar box writes back through the same binding |
+| ShowColumnChooser | bool | true | `false` drops the toolbar's `Columns` dropdown and keeps the search box. Ignored when `ShowToolbar` is false |
 | ShowPagination | bool | true | **Gates the data, not just the pager.** `true` → page window applied and the bar auto-hides when all rows fit one page. `false` → **every** row of the filtered/sorted sequence renders and `InitialPageSize` is ignored |
 | ShowHeader | bool | true | `false` renders no `<thead>` at all — for key/value style tables that need no column headings |
 | Density | DataTableDensity | Comfortable | `Comfortable` or `Compact`; controls header/body cell padding |
@@ -1401,8 +1459,23 @@ Every one of these is honoured — the grid reads them when it registers and ren
 | MinWidth | string? | null | CSS length, e.g. `"120px"`. Emitted as an inline `min-width` on the column. |
 | MaxWidth | string? | null | CSS length, e.g. `"400px"`. Prevents an over-wide column. |
 | CellTemplate | RenderFragment<TData>? | null | Custom body-cell rendering; `context` is the row's `TData`. When null the value is rendered with `ToString()`. |
+| Align | DataTableColumnAlign? | null | `Start`, `Center` or `End`. Aligns the header cell, the header's own **label box** and every body cell together — the one parameter a figure column needs |
 | CellClass | string? | null | Extra CSS classes merged (via `cn`) onto every body cell in this column |
 | HeaderClass | string? | null | Extra CSS classes merged (via `cn`) onto this column's header cell |
+
+> **Right-align a figure column with `Align`, not with `text-right`.** The header label is rendered
+> inside its own `flex` box, so a `text-right` in `HeaderClass` reaches the `<th>` and then has
+> nothing left to move: the cells align and the header stays at the left of the column. `Align`
+> puts the matching `justify-*` on that flex box and the matching `text-*` on the cells:
+>
+> ```razor
+> <DataTableColumn TData="Rate" TValue="decimal"
+>                  Property="@(r => r.InputPerMillion)" Header="Input"
+>                  Align="DataTableColumnAlign.End" CellClass="tabular-nums" />
+> ```
+>
+> `HeaderClass="text-right"` on its own is still honoured for markup written before `Align`
+> existed — the grid reads the intent off the class and aligns the label box to match.
 
 > **Identifier columns need `whitespace-nowrap`, or they soft-wrap with nothing to show for it.**
 > The grid renders its `<table>` as `w-full` inside its own `relative w-full overflow-x-auto`
@@ -2168,6 +2241,11 @@ Chart types: `AreaChart`, `BarChart`, `LineChart`, `PieChart`, `RadarChart`, `Ra
 The chart family wraps **Blazor-ApexCharts**, so `@using ApexCharts` is required (it is in the §1
 import block). `ChartContainer` is optional.
 
+**You never have to drop the wrapper to change an option.** `Options` takes a real
+`ApexChartOptions<TItem>`, merged over the wrapper's own defaults — so a chart can be made to match
+a design (no axis, no gridlines, a compact value above each bar) without giving up `Items`/`XValue`,
+the theme colours, or the empty state. See *Steering a chart with `Options`* below.
+
 All six types inherit `ChartBase<TItem> where TItem : class`:
 
 | Parameter | Type | Default | Description |
@@ -2178,6 +2256,8 @@ All six types inherit `ChartBase<TItem> where TItem : class`:
 | YValue | Func<TItem, decimal?>? | null | **NEW.** Y-axis accessor for the built-in series |
 | SeriesName | string? | null | **NEW.** Legend name of the built-in series; falls back to `Title`, then to `"Series"` |
 | EmptyText | string? | null | **NEW.** Message shown in place of an empty chart canvas |
+| Options | ApexChartOptions<TItem>? | null | **NEW.** Raw ApexCharts options merged **over** the wrapper's defaults. Anything you set wins; anything you leave null the wrapper fills in |
+| OptionsConfigurator | Action<ApexChartOptions<TItem>>? | null | **NEW.** Runs last, after `Options` and every default — for values that must be computed, such as a data-label formatter |
 | Config | ChartConfig? | null | Series label / colour map |
 | Height | string | `"350px"` | Any CSS height |
 | Width | string | `"100%"` | Any CSS width |
@@ -2237,6 +2317,68 @@ ApexPointSeries children."* A misconfigured chart is therefore visible rather th
 
 Series colours pick up `--chart-1` … `--chart-5`, which the library now ships defaults for in both
 light and dark mode; override them in your own `theme.css` to brand the charts.
+
+#### Steering a chart with `Options`
+
+Give the chart an `ApexChartOptions<TItem>` and every member you set replaces the wrapper's default
+for that member; everything you leave null the wrapper still fills in. So changing three options
+costs three lines, not the wrapper.
+
+```razor
+@using ApexCharts
+
+<ChartContainer Bare="true">
+    <BarChart TItem="Total" Items="@objRows" Height="260px" ShowLegend="false" ShowDataLabels="true"
+              XValue="@(r => r.Name)" YValue="@(r => (decimal?)r.Value)"
+              Options="@objChartOptions"
+              OptionsConfigurator="@(o => o.DataLabels.Formatter =
+                  "function (v) { return (v / 1e6).toFixed(1) + 'M' }")" />
+</ChartContainer>
+
+@code {
+    // A comparison chart the usual way: no y axis, no gridlines, the value above each bar.
+    private readonly ApexChartOptions<Total> objChartOptions = new()
+    {
+        Grid = new Grid
+        {
+            Show = false,
+            Xaxis = new GridXAxis { Lines = new Lines { Show = false } },
+            Yaxis = new GridYAxis { Lines = new Lines { Show = false } }
+        },
+        Yaxis = [new YAxis { Show = false }]
+    };
+}
+```
+
+Two details worth knowing:
+
+- **The chart's own parameters still win over `Options`** for what they express — `Variant` drives
+  stacking and orientation, because that is the parameter you set to choose them. Use
+  `OptionsConfigurator`, which runs after everything, to reach those.
+- **The instance is filled in place**, the way `ApexChart` itself treats the options object it is
+  given. Hold it in a field the component owns, not in a shared static.
+
+#### ChartContainer
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| Bare | bool | false | `true` drops the container's own card chrome — border, card background, shadow and `p-6` — and keeps only the flex column the chart sizes against |
+| Class | string? | null | Additional CSS classes |
+
+`ChartContainer` paints a shadcn Card by default. Inside a `Card` — which is where a chart usually
+goes — that draws a **card inside a card**. Pass `Bare="true"` for a flush chart that takes its
+surface from whatever it is placed in:
+
+```razor
+<Card>
+    <CardHeader><CardTitle>Total tokens by harness</CardTitle></CardHeader>
+    <CardContent>
+        <ChartContainer Bare="true">
+            <BarChart TItem="Total" Items="@objRows" ... />
+        </ChartContainer>
+    </CardContent>
+</Card>
+```
 
 ### Prose (rendered HTML you did not author)
 

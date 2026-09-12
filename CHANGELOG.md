@@ -28,6 +28,35 @@ Verified 2026-08-31: Release build 0 warnings / 0 errors; **44/44** headless-Chr
 
 ### ⚠ Behaviour changes to review before upgrading
 
+- **`Badge` renders a `<span>`, not a `<div>` (TR-034).** It is still `inline-flex`, so nothing
+  about the appearance changes — but a `div` could not sit inside a `<p>` without the parser
+  reshaping the markup, and a design that draws its pills as `<span class="badge">` could never be
+  matched element for element. **A CSS selector, a Playwright locator or a stylesheet that keys on
+  `div` will stop matching.** Pass `As="div"` to keep the old tag.
+- **A long `Badge` label no longer wraps by default (TR-029).** It is held on one line and
+  overflows, which is visible; it used to wrap while the pill kept its `rounded-full` geometry, so
+  at a phone width a three-line label sat inside 33,554,432px end caps that cut into its first and
+  last lines and read as two overlapping shapes. **A badge you relied on wrapping will now
+  overflow its container** — set `Wrap="true"` (the pill grows, left-aligned, corner radius) or
+  `Truncate="true"` (clipped with an ellipsis) to say which you meant.
+- **`ClassNames.cn` no longer deletes classes containing `url(` (TR-032).** The injection guard
+  rejected the whole class, which silently dropped the library's own chevron on `NativeSelect` —
+  `appearance-none` with no arrow at all — and any arbitrary value a consumer passed with a
+  `url()` in it. Arbitrary values (the text inside `[…]`) are now validated against their own
+  charset, and only payload forms that could execute (`url(javascript`, `url(data:text/html`,
+  `expression(`, `javascript:`, `@import`) are rejected. **A class you were passing that used to
+  vanish will now take effect**, so a `NativeSelect` (or anything given a `bg-[url(…)]`) paints
+  what it was always asking for.
+- **`text-left` / `text-center` / `text-right` / `text-justify` / `text-start` / `text-end` are a
+  `text-align` conflict group in `TailwindMerge`, not a colour one.** They previously fell through
+  to the bare `text-([a-z]+)` colour pattern, so `text-right` and `text-muted-foreground`
+  conflicted: setting a colour silently un-aligned an element and setting an alignment silently
+  uncoloured it. **Both now survive together**, which changes the rendering of any element that
+  passed one of each.
+- **The phone sidebar is 18rem wide, not 16rem (TR-035).** `SidebarProvider`'s slid-out menu was
+  sized with `--sidebar-width`; it now reads `--sidebar-width-mobile`, the token the stylesheet has
+  always declared at 18rem and nothing ever read. Any app that compensated by redefining
+  `--sidebar-width` inside a mobile media query should drop that rule, or it will now compound.
 - **`DataTable ShowPagination="false"` now renders every row.** It previously still applied
   `InitialPageSize` (default **5**) to the data while hiding the pager, so a grid with pagination
   turned off was silently truncated with no pager, no count and no warning — the page looked
@@ -57,6 +86,108 @@ Verified 2026-08-31: Release build 0 warnings / 0 errors; **44/44** headless-Chr
   raw string. A caller's conflicting utility now genuinely wins by conflict-deletion rather than
   losing to stylesheet source order. Any `Class` you passed to `Tabs`/`TabsList`/`TabsTrigger`/
   `TabsContent` that was previously inert **will now take effect**.
+
+### Fixed — accessibility (REQ-NFR-001)
+
+The accessibility row had carried "Not independently audited — 90%" and **no acceptance line**
+since the project began, so nothing had ever been able to fail it. It was graded against a scanner
+for the first time on 2026-09-12 (axe-core, WCAG 2.1 A/AA, over `/components/select`,
+`/components/datatable`, `/components/dialog`, `/components/collapsible` at 1280) and reported
+**7 violation types across 37 nodes, every one `serious`**. All are fixed; the re-scan reports
+**0 violations, 0 nodes**, with the four controls smoke-tested to confirm they still work.
+
+- **`Kbd` used a colour pairing with no headroom.** The shortcut hint painted
+  `text-muted-foreground` on `bg-muted` at 12px. The library's own tokens give **4.60:1** against a
+  4.5:1 floor — one hundredth of a step from failing — and this project's own demo theme lightens
+  `--muted-foreground` by 0.014, which drops it to **4.34:1** and fails. `Kbd` now uses
+  `text-foreground`: **18.15:1** light, **14.48:1** dark, so no consumer theme can break it. The
+  demo theme's `--muted-foreground` also moves from `oklch(0.5560)` to `oklch(0.5200)` (**5.05:1**
+  on `--muted`), because muted-on-muted needs real headroom wherever it is used, not just here.
+- **The pagination bar was not a valid list — 30 of the 37 nodes.** `PaginationContent` renders the
+  `<ul>` and `PaginationItem` the `<li>`, but `DataTable` was wrapping the page-size selector, the
+  page display and two plain `<div>` spacers *inside* that `<ul>`. The result was **6 lists holding
+  non-list children and 24 list items outside any list**, so a screen reader announced a list whose
+  item count was wrong. The grouping is now done by plain `<div>`s and the `<ul>` holds only the
+  four page buttons. No API changed — the library was misusing its own components.
+- **Three controls were nested inside other controls.** The toolbar's *Filter* and *Columns*
+  popovers rendered a `<Button>` inside `PopoverTrigger`'s own `<button>`; both now pass
+  `AsChild="true"`, so the `Button` *is* the trigger. The DataTable's select-all header rendered a
+  real `role="checkbox"` inside the dropdown trigger's `<button>`, where it was decoration — the
+  trigger owns the click. The accessible name moved to the trigger and the checkbox is now
+  decorative.
+
+### Added
+
+- **`Checkbox.Decorative`** (styled and primitive, default `false`). Renders a plain `<span>` — no
+  role, nothing focusable, `aria-hidden` — keeping the box, the tick and the `data-state` hook but
+  no behaviour. For a checkbox drawn inside something that already owns the click and the name.
+  `tabindex="-1"` is **not** a substitute: a negative tabindex still leaves an element focusable, so
+  the nesting rule still fails on it — which is how this was first mis-fixed and caught.
+
+### Fixed — TfLens TR-028…TR-035 (filed after the 2026-08-31 reply)
+
+Verified 2026-09-12: Release build 0 warnings / 0 errors; **37/37** headless-Chromium checks
+(`tests/verify/ui-tflens-2.spec.js` on `/verify-tflens-2`), with every runnable regression suite
+still green — `ui-tflens` 44/44, `ui-techieblog` 76/76, `ui-ui016` 23/23, `ui-demo-2-1-0` 15/15,
+`ui-ui014` 8/8, `ui-ui004` PASS desktop+mobile; 0 console/page errors and 0 horizontal overflow at
+1280 and 390.
+
+- **A chart could not be made to match a design (TR-028)** — `BarChart` and its five siblings
+  exposed `ShowLegend`/`ShowTooltip`/`ShowDataLabels`/`Height`/`Width`/`BarWidth` and nothing else,
+  so ApexCharts' defaults were the only chart available: a linear y axis printing raw unseparated
+  counts, gridlines a design has none of, and no value labels. Changing three options meant giving
+  up the wrapper for a raw `ApexChart`. New **`Options`** takes a real `ApexChartOptions<TItem>`
+  merged **over** the wrapper's defaults — every member you set wins, every member you leave null
+  the wrapper still fills — and new **`OptionsConfigurator`** runs last for values that have to be
+  computed, such as a data-label formatter. Each chart type's own defaults became `??=`, which is
+  what makes the merge real rather than decorative. Measured: `Grid`+`Yaxis` through `Options`
+  takes the same chart from 5 gridlines / 2 grid borders / 5 y-axis labels to **0 / 0 / 0** while
+  still drawing its 3 bars, and a chart passing no `Options` keeps every default unchanged.
+- **`ChartContainer` drew a card inside a card (TR-028, second half)** — it paints
+  `rounded-lg border bg-card shadow-sm p-6`, and a chart almost always sits in a `Card` already.
+  New **`Bare`** drops that chrome and keeps the flex column the chart sizes against. Measured:
+  border 1px→0, shadow→none, padding 24px→0, with the default container untouched.
+- **A long `Badge` label collapsed into an unreadable shape (TR-029)** — see the behaviour-change
+  note above. New **`Wrap`** and **`Truncate`**. Measured in a 180px box: `Wrap="true"` gives 3
+  lines at 54px with an **8px** radius (was 33,554,432px) and start-aligned text;
+  `Truncate="true"` gives one clipped line; the default holds one line with `white-space: nowrap`.
+- **`Badge` was always a `<div>` (TR-034)** — new **`As`**, defaulting to `"span"`. Measured: the
+  pill stays inside its `<p>` instead of being parsed out of it, `display` is still `inline-flex`,
+  and `As="div"` still renders the old tag.
+- **A column header would not align over its figures (TR-031)** — `HeaderClass="text-right"` set
+  `text-align` on the `<th>`, but the label sits inside its own `flex` box where that moves
+  nothing, so the cells aligned and the header did not. New **`Align`** (`Start`/`Center`/`End`)
+  reaches the header cell, the label's flex box and the body cells together. Markup written before
+  `Align` still works: a `text-right`/`text-center` in `HeaderClass` is read as the same intent.
+  Measured: the label box goes `normal` → `flex-end`, and alignment now survives a `CellClass`
+  colour on the same column (see the `text-align` grouping note above).
+- **`NativeSelect` painted no arrow at all (TR-032)** — the root cause was not in `NativeSelect`.
+  Its chevron is a `bg-[url('data:image/svg+xml;…')]` background image, and
+  `TailwindMerge.IsValidClassName` rejected any class containing `url(`, so `cn()` silently deleted
+  the library's own class and left `appearance-none` with nothing to replace the native arrow.
+  Measured: the class is on the rendered element and computed `background-image` is the data URI
+  (was `none`). See the behaviour-change note — this fixes every consumer class it was eating too.
+- **A grid's filter could only live in the grid's own toolbar (TR-033)** — `ShowToolbar` was
+  all-or-nothing: `true` drew the search box *and* a `Columns` dropdown inside its own box,
+  `false` drew neither and exposed no filter state, so a design that puts the filter in the card
+  header needed a second hand-written filter the grid's `Filterable` columns would not feed. New
+  two-way **`SearchText`** is the same state the built-in box drives, and new
+  **`ShowColumnChooser`** separates the dropdown from the search box. Measured: typing in a
+  card-header input narrows the grid 3 rows → 1 with no toolbar rendered, the built-in box writes
+  back to the bound field, and `ShowColumnChooser="false"` leaves 1 search box and 0 Columns
+  buttons.
+- **The phone menu ignored the mobile width the library defines (TR-035)** — see the
+  behaviour-change note. `SidebarProvider` also gains **`Width`**, **`MobileWidth`** and
+  **`IconWidth`** so a shell can set all three without redefining tokens globally; `MobileWidth`
+  travels on `SidebarContext` because the phone menu is a portalled Sheet under `<body>` that
+  cannot inherit a custom property from the provider's element. Measured at 390px: the slid-out
+  menu is **288px** (was 256px), and one element now reads `--sidebar-width-mobile` where none did.
+
+**Not a library change — TR-030.** The entry reports that `CollapsibleTrigger` takes no `Class`
+parameter. It does, and has since 2.1.0; TfLens filed against 2.0.0. Measured live: `Class` lands
+on the real `<button>`, a `w-full text-left` trigger fills its 502px row and a spacer pushes the
+badge flush to the right edge. The default is deliberately left shrink-to-fit — widening every
+existing trigger would be a silent breaking change — and the row recipe is now in the reference.
 
 ### Fixed
 
@@ -107,6 +238,11 @@ Verified 2026-08-31: Release build 0 warnings / 0 errors; **44/44** headless-Chr
 - `Breadcrumb.Wrap`; `BreadcrumbList.Class`.
 - `ChartBase.XValue` / `.YValue` / `.SeriesName` / `.EmptyText`.
 - `LucideIconData.GetAliases()` / `.AliasCount` / `.ResolveName()`.
+- `ChartBase.Options` / `.OptionsConfigurator`; `ChartContainer.Bare` (TR-028).
+- `Badge.As` / `.Wrap` / `.Truncate` (TR-029, TR-034).
+- `DataTableColumn.Align` + `DataTableColumnAlign` enum (TR-031).
+- `DataTable.SearchText` (two-way) / `.ShowColumnChooser` (TR-033).
+- `SidebarProvider.Width` / `.MobileWidth` / `.IconWidth`; `SidebarContext.MobileWidth` (TR-035).
 
 ### Documentation
 
@@ -122,6 +258,13 @@ Verified 2026-08-31: Release build 0 warnings / 0 errors; **44/44** headless-Chr
   (splatted after, overwriting the component's own classes). Nine occurrences of the latter in the
   reference's own examples — including the KPI-card recipe, which silently lost its padding — were
   corrected.
+- Parameter rows and worked examples for everything added for TR-028…TR-035: `Badge`'s `As`/`Wrap`/
+  `Truncate` with the "a badge is an inline element" rule, `DataTableColumn.Align` with the reason
+  `HeaderClass="text-right"` appears to do nothing, `DataTable.SearchText`/`ShowColumnChooser` with
+  the card-header filter recipe, a *Steering a chart with `Options`* section, a first
+  `ChartContainer` parameter table (it had none) covering `Bare`, `SidebarProvider`'s three width
+  parameters with the three-tokens note, the `CollapsibleTrigger Class="w-full"` row recipe
+  (TR-030), and a line stating that `NativeSelect` draws its own chevron.
 
 ---
 

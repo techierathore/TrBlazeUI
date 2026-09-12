@@ -1,5 +1,44 @@
 # TfLens — TrBlazeUI feedback
 
+| | |
+|---|---|
+| App | TfLens |
+| Upstream | TrBlazeUI |
+| Updated | 2026-09-12 |
+
+> ## ✅ RESOLVED LIBRARY-SIDE 2026-09-12 — TR-028 … TR-035, the eight filed after the reply below
+>
+> Triaged and fixed against current source under **REQ-UI-020**. Release build **0 warnings /
+> 0 errors**; **37/37** new headless-Chromium checks (`tests/verify/ui-tflens-2.spec.js` on
+> `/verify-tflens-2`) plus **15/15** row-mapped acceptance tests (`tests/verify/req-ui-020.spec.ts`),
+> with every runnable regression suite still green — `ui-tflens` 44/44, `ui-techieblog` 76/76,
+> `ui-ui016` 23/23, `ui-demo-2-1-0` 15/15, `ui-ui014` 8/8, `ui-ui004` PASS desktop+mobile. 0
+> console/page errors and 0 horizontal overflow at 1280 and 390. Evidence:
+> `docs/TrBlazeUI-Checklist.md` REQ-UI-020, ledger `docs/.last-verify.json`.
+>
+> **Seven were real and are fixed. One (TR-030) was already fixed and needs an upgrade, not a fix.**
+>
+> | Entry | What was actually wrong | What you get |
+> |---|---|---|
+> | **TR-028** | `BarChart` and its five siblings had no route to `ApexChartOptions` at all, and each type overwrote `Grid`/`Xaxis`/`Yaxis` unconditionally. `ChartContainer` painted a Card with no way off. | **`Options`** (merged *over* the wrapper's defaults) and **`OptionsConfigurator`** (runs last, for formatters) on every chart type; **`ChartContainer.Bare`**. Measured: 5 gridlines / 2 borders / 5 y-labels → **0/0/0**, bars still drawn, and a chart passing no `Options` unchanged. |
+> | **TR-029** | Confirmed. In a 180px box the label became 3 lines at 54px inside a **33,554,432px** radius — the end caps really were cutting into the text. | **`Badge.Wrap`** (pill grows, left-aligned, 8px radius) and **`Badge.Truncate`**. ⚠ The default is now one line that overflows rather than a silent broken shape. |
+> | **TR-030** | **Could not reproduce.** `CollapsibleTrigger` has had a `Class` parameter since 2.1.0 — you filed against 2.0.0. Measured live: `Class="w-full text-left"` lands on the real `<button>`, which then fills its 502px row with the badge flush right. | Upgrade and drop the `::deep` rule. The shrink-to-fit default is kept deliberately (widening every existing trigger would break layouts silently); the row recipe is now in the reference. |
+> | **TR-031** | Confirmed, and your diagnosis was exactly right — the label sits in `div.flex`, where `text-align` moves nothing. | **`DataTableColumn.Align`** (`Start`/`Center`/`End`) reaches the `th`, the label's flex box and the cells together. `HeaderClass="text-right"` alone is still read as the same intent, so your existing markup works unchanged. |
+> | **TR-032** | **The root cause is not `NativeSelect`.** Your "the class merge appears to drop `bg-[url(…)]`, unconfirmed" was right, and here is the confirmation: `TailwindMerge.IsValidClassName` rejected **any** class containing `url(` as an injection guard, so `cn()` silently deleted the library's own chevron. | Arbitrary values (inside `[…]`) are now validated against their own charset; only executable payloads are rejected. **This was eating your classes too** — any `bg-[url(…)]` you passed anywhere vanished the same way. |
+> | **TR-033** | Confirmed. `ShowToolbar` was all-or-nothing and exposed no filter state. | **`@bind-SearchText`** — the same state the built-in box drives, so you can host the input in the card header and still get the grid's real filtering over `Filterable` columns — plus **`ShowColumnChooser`** to drop the `Columns` button on its own. Measured: 3 rows → 1 from a card-header input, no toolbar rendered. |
+> | **TR-034** | Confirmed, and `<span>` was the right call. | **`Badge.As`**, defaulting to **`"span"`**. Still `inline-flex`, so nothing looks different — your six permanent `mockup-parity` findings on `/effort` should now key correctly. `As="div"` is the escape hatch. |
+> | **TR-035** | Confirmed exactly as filed: `--sidebar-width-mobile` was declared at 18rem and read by **zero** elements. | The phone sheet reads it. Measured at 390px: **288px**, was 256px. Also **`SidebarProvider.Width` / `.MobileWidth` / `.IconWidth`** if you want per-shell control. **Drop your `:root { --sidebar-width: var(--sidebar-width-mobile) }` media-query rule** or it will now compound. |
+>
+> **Read the CHANGELOG's "Behaviour changes to review before upgrading" before you take this.** Five
+> things change by design: `Badge` is a `<span>`, a long badge label no longer wraps unless asked,
+> classes containing `url(` are no longer deleted (so classes that used to vanish now take effect),
+> `text-left`/`text-center`/`text-right` no longer conflict with text *colour* in the merge, and the
+> phone sidebar is 18rem.
+>
+> **Please re-test and reopen anything that still bites.**
+
+---
+
 > ## ✅ RESOLVED LIBRARY-SIDE 2026-08-31 — ships in the next release
 >
 > Triaged (`*triage-issues`) and fixed (`*fix-issues`) against current source under **REQ-UI-019**.
@@ -99,24 +138,73 @@ build never stopped for a library issue.
 
 ## Summary
 
-- **5 blockers, 11 majors, 8 minors, 0 nice-to-haves** — 24 entries, **all 24 open**. None is fixed
-  upstream; every one shipped with a workaround instead.
-- Last consolidated: 2026-08-28. **Re-tallied 2026-08-30** for the four entries added during the
-  `*build-phase` mockup-parity FIX pass: `TR-023`, `TR-024` and `TR-026` are Medium (major),
-  `TR-025` is Low (minor). Counted from the 24 `## TR-` headings less the one merge stub
-  (`TR-022` → `TR-008`); `TR-006` and `TR-007` remain unallocated.
+33 entries: **0 blocking now, 0 filed and not blocking, 32 fixed upstream**, 1 closed (TR-022,
+merged into TR-008). **Nothing is blocked.**
+
+Two library replies cover all 32. The reply of **2026-08-31** answers 24 — TR-001 to TR-005, TR-008
+to TR-021, TR-023 to TR-027. The reply of **2026-09-12**, at the top of this file, answers the eight
+filed since: TR-028 to TR-035. Seven were fixed under REQ-UI-020; **TR-030 could not be reproduced**
+— the `Class` parameter it asks for has existed since 2.1.0, and TfLens filed against 2.0.0.
+
+TfLens still builds against **2.0.0**, so all 32 are re-checked after the upgrade, not before. Close
+each one with `bash .tfcore/utils/tf-feedback.sh TfLens --close <ID> "<what you ran and what it
+showed>"`; a bare `tf-feedback.sh TfLens` prints every entry's state. Never describe a fixed entry
+as an open problem.
+
+**Every workaround in TR-028 to TR-035 can be removed on upgrade**, and the `--sidebar-width`
+media-query override for TR-035 **must** go or it will compound with the library's own fix.
+
+This file is the one log of library gaps for every phase; a gap met on any phase's screen is filed
+here as a new entry.
+
+#### Detail
+
+What the last eight entries affected, as filed:
+
+| Entry | What it affects | Blocks or breaks anything? |
+|---|---|---|
+| **TR-028** — the bar chart has no axis, grid or value-label settings | The token chart on the Harness page. TfLens draws it with the chart component underneath, which does take settings. | No. The chart matches its design. |
+| **TR-029** — a long badge label spills out of its pill on a phone | The stream-health card on the Misses page. The label was shortened and the sentence moved into the card's text. | No. |
+| **TR-030** — the button that opens a collapsible row does not fill the row | The per-phase rows on the Phase effort page. One style rule widens the button. | No. |
+| **TR-031** — a table column's header cannot be right-aligned over its figures | The rate tables on the Price providers page. One style rule moves the header label right. | No. |
+| **TR-032** — the native select shows no arrow | The Provider list in "Add or change a rate" on the Price providers page. One style rule gives the browser's own arrow back. | No. |
+| **TR-033** — a data grid's search box can only sit in the grid's own toolbar | The per-miss table on the Misses page. The filter works; it sits above the table instead of in the card header, where the design draws it. | No. |
+| **TR-034** — a pill is always a block element, so it cannot sit inside a sentence | The count pills on the Phase effort page. They render and read correctly; a design gate cannot pair them with the mockup's. | No. |
+| **TR-035** — the phone menu ignores the mobile width the library itself defines | The slid-out menu on every screen below 768px. One rule in the app's stylesheet restores the designed 18rem. | No. |
+
+**Answered 2026-09-12** — the request below was sent and has been worked. See the reply at the top
+of this file for what changed and what to review before upgrading. It is kept here as the record of
+what was asked.
+
+```
+Fix the TrBlazeUI problems TfLens filed after your reply of 2026-08-31. Work from
+docs/TfLens-TrBlazeUI-Feedback.md in the TfLens repo: entries TR-028, TR-029,
+TR-030, TR-031, TR-032, TR-033, TR-034 and TR-035. Each names the component, what TfLens saw, the
+workaround it shipped and a suggested fix.
+```
+
+- **Corrected 2026-09-11.** This Summary used to say "all 28 open. None is fixed upstream". It was
+  written on 2026-09-02, after the reply at the top of the file, and never took the reply in. It now
+  follows the entries.
+- `TR-006` and `TR-007` were never allocated; `TR-022` is the merge stub into `TR-008`.
 
 **Severity words used in the entries map to those counts as:** `High` = blocker · `Medium` = major ·
 `Low` = minor. Nothing in this file is filed nice-to-have. The entry bodies keep their original
 `High`/`Medium`/`Low` wording — the mapping is stated here rather than applied to them, so no entry's
 recorded severity was silently reinterpreted.
 
-| Band | Count | Entries |
-|---|---|---|
-| **Blocker** (High) | 5 | TR-001 · TR-002 · TR-009 · TR-011 · **TR-021** |
-| **Major** (Medium) | 8 | TR-003 · TR-005 · TR-008 · TR-010 · TR-014 · TR-018 · TR-019 · TR-020 |
-| **Minor** (Low) | 6 | TR-004 · TR-012 · TR-013 · TR-015 · TR-016 · TR-017 |
-| Nice-to-have | 0 | — |
+| Band | Count | Entries | State |
+|---|---|---|---|
+| **Blocker** (High) | 6 | TR-001 · TR-002 · TR-009 · TR-011 · TR-021 · TR-028 | all six fixed upstream |
+| **Major** (Medium) | 12 | TR-003 · TR-005 · TR-008 · TR-010 · TR-014 · TR-018 · TR-019 · TR-020 · TR-023 · TR-024 · TR-026 · TR-029 | all twelve fixed upstream |
+| **Minor** (Low) | 14 | TR-004 · TR-012 · TR-013 · TR-015 · TR-016 · TR-017 · TR-025 · TR-027 · TR-030 · TR-031 · TR-032 · TR-033 · TR-034 · TR-035 | all fourteen fixed upstream (TR-030 was already fixed in 2.1.0 — upgrade, no library change) |
+| Nice-to-have | 0 | — | — |
+
+The table used to list 19 entries; TR-023 to TR-030 had been added since it was last rebuilt. With
+TR-022 closed as a merge, the 27 rows here and that one make the 28. TR-031 was added on 2026-09-11,
+which makes 29, TR-032 the same day, which makes 30, TR-033 the same day, which makes 31, and TR-034
+and TR-035 the same day — the fix-cycle-1 side-by-side comparisons — which makes 33. **The next free
+number is `TR-036`.**
 
 Entries below are ordered **blocker → major → minor**, and by ID within a band. **IDs are unchanged** —
 the order is a reading aid, never a renumbering.
@@ -142,8 +230,8 @@ been written before the 2026-08-27 renumbering:
 | Citation | Cites | Actually means |
 |---|---|---|
 | `src/TfLens/Components/Pages/Harness.razor:99` | `TR-006` | **TR-009** (`ShowPagination="false"` still truncates to `InitialPageSize`) |
-| `src/TfLens/Components/Pages/ThreeQuestions.razor:92` | `TR-006` | **TR-010** (`TabsTrigger` captures no unmatched attributes) |
-| `src/TfLens/Components/Pages/ThreeQuestions.razor:22` | `TR-007` | **TR-013** (the `Typography*` family) |
+| `src/TfLens/Components/Pages/GateOutcomes.razor:92` | `TR-006` | **TR-010** (`TabsTrigger` captures no unmatched attributes) |
+| `src/TfLens/Components/Pages/GateOutcomes.razor:22` | `TR-007` | **TR-013** (the `Typography*` family) |
 
 Left as-is deliberately: they are `src/` comments and this pass is documentation-only. Recorded here so
 the next reader is not sent looking for two entries that do not exist. `docs/TfLens-DevGuide-Screens.md`
@@ -202,7 +290,7 @@ already lists its own `TR-007` mention under "stale comments to ignore".
   reference describes `ShowPagination` as "Allow pagination; the bar auto-hides when all rows fit one page",
   which reads as "no pager, all rows".
 - **Actual:** only the first `InitialPageSize` rows render (default **5**). With `ShowPagination="false"` there is
-  no pager to reveal the rest, so rows six onwards are simply absent from the DOM. On `/three-questions` this
+  no pager to reveal the rest, so rows six onwards are simply absent from the DOM. On `/gate-outcomes` this
   silently cut the `standards`, **`escaped`** and `unattributed` rows off the gate-catch distribution — the
   `escaped` row is the one row the requirement exists for.
 - **Encountered in:** REQ-UI-020 (`gate-dist-{type}`, eight fixed rows in the reference's gate order).
@@ -350,7 +438,7 @@ Two defects met on the same screen; both make a control unusable as shipped.
   `zap`, `chart-bar` and `bar-chart-3` all render; `check-circle`, `check-circle-2`, `alert-circle`,
   `alert-triangle`, `x-circle`, `help-circle` and `circle-help` all render nothing. There is no
   `circle-help` under either name, so a "question" glyph is simply unavailable.
-  This is already visible in the shipped shell: the sidebar's **Three questions** item (`help-circle`) has no
+  This is already visible in the shipped shell: the sidebar's **Gate outcomes** item (`shield-check`; `help-circle` when this was logged) has no
   icon at all, and `Repos.razor`'s rate-limit and private-repo alerts (`alert-triangle`) have none either.
 - **Root cause (from the merged TR-022, 2026-08-28):** the names are **not missing from the package** —
   this entry's original reading ("2.0.0 carries only the post-rename names") was one layer short.
@@ -359,7 +447,7 @@ Two defects met on the same screen; both make a control unusable as shipped.
   (`check-circle` → `circle-check`, and the rest of Lucide's renamed set) resolves to nothing. There is
   no warning and no fallback glyph, which is why a blank icon is indistinguishable from a deliberate one.
 - **Encountered in:** REQ-UI-018 (the three KPI tiles' icons and the empty state's icon on
-  `/three-questions`); and, as TR-022, REQ-UI-036 — the measured-USD tile's accent chip on `/misses`
+  `/gate-outcomes`); and, as TR-022, REQ-UI-036 — the measured-USD tile's accent chip on `/misses`
   rendered as an empty coloured square.
 - **Workaround:** use the canonical name from the `icons` map — `circle-check`, `triangle-alert`, `x` —
   and substitute `list-checks` where no question glyph exists. A quick check against
@@ -826,3 +914,334 @@ root and cannot carry this file's scope attribute:
 split its gap into `gap-x-2.5 gap-y-0` — a breadcrumb's rows never want the column spacing between
 them. Adding `CaptureUnmatchedValues` would also do, and would settle TR-023's family of cases at the
 same time.
+
+## TR-028 — `BarChart` exposes no axis, grid or data-label control and no route to `ApexChartOptions`, so a chart cannot be made to match an approved design
+
+**Severity:** High · **Raised:** 2026-09-01 · **Status:** open
+
+**Repro.** `docs/mockups/harness.html` draws *Total tokens by harness* the way a comparison chart is
+normally drawn when the values span orders of magnitude: **no y axis, no gridlines, and the value
+printed above each bar** (`68.6M`, `19.0M`, `0.61M`). The mockup's own card description names the
+components to build it with — `ChartContainer → BarChart`. So:
+
+```razor
+<ChartContainer>
+    <BarChart TItem="HarnessTokenTotal" Items="@objChartRows" Height="260px" Width="100%"
+              ShowLegend="false" ShowTooltip="true">
+        <ApexPointSeries TItem="HarnessTokenTotal" Items="@objChartRows" SeriesType="SeriesType.Bar"
+                         XValue="@(r => r.Harness)" YValue="@(r => (decimal)r.Tokens)"
+                         PointColor="@(r => ChartColourFor(r.Harness))" />
+    </BarChart>
+</ChartContainer>
+```
+
+`BarChart`'s entire public surface for this is `ShowLegend`, `ShowTooltip`, `ShowDataLabels`,
+`Height`, `Width`, `BarWidth`. There is **no** `Options`, no `Xaxis`/`Yaxis`, no `Grid`, and no
+formatter — so ApexCharts' defaults are the only chart you can have. On this screen's real data
+(claude-code 3.2B, opencode 814k, codex 18.5M) the defaults produced:
+
+* a linear y axis printing **raw counts** — `3000000000`, unscaled and unseparated;
+* horizontal gridlines and a rounded plot border the design has none of;
+* **no value labels at all**, so with claude-code at 3.2B the other two bars were a 0–1px line with
+  no figure anywhere near them.
+
+Two of the three numbers the card exists to compare were unreadable. This is not a cosmetic gap: on
+a product whose one claim is that its figures can be quoted, a chart that can only render an
+unscaled axis is a chart that cannot be shipped.
+
+**Encountered in:** `src/TfLens/Components/Pages/Harness.razor` (REQ-UI-023), owner UAT 2026-08-30.
+
+**Workaround — drop the wrapper.** `ApexChart<T>` (the component `BarChart` wraps) *does* take
+`Options`, so the fix was to stop using `BarChart`:
+
+```razor
+<ChartContainer>
+    <ApexChart TItem="HarnessTokenTotal" Options="@objChartOptions" Height="260" Width="@("100%")">
+        <ApexPointSeries … ShowDataLabels="true" />
+    </ApexChart>
+</ChartContainer>
+```
+
+with `Grid { Show = false }`, `Yaxis = [new YAxis { Show = false }]`, and a `DataLabels.Formatter`
+carrying the same compact notation the table cells use. That is the whole value of the wrapper
+given up to change three options.
+
+**A second, separable defect found in the same hour:** `ChartContainer` renders its own
+`rounded-lg border bg-card shadow-sm p-6` surface. Placed inside a `Card` — which is where a chart
+almost always goes, and where both the mockup and the library's own reference put it — it draws a
+**card inside a card**: a second bordered, shadowed panel around the plot. There is no `Bare` or
+`Variant` switch, so the only way to get the design's flush chart is scoped CSS unpicking the
+container's own decoration:
+
+```css
+.tflens-chart ::deep > div { border: 0; background: transparent; box-shadow: none; padding: 0; }
+```
+
+**Suggested fix:** (1) give `BarChart` (and its siblings) an `Options` parameter merged over the
+wrapper's defaults — one parameter settles every case of this shape, rather than growing a
+`ShowYAxis` / `ShowGrid` / `LabelFormatter` surface one report at a time. (2) Give `ChartContainer` a
+`Bare` parameter, or drop the card chrome entirely and let the caller supply it — a *container* that
+paints a card is doing two jobs, and the second one is almost always already done.
+
+---
+
+## TR-029 — `Badge` is a fixed-height `rounded-full` pill with no wrapping treatment, so a multi-word label collapses into an unreadable shape on a phone
+
+**Severity:** Medium · **Raised:** 2026-09-01 · **Status:** open
+
+**Repro.** The Playbook stream-health card on `/misses` states each stream's state in a badge, exactly
+as `docs/mockups/misses-playbook.html` draws it — including the transient stream, whose state the
+mockup writes as a sentence:
+
+```razor
+<Badge Variant="BadgeVariant.Outline">transient · best-effort, absence is not an error</Badge>
+```
+
+**Expected:** at 390px the label wraps to two or three lines inside a pill that grows with it — which
+is what the approved mockups do, in one rule they had to write by hand:
+
+```css
+@media (max-width: 700px) {
+  .badge { white-space: normal; height: auto; min-height: 22px; padding: 2px 8px; border-radius: 12px; text-align: left; }
+}
+```
+
+**Actual:** the shipped badge is `inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs
+font-semibold …` — a **fixed-height** pill with a 999px radius and no `white-space` handling. The text
+wraps anyway, so at 390 the label spills past a pill that has not grown with it: measured in the
+browser, the four-line label overlapped its own rounded ends and the row beside it, and read as two
+overlapping shapes rather than one badge. There is no `Truncate`, `Wrap` or size parameter to say
+which of the two behaviours the caller wants.
+
+**Encountered in:** `src/TfLens/Components/Shared/Playbook/PlaybookMissesSurface.razor` (REQ-UI-051),
+1280 and 390 smoke, 2026-09-01.
+
+**Workaround — shorten the label and move the sentence to prose.** The badge now says `transient` and
+the card's footer carries "…is transient and best-effort — it is the exporter's input, rotates, and
+TfLens never stores it, so its absence is not an error." That is the better copy anyway, so the cost
+here was small; it will not be small on a screen whose badge text is data rather than an author's
+sentence, and the alternative — a `::deep` rule per component reaching a child's root element, since
+scoped CSS cannot reach it directly — is the shape TR-025 and TR-016 already document.
+
+**Suggested fix:** drop the fixed height in favour of a `min-height` and let the pill grow (the
+mockups' own rule), or add a `Wrap` / `Truncate` parameter so the caller states which behaviour a long
+label should get. Either settles every case; neither needs a new variant.
+
+---
+
+## TR-030 — `CollapsibleTrigger` renders an `inline-block` button with a bare `class="group"`, so a disclosure header cannot span its own row
+
+**Severity:** Low · **Raised:** 2026-09-01 · **Status:** open
+
+**Repro.** The per-phase disclosures on `/effort` are drawn by `docs/mockups/effort.html` as one full
+width row: a chevron, the command, a muted summary, a spacer, and an observation badge flush right.
+
+```razor
+<Collapsible Open="@vIsOpen" OpenChanged="…">
+    <CollapsibleTrigger>
+        <span class="tflens-detail-trigger">
+            <LucideIcon Name="chevron-down" Size="16" />
+            <span class="font-mono">build-phase</span>
+            <span class="text-muted-foreground">— 24 runs · 21h 40m · 24.2M output</span>
+            <span class="tflens-spacer"></span>
+            <Badge Variant="BadgeVariant.Outline">6 of 24 observed</Badge>
+        </span>
+    </CollapsibleTrigger>
+    …
+</Collapsible>
+```
+
+**Expected:** the trigger fills the row it is placed in — or exposes a parameter, a class hook or a
+documented `AsChild` so the caller can say so — the way `SidebarMenuButton` already does for exactly
+this layout.
+
+**Actual:** the rendered element is `<button class="group">`, `display: inline-block`, with no width
+and no other class. It shrinks to fit its content, so the spacer has nothing to push against and the
+badge sits immediately after the summary text rather than at the right edge. `CollapsibleTrigger`
+takes no `Class` parameter either, so the only way to reach the button is a `::deep` rule from an
+ancestor the consuming page owns — a page's own scoped CSS cannot match a child component's root,
+which is the same wall TR-016, TR-025 and TR-029 each end at.
+
+**Workaround:**
+
+```css
+.tflens-effort ::deep .tflens-detail button { width: 100%; }
+```
+
+**Suggested fix:** add `Class` to `CollapsibleTrigger` (every other TrBlazeUI component that renders a
+box has one), or default the trigger to `w-full text-left` since a disclosure header is a row in every
+design that has one. The first is the smaller change and settles the general case.
+
+**Encountered in:** `src/TfLens/Components/Pages/Effort.razor` (REQ-UI-048), 1280 and 390 smoke,
+2026-09-01.
+
+---
+
+## TR-031 — `DataTableColumn` `HeaderClass="text-right"` does not right-align the header, because the label sits in its own flex box
+
+**Severity:** Low · **Raised:** 2026-09-11 · **Status:** open
+
+**Repro.** A money column in a `DataTable`, right-aligned the way every figure column is:
+
+```razor
+<DataTableColumn TData="PriceProviderModel" TValue="decimal"
+                 Property="@(aRate => aRate.InputPerMillion)" Header="Input"
+                 CellClass="text-right tabular-nums" HeaderClass="text-right">
+    <CellTemplate Context="vRate">@Usd(vRate.InputPerMillion)</CellTemplate>
+</DataTableColumn>
+```
+
+**Expected:** the header label sits over the right edge of its column, above the figures, the way
+`docs/mockups/prices.html` draws it (`th class="r"`). There is either a column alignment parameter
+(`Align="End"`) or `HeaderClass` reaches the label.
+
+**Actual:** the cells right-align and the header does not. The th renders as
+`<th class="h-12 px-4 align-middle … text-right"><div class="flex items-center gap-2"><span>Input</span></div></th>`.
+`text-right` sets `text-align` on the th, but the label is inside a `div.flex`, where `text-align`
+moves nothing. `DataTableColumn` has no `Align` and no `HeaderTemplate`, so no parameter reaches that
+div. The label stays at the left of its column while the figures sit at the right. On a phone the
+Input and Output headers then read as one run of words over nothing, which the verifier reported
+on REQ-UI-072 on 2026-09-11.
+
+**What TfLens did:** one rule in the page's own scoped stylesheet carries the column's
+`text-right` one level in. It adds no control and no markup:
+
+```css
+.tflens-prices ::deep .tflens-prices-flush th.text-right > div { justify-content: flex-end; }
+```
+
+**Suggested fix:** when `HeaderClass` carries `text-right` (or `text-center`), put the matching
+`justify-end` (`justify-center`) on the label's flex box. Better, add `Align` (`Start`, `Center`, `End`)
+to `DataTableColumn` and apply it to the th, the label box and every cell together. Figure columns
+are right-aligned in every table that has figures.
+
+**Not affected:** sorting, cell alignment (`CellClass="text-right"` works on the td), and left-aligned
+columns.
+
+**Encountered in:** `src/TfLens/Components/Pages/Prices.razor` (REQ-UI-072), 1280 and 390 smoke,
+2026-09-11.
+
+---
+
+## TR-032 — `NativeSelect` renders with `appearance-none` and no arrow, so a select reads as a text box
+
+- **Severity:** Low (raised 2026-09-11, open)
+- **Blocks:** no. One scoped style rule turns the browser's arrow back on and the form works throughout.
+- **Repro:** the provider list in the Price providers page's rate form:
+
+  ```razor
+  <NativeSelect @bind-Value="objRateProvider" id="prices-rate-provider">
+      <option value="anthropic">Anthropic (Claude)</option>
+      <option value="openai">OpenAI</option>
+  </NativeSelect>
+  ```
+
+- **Expected:** a down arrow at the select's right edge, as `docs/mockups/prices.html` draws it and as the component intends: its 2.0.0
+  class list carries `appearance-none bg-no-repeat bg-[url('data:image/svg+xml;…m6 9 6 6 6-6…')] bg-[length:1rem]
+  bg-[right_0.5rem_center] pr-8` — a chevron as a background image — and `trblazeui.css` ships a rule for that `bg-[url(…)]` class.
+- **Actual:** the rendered `<select>` carries all of those except `bg-[url(…)]`, so it has no background image: native arrow off, drawn
+  arrow missing, no arrow at all. Beside five text inputs of the same size it reads as a sixth. Measured at 1280 and 390, headless
+  Chromium, dark theme, 2026-09-11.
+- **Encountered in:** `src/TfLens/Components/Pages/Prices.razor` (REQ-UI-072), fix-cycle-1 side-by-side with the mockup, 2026-09-11.
+- **Workaround:** one rule in the page's own scoped stylesheet, adding no control and no markup:
+  `.tflens-prices ::deep .tflens-prices-rates select { appearance: auto; }`.
+- **Suggested fix:** get the chevron class onto the rendered element — the class merge appears to drop `bg-[url(…)]`, unconfirmed. Safer
+  still, draw it as an element: a `LucideIcon` `chevron-down` over the right edge, as shadcn's NativeSelect does.
+
+**What is NOT affected.** Binding, keyboard use and the option list: a real `<select>` that works. Only the arrow is missing.
+
+---
+
+## TR-033 — `DataTable`'s search box exists only inside its own toolbar, so a design that puts the table's filter in the card header cannot be built
+
+- **Severity:** Low (raised 2026-09-11, open)
+- **Blocks:** no. The filter works, above the table rather than in the card header, with a `Columns` button the design lacks.
+- **Repro:** the per-miss table on `/misses`, filterable by REQ, class and whose gap:
+
+  ```razor
+  <DataTable TData="MissRow" Data="@DetailRows" ShowToolbar="true" ShowPagination="true" …>
+  ```
+
+- **Expected:** a way to put the grid's search box where the design puts it — `docs/mockups/misses.html` draws it in the card header
+  opposite the title (`<input class="input lead sm" placeholder="Filter by REQ, class or whose gap">`). A two-way `SearchText`, or a
+  `ToolbarContent` slot, would settle it.
+- **Actual:** `ShowToolbar` is the only control and is all-or-nothing: `true` renders the library's toolbar — search input *and*
+  column-visibility `Columns` dropdown — above the grid, inside its own box; `false` renders neither and exposes no filter state. Drawing
+  the header filter needs a second hand-written filter over `DetailRows`, which the grid's `Filterable` columns would not feed.
+- **Encountered in:** `src/TfLens/Components/Pages/Misses.razor` (REQ-UI-038 / REQ-UI-053), fix-cycle-1 side-by-side with the mockup,
+  2026-09-11.
+- **Workaround:** none, deliberately. REQ-UI-052's test locates the search box *inside* `miss-detail-table` and asserts typing narrows the
+  rows, so moving it would break that test or duplicate the filter. Recorded as a deviation in
+  `tests/.artifacts/verify/misses-fix/findings-verdict.md`.
+- **Suggested fix:** add `@bind-SearchText` (and, separately, `ShowColumnChooser`) so a caller can host the search input anywhere and
+  still drive the grid's filtering; a `ToolbarContent` slot would do as well.
+
+**What is NOT affected.** The filtering itself, `Filterable` columns, sorting and pagination. Only where the search box can be drawn.
+
+---
+
+## TR-034 — `Badge` always renders a `<div>`, so a pill cannot sit inside a sentence and cannot match a design that draws one as a `<span>`
+
+- **Severity:** Low (raised 2026-09-11, open)
+- **Blocks:** no. Every pill on `/effort` renders and reads correctly; the findings are adjudicated as tool artefacts.
+- **Repro:** any count pill in running text, e.g. the phase table's caption row on `/effort`:
+
+  ```razor
+  <Badge Variant="BadgeVariant.Outline" Class="tflens-nowrap-badge">
+      @objPhases.Phases.Count phases · @objPhases.RunsLive runs
+  </Badge>
+  ```
+
+- **Expected:** the element `Badge` renders can be inline — an `As`/`Element` parameter, or the `AsChild` pattern the triggers use
+  (`<Badge AsChild><span>…</span></Badge>`) — because a pill is an inline object: `docs/mockups/effort.html` writes every one as
+  `<span class="badge …">`, and three of this page's pills sit next to inline text.
+- **Actual:** the markup is always `<div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold …">`.
+  `inline-flex` makes it look inline, but a `<div>` cannot sit inside a `<p>` without invalid HTML, and the mockups'
+  `<span class="badge">` can never be matched element-for-element. On `/effort` that is six permanent `mockup-parity` findings across two
+  widths, on pills plainly on screen, because the gate keys elements by tag and index
+  (`tests/.artifacts/verify/effort-fix/findings-verdict.md`, verdict 10).
+- **Encountered in:** `src/TfLens/Components/Pages/Effort.razor` (REQ-UI-045 … REQ-UI-049), fix cycle 1 side-by-side with
+  `docs/mockups/effort.html`, 2026-09-11.
+- **Workaround:** none — there is no parameter to set. The pills are left as the library draws them.
+- **Suggested fix:** `AsChild` on `Badge` (as `DialogTrigger`, `SheetTrigger`, … have), or an `As="span"` parameter. `span` would be the
+  better default: shadcn/ui's own Badge moved to `<span>` for this reason.
+
+**What is NOT affected.** The variants, the colours, `Class`, and pills standing alone in a flex row — most of them.
+
+---
+
+## TR-035 — `SidebarProvider`'s phone menu is sized with `--sidebar-width`, so the `--sidebar-width-mobile` the stylesheet defines is never read
+
+- **Severity:** Low (raised 2026-09-11, open)
+- **Blocks:** no. The phone menu opens, paints and navigates; one `:root` rule restores the designed width.
+- **Repro:** any `SidebarProvider` / `Sidebar Collapsible="true"` shell opened below 768px, where the sidebar is the phone sheet:
+
+  ```razor
+  <SidebarProvider DefaultOpen="true" HeightClass="h-screen" CookieKey="tflens:sidebar">
+      <Sidebar Collapsible="true">…</Sidebar>
+      <SidebarInset>…</SidebarInset>
+  </SidebarProvider>
+  ```
+
+- **Expected:** the slid-out menu is `--sidebar-width-mobile` wide — 18rem — the value `trblazeui.css` defines beside
+  `--sidebar-width: 16rem` and `--sidebar-width-icon: 3rem`, and the width `docs/mockups/misses.html` draws it at
+  (`@media (max-width:767px){.sidebar{width:18rem}}`).
+- **Actual:** the sheet renders as `<div class="… sm:max-w-sm w-[var(--sidebar-width)] bg-sidebar p-0 flex flex-col" data-side="left">` —
+  `--sidebar-width`, not `--sidebar-width-mobile`. Measured at 390px: 256px against the mockup's 288px. `--sidebar-width-mobile` is
+  defined in `:root` and read by nothing in the stylesheet or the component set, and `SidebarProvider` exposes no width parameter.
+- **Encountered in:** `src/TfLens/Components/Layout/MainLayout.razor` (REQ-UI-006), fix cycle 1 side-by-side with
+  `docs/mockups/{misses,effort,prices}.html` at 390px, 2026-09-11.
+- **Workaround:** one rule in the app's own stylesheet, in the band where the desktop sidebar is `display: none` and nothing else reads
+  the token — the route already taken for TR-028 … TR-031:
+
+  ```css
+  @media (max-width: 47.999rem) {
+      :root { --sidebar-width: var(--sidebar-width-mobile); }
+  }
+  ```
+
+- **Suggested fix:** size the phone sheet with `w-[var(--sidebar-width-mobile)]` — a one-word change that makes the shipped token mean
+  something — or expose `MobileWidth` / `Width` parameters on `SidebarProvider` so a consumer can state both.
+
+**What is NOT affected.** The desktop column, the 3rem icon rail, the backdrop, the slide animation, and the controls inside the menu.
+Only the phone panel's width.

@@ -112,6 +112,18 @@ public class SidebarContext
     public SidebarSide Side => objState.Side;
 
     /// <summary>
+    /// Gets or sets the width of the slid-out phone menu, as any CSS length, or null to use the
+    /// stylesheet's <c>--sidebar-width-mobile</c>.
+    /// </summary>
+    /// <remarks>
+    /// Set by <c>SidebarProvider.MobileWidth</c>. It is carried on the context rather than
+    /// inherited as a custom property because the phone menu is a portalled Sheet rendered under
+    /// <c>&lt;body&gt;</c>, outside the provider's subtree, so nothing declared on the provider's
+    /// own element reaches it (TfLens TR-035).
+    /// </remarks>
+    public string? MobileWidth { get; set; }
+
+    /// <summary>
     /// Event raised when the sidebar state changes.
     /// </summary>
     public event EventHandler? StateChanged;

@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Business Requirements</h1>
-    <div class="sub">Last rendered: 2026-08-31</div>
+    <div class="sub">Last rendered: 2026-09-12</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#table-of-contents">Table of Contents</a></li>
@@ -143,7 +143,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Business Requirements</h1>
-    <div class="subtitle">Rendered 2026-08-31 &middot; source <code>TrBlazeUI-BRD.md</code></div>
+    <div class="subtitle">Rendered 2026-09-12 &middot; source <code>TrBlazeUI-BRD.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -296,32 +296,17 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </li>
 </ul>
 <h2 id="development-status">4. Development status<a class="anchor-link" href="#development-status">#</a></h2>
-<p><strong>Snapshot as of 2026-08-11.</strong> Live, per-requirement status: see <code>PROJECT-STATUS.md</code> and the <strong>Requirements Status</strong> table in <code>docs/TrBlazeUI-Checklist.md</code>. Status is derived from the migrated modernization/toolbar plans (both fully delivered), a static scan of the as-built codebase, and the runtime verification runs logged in PROJECT-STATUS.</p>
-<p><strong>All features are <code>Done</code>; every REQ in the checklist is terminal (23 <code>Done (pre-existing)</code> + 8 <code>Verified</code>).</strong> Four consumer-feedback cycles have landed and been runtime-verified since the 2026-06-30 snapshot: REQ-UI-014 (AstroLyfe TR-001…009 and, after their 2.0.0 re-verification, TR-003), REQ-UI-015 (TrStudio TR-001…011 incl. the Mac Catalyst packaging blocker), REQ-FN-009 (AngleSharp / CVE-2026-54570 supply-chain fix), REQ-UI-016 (AstroLyfe TR-010/011/012 plus the TR-014 auto-margin hardening) and, most recently, <strong>REQ-UI-017 — the TechieBlog cycle (TR-001…TR-065), released as 2.1.0</strong>. That last cycle changed the most: attribute splatting became a measured guarantee across the whole catalog (344/344 styled + 59/59 primitive component types, checked by <code>tools/splat-audit</code>); Rating, Tabs, NavigationMenu, MarkdownEditor and Item had real WCAG defects corrected; <code>Input</code>/<code>Textarea</code> no longer lose keystrokes on a Blazor Server circuit; the shipped stylesheet gained the full Tailwind utility scale so consumer markup can actually be styled with utility classes; the token set is now validated as a contrast matrix by <code>tools/token-contrast.py</code> (18 failing pairings → 0, including <code>--input</code> at 1.26:1 against a 3:1 obligation); and nine components were added — <code>Prose</code>, <code>StatTile</code>/<code>StatGroup</code>, <code>Timeline</code>, <code>Stepper</code>, <code>AnchorNav</code>, <code>SortableList</code>, <code>PasswordStrength</code>, <code>CodeBlock</code>, <code>CenteredPanel</code> — each with its own demo page. F-A11Y holds at <code>Done</code> but is annotated: the consumer-reported defects are fixed and verified, an independent third-party audit still has not been run.</p>
+<p>Written by the status gate after every build, verify and handoff; not by hand.</p>
+<p><strong>Snapshot as of 2026-09-12.</strong> Live per-requirement status: <code>PROJECT-STATUS.md</code> and the Requirements Status table in <code>docs/TrBlazeUI-Checklist.md</code>.</p>
 <table>
-<thead><tr><th>Feature (F-code)</th><th>Phase</th><th>Status</th><th>%</th><th>Notes</th></tr></thead>
+<thead><tr><th>Screen</th><th>Requirements</th><th>Verified</th><th>Open</th><th>Status</th></tr></thead>
 <tbody>
-<tr><td>F-PRIM: Headless primitives</td><td>Pre-existing</td><td>Done</td><td>100</td><td>16 primitives + portal/focus/keyboard/positioning services</td></tr>
-<tr><td>F-FORM: Form components</td><td>Pre-existing</td><td>Done</td><td>100</td><td>~28 form components incl. pickers, OTP, masked, multiselect. 2.1.0: Blazor Server keystroke-loss fix on <code>Input</code>/<code>Textarea</code>, <code>SelectValue</code> first-paint text, new <code>PasswordStrength</code> (REQ-UI-017)</td></tr>
-<tr><td>F-LAYOUT: Layout &amp; navigation</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Sidebar (22 parts), nav menu, tabs, breadcrumb, pagination, resizable. 2.1.0: keyboard-reachable NavigationMenu, new <code>AnchorNav</code>, <code>Stepper</code>, <code>CenteredPanel</code> (REQ-UI-017)</td></tr>
-<tr><td>F-OVERLAY: Overlay &amp; feedback</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Dialog, Sheet, Drawer, Popover, Toast, Tooltip, Command, menus. 2.0.0: Dialog clamped to viewport, popover token fallbacks (REQ-UI-016). 2.1.0: portals render in open order so stacked dialogs are clickable (REQ-UI-017). Known: a Dialog nested inside another's DialogContent does not open — TR-066, pre-existing</td></tr>
-<tr><td>F-DATA: Data &amp; content</td><td>Pre-existing</td><td>Done</td><td>100</td><td>DataTable, MarkdownEditor, RichTextEditor. 2.0.0: toolbar opt-in, pagination auto-hides (REQ-UI-016). 2.1.0: <code>DataTable.Refresh()</code> + <code>MinWidth</code>, <code>MarkdownEditor</code> tablist, new <code>Prose</code> / <code>CodeBlock</code> (REQ-UI-017)</td></tr>
-<tr><td>F-DISPLAY: Display components</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Avatar, Badge, Alert, Progress, Skeleton, Spinner, Typography, etc. 2.1.0: <code>Typography.Size</code>, <code>Item</code> list semantics, new <code>StatTile</code>/<code>StatGroup</code>, <code>Timeline</code>, <code>SortableList</code> (REQ-UI-017)</td></tr>
-<tr><td>F-TOOLBAR: Toolbar</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Toolbar + Group/Button/ToggleButton/Separator (per toolbar plan)</td></tr>
-<tr><td>F-CHART: Charts</td><td>Pre-existing</td><td>Done</td><td>100</td><td>6 chart types via Blazor-ApexCharts</td></tr>
-<tr><td>F-ICONS: Icon libraries</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Lucide / Heroicons / Feather (3,200+ icons)</td></tr>
-<tr><td>F-THEME: Theming &amp; dark mode</td><td>Pre-existing</td><td>Done</td><td>100</td><td>CSS variables, OKLCH, shadcn/tweakcn compatible, <code>.dark</code> toggle. 2.1.0: full Tailwind utility scale shipped, contrast-validated token matrix, new <code>--success</code> / <code>--alert-*</code> / <code>--chart-*</code> / <code>--sidebar*</code> defaults (REQ-UI-017)</td></tr>
-<tr><td>F-A11Y: Accessibility</td><td>Pre-existing</td><td>Done</td><td>100</td><td>WCAG 2.1 AA patterns library-wide; consumer axe findings resolved + verified (REQ-UI-014/016/017 — keyboard-operable Rating, literal ARIA state serialisation, list semantics, tablist parents); still not independently audited</td></tr>
-<tr><td>F-DEMO: Demo applications</td><td>Pre-existing</td><td>Done</td><td>100</td><td>100+ pages across Server / WASM / Auto; 2.1.0 added 9 component pages plus a <code>/whats-new</code> release page, gated by <code>tests/verify/ui-demo-2-1-0.spec.js</code></td></tr>
-<tr><td>F-DIST: Packaging &amp; distribution</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Shared versioning from the release tag, 5 packages, GitHub Actions → GitHub Packages + NuGet.org (BRD-43 amended 2026-08-31: per-package MinVer evaluated and rejected)</td></tr>
-<tr><td>F-AI: AI agent skills</td><td>Pre-existing</td><td>Done</td><td>100</td><td>Claude Code + OpenCode skills + AI reference doc. 2.1.0: the false "all components splat" claim corrected in the reference and both personas, imports/chart API fixed (REQ-UI-017)</td></tr>
-<tr><td>(cross-cutting) XML documentation</td><td>Pre-existing</td><td>Done</td><td>100</td><td>All public members documented; CS1591 suppression removed (now build-enforced)</td></tr>
+<tr><td>UI / Pages</td><td>19</td><td>15</td><td>4</td><td>Partial</td></tr>
+<tr><td>Functional requirements</td><td>10</td><td>9</td><td>1</td><td>Partial</td></tr>
+<tr><td>Non-functional</td><td>5</td><td>5</td><td>0</td><td>Done</td></tr>
+<tr><td>Component demos</td><td>1</td><td>1</td><td>0</td><td>Done</td></tr>
 </tbody>
 </table>
-<p><strong>Legend:</strong> <strong>Done</strong> = shipped &amp; working · <strong>In progress</strong> = actively being built · <strong>Partial</strong> = some sub-features done · <strong>Planned</strong> = not started. (Maps to checklist <code>Done (pre-existing)</code> / <code>In Progress</code> / <code>PARTIAL</code> / <code>Not Started</code>.)</p>
-<blockquote>
-<p>Note (resolved 2026-06-30): the strict Release build is now clean (0 warnings / 0 errors). The IDE0031 analyzer errors in the Sidebar component were event-accessor null guards where <code>?.</code> is illegal (CS0131), resolved via a justified one-rule <code>.editorconfig</code> downgrade; XML-doc coverage was completed to 100% and the CS1591 suppression removed. All features are <code>Done</code> and the build is green.</p>
-</blockquote>
 <h2 id="stakeholders-users">5. Stakeholders / users<a class="anchor-link" href="#stakeholders-users">#</a></h2>
 <p>TrBlazeUI has no end-user accounts — its "users" are <strong>developers</strong> who consume the library, plus the maintainers. There is no authentication or role system anywhere in the product.</p>
 <table>

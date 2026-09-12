@@ -39,6 +39,24 @@ public partial class ChartContainer : ComponentBase
     public string? Class { get; set; }
 
     /// <summary>
+    /// Gets or sets whether the container drops its own card chrome.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The container paints a shadcn Card surface — border, card background, shadow and 24px of
+    /// padding. Inside a <c>Card</c>, which is where a chart usually goes and where both the AI
+    /// reference and the mockups put it, that draws a second bordered panel around the plot: a
+    /// card inside a card. Set this to <c>true</c> for a flush chart that takes its surface from
+    /// whatever it is placed in (TfLens TR-028).
+    /// </para>
+    /// <para>
+    /// The layout role — the flex column the chart sizes itself against — is kept either way.
+    /// </para>
+    /// </remarks>
+    [Parameter]
+    public bool Bare { get; set; }
+
+    /// <summary>
     /// Gets or sets additional HTML attributes to apply to the container.
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
@@ -48,7 +66,8 @@ public partial class ChartContainer : ComponentBase
     /// Gets the computed CSS classes for the container.
     /// </summary>
     private string CssClass => ClassNames.cn(
-        "flex flex-col rounded-lg border bg-card text-card-foreground shadow-sm p-6",
+        "flex flex-col",
+        Bare ? null : "rounded-lg border bg-card text-card-foreground shadow-sm p-6",
         Class
     );
 }

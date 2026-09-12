@@ -16,6 +16,7 @@
                               GlobalSearchValue="@objGlobalSearchValue"
                               OnGlobalSearchChanged="HandleGlobalSearchChanged"
                               Columns="@objColumns"
+                              ShowColumnChooser="@ShowColumnChooser"
                               OnColumnVisibilityChanged="HandleColumnVisibilityChanged">
                 @ToolbarActions
             </DataTableToolbar>
@@ -71,11 +72,18 @@
                                     <div @onclick:stopPropagation="true">
                                         @if (ShouldShowSelectAllPrompt())
                                         {
+                                            @* The checkbox here is a picture of the state, not a
+                                               control - the trigger owns the click. It therefore
+                                               carries the name and the checkbox is taken out of the
+                                               tab order and hidden from assistive technology, so the
+                                               trigger is not a button containing a focusable
+                                               role="checkbox" (REQ-NFR-001, 2026-09-12). *@
                                             <DropdownMenu @bind-Open="objSelectAllDropdownOpen">
-                                                <DropdownMenuTrigger Class="inline-flex items-center justify-center p-0 bg-transparent border-0 hover:bg-transparent focus:outline-none">
+                                                <DropdownMenuTrigger Class="inline-flex items-center justify-center p-0 bg-transparent border-0 hover:bg-transparent focus:outline-none"
+                                                                     aria-label="Select rows - click to see options">
                                                     <Checkbox Checked="@IsAllSelected()"
                                                               Indeterminate="@IsSomeSelected()"
-                                                              AriaLabel="Select rows - click to see options"
+                                                              Decorative="true"
                                                               Class="pointer-events-none" />
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent Side="PopoverSide.Bottom" Align="PopoverAlign.Start">
@@ -111,11 +119,14 @@
                                     ? (objTableState.Sorting.Direction == SortDirection.Ascending ? "ascending" : "descending")
                                     : (column.Sortable ? "none" : null);
 
+                                @* Align reaches the th, the label's own flex box and the body cells
+                                   together; text-align alone could never move the label, which is
+                                   why HeaderClass="text-right" appeared to do nothing (TR-031). *@
                                 <TableHeaderCell TData="TData" ColumnId="@(column.Sortable ? column.Id : null)"
-                                                 Class="@ClassNames.cn(HeaderCellCssClass, column.Sortable ? "cursor-pointer select-none" : "", column.HeaderClass)"
+                                                 Class="@ClassNames.cn(HeaderCellCssClass, column.Sortable ? "cursor-pointer select-none" : "", column.AlignTextClass, column.HeaderClass)"
                                                  style="@GetColumnWidthStyle(column)"
                                                  aria-sort="@ariaSortValue">
-                                    <div class="flex items-center gap-2">
+                                    <div class="@ClassNames.cn("flex items-center gap-2", column.HeaderJustifyClass)">
                                         <span>@column.Header</span>
                                         @if (column.Sortable && objTableState.Sorting.SortedColumn == column.Id)
                                         {
@@ -161,7 +172,7 @@
                                 }
                                 @foreach (var column in objColumns.Where(c => c.Visible))
                                 {
-                                    <TableCell Class="@ClassNames.cn(BodyCellCssClass, "[&:has([role=checkbox])]:pr-0", column.CellClass)">
+                                    <TableCell Class="@ClassNames.cn(BodyCellCssClass, "[&:has([role=checkbox])]:pr-0", column.AlignTextClass, column.CellClass)">
                                         @if (column.CellTemplate != null)
                                         {
                                             @column.CellTemplate(item)
@@ -182,24 +193,30 @@
 
         @if (ShouldShowPagination())
         {
+            @* PaginationContent renders the <ul> and PaginationItem the <li>, so the list may hold
+               nothing else. This block used to wrap the page-size selector, the page display and two
+               plain <div> spacers inside that <ul>, which left 6 <ul>s holding non-list children and
+               24 <li>s outside any list - a screen reader announced a list whose item count was
+               wrong. The grouping is now done by plain divs and the <ul> holds only the four page
+               buttons (REQ-NFR-001, 2026-09-12). *@
             <Pagination State="@objTableState.Pagination"
                         PageSizes="@PageSizes"
                         OnPageChanged="@HandlePageChanged"
                         OnPageSizeChanged="@HandlePageSizeChanged"
                         Class="flex flex-wrap items-center justify-between gap-2 px-2 py-4">
                 <PaginationInfo />
-                <PaginationContent Class="flex flex-wrap items-center gap-2 sm:gap-6 lg:gap-8">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-6 lg:gap-8">
                     <PaginationPageSizeSelector />
                     <div class="flex items-center gap-2">
                         <PaginationPageDisplay />
-                        <div class="flex items-center gap-1">
+                        <PaginationContent Class="flex items-center gap-1">
                             <PaginationItem><PaginationFirst /></PaginationItem>
                             <PaginationItem><PaginationPrevious ShowText="false" /></PaginationItem>
                             <PaginationItem><PaginationNext ShowText="false" /></PaginationItem>
                             <PaginationItem><PaginationLast /></PaginationItem>
-                        </div>
+                        </PaginationContent>
                     </div>
-                </PaginationContent>
+                </div>
             </Pagination>
         }
     </div>

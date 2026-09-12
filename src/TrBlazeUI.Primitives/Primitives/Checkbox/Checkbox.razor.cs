@@ -109,6 +109,27 @@ public partial class Checkbox : ComponentBase
     public bool Disabled { get; set; }
 
     /// <summary>
+    /// Gets or sets whether the checkbox is drawn as a picture of its state rather than as a control.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Default <c>false</c>. When <c>true</c> the checkbox renders a plain <c>&lt;span&gt;</c> with
+    /// no role, nothing focusable and <c>aria-hidden</c>, keeping only the visual and the
+    /// <c>data-state</c> hook. <see cref="Checked"/>, <see cref="Indeterminate"/> and
+    /// <see cref="Disabled"/> still drive the appearance; nothing is clickable and no callback fires.
+    /// </para>
+    /// <para>
+    /// Use it where something else already owns the click and the accessible name — a checkbox
+    /// inside a menu trigger, or one in a row that toggles itself. A real <c>role="checkbox"</c>
+    /// there is a control nested inside a control, which assistive technology announces
+    /// unpredictably. <c>tabindex="-1"</c> does not settle it: a negative tabindex still leaves the
+    /// element focusable, so the nesting is still wrong (REQ-NFR-001, 2026-09-12).
+    /// </para>
+    /// </remarks>
+    [Parameter]
+    public bool Decorative { get; set; }
+
+    /// <summary>
     /// Gets or sets the ID attribute for the checkbox element.
     /// </summary>
     /// <remarks>

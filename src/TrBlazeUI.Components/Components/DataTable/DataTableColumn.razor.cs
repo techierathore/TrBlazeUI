@@ -131,8 +131,109 @@ public partial class DataTableColumn<TData, TValue> : ComponentBase where TData 
     /// <summary>
     /// Gets or sets additional CSS classes to apply to the header cell.
     /// </summary>
+    /// <remarks>
+    /// The header label is rendered inside a flex box, so a <c>text-right</c> or
+    /// <c>text-center</c> here reaches the <c>th</c> but cannot move the label itself. Where this
+    /// class carries one of those and <see cref="Align"/> was not set, the table applies the
+    /// matching <c>justify-*</c> to the label box so the intent is honoured anyway (TfLens TR-031);
+    /// <see cref="Align"/> is the parameter to reach for in new markup.
+    /// </remarks>
     [Parameter]
     public string? HeaderClass { get; set; }
+
+    /// <summary>
+    /// Gets or sets the horizontal alignment of the column's header label and of every cell in it.
+    /// </summary>
+    /// <remarks>
+    /// Leave null to align from <see cref="CellClass"/> / <see cref="HeaderClass"/> as before.
+    /// Setting it aligns the header cell, the header's own label box and the body cells together,
+    /// which is what a figure column needs and what neither class parameter could do alone
+    /// (TfLens TR-031).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// &lt;DataTableColumn TData="Rate" TValue="decimal" Property="@(r =&gt; r.InputPerMillion)"
+    ///                  Header="Input" Align="DataTableColumnAlign.End"
+    ///                  CellClass="tabular-nums" /&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public DataTableColumnAlign? Align { get; set; }
+
+    /// <summary>
+    /// Gets the alignment this column is drawn with, falling back to the alignment implied by
+    /// <see cref="HeaderClass"/> when <see cref="Align"/> was not set.
+    /// </summary>
+    internal DataTableColumnAlign EffectiveAlign
+    {
+        get
+        {
+            if (Align is not null)
+            {
+                return Align.Value;
+            }
+
+            if (HeaderClass is null)
+            {
+                return DataTableColumnAlign.Start;
+            }
+
+            if (HasClass(HeaderClass, "text-right") || HasClass(HeaderClass, "text-end"))
+            {
+                return DataTableColumnAlign.End;
+            }
+
+            return HasClass(HeaderClass, "text-center")
+                ? DataTableColumnAlign.Center
+                : DataTableColumnAlign.Start;
+        }
+    }
+
+    /// <summary>
+    /// Gets the flex justification the header's label box is given for this column.
+    /// </summary>
+    internal string HeaderJustifyClass => EffectiveAlign switch
+    {
+        DataTableColumnAlign.End => "justify-end",
+        DataTableColumnAlign.Center => "justify-center",
+        _ => "justify-start"
+    };
+
+    /// <summary>
+    /// Gets the text alignment applied to this column's header and body cells, or null when the
+    /// caller did not ask for one and the cell classes should stand alone.
+    /// </summary>
+    internal string? AlignTextClass => Align switch
+    {
+        DataTableColumnAlign.End => "text-right",
+        DataTableColumnAlign.Center => "text-center",
+        DataTableColumnAlign.Start => "text-left",
+        _ => null
+    };
+
+    /// <summary>
+    /// Tests whether a space-separated class list contains one exact class.
+    /// </summary>
+    private static bool HasClass(string classList, string className)
+    {
+        var vIndex = classList.IndexOf(className, StringComparison.Ordinal);
+
+        while (vIndex >= 0)
+        {
+            var vStartsCleanly = vIndex == 0 || char.IsWhiteSpace(classList[vIndex - 1]);
+            var vEnd = vIndex + className.Length;
+            var vEndsCleanly = vEnd == classList.Length || char.IsWhiteSpace(classList[vEnd]);
+
+            if (vStartsCleanly && vEndsCleanly)
+            {
+                return true;
+            }
+
+            vIndex = classList.IndexOf(className, vIndex + 1, StringComparison.Ordinal);
+        }
+
+        return false;
+    }
 
     /// <summary>
     /// Gets or sets the parent DataTable component.

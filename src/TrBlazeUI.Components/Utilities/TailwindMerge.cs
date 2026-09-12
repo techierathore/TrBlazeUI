@@ -94,6 +94,17 @@ public static class TailwindMerge
         ["flex-col"] = "flex-direction",
         ["flex-col-reverse"] = "flex-direction",
 
+        // Text Align - a separate axis from text COLOUR, which the bare `text-([a-z]+)` pattern
+        // below would otherwise sweep these into. Left ungrouped that way, `text-right` and
+        // `text-muted-foreground` conflicted, so setting a colour on a cell silently un-aligned it
+        // and setting an alignment silently uncoloured it (met while fixing TR-031).
+        ["text-left"] = "text-align",
+        ["text-center"] = "text-align",
+        ["text-right"] = "text-align",
+        ["text-justify"] = "text-align",
+        ["text-start"] = "text-align",
+        ["text-end"] = "text-align",
+
         // Flex Wrap - a separate axis from flex-direction. Without this group,
         // "flex-wrap flex-nowrap" left both classes live and the cascade (not the caller)
         // picked the winner, so a nowrap override was silently inert (TR-027).
@@ -149,32 +160,112 @@ public static class TailwindMerge
     // Cache for utility group lookups to avoid repeated regex evaluation
     private static readonly ConcurrentDictionary<string, string?> objUtilityGroupCache = new();
 
-    // Regex to validate CSS class names - allows alphanumeric, hyphens, underscores, colons, slashes, brackets, dots, percentages, and CSS combinator characters
-    // This covers Tailwind classes like "w-1/2", "hover:bg-blue-500", "data-[state=open]:block", "text-[14px]", "[&>svg]:absolute"
+    // Characters allowed OUTSIDE an arbitrary-value bracket - alphanumeric, hyphens, underscores,
+    // colons, slashes, brackets, dots, percentages, and CSS combinator characters.
+    // This covers Tailwind classes like "w-1/2", "hover:bg-blue-500", "text-[14px]", "[&>svg]:absolute".
     private static readonly Regex ValidClassNameRegex = new(@"^[a-zA-Z0-9_\-:/.[\]()%!@#&>+~=]+$", RegexOptions.Compiled);
+
+    // The same set plus the characters a real arbitrary VALUE needs: quotes, comma, semicolon,
+    // asterisk, comparison and currency signs, and whitespace escaped as an underscore (already
+    // allowed above). Only ever applied to the text between '[' and ']' - see IsValidClassName.
+    private static readonly Regex ValidArbitraryValueRegex = new(@"^[a-zA-Z0-9_\-:/.,;'""[\]()%!@#&>+~=*$?|^{} ]*$", RegexOptions.Compiled);
+
+    // Substrings that are never legitimate in a class name, at any depth.
+    private static readonly string[] DangerousFragments =
+    [
+        "expression(",
+        "javascript:",
+        "@import",
+        "url(javascript",
+        "url(data:text/html",
+    ];
 
     /// <summary>
     /// Validates that a CSS class name contains only safe characters.
     /// Rejects classes that could be used for CSS injection attacks.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Tailwind arbitrary values - the text between <c>[</c> and <c>]</c> - legitimately carry
+    /// characters no plain utility needs: quotes, commas and semicolons inside a data URI, for
+    /// example. The two charsets are therefore applied to different parts of the class, rather
+    /// than one strict charset to the whole of it.
+    /// </para>
+    /// <para>
+    /// This is why <c>url(</c> is no longer a blanket rejection (TfLens TR-032). The guard used to
+    /// drop any class containing it, which silently deleted the library's OWN chevron class on
+    /// <see cref="NativeSelect"/> - <c>bg-[url('data:image/svg+xml;...')]</c> - so the control shipped
+    /// with <c>appearance-none</c> and no arrow at all. A consumer passing any arbitrary value with a
+    /// <c>url()</c> in it lost the class the same way, with no warning. Only the payload forms that
+    /// could actually execute (<c>url(javascript</c>, <c>url(data:text/html</c>) are rejected now.
+    /// </para>
+    /// <para>
+    /// Class names are emitted into a <c>class</c> attribute that Blazor HTML-encodes, so a class
+    /// name cannot break out of the attribute; these checks are defence in depth over that.
+    /// </para>
+    /// </remarks>
     private static bool IsValidClassName(string className)
     {
-        if (string.IsNullOrWhiteSpace(className) || className.Length > 200)
+        if (string.IsNullOrWhiteSpace(className) || className.Length > 500)
         {
             return false;
         }
 
-        // Check for potentially dangerous patterns
-        if (className.Contains("expression", StringComparison.OrdinalIgnoreCase) ||
-            className.Contains("javascript", StringComparison.OrdinalIgnoreCase) ||
-            className.Contains("url(", StringComparison.OrdinalIgnoreCase) ||
-            className.Contains("import", StringComparison.OrdinalIgnoreCase))
+        foreach (var vFragment in DangerousFragments)
         {
-            return false;
+            if (className.Contains(vFragment, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
         }
 
-        return ValidClassNameRegex.IsMatch(className);
+        // Walk the class once, validating the bracketed arbitrary values against the wider
+        // charset and everything outside them against the strict one.
+        var vDepth = 0;
+        var vSegmentStart = 0;
+
+        for (var i = 0; i < className.Length; i++)
+        {
+            var vChar = className[i];
+
+            if (vChar == '[')
+            {
+                if (vDepth == 0)
+                {
+                    if (!IsValidOutsideBrackets(className[vSegmentStart..i]))
+                    {
+                        return false;
+                    }
+                    vSegmentStart = i + 1;
+                }
+                vDepth++;
+            }
+            else if (vChar == ']')
+            {
+                vDepth--;
+                if (vDepth < 0)
+                {
+                    return false;
+                }
+                if (vDepth == 0)
+                {
+                    if (!ValidArbitraryValueRegex.IsMatch(className[vSegmentStart..i]))
+                    {
+                        return false;
+                    }
+                    vSegmentStart = i + 1;
+                }
+            }
+        }
+
+        return vDepth == 0 && IsValidOutsideBrackets(className[vSegmentStart..]);
     }
+
+    /// <summary>
+    /// Validates one stretch of a class name that lies outside any arbitrary-value bracket.
+    /// </summary>
+    private static bool IsValidOutsideBrackets(string segment) =>
+        segment.Length == 0 || ValidClassNameRegex.IsMatch(segment);
 
     /// <summary>
     /// Merges an array of CSS class strings, resolving Tailwind utility conflicts.
