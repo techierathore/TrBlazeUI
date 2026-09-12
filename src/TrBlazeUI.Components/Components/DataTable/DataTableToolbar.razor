@@ -16,8 +16,11 @@
 
         @if (Columns.Any(c => c.Filterable))
         {
+            @* AsChild: the Button becomes the trigger instead of being nested inside the trigger's
+               own <button>. A button inside a button is announced unpredictably and puts a focusable
+               control where assistive technology cannot address it (REQ-NFR-001, 2026-09-12). *@
             <Popover>
-                <PopoverTrigger>
+                <PopoverTrigger AsChild="true">
                     <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Small" Class="h-8 border-dashed">
                         <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -36,8 +39,13 @@
             </Popover>
         }
 
+        @* The column chooser used to be inseparable from the search box: ShowToolbar drew both or
+           neither, so a design wanting only the filter got a Columns button it never asked for
+           (TR-033). *@
+        @if (ShowColumnChooser)
+        {
         <Popover>
-            <PopoverTrigger>
+            <PopoverTrigger AsChild="true">
                 <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Small" Class="h-8 ms-auto">
                     <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -60,6 +68,7 @@
                 </div>
             </PopoverContent>
         </Popover>
+        }
     </div>
 
     @if (ChildContent != null)
@@ -84,6 +93,12 @@
 
     [Parameter]
     public Action<string, bool> OnColumnVisibilityChanged { get; set; } = null!;
+
+    /// <summary>
+    /// Whether the column-visibility dropdown renders beside the search box.
+    /// </summary>
+    [Parameter]
+    public bool ShowColumnChooser { get; set; } = true;
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }

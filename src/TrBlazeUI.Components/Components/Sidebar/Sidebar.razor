@@ -14,7 +14,7 @@
     {
         @* Mobile: Render as Sheet *@
         <TrBlazeUI.Components.Sheet.Sheet Open="@MobileOpen" OpenChanged="@(value => MobileOpen = value)" Side="@GetSheetSide()">
-            <TrBlazeUI.Components.Sheet.SheetContent Class="@GetMobileClasses()" ShowClose="false">
+            <TrBlazeUI.Components.Sheet.SheetContent Class="@GetMobileClasses()" ShowClose="false" style="@GetMobileStyle()">
                 @ChildContent
             </TrBlazeUI.Components.Sheet.SheetContent>
         </TrBlazeUI.Components.Sheet.Sheet>

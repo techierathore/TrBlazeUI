@@ -45,8 +45,14 @@
         _ => "text-xs px-1.5 py-0.5"
     };
 
+    // text-foreground, NOT text-muted-foreground. A keyboard hint is small (12px) and its whole job
+    // is to be read, but muted-on-muted is the one pairing in the token set with almost no headroom:
+    // the library's own values give 4.60:1 against a 4.5:1 floor, and a host theme that lightens
+    // --muted-foreground by 0.014 drops it to 4.34:1 and fails. This project's own demo does exactly
+    // that, which is how axe caught it on four screens at once (REQ-NFR-001, 2026-09-12).
+    // On --muted this reads 18.15:1 light and 14.48:1 dark, so no consumer theme can break it.
     private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
-        "pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted font-mono font-medium text-muted-foreground",
+        "pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted font-mono font-medium text-foreground",
         SizeClasses,
         Class
     );

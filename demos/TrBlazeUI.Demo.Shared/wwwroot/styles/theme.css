@@ -17,7 +17,11 @@
   --secondary: oklch(0.9700 0 0);
   --secondary-foreground: oklch(0.2050 0 0);
   --muted: oklch(0.9700 0 0);
-  --muted-foreground: oklch(0.5560 0 0);
+  /* 0.5200, not 0.5560. Muted text on a muted surface is the tightest pairing in the set: at
+     0.5560 it measures 4.34:1 against the 4.5:1 floor and fails WCAG AA, which is what axe found
+     on the kbd hint across four screens (REQ-NFR-001, 2026-09-12). 0.5200 gives 5.05:1 on --muted
+     and keeps real headroom, rather than sitting a hundredth above the line the way 0.5420 does. */
+  --muted-foreground: oklch(0.5200 0 0);
   --accent: oklch(0.9700 0 0);
   --accent-foreground: oklch(0.2050 0 0);
   --destructive: oklch(0.5770 0.2450 27.3250);

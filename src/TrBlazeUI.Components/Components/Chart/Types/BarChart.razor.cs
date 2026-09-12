@@ -115,8 +115,11 @@ public partial class BarChart<TItem> : ChartBase<TItem> where TItem : class
     {
         objOptions = CreateBaseOptions();
 
+        // Every default below is applied only where the caller's Options left the member unset,
+        // so a chart can be steered to match a design without giving up the wrapper (TR-028).
+
         // Configure bar-specific options
-        objOptions.PlotOptions = new PlotOptions
+        objOptions.PlotOptions ??= new PlotOptions
         {
             Bar = new PlotOptionsBar
             {
@@ -127,23 +130,24 @@ public partial class BarChart<TItem> : ChartBase<TItem> where TItem : class
             }
         };
 
-        // Configure stacking
+        // Configure stacking. Applied unconditionally: Variant is the parameter a caller sets to
+        // choose it, so the parameter has to win. OptionsConfigurator is the way past this.
         var (stacked, stackType) = GetStackingConfig();
         objOptions.Chart!.Stacked = stacked;
         objOptions.Chart.StackType = stackType;
 
         // Set colors from config or defaults
-        objOptions.Colors = ChartColor.DefaultColors.ToList();
+        objOptions.Colors ??= ChartColor.DefaultColors.ToList();
 
         // Grid styling
-        objOptions.Grid = new ApexCharts.Grid
+        objOptions.Grid ??= new ApexCharts.Grid
         {
             BorderColor = "var(--border)",
             StrokeDashArray = 4
         };
 
         // X-Axis styling
-        objOptions.Xaxis = new XAxis
+        objOptions.Xaxis ??= new XAxis
         {
             Labels = new XAxisLabels
             {
@@ -163,7 +167,7 @@ public partial class BarChart<TItem> : ChartBase<TItem> where TItem : class
         };
 
         // Y-Axis styling
-        objOptions.Yaxis =
+        objOptions.Yaxis ??=
         [
             new YAxis
             {
@@ -176,6 +180,8 @@ public partial class BarChart<TItem> : ChartBase<TItem> where TItem : class
                 }
             }
         ];
+
+        objOptions = FinalizeOptions(objOptions);
     }
 
     private bool IsHorizontal()

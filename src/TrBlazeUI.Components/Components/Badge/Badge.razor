@@ -1,5 +1,16 @@
 @namespace TrBlazeUI.Components.Badge
 
-<div class="@CssClass" @attributes="AdditionalAttributes">
-    @ChildContent
-</div>
+@* The element is the caller's to choose (TR-034). A badge is an inline object, so `span` is the
+   default; `div` is kept reachable for markup that relied on the old rendering. *@
+@if (RenderAsDiv)
+{
+    <div class="@CssClass" @attributes="AdditionalAttributes">
+        @ChildContent
+    </div>
+}
+else
+{
+    <span class="@CssClass" @attributes="AdditionalAttributes">
+        @ChildContent
+    </span>
+}

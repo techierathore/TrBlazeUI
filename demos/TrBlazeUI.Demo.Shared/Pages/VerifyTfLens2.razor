@@ -1,0 +1,245 @@
+@page "/verify-tflens-2"
+@using ApexCharts
+@using TrBlazeUI.Components.Badge
+@using TrBlazeUI.Components.Card
+@using TrBlazeUI.Components.Chart
+@using TrBlazeUI.Components.Collapsible
+@using TrBlazeUI.Components.DataTable
+@using TrBlazeUI.Components.Input
+@using TrBlazeUI.Components.NativeSelect
+@using TrBlazeUI.Icons.Lucide.Components
+
+@* REQ-UI-020 verification harness — TfLens feedback TR-028 … TR-035
+   (docs/TfLens-TrBlazeUI-Feedback.md).
+   Not a documentation demo: every block here exists so the headless spec
+   (tests/verify/ui-tflens-2.spec.js) can assert one acceptance criterion. *@
+
+<PageTitle>Verify REQ-UI-020 - TrBlazeUI</PageTitle>
+
+<div class="p-6 space-y-10" data-testid="verify-heading">
+    <h1 class="text-2xl font-bold">REQ-UI-020 verification harness — TfLens TR-028…TR-035</h1>
+
+    @* ============================ TR-028 — chart options ============================ *@
+    @* The caller asks for no grid, no y axis and a compact value above each bar. Before the fix
+       BarChart had no route to any of it and the only way out was dropping the wrapper. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-028 · BarChart steered through Options</h2>
+        <div data-testid="tr028-styled">
+            <ChartContainer Bare="true" data-testid="tr028-bare-container">
+                <BarChart TItem="TokenTotal"
+                          Items="@objTokenTotals"
+                          XValue="@(aRow => aRow.Harness)"
+                          YValue="@(aRow => (decimal)aRow.Tokens)"
+                          Height="240px"
+                          ShowLegend="false"
+                          ShowDataLabels="true"
+                          Options="@objBareChartOptions" />
+            </ChartContainer>
+        </div>
+    </section>
+
+    @* The same chart with no Options at all: every wrapper default must still be in force, so the
+       new parameter costs nothing to a caller who does not use it. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-028 · the same chart with wrapper defaults</h2>
+        <div data-testid="tr028-default">
+            <ChartContainer data-testid="tr028-card-container">
+                <BarChart TItem="TokenTotal"
+                          Items="@objTokenTotals"
+                          XValue="@(aRow => aRow.Harness)"
+                          YValue="@(aRow => (decimal)aRow.Tokens)"
+                          Height="240px"
+                          ShowLegend="false" />
+            </ChartContainer>
+        </div>
+    </section>
+
+    @* ============================ TR-029 / TR-034 — Badge ============================ *@
+    <section class="space-y-3">
+        <h2 class="text-lg font-semibold">TR-034 · the element a Badge renders</h2>
+        <p>
+            A pill inside a sentence:
+            <Badge Variant="BadgeVariant.Outline" data-testid="tr034-inline">24 runs</Badge>
+            reads as part of the line.
+        </p>
+        <Badge Variant="BadgeVariant.Outline" As="div" data-testid="tr034-asdiv">still a div</Badge>
+    </section>
+
+    <section class="space-y-3">
+        <h2 class="text-lg font-semibold">TR-029 · a long label under width pressure</h2>
+        <div class="border border-dashed p-1" style="width:180px" data-testid="tr029-box-default">
+            <Badge Variant="BadgeVariant.Outline" data-testid="tr029-default">
+                transient · best-effort, absence is not an error
+            </Badge>
+        </div>
+        <div class="border border-dashed p-1" style="width:180px" data-testid="tr029-box-wrap">
+            <Badge Variant="BadgeVariant.Outline" Wrap="true" data-testid="tr029-wrap">
+                transient · best-effort, absence is not an error
+            </Badge>
+        </div>
+        <div class="border border-dashed p-1" style="width:180px" data-testid="tr029-box-truncate">
+            <Badge Variant="BadgeVariant.Outline" Truncate="true" data-testid="tr029-truncate">
+                transient · best-effort, absence is not an error
+            </Badge>
+        </div>
+    </section>
+
+    @* ============================ TR-030 — CollapsibleTrigger ============================ *@
+    @* Filed as "CollapsibleTrigger takes no Class parameter". It does, and this is the row layout
+       the entry wanted: a spacer pushes the badge to the right edge of a full-width trigger. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-030 · a disclosure header spanning its row</h2>
+        <div class="border rounded-md p-2" style="width:520px" data-testid="tr030-box">
+            <Collapsible @bind-Open="objIsPhaseOpen">
+                <CollapsibleTrigger Class="w-full text-left" data-testid="tr030-trigger">
+                    <span class="flex w-full items-center gap-2">
+                        <LucideIcon Name="chevron-down" Size="16" />
+                        <span class="font-mono">build-phase</span>
+                        <span class="text-muted-foreground">— 24 runs</span>
+                        <span class="flex-1"></span>
+                        <Badge Variant="BadgeVariant.Outline" data-testid="tr030-badge">6 of 24 observed</Badge>
+                    </span>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <div class="p-2 text-sm">Per-run detail for build-phase.</div>
+                </CollapsibleContent>
+            </Collapsible>
+        </div>
+    </section>
+
+    @* ============================ TR-031 — column alignment ============================ *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-031 · a money column's header over its figures</h2>
+        <div data-testid="tr031-table">
+            <DataTable TData="RateRow" Data="@objRates" ShowPagination="false">
+                <Columns>
+                    <DataTableColumn TData="RateRow" TValue="string"
+                                     Property="@(aRate => aRate.Model)" Header="Model" />
+                    <DataTableColumn TData="RateRow" TValue="decimal"
+                                     Property="@(aRate => aRate.Input)" Header="Input"
+                                     Align="DataTableColumnAlign.End" CellClass="tabular-nums" />
+                    @* The back-compat route: HeaderClass alone, no Align. *@
+                    <DataTableColumn TData="RateRow" TValue="decimal"
+                                     Property="@(aRate => aRate.Output)" Header="Output"
+                                     CellClass="text-right tabular-nums" HeaderClass="text-right" />
+                    @* Alignment must survive a colour on the same cells. *@
+                    <DataTableColumn TData="RateRow" TValue="decimal"
+                                     Property="@(aRate => aRate.Cached)" Header="Cached"
+                                     Align="DataTableColumnAlign.End" CellClass="text-muted-foreground" />
+                </Columns>
+            </DataTable>
+        </div>
+    </section>
+
+    @* ============================ TR-032 — NativeSelect chevron ============================ *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-032 · the select's own arrow</h2>
+        <div style="width:260px">
+            <NativeSelect TValue="string" @bind-Value="objProvider" data-testid="tr032-select">
+                <option value="anthropic">Anthropic (Claude)</option>
+                <option value="openai">OpenAI</option>
+            </NativeSelect>
+        </div>
+    </section>
+
+    @* ============================ TR-033 — search hosted outside ============================ *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-033 · the grid's filter drawn in the card header</h2>
+        <Card data-testid="tr033-card">
+            <CardHeader>
+                <div class="flex w-full items-center justify-between gap-2">
+                    <CardTitle>Misses</CardTitle>
+                    @* A plain input the page owns, exactly as a design that draws the filter in
+                       the card header would: the grid's own filtering follows it through
+                       @bind-SearchText, with no second hand-written filter anywhere (TR-033). *@
+                    <input @bind="objMissFilter" @bind:event="oninput"
+                           placeholder="Filter by REQ, class or whose gap"
+                           class="flex h-8 rounded-md border border-input bg-background px-3 text-sm"
+                           style="width:240px" data-testid="tr033-header-filter" />
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div data-testid="tr033-table">
+                    <DataTable TData="MissRow" Data="@objMisses" ShowToolbar="false"
+                               ShowPagination="false" @bind-SearchText="objMissFilter">
+                        <Columns>
+                            <DataTableColumn TData="MissRow" TValue="string"
+                                             Property="@(aMiss => aMiss.Req)" Header="REQ" Filterable="true" />
+                            <DataTableColumn TData="MissRow" TValue="string"
+                                             Property="@(aMiss => aMiss.Whose)" Header="Whose gap" Filterable="true" />
+                        </Columns>
+                    </DataTable>
+                </div>
+            </CardContent>
+        </Card>
+    </section>
+
+    @* The toolbar's search box must write back to the same bound field, and the column chooser
+       must be droppable on its own. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-033 · toolbar without a column chooser</h2>
+        <div data-testid="tr033-nochooser">
+            <DataTable TData="MissRow" Data="@objMisses" ShowToolbar="true"
+                       ShowColumnChooser="false" ShowPagination="false"
+                       @bind-SearchText="objToolbarFilter">
+                <Columns>
+                    <DataTableColumn TData="MissRow" TValue="string"
+                                     Property="@(aMiss => aMiss.Req)" Header="REQ" Filterable="true" />
+                    <DataTableColumn TData="MissRow" TValue="string"
+                                     Property="@(aMiss => aMiss.Whose)" Header="Whose gap" Filterable="true" />
+                </Columns>
+            </DataTable>
+        </div>
+        <div class="text-sm text-muted-foreground" data-testid="tr033-echo">bound search text: @objToolbarFilter</div>
+    </section>
+</div>
+
+@code {
+    /// <summary>One harness's token total, the shape TfLens's comparison chart is drawn from.</summary>
+    public sealed record TokenTotal(string Harness, long Tokens);
+
+    /// <summary>One provider rate row, the shape the Price providers table is drawn from.</summary>
+    public sealed record RateRow(string Model, decimal Input, decimal Output, decimal Cached);
+
+    /// <summary>One logged miss, the shape the Misses table is drawn from.</summary>
+    public sealed record MissRow(string Req, string Whose);
+
+    private readonly List<TokenTotal> objTokenTotals =
+    [
+        new("claude-code", 3_200_000_000),
+        new("codex", 18_500_000),
+        new("opencode", 814_000)
+    ];
+
+    private readonly List<RateRow> objRates =
+    [
+        new("claude-opus-5", 15.00m, 75.00m, 1.50m),
+        new("claude-sonnet-5", 3.00m, 15.00m, 0.30m),
+        new("gpt-5", 1.25m, 10.00m, 0.13m)
+    ];
+
+    private readonly List<MissRow> objMisses =
+    [
+        new("REQ-UI-045", "spec"),
+        new("REQ-UI-048", "weak-check"),
+        new("REQ-UI-072", "escaped")
+    ];
+
+    // TR-028: exactly the option changes TfLens had to drop the wrapper for — no y axis, no
+    // gridlines, values above the bars. None of this was reachable through BarChart before.
+    private readonly ApexChartOptions<TokenTotal> objBareChartOptions = new()
+    {
+        Grid = new Grid
+        {
+            Show = false,
+            Xaxis = new GridXAxis { Lines = new Lines { Show = false } },
+            Yaxis = new GridYAxis { Lines = new Lines { Show = false } }
+        },
+        Yaxis = [new YAxis { Show = false }]
+    };
+
+    private bool objIsPhaseOpen;
+    private string objProvider = "anthropic";
+    private string objMissFilter = string.Empty;
+    private string objToolbarFilter = string.Empty;
+}

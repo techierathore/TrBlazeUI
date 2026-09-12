@@ -25,6 +25,11 @@ public partial class SidebarProvider
         // Update context when parameters change
         Context.SetVariant(Variant);
         Context.SetSide(Side);
+
+        // The phone menu is a portalled Sheet under <body>, so it cannot inherit the custom
+        // property this component declares on its own element - it travels by context instead
+        // and Sidebar puts it on the sheet itself (TfLens TR-035).
+        Context.MobileWidth = MobileWidth;
     }
 
     /// <summary>

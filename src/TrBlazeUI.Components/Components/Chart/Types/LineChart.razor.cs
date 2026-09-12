@@ -108,7 +108,7 @@ public partial class LineChart<TItem> : ChartBase<TItem> where TItem : class
         objOptions = CreateBaseOptions();
 
         // Configure stroke based on variant
-        objOptions.Stroke = new Stroke
+        objOptions.Stroke ??= new Stroke
         {
             Curve = GetCurveType(),
             Width = StrokeWidth,
@@ -116,7 +116,7 @@ public partial class LineChart<TItem> : ChartBase<TItem> where TItem : class
         };
 
         // Configure markers
-        objOptions.Markers = new Markers
+        objOptions.Markers ??= new Markers
         {
             Size = ShowMarkers ? MarkerSize : 0,
             StrokeWidth = 0,
@@ -127,12 +127,12 @@ public partial class LineChart<TItem> : ChartBase<TItem> where TItem : class
         };
 
         // Set colors from config or defaults
-        objOptions.Colors = ChartColor.DefaultColors.ToList();
+        objOptions.Colors ??= ChartColor.DefaultColors.ToList();
 
         // Configure fill for gradient variant
         if (Variant == LineChartVariant.Gradient)
         {
-            objOptions.Fill = new Fill
+            objOptions.Fill ??= new Fill
             {
                 Type = FillType.Gradient,
                 Gradient = new FillGradient
@@ -146,14 +146,14 @@ public partial class LineChart<TItem> : ChartBase<TItem> where TItem : class
         }
 
         // Grid styling
-        objOptions.Grid = new ApexCharts.Grid
+        objOptions.Grid ??= new ApexCharts.Grid
         {
             BorderColor = "var(--border)",
             StrokeDashArray = 4
         };
 
         // X-Axis styling
-        objOptions.Xaxis = new XAxis
+        objOptions.Xaxis ??= new XAxis
         {
             Labels = new XAxisLabels
             {
@@ -177,7 +177,7 @@ public partial class LineChart<TItem> : ChartBase<TItem> where TItem : class
         };
 
         // Y-Axis styling
-        objOptions.Yaxis =
+        objOptions.Yaxis ??=
         [
             new YAxis
             {
@@ -190,6 +190,8 @@ public partial class LineChart<TItem> : ChartBase<TItem> where TItem : class
                 }
             }
         ];
+
+        objOptions = FinalizeOptions(objOptions);
     }
 
     private Curve GetCurveType()

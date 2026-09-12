@@ -104,10 +104,10 @@ public partial class RadarChart<TItem> : ChartBase<TItem> where TItem : class
         objOptions = CreateBaseOptions();
 
         // Set colors from config or defaults
-        objOptions.Colors = ChartColor.DefaultColors.ToList();
+        objOptions.Colors ??= ChartColor.DefaultColors.ToList();
 
         // Configure radar-specific plot options
-        objOptions.PlotOptions = new PlotOptions
+        objOptions.PlotOptions ??= new PlotOptions
         {
             Radar = new PlotOptionsRadar
             {
@@ -122,33 +122,33 @@ public partial class RadarChart<TItem> : ChartBase<TItem> where TItem : class
         // Configure fill based on variant
         if (Variant == RadarChartVariant.PolygonFill || Variant == RadarChartVariant.MultiSeries)
         {
-            objOptions.Fill = new Fill
+            objOptions.Fill ??= new Fill
             {
                 Opacity = FillOpacity
             };
         }
         else
         {
-            objOptions.Fill = new Fill
+            objOptions.Fill ??= new Fill
             {
                 Opacity = 0
             };
         }
 
         // Stroke configuration
-        objOptions.Stroke = new Stroke
+        objOptions.Stroke ??= new Stroke
         {
             Width = 2
         };
 
         // Markers
-        objOptions.Markers = new Markers
+        objOptions.Markers ??= new Markers
         {
             Size = ShowMarkers ? MarkerSize : 0
         };
 
         // X-Axis (categories) styling
-        objOptions.Xaxis = new XAxis
+        objOptions.Xaxis ??= new XAxis
         {
             Labels = new XAxisLabels
             {
@@ -161,7 +161,7 @@ public partial class RadarChart<TItem> : ChartBase<TItem> where TItem : class
         };
 
         // Y-Axis styling
-        objOptions.Yaxis =
+        objOptions.Yaxis ??=
         [
             new YAxis
             {
@@ -174,5 +174,7 @@ public partial class RadarChart<TItem> : ChartBase<TItem> where TItem : class
                 }
             }
         ];
+
+        objOptions = FinalizeOptions(objOptions);
     }
 }

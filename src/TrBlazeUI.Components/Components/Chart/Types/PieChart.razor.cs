@@ -108,10 +108,10 @@ public partial class PieChart<TItem> : ChartBase<TItem> where TItem : class
         objOptions = CreateBaseOptions();
 
         // Set colors from config or defaults
-        objOptions.Colors = ChartColor.DefaultColors.ToList();
+        objOptions.Colors ??= ChartColor.DefaultColors.ToList();
 
         // Configure pie/donut specific options
-        objOptions.PlotOptions = new PlotOptions
+        objOptions.PlotOptions ??= new PlotOptions
         {
             Pie = new PlotOptionsPie
             {
@@ -149,7 +149,7 @@ public partial class PieChart<TItem> : ChartBase<TItem> where TItem : class
         // Configure fill for gradient variant
         if (Variant == PieChartVariant.GradientDonut)
         {
-            objOptions.Fill = new Fill
+            objOptions.Fill ??= new Fill
             {
                 Type = FillType.Gradient,
                 Gradient = new FillGradient
@@ -165,11 +165,13 @@ public partial class PieChart<TItem> : ChartBase<TItem> where TItem : class
         }
 
         // Stroke between slices
-        objOptions.Stroke = new Stroke
+        objOptions.Stroke ??= new Stroke
         {
             Width = 2,
             Colors = ["var(--background)"]
         };
+
+        objOptions = FinalizeOptions(objOptions);
     }
 
     private bool IsDonut() =>

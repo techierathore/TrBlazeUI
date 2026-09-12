@@ -97,6 +97,30 @@ public partial class Checkbox : ComponentBase
     public bool Disabled { get; set; }
 
     /// <summary>
+    /// Gets or sets whether the checkbox is drawn as a picture of its state rather than as a control.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Default <c>false</c>. When <c>true</c> it renders a plain <c>&lt;span&gt;</c> — no role,
+    /// nothing focusable, <c>aria-hidden</c> — keeping the tick, the box and the
+    /// <see cref="Checked"/>/<see cref="Indeterminate"/> appearance, but no behaviour.
+    /// </para>
+    /// <para>
+    /// Use it where something else already owns the click and the accessible name, such as a
+    /// checkbox inside a menu trigger. Put the name on that outer control (REQ-NFR-001).
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// &lt;DropdownMenuTrigger aria-label="Select rows - click to see options"&gt;
+    ///     &lt;Checkbox Checked="@objIsAllSelected" Decorative="true" /&gt;
+    /// &lt;/DropdownMenuTrigger&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public bool Decorative { get; set; }
+
+    /// <summary>
     /// Gets or sets additional CSS classes to apply to the checkbox.
     /// </summary>
     /// <remarks>

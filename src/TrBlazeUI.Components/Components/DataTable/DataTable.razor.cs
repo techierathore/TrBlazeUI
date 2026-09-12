@@ -108,6 +108,19 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         /// Gets or sets additional CSS classes to apply to the header cell.
         /// </summary>
         public string? HeaderClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets the flex justification applied to the header's own label box, so that a
+        /// right- or centre-aligned column's header sits over its figures rather than staying at
+        /// the left of the column (TfLens TR-031).
+        /// </summary>
+        public string HeaderJustifyClass { get; set; } = "justify-start";
+
+        /// <summary>
+        /// Gets or sets the text alignment applied to the header and body cells of the column when
+        /// the caller set <c>DataTableColumn.Align</c>, or null when they did not.
+        /// </summary>
+        public string? AlignTextClass { get; set; }
     }
 
     private List<ColumnData> objColumns = new();
@@ -115,6 +128,7 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     private IEnumerable<TData> objProcessedData = Array.Empty<TData>();
     private IEnumerable<TData> objFilteredData = Array.Empty<TData>();
     private string objGlobalSearchValue = string.Empty;
+    private string? objLastBoundSearchText;
     private int objColumnsVersion;
     private bool objSelectAllDropdownOpen;
 
@@ -138,6 +152,8 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     private bool objLastShowPagination = true;
     private bool objLastShowHeader = true;
     private DataTableDensity objLastDensity = DataTableDensity.Comfortable;
+    private bool objLastShowToolbar;
+    private bool objLastShowColumnChooser = true;
 
     /// <summary>
     /// Gets or sets the data source for the table.
@@ -163,8 +179,53 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     /// Gets or sets whether to show the toolbar with global search and column visibility.
     /// Default is false — the toolbar is opt-in so a bare table renders as just a table.
     /// </summary>
+    /// <remarks>
+    /// This decides only where the grid's own chrome is drawn, not whether filtering is available.
+    /// To host the search box somewhere else — a card header, a page-level filter bar — leave the
+    /// toolbar off and bind <see cref="SearchText"/> to your own input (TfLens TR-033).
+    /// </remarks>
     [Parameter]
     public bool ShowToolbar { get; set; }
+
+    /// <summary>
+    /// Gets or sets the grid's global search text.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Two-way bindable (<c>@bind-SearchText</c>), and the same state the toolbar's own search box
+    /// drives — so a caller can put the input wherever the design puts it and still get the grid's
+    /// real filtering over its <c>Filterable</c> columns, instead of hand-writing a second filter
+    /// the grid knows nothing about (TfLens TR-033). Typing in the built-in box writes back here.
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// A filter drawn in the card header rather than in the grid's toolbar:
+    /// <code>
+    /// &lt;CardHeader&gt;
+    ///     &lt;Input @bind-Value="objFilter" Placeholder="Filter by REQ, class or whose gap" /&gt;
+    /// &lt;/CardHeader&gt;
+    /// &lt;DataTable TData="MissRow" Data="@objRows" ShowToolbar="false" @bind-SearchText="objFilter" /&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public string? SearchText { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback invoked when the grid's global search text changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> SearchTextChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the toolbar's column-visibility dropdown renders.
+    /// </summary>
+    /// <remarks>
+    /// Default is true, which is the toolbar's long-standing shape. Set to false for a design that
+    /// wants the search box but not the <c>Columns</c> button, which used to be inseparable from it
+    /// (TfLens TR-033). Ignored when <see cref="ShowToolbar"/> is false.
+    /// </remarks>
+    [Parameter]
+    public bool ShowColumnChooser { get; set; } = true;
 
     /// <summary>
     /// Gets or sets whether the grid paginates at all.
@@ -413,6 +474,20 @@ public partial class DataTable<TData> : ComponentBase where TData : class
             objSelectionVersion++;
         }
 
+        // Take a bound SearchText the caller has changed. Guarded on the caller's own last value
+        // rather than on objGlobalSearchValue, so typing in the built-in toolbar box - which writes
+        // back through SearchTextChanged - is not undone by the echo that follows it (TR-033).
+        if (SearchText is not null && SearchText != objLastBoundSearchText)
+        {
+            objLastBoundSearchText = SearchText;
+
+            if (objGlobalSearchValue != SearchText)
+            {
+                objGlobalSearchValue = SearchText;
+                objTableState.Pagination.CurrentPage = 1;
+            }
+        }
+
         await ProcessDataAsync();
     }
 
@@ -437,7 +512,9 @@ public partial class DataTable<TData> : ComponentBase where TData : class
             MaxWidth = column.MaxWidth,
             CellTemplate = column.CellTemplate,
             CellClass = column.CellClass,
-            HeaderClass = column.HeaderClass
+            HeaderClass = column.HeaderClass,
+            HeaderJustifyClass = column.HeaderJustifyClass,
+            AlignTextClass = column.AlignTextClass
         };
 
         objColumns.Add(columnData);
@@ -584,6 +661,13 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     private async Task HandleGlobalSearchChanged(string value)
     {
         objGlobalSearchValue = value;
+
+        // Write the new text back to a bound SearchText, so a caller hosting the input elsewhere
+        // and the grid's own toolbar are two views of one state, never two states (TR-033).
+        if (SearchTextChanged.HasDelegate)
+        {
+            await SearchTextChanged.InvokeAsync(objGlobalSearchValue);
+        }
 
         // Invoke custom callback if provided
         if (OnFilter.HasDelegate)
@@ -876,12 +960,18 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         var showPaginationChanged = objLastShowPagination != ShowPagination;
         var showHeaderChanged = objLastShowHeader != ShowHeader;
         var densityChanged = objLastDensity != Density;
+        // Tracked for the same reason ShowPagination is: a chrome flag toggled at runtime would
+        // otherwise be swallowed here and appear to do nothing (TR-033).
+        var showToolbarChanged = objLastShowToolbar != ShowToolbar;
+        var columnChooserChanged = objLastShowColumnChooser != ShowColumnChooser;
 
-        if (refreshRequested || dataChanged || selectionModeChanged || loadingChanged || columnsChanged || searchChanged || selectionChanged || paginationChanged || showPaginationChanged || showHeaderChanged || densityChanged)
+        if (refreshRequested || dataChanged || selectionModeChanged || loadingChanged || columnsChanged || searchChanged || selectionChanged || paginationChanged || showPaginationChanged || showHeaderChanged || densityChanged || showToolbarChanged || columnChooserChanged)
         {
             objLastShowPagination = ShowPagination;
             objLastShowHeader = ShowHeader;
             objLastDensity = Density;
+            objLastShowToolbar = ShowToolbar;
+            objLastShowColumnChooser = ShowColumnChooser;
             objLastRefreshVersion = objRefreshVersion;
             objLastData = Data;
             objLastSelectionMode = SelectionMode;

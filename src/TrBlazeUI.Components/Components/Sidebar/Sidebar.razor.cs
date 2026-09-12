@@ -106,14 +106,30 @@ public partial class Sidebar : IDisposable
         );
     }
 
+    /// <remarks>
+    /// The phone sheet is sized with <c>--sidebar-width-mobile</c>, not <c>--sidebar-width</c>.
+    /// The stylesheet has always declared both (16rem and 18rem), but nothing read the mobile one,
+    /// so the slid-out menu rendered at the desktop column's width and the token meant nothing
+    /// (TfLens TR-035).
+    /// </remarks>
     private string GetMobileClasses()
     {
         return Utilities.ClassNames.cn(
-            "w-[var(--sidebar-width)] bg-sidebar p-0 flex flex-col",
+            "w-[var(--sidebar-width-mobile)] bg-sidebar p-0 flex flex-col",
             "[&>button]:hidden", // Hide the default Sheet close button
             Class
         );
     }
+
+    /// <summary>
+    /// Gets the inline custom-property declaration that carries
+    /// <c>SidebarProvider.MobileWidth</c> onto the portalled phone sheet, or null when the caller
+    /// left it unset and the stylesheet's own <c>--sidebar-width-mobile</c> should stand.
+    /// </summary>
+    private string? GetMobileStyle() =>
+        string.IsNullOrWhiteSpace(Context?.MobileWidth)
+            ? null
+            : $"--sidebar-width-mobile:{Context.MobileWidth}";
 
     private string GetDataState()
     {

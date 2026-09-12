@@ -88,6 +88,62 @@ public abstract class ChartBase<TItem> : ComponentBase where TItem : class
     public ChartConfig? Config { get; set; }
 
     /// <summary>
+    /// Gets or sets the raw ApexCharts options this chart is built on.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Anything set here wins over the wrapper's own defaults; anything left null the wrapper
+    /// fills in as usual. That makes the whole ApexCharts option surface reachable — axes, grid,
+    /// data-label formatters, annotations, responsive breakpoints — without giving up the wrapper,
+    /// which previously forced a caller who wanted three options changed to drop down to a raw
+    /// <c>ApexChart</c> (TfLens TR-028).
+    /// </para>
+    /// <para>
+    /// Members the chart's own parameters express are still applied over this: stacking and
+    /// orientation follow the chart's <c>Variant</c>, because that is the parameter a caller sets
+    /// to choose them. Use <see cref="OptionsConfigurator"/> to reach those.
+    /// </para>
+    /// <para>
+    /// The instance is filled in place rather than cloned, matching how <c>ApexChart</c> itself
+    /// treats the options object it is given. Supply a field the component owns, not a shared
+    /// static.
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// A comparison chart with no y axis, no gridlines and a compact value above each bar:
+    /// <code>
+    /// &lt;BarChart TItem="Total" Items="@objRows" XValue="@(r =&gt; r.Name)" YValue="@(r =&gt; r.Value)"
+    ///           Options="@objChartOptions" /&gt;
+    ///
+    /// private readonly ApexChartOptions&lt;Total&gt; objChartOptions = new()
+    /// {
+    ///     Grid = new Grid { Show = false },
+    ///     Yaxis = [new YAxis { Show = false }],
+    /// };
+    /// </code>
+    /// </example>
+    [Parameter]
+    public ApexChartOptions<TItem>? Options { get; set; }
+
+    /// <summary>
+    /// Gets or sets a callback that receives the fully built options immediately before they are
+    /// handed to ApexCharts.
+    /// </summary>
+    /// <remarks>
+    /// Runs after <see cref="Options"/> and after every wrapper default, so it is the last word on
+    /// anything — including the members the chart's own parameters drive. Use it for values that
+    /// have to be computed rather than declared, such as a data-label formatter.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// &lt;BarChart TItem="Total" Items="@objRows" ShowDataLabels="true"
+    ///           OptionsConfigurator="@(o =&gt; o.DataLabels.Formatter = "function (v) { return (v/1e6).toFixed(1) + 'M' }")" /&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public Action<ApexChartOptions<TItem>>? OptionsConfigurator { get; set; }
+
+    /// <summary>
     /// Gets or sets the height of the chart.
     /// </summary>
     /// <remarks>
@@ -279,28 +335,33 @@ public abstract class ChartBase<TItem> : ComponentBase where TItem : class
     /// <summary>
     /// Creates base ApexChartOptions with common settings.
     /// </summary>
+    /// <remarks>
+    /// Starts from the caller's <see cref="Options"/> when one was supplied and fills only the
+    /// members they left null, so every wrapper default is a floor and never a ceiling
+    /// (TfLens TR-028). Each chart type layers its own type-specific defaults on top the same way
+    /// and then calls <see cref="FinalizeOptions"/>.
+    /// </remarks>
     protected ApexChartOptions<TItem> CreateBaseOptions()
     {
-        var options = new ApexChartOptions<TItem>();
+        var options = Options ?? new ApexChartOptions<TItem>();
 
-        // Chart settings
-        options.Chart = new ApexCharts.Chart
+        // Chart settings. A caller who supplied a Chart to set one field still gets the wrapper's
+        // defaults for the fields they left alone, so opting into one option costs nothing else.
+        options.Chart ??= new ApexCharts.Chart();
+        options.Chart.Height ??= Height;
+        options.Chart.Width ??= Width;
+        options.Chart.Animations ??= new Animations
         {
-            Height = Height,
-            Width = Width,
-            Animations = new Animations
-            {
-                Enabled = EnableAnimations
-            },
-            Toolbar = new ApexCharts.Toolbar
-            {
-                Show = false
-            },
-            Background = "transparent"
+            Enabled = EnableAnimations
         };
+        options.Chart.Toolbar ??= new ApexCharts.Toolbar
+        {
+            Show = false
+        };
+        options.Chart.Background ??= "transparent";
 
         // Legend
-        options.Legend = new Legend
+        options.Legend ??= new Legend
         {
             Show = ShowLegend && LegendPosition != LegendPosition.Hidden,
             Position = GetApexLegendPosition(),
@@ -311,14 +372,14 @@ public abstract class ChartBase<TItem> : ComponentBase where TItem : class
         };
 
         // Tooltip - use cssClass for theme-aware styling
-        options.Tooltip = new ApexCharts.Tooltip
+        options.Tooltip ??= new ApexCharts.Tooltip
         {
             Enabled = ShowTooltip,
             CssClass = "trblazeui-chart-tooltip"
         };
 
         // Data labels
-        options.DataLabels = new DataLabels
+        options.DataLabels ??= new DataLabels
         {
             Enabled = ShowDataLabels
         };
@@ -326,7 +387,7 @@ public abstract class ChartBase<TItem> : ComponentBase where TItem : class
         // Title
         if (!string.IsNullOrEmpty(Title))
         {
-            options.Title = new Title
+            options.Title ??= new Title
             {
                 Text = Title,
                 Align = Align.Center
@@ -334,5 +395,17 @@ public abstract class ChartBase<TItem> : ComponentBase where TItem : class
         }
 
         return options;
+    }
+
+    /// <summary>
+    /// Applies the caller's <see cref="OptionsConfigurator"/> as the last step of building a
+    /// chart's options, and returns the same instance for convenient assignment.
+    /// </summary>
+    /// <param name="aOptions">The options every default has already been applied to.</param>
+    /// <returns>The same instance, after the configurator has run.</returns>
+    protected ApexChartOptions<TItem> FinalizeOptions(ApexChartOptions<TItem> aOptions)
+    {
+        OptionsConfigurator?.Invoke(aOptions);
+        return aOptions;
     }
 }
