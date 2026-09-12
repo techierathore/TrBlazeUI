@@ -137,20 +137,25 @@ no-op instead of failing the run.
 
 ## 4. Shared version rule
 
-**All five packages carry one version, from one place.**
+**All five packages carry one version, and that version is the release tag.**
 
-That place is the `<Version>` element in `Directory.Build.props` at the repo root. It is
-currently `2.0.0`.
+- Both workflows resolve the version from the **release tag** and pass it as `-p:Version=` to
+  `dotnet build` and `dotnet pack`. The GitHub Packages workflow also builds a `-ci.N`
+  pre-release stem on a push to `main`.
+- The `<Version>` element in `Directory.Build.props` is the **local-build fallback and the CI
+  pre-release stem** — not the released version. It is not bumped as part of ordinary work, so it
+  goes stale by design.
+- A real (non-dry-run) push to nuget.org with a version that came from `Directory.Build.props`
+  instead of a tag is **refused** by the *Refuse to publish a non-tag version* step.
 
-- The NuGet.org workflow **reads** that version and never overrides it. A public release ships
-  exactly the version that is committed — there is no version synthesis, no run-number suffix.
-- The GitHub Packages workflow *does* override it (`-ci.N` on push, or the release tag on
-  release). That is intentional and unchanged.
-- The first public release is the **current stable line, `2.0.0`** — the version number is not
-  bumped for the move to NuGet.org.
+> **Corrected 2026-09-12.** This section used to say the NuGet.org workflow "reads
+> that version and never overrides it", which stopped being true on 2026-08-31 when the release
+> tag became the version. Believing the old text is how nuget.org sat on `2.0.0` across two
+> release cycles while every run went green.
 
-To release a new public version: change `<Version>` in `Directory.Build.props`, commit, then
-dispatch the workflow. Never pass a version override to the NuGet.org workflow.
+To release a new public version: cut the GitHub Release with the tag you want published, then
+dispatch the workflow with that tag as the `ref`. Tag format and what happens to a mistyped
+prefix: `RELEASE.md`.
 
 > `TrBlazeUI.Components.csproj` has an alternate `UsePackageReferences=true` path that references
 > Primitives and Icons.Lucide as packages rather than projects. Those references use

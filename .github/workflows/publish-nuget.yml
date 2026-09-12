@@ -89,6 +89,16 @@ jobs:
           #   2. inputs.ref is a version tag (v2.1.1 / 2.1.1 / 2.1.1-beta.1)
           #   3. nearest tag reachable from the checked-out ref (git describe)
           #   4. Directory.Build.props  -- FALLBACK ONLY, and it BLOCKS a real push (see below)
+          # The tag -> version rule itself lives in scripts/TagVersion.ps1 and is shared with
+          # publish-github-packages.yml; only the RESOLUTION ORDER below is this workflow's own.
+          # The two workflows used to carry private copies of the rule, and they had drifted -
+          # both stripped a single leading 'v' and nothing else, which is how the tag 'c2.0.5'
+          # killed the 2.0.5 release on 2026-09-12 (docs/CI-Issues.md CI-001). Note that a bad
+          # tag was not only that one release's problem: step 3 below resolves a branch ref
+          # through `git describe`, which returns the nearest tag, so a prefixed tag left sitting
+          # on main used to fail EVERY later publish with ref = main.
+          . ./scripts/TagVersion.ps1
+
           $ver = $null
           $source = $null
           $fromTag = $false
@@ -99,6 +109,10 @@ jobs:
           if (-not [string]::IsNullOrWhiteSpace($releaseTag)) {
             $ver = $releaseTag; $source = "release event tag '$releaseTag'"; $fromTag = $true
           }
+          # Only a canonically-shaped ref takes this shortcut. A prefixed tag ('c2.0.5') falls
+          # through to `git describe` below, which returns that same tag and normalises it - the
+          # regex is deliberately NOT widened, because anything looser would also match a branch
+          # name like 'hotfix-2.0' and let it past the "refuse a non-tag version" guard.
           elseif ($inputRef -match '^v?\d+\.\d+(\.\d+)?(-[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*)?$') {
             $ver = $inputRef; $source = "workflow ref '$inputRef' (a version tag)"; $fromTag = $true
           }
@@ -124,15 +138,14 @@ jobs:
             throw "Could not resolve a package version from a release tag, the workflow ref, or Directory.Build.props."
           }
 
-          $ver = $ver.Trim() -replace '^v', ''
-          # Normalise a two-part tag (v2.1 -> 2.1.0); NuGet requires three parts.
-          if ($ver -match '^\d+\.\d+$') {
-            Write-Host "Tag has only two version parts; normalising to '$ver.0'"
-            $ver = "$ver.0"
+          # One rule for every source above: strip any non-digit prefix (warning loudly when it
+          # is not the canonical 'v'), complete a two-part version, then validate.
+          $advice = if ($fromTag) {
+            "To recover: delete this GitHub Release AND its tag, re-cut both with a valid tag, then re-run this workflow with that tag as the ref."
+          } else {
+            "To recover: fix <Version> in Directory.Build.props - though a real publish needs a release tag anyway (see RELEASE.md)."
           }
-          if ($ver -notmatch '^\d+\.\d+\.\d+(-[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*)?$') {
-            throw "Invalid semver version '$ver' (from $source). Expected MAJOR.MINOR.PATCH with an optional pre-release suffix, e.g. 2.1.1 or v2.1.1-beta.1"
-          }
+          $ver = ConvertTo-PackageVersion -Tag $ver -Source $source -Advice $advice
 
           Write-Host "Publishing version: $ver   (source: $source)"
           echo "PACKAGE_VERSION=$ver" >> $env:GITHUB_OUTPUT

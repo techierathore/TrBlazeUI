@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TrBlazeUI — Status</title>
+<title>TrBlazeUI — decisions I need from you</title>
 <script>
 /* Resolve the theme BEFORE first paint (no flash). Saved choice wins; otherwise
    pick by time of day — light 07:00–19:00 local, softened dark at night. */
@@ -103,122 +103,80 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </head>
 <body>
 <button id="themeToggle" class="theme-toggle" title="Toggle light / dark">&#9790; Dark</button>
-<div class="layout">
-  <nav class="side">
-    <h1>TrBlazeUI — Status</h1>
-    <div class="sub">Last rendered: 2026-09-12</div>
-    <div class="group">Contents</div>
-    <ol>
-        <li><a href="#where-i-am">Where I am</a></li>
-        <li><a href="#next-command-to-run">Next command to run</a></li>
-        <li><a href="#open-requirements">Open requirements</a></li>
-        <li><a href="#known-blockers">Known blockers</a></li>
-        <li><a href="#verification-log">Verification log</a></li>
-        <li><a href="#library-feedback-summary">Library feedback summary</a></li>
-        <li><a href="#standards-compliance">Standards compliance</a></li>
-        <li><a href="#deferred-future">Deferred / future</a></li>
-    </ol>
-  </nav>
+<div class="layout no-toc">
   <main>
-    <h1>TrBlazeUI — Status</h1>
-    <div class="subtitle">Rendered 2026-09-12 &middot; source <code>PROJECT-STATUS.md</code></div>
-    <div class="cta-next" style="padding:20px; background:var(--cta-bg); border:2px solid var(--accent); border-radius:10px; margin:20px 0;">
-      <div style="font-size:11px; color:var(--muted); letter-spacing:.5px;">NEXT COMMAND TO RUN</div>
-      <div style="font-family:var(--mono); font-size:18px; margin-top:6px;">(owner) 1 row(s) cannot be measured here — create the data, change the acceptance line, or mark the row N/A: REQ-FN-004</div>
-    </div>
-<table>
-<tbody>
-<tr><th>project</th><td>TrBlazeUI</td></tr>
-<tr><th>last_updated</th><td>2026-09-12</td></tr>
-<tr><th>current_phase</th><td>Verify — 1 not measurable, 34 of 35 verified</td></tr>
-<tr><th>last_verified_build</th><td>PASS</td></tr>
-<tr><th>last_verified_date</th><td>2026-09-12</td></tr>
-</tbody>
-</table>
+    <h1>TrBlazeUI — decisions I need from you</h1>
+    <div class="subtitle">Rendered 2026-09-12 &middot; source <code>TrBlazeUI-Decision-Request.md</code></div>
+
     <div class="toc-inline">
       <div>Contents</div>
       <ol>
-        <li><a href="#where-i-am">Where I am</a></li>
-        <li><a href="#next-command-to-run">Next command to run</a></li>
-        <li><a href="#open-requirements">Open requirements</a></li>
-        <li><a href="#known-blockers">Known blockers</a></li>
-        <li><a href="#verification-log">Verification log</a></li>
-        <li><a href="#library-feedback-summary">Library feedback summary</a></li>
-        <li><a href="#standards-compliance">Standards compliance</a></li>
-        <li><a href="#deferred-future">Deferred / future</a></li>
+        <li><a href="#what-happened">What happened</a></li>
+        <li><a href="#what-i-need-you-to-decide">What I need you to decide</a></li>
+        <li class="h3"><a href="#which-version-number-the-next-release-carries">1. Which version number the next release carries</a></li>
+        <li><a href="#what-i-do-when-you-answer">What I do when you answer</a></li>
+        <li><a href="#copy-this-back-to-me">Copy this back to me</a></li>
       </ol>
     </div>
-<h2 id="where-i-am">Where I am<a class="anchor-link" href="#where-i-am">#</a></h2>
-<p>34 of 35 rows verified, none failing. Today's reported CI failure is fixed: a release
-tag with any prefix other than <code>v</code> killed the publish, so the tag-to-version rule now
-lives once in <code>scripts/TagVersion.ps1</code>, strips any non-digit prefix with a warning,
-and is tested on every push. REQ-FN-005 is re-verified. One row is left: publishing
-the packages to nuget.org, which only a real publish can close.</p>
-<h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2>
-<p>Claude Code:</p>
-<pre><code>(owner) 1 row(s) cannot be measured here — create the data, change the acceptance line, or mark the row N/A: REQ-FN-004</code></pre>
-<p>OpenCode:</p>
-<pre><code>(owner) 1 row(s) cannot be measured here — create the data, change the acceptance line, or mark the row N/A: REQ-FN-004</code></pre>
-<p>Every test carrying REQ-FN-004 is skipped, so another verify run changes nothing.</p>
-<h2 id="open-requirements">Open requirements<a class="anchor-link" href="#open-requirements">#</a></h2>
 <table>
-<thead><tr><th>Status</th><th>Count</th></tr></thead>
+<thead><tr><th></th><th></th></tr></thead>
 <tbody>
-<tr><td>Not Started</td><td>0</td></tr>
-<tr><td>In Progress</td><td>0</td></tr>
-<tr><td>Implemented</td><td>1</td></tr>
-<tr><td>Needs re-verify</td><td>0</td></tr>
-<tr><td>Blocked</td><td>0</td></tr>
+<tr><td>App</td><td>TrBlazeUI</td></tr>
+<tr><td>Written</td><td>2026-09-12</td></tr>
+<tr><td>Waiting on</td><td>1 decision. Nothing has been changed yet.</td></tr>
 </tbody>
 </table>
-<ul>
-<li>[ ] REQ-FN-004 — GitHub Packages CI/CD (publish-nuget.yml + build.yml) (Implemented)
-</li>
-</ul>
-<h2 id="known-blockers">Known blockers<a class="anchor-link" href="#known-blockers">#</a></h2>
-<ul>
-<li>REQ-FN-004 waits on the owner. Everything up to the push is fixed and tested; only a real, non-dry-run publish proves the row.
-</li>
-<li>The number for the next release is an open decision — <code>docs/TrBlazeUI-Decision-Request.md</code> holds it. nuget.org is live at 2.0.3, and the unreleased work changes existing behaviour, so the number is a signal rather than the next in sequence.
-</li>
-<li>The <code>c2.0.5</code> release is deleted; its tag is still on the repository and is the owner's to delete, because agents never run git.
-</li>
-<li><code>/verify-trstudio</code> returns 404 and its page is missing from <code>demos/</code>, so REQ-UI-015's 14 checks cannot be reproduced. Its verdict rests on a run from 12 July.
-</li>
-</ul>
-<h2 id="verification-log">Verification log<a class="anchor-link" href="#verification-log">#</a></h2>
-<p>Last five passes; older passes live in <code>docs/metrics/gates.jsonl</code>.</p>
+<h2 id="what-happened">What happened<a class="anchor-link" href="#what-happened">#</a></h2>
+<p>You asked why I suggested <code>v2.1.1</code> for the next release. I should not have suggested
+any number. The changelog says the release number is yours to assign when you cut the
+release, and says in as many words not to write one into it speculatively. I guessed
+from the <code>2.1.0</code> sitting in <code>Directory.Build.props</code>, which is only the number local
+builds use when nobody passes one in. That was my mistake, not a decision the project
+had already taken.</p>
+<p>Here is what is actually true today. All five packages on nuget.org are live at
+<strong>2.0.0</strong> and <strong>2.0.3</strong> — I checked the public index for each one. <code>2.1.0</code> was never
+published anywhere public; the changelog has a <code>2.1.0</code> section and it is still headed
+"unreleased". So the tag you cut, <code>2.0.5</code>, was not a step backwards at all: it is the
+next patch number after what is live. My earlier warning that it was "below 2.1.0"
+was misleading and I withdraw it.</p>
+<p>The open question is not which number comes next in sequence. It is that the work
+waiting to be released changes how existing code behaves: <code>Badge</code> now renders a
+<code>&lt;span&gt;</code> instead of a <code>&lt;div&gt;</code>, a long <code>Badge</code> label no longer wraps, <code>DataTable</code> with
+pagination switched off renders every row instead of five, and <code>AlertDialog</code> now
+closes on Escape. Each can change a page someone already built against 2.0.3.</p>
+<h2 id="what-i-need-you-to-decide">What I need you to decide<a class="anchor-link" href="#what-i-need-you-to-decide">#</a></h2>
+<h3 id="which-version-number-the-next-release-carries">1. Which version number the next release carries<a class="anchor-link" href="#which-version-number-the-next-release-carries">#</a></h3>
+<p>The packages are at 2.0.3 in public. The unreleased work includes changes that alter
+how existing code behaves, which is what version numbers exist to signal. The number
+you pick is the whole signal — it decides whether someone upgrading gets a surprise.</p>
 <table>
-<thead><tr><th>Date</th><th>Phase</th><th>Result</th><th>Status table</th></tr></thead>
+<thead><tr><th>Option</th><th>What happens</th><th>What it costs</th></tr></thead>
 <tbody>
-<tr><td>2026-08-31</td><td>Build + verify (versioning)</td><td>REQ-FN-005 Verified — per-package MinVer removed on the owner's decision; ADR-005 superseded by ADR-008. Release 0/0</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-<tr><td>2026-09-12</td><td>triage-and-fix</td><td>34/35 Verified. REQ-UI-020 added; 6 rows re-verified. Build 0/0</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-<tr><td>2026-09-12</td><td>verify-phase</td><td>33/35 Verified. 13 PASS, 1 FAIL (REQ-NFR-001), 1 not tested (REQ-FN-004)</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-<tr><td>2026-09-12</td><td>Fix-issues + verify</td><td>REQ-NFR-001 Verified — accessibility findings 37 nodes → 0. 5 rows re-verified. Build 0/0</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-<tr><td>2026-09-12</td><td>triage-and-fix</td><td>34/35 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td><strong>A — 3.0.0</strong></td><td>Says plainly that behaviour changed and code may need attention. Anyone on 2.x stays there until they choose to move, and reads the notes when they do.</td><td>A major number sets an expectation about how much changed. The list is real but it is eight or so items, not a rewrite.</td></tr>
+<tr><td><strong>B — 2.1.0</strong></td><td>Uses the number the changelog already has a section for, so the section and the release match. Signals new features, not breakage.</td><td>Understates it. Someone upgrading a minor version does not expect a <code>&lt;div&gt;</code> to become a <code>&lt;span&gt;</code>, and a stylesheet or test keyed on <code>div</code> stops matching with no warning.</td></tr>
+<tr><td><strong>C — 2.0.5</strong></td><td>The number you already tagged. Smallest possible step from 2.0.3.</td><td>Understates it most. A patch release is understood as safe to take without reading anything, and this one is not.</td></tr>
 </tbody>
 </table>
-<h2 id="library-feedback-summary">Library feedback summary<a class="anchor-link" href="#library-feedback-summary">#</a></h2>
-<ul>
-<li>None
+<p><strong>My recommendation: A — 3.0.0.</strong> The behaviour changes are the kind that break a
+working page silently rather than loudly, and a major number is the only one that
+tells someone to read the notes before upgrading.</p>
+<h2 id="what-i-do-when-you-answer">What I do when you answer<a class="anchor-link" href="#what-i-do-when-you-answer">#</a></h2>
+<ol>
+<li>Correct the changelog: the <code>2.0.0</code> and <code>2.1.0</code> sections are both headed "unreleased" although 2.0.0 and 2.0.3 are live, and the unreleased work gets the number you choose. Around ten minutes.
 </li>
-</ul>
-<h2 id="standards-compliance">Standards compliance<a class="anchor-link" href="#standards-compliance">#</a></h2>
-<ul>
-<li>Last check 2026-09-12: 0 findings, see the checklist Remarks.
+<li>Set the fallback number in <code>Directory.Build.props</code> to match, so a local build and a release agree.
 </li>
-</ul>
-<h2 id="deferred-future">Deferred / future<a class="anchor-link" href="#deferred-future">#</a></h2>
-<ul>
-<li>Restore the <code>/verify-trstudio</code> harness page so REQ-UI-015's spec can run again.
+<li>Tell you the exact tag to cut and the two steps to run the publish, then watch the run and confirm all five packages are live on nuget.org at that version.
 </li>
-<li>Have a person test with real assistive technology; the scanner covers only part of accessibility.
+<li>Close the last open row on the checklist, which only a real publish can close.
 </li>
-<li>Re-run <code>tests/package/codex-agent-deployment.sh</code>: the session sweep removed REQ-FN-010's consumer fixture, so its test fails until the fixture is rebuilt.
-</li>
-<li>Delete <code>scripts/release-*.sh</code> — dead code whose <code>components/v…</code> tag prefixes correspond to nothing in the build.
-</li>
-</ul>
+</ol>
+<p>I do not need an answer to delete the old tag — the commands for that are in my
+message and are yours to run either way.</p>
+<h2 id="copy-this-back-to-me">Copy this back to me<a class="anchor-link" href="#copy-this-back-to-me">#</a></h2>
+<pre><code>TrBlazeUI: decision 1 — cut the next release as 3.0.0. Update the changelog and the fallback version to match, then tell me the tag to cut.</code></pre>
+<pre><code>TrBlazeUI: decision 1 — cut the next release as 2.1.0. Update the changelog and the fallback version to match, then tell me the tag to cut.</code></pre>
+<pre><code>TrBlazeUI: decision 1 — cut the next release as 2.0.5. Update the changelog and the fallback version to match, then tell me the tag to cut.</code></pre>
   </main>
 </div>
 
