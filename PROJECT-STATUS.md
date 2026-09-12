@@ -1,7 +1,7 @@
 ---
 project: TrBlazeUI
 last_updated: 2026-09-12
-current_phase: Verify — 1 to verify, 34 of 35 verified
+current_phase: Verify — 1 not measurable, 34 of 35 verified
 last_verified_build: PASS
 last_verified_date: 2026-09-12
 ---
@@ -10,19 +10,23 @@ last_verified_date: 2026-09-12
 
 ## Where I am
 
-34 of 35 rows verified, none failing. The accessibility row was graded against a scanner for the first time today, failed with 7 findings across 37 places, and is now fixed and passing with zero findings. One row is left: publishing packages to nuget.org, which only a real publish can close.
+34 of 35 rows verified, none failing. Today's reported CI failure is fixed: a release
+tag with any prefix other than `v` killed the publish, so the tag-to-version rule now
+lives once in `scripts/TagVersion.ps1`, strips any non-digit prefix with a warning,
+and is tested on every push. REQ-FN-005 is re-verified. One row is left: publishing
+the packages to nuget.org, which only a real publish can close.
 
 ## Next command to run
 
 Claude Code:
 ```
-/TechieFlow:agents:verifier *verify functional TrBlazeUI
+(owner) 1 row(s) cannot be measured here — create the data, change the acceptance line, or mark the row N/A: REQ-FN-004
 ```
 OpenCode:
 ```
-/flow-verifier *verify functional TrBlazeUI
+(owner) 1 row(s) cannot be measured here — create the data, change the acceptance line, or mark the row N/A: REQ-FN-004
 ```
-Target REQ-FN-004 — but run it only after the owner has published for real; nothing else can close that row.
+Every test carrying REQ-FN-004 is skipped, so another verify run changes nothing.
 
 ## Open requirements
 
@@ -38,9 +42,10 @@ Target REQ-FN-004 — but run it only after the owner has published for real; no
 
 ## Known blockers
 
-- REQ-FN-004 waits on the owner. Everything up to the push is verified; only a real, non-dry-run publish proves the row.
+- REQ-FN-004 waits on the owner. Everything up to the push is fixed and tested; only a real, non-dry-run publish proves the row.
+- The number for the next release is an open decision — `docs/TrBlazeUI-Decision-Request.md` holds it. nuget.org is live at 2.0.3, and the unreleased work changes existing behaviour, so the number is a signal rather than the next in sequence.
+- The `c2.0.5` release is deleted; its tag is still on the repository and is the owner's to delete, because agents never run git.
 - `/verify-trstudio` returns 404 and its page is missing from `demos/`, so REQ-UI-015's 14 checks cannot be reproduced. Its verdict rests on a run from 12 July.
-- Session telemetry stops at 2026-08-31 while runs continue; the session hook is not firing on this machine, so token totals are understated.
 
 ## Verification log
 
@@ -48,15 +53,15 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 | Date | Phase | Result | Status table |
 |---|---|---|---|
-| 2026-08-31 | Fix-issues (CI/CD) | REQ-FN-004 → Implemented; REQ-FN-005 → PARTIAL. Release 0/0 | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-08-31 | Build + verify (versioning) | REQ-FN-005 Verified — per-package MinVer removed on the owner's decision; ADR-005 superseded by ADR-008. Release 0/0 | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-09-12 | triage-and-fix | 34/35 Verified. REQ-UI-020 added; 6 rows re-verified. Build 0/0 | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-09-12 | verify-phase | 33/35 Verified. 13 PASS, 1 FAIL (REQ-NFR-001), 1 not tested (REQ-FN-004) | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-09-12 | Fix-issues + verify | REQ-NFR-001 Verified — accessibility findings 37 nodes → 0. 5 rows re-verified. Build 0/0 | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-09-12 | triage-and-fix | 34/35 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 
-- TfLens: 0 open — docs/TfLens-TrBlazeUI-Feedback.md
+- None
 
 ## Standards compliance
 
@@ -66,3 +71,5 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 - Restore the `/verify-trstudio` harness page so REQ-UI-015's spec can run again.
 - Have a person test with real assistive technology; the scanner covers only part of accessibility.
+- Re-run `tests/package/codex-agent-deployment.sh`: the session sweep removed REQ-FN-010's consumer fixture, so its test fails until the fixture is rebuilt.
+- Delete `scripts/release-*.sh` — dead code whose `components/v…` tag prefixes correspond to nothing in the build.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TrBlazeUI — Status</title>
+<title>TrBlazeUI — CI / release pipeline issues</title>
 <script>
 /* Resolve the theme BEFORE first paint (no flash). Saved choice wins; otherwise
    pick by time of day — light 07:00–19:00 local, softened dark at night. */
@@ -103,122 +103,67 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </head>
 <body>
 <button id="themeToggle" class="theme-toggle" title="Toggle light / dark">&#9790; Dark</button>
-<div class="layout">
-  <nav class="side">
-    <h1>TrBlazeUI — Status</h1>
-    <div class="sub">Last rendered: 2026-09-12</div>
-    <div class="group">Contents</div>
-    <ol>
-        <li><a href="#where-i-am">Where I am</a></li>
-        <li><a href="#next-command-to-run">Next command to run</a></li>
-        <li><a href="#open-requirements">Open requirements</a></li>
-        <li><a href="#known-blockers">Known blockers</a></li>
-        <li><a href="#verification-log">Verification log</a></li>
-        <li><a href="#library-feedback-summary">Library feedback summary</a></li>
-        <li><a href="#standards-compliance">Standards compliance</a></li>
-        <li><a href="#deferred-future">Deferred / future</a></li>
-    </ol>
-  </nav>
+<div class="layout no-toc">
   <main>
-    <h1>TrBlazeUI — Status</h1>
-    <div class="subtitle">Rendered 2026-09-12 &middot; source <code>PROJECT-STATUS.md</code></div>
-    <div class="cta-next" style="padding:20px; background:var(--cta-bg); border:2px solid var(--accent); border-radius:10px; margin:20px 0;">
-      <div style="font-size:11px; color:var(--muted); letter-spacing:.5px;">NEXT COMMAND TO RUN</div>
-      <div style="font-family:var(--mono); font-size:18px; margin-top:6px;">(owner) 1 row(s) cannot be measured here — create the data, change the acceptance line, or mark the row N/A: REQ-FN-004</div>
-    </div>
+    <h1>TrBlazeUI — CI / release pipeline issues</h1>
+    <div class="subtitle">Rendered 2026-09-12 &middot; source <code>CI-Issues.md</code></div>
+
+<p>Pipeline defects reported from a GitHub Actions run log, as opposed to the consumer feedback
+files (<code>docs/&lt;Consumer&gt;-TrBlazeUI-Feedback.md</code>) and the component issue reports. One dated entry
+per report, newest first, with the log as it was handed over.</p>
+<hr>
+<h2 id="ci-001-a-release-tag-with-any-prefix-other-than-v-kills-the-publish-2026-09-12">CI-001 — a release tag with any prefix other than <code>v</code> kills the publish (2026-09-12)<a class="anchor-link" href="#ci-001-a-release-tag-with-any-prefix-other-than-v-kills-the-publish-2026-09-12">#</a></h2>
+<p><strong>Reported by:</strong> the owner, from the failed Actions run.
+<strong>Workflow:</strong> <code>.github/workflows/publish-github-packages.yml</code>, step <em>Determine package version</em>.
+<strong>Tag:</strong> <code>c2.0.5</code> (a stray <code>c</code> where <code>v2.0.5</code> was meant).
+<strong>Rows:</strong> REQ-FN-005 (tag → version resolution), REQ-FN-004 (the publish path that shares it).</p>
+<h3 id="the-log-as-handed-over">The log, as handed over<a class="anchor-link" href="#the-log-as-handed-over">#</a></h3>
+<pre><code class="language-text">$source = "Directory.Build.props"
+Release tag: c2.0.5 -&gt; version: c2.0.5
+Exception: D:\a\_temp\df294226-435e-4df1-a5a8-40644950c219.ps1:25
+Line |
+  25 |    throw "Invalid semver version '$ver' (from $source). Expected MAJOR …
+     |    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Invalid semver version 'c2.0.5' (from release tag 'c2.0.5'). Expected MAJOR.MINOR.PATCH with an optional
+     | pre-release suffix, e.g. 1.10.0 or v1.10.0-beta.1
+Error: Process completed with exit code 1.</code></pre>
+<h3 id="reproduced">Reproduced<a class="anchor-link" href="#reproduced">#</a></h3>
+<p>The step's own script was lifted verbatim into
+<code>tests/.artifacts/verify/tagver/repro-before.ps1</code> (run material, swept after 7 days — the durable
+form of these cases is <code>tests/version/TagVersion.Tests.ps1</code>) and run on pwsh 7, the same shell the
+workflow uses. It reproduces the owner's message character for character:</p>
 <table>
+<thead><tr><th>Tag</th><th>Before the fix</th></tr></thead>
 <tbody>
-<tr><th>project</th><td>TrBlazeUI</td></tr>
-<tr><th>last_updated</th><td>2026-09-12</td></tr>
-<tr><th>current_phase</th><td>Verify — 1 not measurable, 34 of 35 verified</td></tr>
-<tr><th>last_verified_build</th><td>PASS</td></tr>
-<tr><th>last_verified_date</th><td>2026-09-12</td></tr>
+<tr><td><code>c2.0.5</code></td><td><strong>THROW</strong> — <code>Invalid semver version 'c2.0.5' (from release tag 'c2.0.5')</code></td></tr>
+<tr><td><code>v2.0.5</code></td><td>2.0.5</td></tr>
+<tr><td><code>2.0.5</code></td><td>2.0.5</td></tr>
+<tr><td><code>1.10</code></td><td>1.10.0</td></tr>
+<tr><td><code>V2.0.5</code></td><td>2.0.5</td></tr>
+<tr><td><code>release-2.0.5</code></td><td><strong>THROW</strong></td></tr>
+<tr><td><code>components/v2.0.5</code></td><td><strong>THROW</strong></td></tr>
+<tr><td><code>v2.1.1-beta.1</code></td><td>2.1.1-beta.1</td></tr>
 </tbody>
 </table>
-    <div class="toc-inline">
-      <div>Contents</div>
-      <ol>
-        <li><a href="#where-i-am">Where I am</a></li>
-        <li><a href="#next-command-to-run">Next command to run</a></li>
-        <li><a href="#open-requirements">Open requirements</a></li>
-        <li><a href="#known-blockers">Known blockers</a></li>
-        <li><a href="#verification-log">Verification log</a></li>
-        <li><a href="#library-feedback-summary">Library feedback summary</a></li>
-        <li><a href="#standards-compliance">Standards compliance</a></li>
-        <li><a href="#deferred-future">Deferred / future</a></li>
-      </ol>
-    </div>
-<h2 id="where-i-am">Where I am<a class="anchor-link" href="#where-i-am">#</a></h2>
-<p>34 of 35 rows verified, none failing. Today's reported CI failure is fixed: a release
-tag with any prefix other than <code>v</code> killed the publish, so the tag-to-version rule now
-lives once in <code>scripts/TagVersion.ps1</code>, strips any non-digit prefix with a warning,
-and is tested on every push. REQ-FN-005 is re-verified. One row is left: publishing
-the packages to nuget.org, which only a real publish can close.</p>
-<h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2>
-<p>Claude Code:</p>
-<pre><code>(owner) 1 row(s) cannot be measured here — create the data, change the acceptance line, or mark the row N/A: REQ-FN-004</code></pre>
-<p>OpenCode:</p>
-<pre><code>(owner) 1 row(s) cannot be measured here — create the data, change the acceptance line, or mark the row N/A: REQ-FN-004</code></pre>
-<p>Every test carrying REQ-FN-004 is skipped, so another verify run changes nothing.</p>
-<h2 id="open-requirements">Open requirements<a class="anchor-link" href="#open-requirements">#</a></h2>
-<table>
-<thead><tr><th>Status</th><th>Count</th></tr></thead>
-<tbody>
-<tr><td>Not Started</td><td>0</td></tr>
-<tr><td>In Progress</td><td>0</td></tr>
-<tr><td>Implemented</td><td>1</td></tr>
-<tr><td>Needs re-verify</td><td>0</td></tr>
-<tr><td>Blocked</td><td>0</td></tr>
-</tbody>
-</table>
-<ul>
-<li>[ ] REQ-FN-004 — GitHub Packages CI/CD (publish-nuget.yml + build.yml) (Implemented)
+<h3 id="root-cause">Root cause<a class="anchor-link" href="#root-cause">#</a></h3>
+<p><code>$ver = $tag -replace '^v', ''</code> strips a single leading <code>v</code> and nothing else, so any other
+prefix survives into the semver gate and the step throws. Two consequences, only the first of
+which the owner saw:</p>
+<ol>
+<li><strong>The release is already published when the run dies.</strong> A GitHub Release is an outward-facing event — it notifies watchers and the tag is public. Recovering means deleting the release and the tag and cutting them again, so failing here is far more expensive than normalising the digits, which are unambiguous. The file already takes the normalising line for a two-part tag (<code>1.10</code> → <code>1.10.0</code>) with exactly that reasoning.
 </li>
-</ul>
-<h2 id="known-blockers">Known blockers<a class="anchor-link" href="#known-blockers">#</a></h2>
-<ul>
-<li>REQ-FN-004 waits on the owner. Everything up to the push is fixed and tested; only a real, non-dry-run publish proves the row.
+<li><strong>A bad tag left in place poisons later releases from <code>main</code>.</strong> <code>publish-nuget.yml</code> resolves a branch or SHA ref through <code>git describe --tags --abbrev=0</code>, which returns the nearest tag — <code>c2.0.5</code>. The same single-<code>v</code> strip sits at line 127 of that file, so <em>every</em> nuget.org publish with <code>ref: main</code> fails the same way for as long as <code>c2.0.5</code> is the newest reachable tag, whether or not the owner ever cuts a prefixed tag again. <code>scripts/release-*.sh</code> (dead code, RELEASE.md) writes <code>components/v…</code>-style tags, which fail identically.
 </li>
-<li>The number for the next release is an open decision — <code>docs/TrBlazeUI-Decision-Request.md</code> holds it. nuget.org is live at 2.0.3, and the unreleased work changes existing behaviour, so the number is a signal rather than the next in sequence.
-</li>
-<li>The <code>c2.0.5</code> release is deleted; its tag is still on the repository and is the owner's to delete, because agents never run git.
-</li>
-<li><code>/verify-trstudio</code> returns 404 and its page is missing from <code>demos/</code>, so REQ-UI-015's 14 checks cannot be reproduced. Its verdict rests on a run from 12 July.
-</li>
-</ul>
-<h2 id="verification-log">Verification log<a class="anchor-link" href="#verification-log">#</a></h2>
-<p>Last five passes; older passes live in <code>docs/metrics/gates.jsonl</code>.</p>
-<table>
-<thead><tr><th>Date</th><th>Phase</th><th>Result</th><th>Status table</th></tr></thead>
-<tbody>
-<tr><td>2026-08-31</td><td>Build + verify (versioning)</td><td>REQ-FN-005 Verified — per-package MinVer removed on the owner's decision; ADR-005 superseded by ADR-008. Release 0/0</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-<tr><td>2026-09-12</td><td>triage-and-fix</td><td>34/35 Verified. REQ-UI-020 added; 6 rows re-verified. Build 0/0</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-<tr><td>2026-09-12</td><td>verify-phase</td><td>33/35 Verified. 13 PASS, 1 FAIL (REQ-NFR-001), 1 not tested (REQ-FN-004)</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-<tr><td>2026-09-12</td><td>Fix-issues + verify</td><td>REQ-NFR-001 Verified — accessibility findings 37 nodes → 0. 5 rows re-verified. Build 0/0</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-<tr><td>2026-09-12</td><td>triage-and-fix</td><td>34/35 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-</tbody>
-</table>
-<h2 id="library-feedback-summary">Library feedback summary<a class="anchor-link" href="#library-feedback-summary">#</a></h2>
-<ul>
-<li>None
-</li>
-</ul>
-<h2 id="standards-compliance">Standards compliance<a class="anchor-link" href="#standards-compliance">#</a></h2>
-<ul>
-<li>Last check 2026-09-12: 0 findings, see the checklist Remarks.
-</li>
-</ul>
-<h2 id="deferred-future">Deferred / future<a class="anchor-link" href="#deferred-future">#</a></h2>
-<ul>
-<li>Restore the <code>/verify-trstudio</code> harness page so REQ-UI-015's spec can run again.
-</li>
-<li>Have a person test with real assistive technology; the scanner covers only part of accessibility.
-</li>
-<li>Re-run <code>tests/package/codex-agent-deployment.sh</code>: the session sweep removed REQ-FN-010's consumer fixture, so its test fails until the fixture is rebuilt.
-</li>
-<li>Delete <code>scripts/release-*.sh</code> — dead code whose <code>components/v…</code> tag prefixes correspond to nothing in the build.
-</li>
-</ul>
+</ol>
+<p>The thrown message also named neither the fix nor the fact that the release itself has to be
+re-cut.</p>
+<h3 id="fixed">Fixed<a class="anchor-link" href="#fixed">#</a></h3>
+<p><code>scripts/TagVersion.ps1</code> — one shared <code>ConvertTo-PackageVersion</code>, dot-sourced by both publish
+workflows, replacing the two drifted copies of the parsing rule. It strips <strong>any</strong> leading
+non-digit prefix, warns in the run summary when that prefix is not the standard <code>v</code>, keeps the
+two-part normalisation, and when the tag really holds no version throws a message that says what
+to do about it. Covered by <code>tests/version/TagVersion.Tests.ps1</code> (run in CI by
+<code>.github/workflows/build.yml</code>) and by the static assertions in <code>tests/verify/req-fn.spec.ts</code>.</p>
   </main>
 </div>
 

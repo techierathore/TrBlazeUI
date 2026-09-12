@@ -26,6 +26,15 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Release-tag version rule
+        shell: pwsh
+        # scripts/TagVersion.ps1 is what both publish workflows use to turn a release tag into a
+        # package version, and it only ever runs during a release - too late to learn it is
+        # broken. The tag 'c2.0.5' failed a publish on 2026-09-12 after the GitHub Release was
+        # already public (docs/CI-Issues.md CI-001), so the rule is checked on every push and PR
+        # instead. Pester-free on purpose: nothing to install.
+        run: pwsh -NoProfile -File tests/version/TagVersion.Tests.ps1
+
       - name: Restore dependencies
         run: dotnet restore TrBlazeUI.sln
 

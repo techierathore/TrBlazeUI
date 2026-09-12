@@ -24,6 +24,31 @@ function walk(dir: string, exts: string[], out: string[] = []): string[] {
 const read = (p: string) => fs.readFileSync(path.join(REPO, p), 'utf8');
 const exists = (p: string) => fs.existsSync(path.join(REPO, p));
 
+/**
+ * Runs the pwsh tests for the shared tag → version rule, returning their output, or null where
+ * no PowerShell 7 is reachable (the rule ships to a windows-latest runner, so its own tests are
+ * pwsh; the static assertions stand on their own where it is absent).
+ */
+function runTagVersionTests(): string | null {
+  const script = 'tests/version/TagVersion.Tests.ps1';
+  const attempts: [string, string[]][] = [
+    ['pwsh', ['-NoProfile', '-File', script]],
+    // WSL-on-Windows: the Windows pwsh is reachable through the interop bridge.
+    ['cmd.exe', ['/c', 'pwsh', '-NoProfile', '-File', script.replace(/\//g, '\\')]],
+  ];
+  for (const [cmd, args] of attempts) {
+    try {
+      return execFileSync(cmd, args, { cwd: REPO, encoding: 'utf8' });
+    } catch (e: any) {
+      // A missing interpreter means "cannot be checked here" and moves on; a non-zero exit from
+      // the script itself is a real failure and must surface.
+      const out = `${e.stdout || ''}${e.stderr || ''}`;
+      if (/FAIL/.test(out)) return out;
+    }
+  }
+  return null;
+}
+
 /** The most recent build log tf-build.sh wrote. */
 function latestBuildLog(): string | null {
   const dir = path.join(REPO, 'tests/.artifacts/build');
@@ -137,6 +162,13 @@ test.describe('Functional requirements', () => {
     expect(publish, 'the dry-run option states it publishes nothing').toMatch(/publishes NOTHING/i);
     expect(publish, 'the run confirms the version went live').toMatch(/Confirm the version is live on nuget\.org/i);
 
+    // A release tag with an unexpected prefix must not be able to stop this workflow either -
+    // it resolves a branch ref through `git describe`, so one bad tag on main used to fail every
+    // publish, not just the release it was cut for (docs/CI-Issues.md CI-001). The rule itself is
+    // asserted on REQ-FN-005.
+    expect(publish, 'the tag parses through the shared rule').toMatch(/ConvertTo-PackageVersion/);
+    expect(publish, 'no private v-only strip').not.toMatch(/-replace\s+'\^v'/);
+
     // Both files must parse as YAML.
     for (const f of ['.github/workflows/publish-nuget.yml', '.github/workflows/build.yml']) {
       const out = execFileSync('python3', ['-c',
@@ -165,6 +197,36 @@ test.describe('Functional requirements', () => {
     const projects = walk(path.join(REPO, 'src'), ['.csproj']);
     const withMinVer = projects.filter(p => /MinVer/.test(fs.readFileSync(p, 'utf8')));
     expect(withMinVer.map(p => path.relative(REPO, p)), 'MinVer is not back').toEqual([]);
+
+    // The tag → version rule itself. On 2026-09-12 the tag 'c2.0.5' - a stray letter where 'v'
+    // was meant - failed the publish after the GitHub Release was already public
+    // (docs/CI-Issues.md CI-001). The cause was that each workflow carried its own copy of the
+    // rule and both stripped a single leading 'v'; what this row asserted was that the version
+    // came from the tag, never that a tag actually parsed. One shared copy now, and no workflow
+    // may re-grow a private strip.
+    expect(exists('scripts/TagVersion.ps1'), 'the tag → version rule has one home').toBe(true);
+    const rule = read('scripts/TagVersion.ps1');
+    expect(rule, 'any non-digit prefix is stripped, not just v').toMatch(/\^\(\[\^0-9\]\+\)/);
+    for (const wf of ['.github/workflows/publish-nuget.yml', '.github/workflows/publish-github-packages.yml']) {
+      const text = read(wf);
+      expect(text, `${wf} dot-sources the shared rule`).toMatch(/\.\s+\.\/scripts\/TagVersion\.ps1/);
+      expect(text, `${wf} resolves through it`).toMatch(/ConvertTo-PackageVersion/);
+      expect(text, `${wf} keeps no private 'v'-only strip`).not.toMatch(/-replace\s+'\^v'/);
+    }
+
+    // The rule only ever runs during a release, which is too late to learn it is broken, so it
+    // is executable and checked on every push and pull request.
+    expect(exists('tests/version/TagVersion.Tests.ps1'), 'the rule has its own tests').toBe(true);
+    expect(read('tests/version/TagVersion.Tests.ps1'), 'the reported tag is a case').toMatch(/'c2\.0\.5'/);
+    expect(read('.github/workflows/build.yml'), 'build validation runs them').toMatch(/TagVersion\.Tests\.ps1/);
+
+    const tagVersionOut = runTagVersionTests();
+    if (tagVersionOut !== null) {
+      expect(tagVersionOut, 'the tag → version rule passes its own tests').toMatch(/0 failed/);
+      expect(tagVersionOut, 'and the cases actually ran').toMatch(/[1-9]\d* checks passed/);
+    } else {
+      console.log('REQ-FN-005: no PowerShell 7 on this host; the tag → version rule was checked statically only.');
+    }
   });
 
   test('REQ-FN-006 the AI reference imports block covers every shipped component namespace', () => {

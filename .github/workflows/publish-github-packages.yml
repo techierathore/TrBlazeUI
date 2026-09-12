@@ -36,30 +36,30 @@ jobs:
         id: version
         shell: pwsh
         run: |
-          $source = "Directory.Build.props"
+          # The tag -> version rule lives in scripts/TagVersion.ps1 and is shared with
+          # publish-nuget.yml. It used to be a private copy in each workflow, and the copies had
+          # drifted: this one stripped a single leading 'v' and nothing else, so the tag 'c2.0.5'
+          # (a stray letter where 'v' was meant) failed the 2.0.5 release on 2026-09-12 AFTER the
+          # GitHub Release had been published - which can only be undone by deleting the release
+          # and its tag. See docs/CI-Issues.md CI-001. Any non-digit prefix is now normalised
+          # with a ::warning:: naming the version that ships; a tag holding no version at all
+          # still fails, with a message that says how to recover.
+          . ./scripts/TagVersion.ps1
+
           if ("${{ github.event_name }}" -eq "release") {
             $tag = "${{ github.event.release.tag_name }}"
-            $source = "release tag '$tag'"
-            # Strip optional 'v' prefix
-            $ver = $tag -replace '^v', ''
-            # Tags are sometimes cut with only MAJOR.MINOR (e.g. '1.10'). NuGet requires
-            # three parts, so normalise rather than failing the release.
-            if ($ver -match '^\d+\.\d+$') {
-              Write-Host "Tag '$tag' has only two version parts; normalising to '$ver.0'"
-              $ver = "$ver.0"
-            }
+            $ver = ConvertTo-PackageVersion -Tag $tag -Source "release tag '$tag'"
             Write-Host "Release tag: $tag -> version: $ver"
           } else {
-            # Read base version from Directory.Build.props
+            # Read the base version from Directory.Build.props and suffix the CI pre-release
+            # stem. The base goes through the same rule so a broken props value fails here with
+            # a usable message rather than inside dotnet pack.
             [xml]$props = Get-Content "Directory.Build.props"
-            $base = $props.Project.PropertyGroup.Version
+            $base = ($props.Project.PropertyGroup.Version | Where-Object { $_ }) -as [string]
+            $base = ConvertTo-PackageVersion -Tag $base -Source "the <Version> in Directory.Build.props" `
+                      -Advice "To recover: fix <Version> in Directory.Build.props (see RELEASE.md)."
             $ver = "$base-ci.${{ github.run_number }}"
             Write-Host "CI build: base=$base -> version: $ver"
-          }
-
-          # Validate semver format (with optional pre-release)
-          if ($ver -notmatch '^\d+\.\d+\.\d+(-[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*)?$') {
-            throw "Invalid semver version '$ver' (from $source). Expected MAJOR.MINOR.PATCH with an optional pre-release suffix, e.g. 1.10.0 or v1.10.0-beta.1"
           }
 
           Write-Host "PACKAGE_VERSION=$ver"

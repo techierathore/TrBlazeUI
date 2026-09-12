@@ -20,7 +20,23 @@ TrBlazeUI uses **shared versioning** — all five packages are published with th
 2. The workflow extracts the version from the tag (stripping an optional `v` prefix)
 3. All packages are built and published with that exact version
 
-**Tag format:** plain semver — `1.0.4`, `2.0.0`, `1.1.0-beta.1`
+**Tag format:** plain semver — `1.0.4`, `2.0.0`, `1.1.0-beta.1`, with an optional `v`.
+
+**A mistyped prefix no longer kills the release.** Both publish workflows resolve the tag through
+the one shared rule in `scripts/TagVersion.ps1`, which strips **any** leading non-digit prefix and
+raises a warning in the run summary naming the version that is actually shipping. `c2.0.5`,
+`release-2.0.5` and `components/v2.0.5` all publish **2.0.5**. This is deliberate: a GitHub Release
+is public the moment it is created, and undoing one means deleting the release and its tag, so a
+tag whose digits are unambiguous is normalised rather than failed. Cut tags in the documented form
+anyway — the warning is there to be noticed.
+
+A tag holding no version at all (`latest`, `main`, `v2`) still fails the run before anything is
+built or pushed, with a message saying to delete the release and its tag and re-cut both.
+
+> A bad tag used to be worse than one failed run. `publish-nuget.yml` resolves a branch or SHA ref
+> through `git describe --tags --abbrev=0`, which returns the nearest tag — so a prefixed tag left
+> sitting on `main` failed **every** later publish with `ref: main`, not only the release it was
+> cut for. Logged as CI-001 in `docs/CI-Issues.md`.
 
 ### CI Builds (Push to master)
 
@@ -119,6 +135,19 @@ Follow [Semantic Versioning](https://semver.org/):
 
 Otherwise, ensure the GitHub Release tag is a new version. The `--skip-duplicate` flag on `dotnet nuget push` silently skips packages that already exist — if the version didn't change, nothing new gets published.
 
+### `Cannot read a version out of release tag '…'`
+
+The tag holds no version the workflows can use. Nothing was built and nothing was pushed. Delete
+the GitHub Release **and its tag**, re-cut both with a valid tag (`v2.1.1`), then publish again.
+
+To check a tag before cutting it:
+
+```pwsh
+. ./scripts/TagVersion.ps1
+ConvertTo-PackageVersion -Tag 'v2.1.1'
+pwsh -NoProfile -File tests/version/TagVersion.Tests.ps1   # the whole rule, 28 cases
+```
+
 ### Packages not appearing after release
 
 - Check the GitHub Actions workflow run for errors
@@ -129,6 +158,13 @@ Otherwise, ensure the GitHub Release tag is a new version. The `--skip-duplicate
 
 This is expected. Local builds use the version from `Directory.Build.props` directly, while CI overrides it via `-p:Version=` with the release tag (or the `-ci.<run>` pre-release stem).
 
-## Legacy Scripts
+## Scripts
+
+`scripts/TagVersion.ps1` is **live**: it holds the single tag → version rule that both publish
+workflows dot-source, and `tests/version/TagVersion.Tests.ps1` covers it (run by
+`.github/workflows/build.yml` on every push and pull request). Change the rule there, once — the
+`c2.0.5` failure happened because each workflow had its own copy and they had drifted.
+
+### Legacy Scripts
 
 The `scripts/release-*.sh` files are legacy from a planned per-package MinVer-based release system that was **never adopted** — MinVer was implemented and removed on 2026-08-31 when shared versioning was confirmed as the model (BRD-43). The per-package tag prefixes these scripts write (`components/v`, `primitives/v`, …) correspond to nothing in the build. They are not used; all releases go through GitHub Releases as described above. Treat them as dead code pending deletion.
