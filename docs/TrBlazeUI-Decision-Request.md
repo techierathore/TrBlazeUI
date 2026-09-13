@@ -4,9 +4,13 @@
 |---|---|
 | App | TrBlazeUI |
 | Written | 2026-09-12 |
-| Waiting on | 1 decision. Nothing has been changed yet. |
+| Waiting on | Nothing. Answered 2026-09-13. |
 
 ## What happened
+
+**Answered 2026-09-13: released as 2.0.6**, live on nuget.org. The original request is kept below.
+
+---
 
 You asked why I suggested `v2.1.1` for the next release. I should not have suggested
 any number. The changelog says the release number is yours to assign when you cut the

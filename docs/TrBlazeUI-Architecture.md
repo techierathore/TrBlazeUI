@@ -1,6 +1,6 @@
 # TrBlazeUI — Architecture
 
-**Last updated:** 2026-08-11 (handoff — as-built at 2.1.0)
+**Last updated:** 2026-09-13 (handoff — as-built at 2.0.6, live on nuget.org)
 **Status:** Current (post-implementation). No structural change since the 2026-06-30 brownfield capture; the deltas are additive — 9 new component families (79 total), the full Tailwind utility scale in the shipped bundle, and two new verification tools (`tools/splat-audit`, `tools/token-contrast.py`) that turn previously-asserted invariants into measured ones.
 
 ## Table of Contents
@@ -33,7 +33,7 @@ TrBlazeUI is a **Blazor UI component library** (not an application) — a rename
 | HTML sanitization | HtmlSanitizer | 9.0.892 | Security layer for RichTextEditor output |
 | Versioning | (none - MSBuild property) | - | Shared version for all 5 packages, taken from the release tag and passed as `-p:Version=`; `Directory.Build.props` holds the local base (BRD-43) |
 | Blazor packages | Microsoft.AspNetCore.Components.* | 10.0.2 | `.Web`, `.WebAssembly`, `.WebAssembly.DevServer`, `.WebAssembly.Server` |
-| Distribution | GitHub Packages (NuGet) | — | `nuget.pkg.github.com/techierathore` |
+| Distribution | nuget.org (public releases) + GitHub Packages (CI builds) | — | nuget.org live at 2.0.6; `nuget.pkg.github.com/techierathore` carries the `-ci.*` builds |
 | AI tooling | TrBlazeUI agent skills | — | `/trblazeui` Claude Code + OpenCode skills in `docs/skills/` |
 
 **Build environment:** the reference machine is WSL-on-Windows; builds run via the Windows dotnet (`cmd.exe /c "dotnet build ..."`) with `-p:CI=true` to skip the Tailwind step (pre-built CSS is committed). This application does **not** support hot-reload — build and restart to test changes.
@@ -149,7 +149,7 @@ flowchart LR
 
 ## 6. Deployment architecture
 
-There is no server deployment. "Deployment" means **publishing NuGet packages** to GitHub Packages via GitHub Actions, plus running the demo apps locally.
+There is no server deployment. "Deployment" means **publishing NuGet packages** through GitHub Actions: public releases to nuget.org via `publish-nuget.yml` (live at 2.0.0, 2.0.3 and 2.0.6), CI builds to GitHub Packages, plus running the demo apps locally.
 
 ```mermaid
 flowchart LR
@@ -176,7 +176,7 @@ flowchart LR
 - **ADR-008 — Shared versioning from the release tag (2026-08-31).** All five packages share one version, resolved by the publish workflows from the release tag and applied with `-p:Version=`. *Why MinVer was rejected after being built:* every publish path already resolves exactly one explicit version, so MinVer's derivation could never reach a published package — and because MinVer assigns the version in an MSBuild **target**, its presence makes a command-line `-p:Version=` **silently ignored**. That would have introduced an invisible way for the release version to stop working, which is the same class of defect that had already frozen NuGet.org at 2.0.0. The measured precedence is recorded in `RELEASE.md`. Consequence: `scripts/release-*.sh` and their `<package>/v` tag prefixes correspond to nothing in the build and are dead code.
 - **ADR-006 — Universal attribute splatting (`CaptureUnmatchedValues`).** Retrofitted across components after consumer apps hit runtime `InvalidOperationException` passing standard HTML attributes; completed catalog-wide in 2.1.0 and enforced by `tools/splat-audit`, which fails if any public component lacks it.
 - **ADR-007 — Reactive portal refresh.** `PortalService.RefreshPortal` + `OnPortalsChanged` so `PortalHost` (a layout sibling, not a descendant) re-renders on internal overlay state changes. Reason: fix the AppStudio-reported "static dialog" blocker.
-- **ADR-008 — GitHub Packages distribution under `techierathore`.** Chosen over nuget.org for the rename/beta phase; consumers configure a PAT-authenticated source.
+- **ADR-008 — GitHub Packages distribution under `techierathore`.** Chosen over nuget.org for the rename/beta phase; consumers configure a PAT-authenticated source. *Superseded for public releases:* nuget.org is now the public feed (2.0.0, 2.0.3, 2.0.6, published through `publish-nuget.yml`); GitHub Packages keeps only the CI builds.
 - **ADR-009 — Rename BlazorUI/BlazorBlueprint → TrBlazeUI.** Namespaces, package names, CSS file, and service-registration method all renamed for the v2.0 fork; NOTICE retains original attribution per Apache 2.0.
 
 ## 8. Target architecture
@@ -202,4 +202,4 @@ No structural change is in flight. The library is feature-complete for its curre
 - `docs/Coding-Standards.md` — naming/field conventions baseline.
 
 ---
-Last updated: 2026-06-30
+Last updated: 2026-09-13

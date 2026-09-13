@@ -124,13 +124,13 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
     <div class="subtitle">Rendered 2026-09-13 &middot; source <code>PROJECT-STATUS.md</code></div>
     <div class="cta-next" style="padding:20px; background:var(--cta-bg); border:2px solid var(--accent); border-radius:10px; margin:20px 0;">
       <div style="font-size:11px; color:var(--muted); letter-spacing:.5px;">NEXT COMMAND TO RUN</div>
-      <div style="font-family:var(--mono); font-size:18px; margin-top:6px;">(owner) 1 row(s) cannot be measured here — create the data, change the acceptance line, or mark the row N/A: REQ-FN-004</div>
+      <div style="font-family:var(--mono); font-size:18px; margin-top:6px;">Manual UAT per docs/TrBlazeUI-UsageGuide.md smoke checklist.</div>
     </div>
 <table>
 <tbody>
 <tr><th>project</th><td>TrBlazeUI</td></tr>
 <tr><th>last_updated</th><td>2026-09-13</td></tr>
-<tr><th>current_phase</th><td>Verify — 1 not measurable, 34 of 35 verified</td></tr>
+<tr><th>current_phase</th><td>Handoff — 35 of 35 verified</td></tr>
 <tr><th>last_verified_build</th><td>PASS</td></tr>
 <tr><th>last_verified_date</th><td>2026-09-13</td></tr>
 </tbody>
@@ -149,41 +149,34 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
       </ol>
     </div>
 <h2 id="where-i-am">Where I am<a class="anchor-link" href="#where-i-am">#</a></h2>
-<p>34 of 35 rows verified, none failing. All 15 functional and non-functional rows were
-re-checked against the running demo today: 14 passed, including the accessibility scan
-and the Codex agent packaging, whose test setup was rebuilt first. The one row left is
-publishing the packages to nuget.org. Its test can only be skipped here, because only a
-real publish proves it.</p>
+<p>All 35 rows are verified and version 2.0.6 is live on nuget.org. Handoff is done: the
+UsageGuide, DevGuide, Architecture and changelog now describe 2.0.6 as released, with
+fresh screenshots of every screen the last two consumer-feedback passes changed. The
+library is ready for your UAT walk-through.</p>
 <h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2>
 <p>Claude Code:</p>
-<pre><code>(owner) 1 row(s) cannot be measured here — create the data, change the acceptance line, or mark the row N/A: REQ-FN-004</code></pre>
+<pre><code>Manual UAT per docs/TrBlazeUI-UsageGuide.md smoke checklist.</code></pre>
 <p>OpenCode:</p>
-<pre><code>(owner) 1 row(s) cannot be measured here — create the data, change the acceptance line, or mark the row N/A: REQ-FN-004</code></pre>
-<p>Every test carrying REQ-FN-004 is skipped, so another verify run changes nothing until the owner runs a real publish.</p>
+<pre><code>Manual UAT per docs/TrBlazeUI-UsageGuide.md smoke checklist.</code></pre>
+<p>After UAT passes, set <code>current_phase: Released</code> in this file yourself.</p>
 <h2 id="open-requirements">Open requirements<a class="anchor-link" href="#open-requirements">#</a></h2>
 <table>
 <thead><tr><th>Status</th><th>Count</th></tr></thead>
 <tbody>
 <tr><td>Not Started</td><td>0</td></tr>
 <tr><td>In Progress</td><td>0</td></tr>
-<tr><td>Implemented</td><td>1</td></tr>
+<tr><td>Implemented</td><td>0</td></tr>
 <tr><td>Needs re-verify</td><td>0</td></tr>
 <tr><td>Blocked</td><td>0</td></tr>
 </tbody>
 </table>
 <ul>
-<li>[ ] REQ-FN-004 — GitHub Packages CI/CD (publish-nuget.yml + build.yml) (Implemented)
+<li>None
 </li>
 </ul>
 <h2 id="known-blockers">Known blockers<a class="anchor-link" href="#known-blockers">#</a></h2>
 <ul>
-<li>REQ-FN-004 waits on the owner. Everything up to the push is fixed and tested; only a real, non-dry-run publish proves the row.
-</li>
-<li>The number for the next release is an open decision — <code>docs/TrBlazeUI-Decision-Request.md</code> holds it. nuget.org is live at 2.0.3, and the unreleased work changes existing behaviour, so the number is a signal rather than the next in sequence.
-</li>
-<li>The <code>c2.0.5</code> release is deleted; its tag is still on the repository and is the owner's to delete, because agents never run git.
-</li>
-<li><code>/verify-trstudio</code> returns 404 and its page is missing from <code>demos/</code>, so REQ-UI-015's 14 checks cannot be reproduced. Its verdict rests on a run from 12 July.
+<li>None
 </li>
 </ul>
 <h2 id="verification-log">Verification log<a class="anchor-link" href="#verification-log">#</a></h2>
@@ -191,11 +184,11 @@ real publish proves it.</p>
 <table>
 <thead><tr><th>Date</th><th>Phase</th><th>Result</th><th>Status table</th></tr></thead>
 <tbody>
-<tr><td>2026-09-12</td><td>verify-phase</td><td>33/35 Verified. 13 PASS, 1 FAIL (REQ-NFR-001), 1 not tested (REQ-FN-004)</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-<tr><td>2026-09-12</td><td>Fix-issues + verify</td><td>REQ-NFR-001 Verified — accessibility findings 37 nodes → 0. 5 rows re-verified. Build 0/0</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-09-12</td><td>triage-and-fix</td><td>34/35 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-09-13</td><td>triage-and-fix</td><td>34/35 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-09-13</td><td>verify-phase</td><td>34/35 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-09-13</td><td>verify-phase</td><td>35/35 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-09-13</td><td>handoff-phase</td><td>35/35 Verified. Ready for UAT; 2.0.6 live on nuget.org. Build 0/0</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 </tbody>
 </table>
 <h2 id="library-feedback-summary">Library feedback summary<a class="anchor-link" href="#library-feedback-summary">#</a></h2>
@@ -210,11 +203,19 @@ real publish proves it.</p>
 </ul>
 <h2 id="deferred-future">Deferred / future<a class="anchor-link" href="#deferred-future">#</a></h2>
 <ul>
-<li>Restore the <code>/verify-trstudio</code> harness page so REQ-UI-015's spec can run again.
+<li>Delete the stray <code>c2.0.5</code> tag (owner; agents never run git).
 </li>
-<li>Have a person test with real assistive technology; the scanner covers only part of accessibility.
+<li>Restore the <code>/verify-trstudio</code> page so REQ-UI-015's spec runs again.
 </li>
-<li>Delete <code>scripts/release-*.sh</code> — dead code whose <code>components/v…</code> tag prefixes correspond to nothing in the build.
+<li>Have a person test with real assistive technology.
+</li>
+<li>Fix the overlapping badge matrix on the <code>/verify-tflens-3</code> test page (REQ-UI-020 Remark).
+</li>
+<li>Bring the Architecture and DevGuide up to the current templates through <code>*amend-docs</code>.
+</li>
+<li>Set the local fallback version in <code>Directory.Build.props</code>; it still says 2.1.0.
+</li>
+<li>Delete the unused <code>scripts/release-*.sh</code>.
 </li>
 </ul>
   </main>

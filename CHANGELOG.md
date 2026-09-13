@@ -11,9 +11,13 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
-> The version number for this section is assigned by the owner when the release is cut — it comes
-> from the **release tag**, not from `Directory.Build.props` (which is only the local-build
-> fallback). Do not write a number here speculatively.
+Nothing yet.
+
+## [2.0.6] — 2026-09-13
+
+> Published to nuget.org on 2026-09-13 from the release tag `v2.0.6`. All five packages are listed
+> at 2.0.6 and each was packed from the commit that tag points at. Everything in this section,
+> including the TfLens TR-036…TR-038 fixes, was confirmed present in the published packages.
 
 Consumer-feedback release closing the TfLens findings in `docs/TfLens-TrBlazeUI-Feedback.md`.
 Verified 2026-08-31: Release build 0 warnings / 0 errors; **44/44** headless-Chromium checks
@@ -296,7 +300,7 @@ existing trigger would be a silent breaking change — and the row recipe is now
 
 ---
 
-## [2.1.0] — unreleased
+## [2.1.0] — never published under this number; shipped in 2.0.3 (2026-08-25)
 
 Consumer-feedback release closing the TechieBlog findings recorded in
 `docs/TechieBlog-TrBlazeUI-Feedback.md` (TR-001 … TR-065).
@@ -447,7 +451,7 @@ Every fix and every new component is demonstrated in the demo apps, not just des
 
 ---
 
-## [2.0.0] — unreleased
+## [2.0.0] — published to nuget.org
 
 Consumer-feedback release closing the AstroLyfe UAT-2/UAT-3 findings (`REQ-UI-016`).
 Verified 2026-07-21: Release build 0 warnings / 0 errors; 21/21 headless-Chromium checks.

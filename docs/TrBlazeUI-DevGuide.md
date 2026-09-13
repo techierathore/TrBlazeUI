@@ -1,7 +1,7 @@
 # TrBlazeUI — Developer Guide (as-built screen map)
 
-**Last updated:** 2026-08-25 (targeted runtime verification)
-**Verification status:** ✅ **RUNTIME-VERIFIED.** Anonymous demo visitor exercised `/components/dialog` and `/verify-techieblog` on **2026-08-25** at desktop and 390px. Nested Dialog/Select behavior, focus, mouse/keyboard interaction, attribute forwarding, component feedback cases, render status, layout bounds and zero horizontal overflow passed (`ui-ui004.spec.js`; `ui-techieblog.spec.js` **76/76**). Release build: **0 warnings / 0 errors**.
+**Last updated:** 2026-09-13 (handoff — as-built at 2.0.6)
+**Verification status:** ✅ **RUNTIME-VERIFIED.** Anonymous demo visitor drove the 8 screens changed by the TfLens passes on **2026-09-13** at 1366 and 390 wide, plus the phone menu at 390: all render, 0 console errors, 0 sideways scroll (screenshots in §6.3). Acceptance suite 33/33; Release build **0 warnings / 0 errors**. Earlier screens were last runtime-verified on 2026-08-25.
 
 > **What this document is.** The screen-by-screen, as-built map a developer uses to chase a bug or catch AI-hallucinated code. TrBlazeUI is a **component library with a demo application** and has **no database, no API, no stored procedures, and no auth** — so the usual *page → service → data-access → proc* lineage collapses to **demo page → demo-shared composition → library component → primitive → JS interop / service**. There is exactly one role: the **anonymous demo visitor**.
 
@@ -93,6 +93,42 @@ Each demo page lives under `demos/TrBlazeUI.Demo.Shared/Pages/` and composes one
 | Item | `/components/item` | `Pages/Components/ItemDemo.razor` | `Item`, `ItemGroup`, `ItemSeparator` | 2.1.0: `role="listitem"` inside `ItemGroup`; separator leaves the a11y tree |
 | Typography | `/components/typography` | `Pages/Components/TypographyDemo.razor` | `Typography*` | 2.1.0: `Size` replaces baked-in size classes; `ClassNames.cn` is variant-aware |
 
+### 2.0.6 screens (changed by REQ-UI-019 and REQ-UI-020, the TfLens passes — runtime-verified 2026-09-13)
+
+| Screen | Route | Demo page file | Library surface exercised | Seen 2026-09-13 |
+|--------|-------|----------------|---------------------------|-----------------|
+| Bar chart | `/charts/bar` | `Pages/Charts/BarChartDemo.razor` | `BarChart` → `ChartBase` → Blazor-ApexCharts | renders at 1366 and 390 |
+| Badge | `/components/badge` | `Pages/Components/BadgeDemo.razor` | `Badge` (`As`, `Wrap`, `Truncate`) → `ClassNames.cn` → `TailwindMerge` | renders at 1366 and 390 |
+| Select | `/components/select` | `Pages/Components/SelectDemo.razor` | `Select` → `Primitives.Select.SelectContent` | renders; leaving the page logs no server error |
+| NativeSelect | `/components/native-select` | `Pages/Components/NativeSelectDemo.razor` | `NativeSelect` → `TailwindMerge.IsValidClassName` (chevron class) | renders with its arrow |
+| AlertDialog | `/components/alert-dialog` | `Pages/Components/AlertDialogDemo.razor` | `AlertDialog` → Dialog primitive (`CloseOnEscape`, `Modal`) | renders at 1366 and 390 |
+| DataTable | `/components/datatable` | `Pages/Components/DataTableDemo.razor` | `DataTable` (`ShowPagination`, `SearchText`, `ShowColumnChooser`), `DataTableColumn.Align` | renders at 1366 and 390 |
+| Phone menu | `/` at 390 | `Shared/MainLayout.razor` | `SidebarProvider` → `--sidebar-width-mobile` | renders, 288px wide |
+| TfLens harness 2 | `/verify-tflens-2` | `Pages/VerifyTfLens2.razor` | fixture for `tests/verify/ui-tflens-2.spec.js` (TR-028…TR-035) | renders; **not consumer-facing** |
+| TfLens harness 3 | `/verify-tflens-3` | `Pages/VerifyTfLens3.razor` | fixture for `tests/verify/ui-tflens-3.spec.js` (TR-036…TR-038) | renders; ⚠ badge matrix overlaps at 1280 (§5); **not consumer-facing** |
+
+Call chain (chart data labels): `BarChart.razor.cs` `OnParametersSet` → `ChartBase.CreateBaseOptions` → `ChartBase.FinalizeOptions` → `BarChart.razor` built-in `ApexPointSeries ShowDataLabels="@DefaultShowDataLabels"` → Blazor-ApexCharts.
+
+Call chain (badge classes): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → `TailwindMerge.Merge` → `ComputeBaseUtilityGroup`.
+
+**Where to break**
+
+| File:line | Function | Watch | It should hold |
+|---|---|---|---|
+| `src/TrBlazeUI.Components/Components/Chart/Core/ChartBase.cs:366` | `CreateBaseOptions` | `options.DataLabels.Enabled` | `true` whenever `ShowDataLabels` is `true` (set at line 412) |
+| `src/TrBlazeUI.Components/Components/Chart/Core/ChartBase.cs:434` | `FinalizeOptions` | `DefaultShowDataLabels` (declared line 296) | the final label switch, after `OptionsConfigurator` (line 144) and `Options` (line 126) |
+| `src/TrBlazeUI.Components/Components/Chart/Types/BarChart.razor:31` | built-in series markup | `ShowDataLabels` on `ApexPointSeries` | the same value as `DefaultShowDataLabels`; the five sibling chart types carry the same line |
+| `src/TrBlazeUI.Components/Components/Chart/Core/ChartContainer.razor.cs:57` | `Bare` parameter | `Bare` | `true` drops the card border, shadow and padding |
+| `src/TrBlazeUI.Components/Utilities/TailwindMerge.cs:401` | `ComputeBaseUtilityGroup` | return value for `text-ellipsis` | `"text-overflow"` (table entry line 112), never `"text-color"` (colour check line 434) |
+| `src/TrBlazeUI.Components/Utilities/TailwindMerge.cs:218` | `IsValidClassName` | result for `bg-[url('data:image/svg+xml;…')]` | `true`; only executable payloads return `false` |
+| `src/TrBlazeUI.Components/Components/Badge/Badge.razor.cs:143` | `CssClass` | the merged class string | the variant's text colour **and** the overflow classes from `OverflowClass` (line 128) |
+| `src/TrBlazeUI.Components/Components/Badge/Badge.razor.cs:81` | `As` parameter | `As` | `"span"` unless the caller asked for `"div"` |
+| `src/TrBlazeUI.Primitives/Primitives/Select/SelectContent.razor:294` | `DisposeAsync` | a `JSDisconnectedException` | caught at lines 313 and 325, never logged as unhandled |
+| `src/TrBlazeUI.Components/Components/DataTable/DataTable.razor.cs:211` | `SearchText` parameter | `SearchText` | the text the page's own filter box holds; `ShowColumnChooser` at line 228 |
+| `src/TrBlazeUI.Components/Components/Collapsible/CollapsibleTrigger.razor.cs:64` | `Class` parameter | `Class` | lands on the rendered `<button>` |
+| `DataTableColumn.Align` | `{unresolved — the parameter was not found under that name in DataTable/*.cs; the column behaviour itself is runtime-verified by req-ui-020.spec.ts TR-031}` | — | — |
+| `SidebarProvider` width parameters | `{unresolved — Width/MobileWidth/IconWidth not found under those names in SidebarProvider.razor.cs; the 288px phone menu is runtime-verified}` | — | — |
+
 _(The remaining ~68 component demos and ~14 primitive demos follow the identical lineage shape; they are enumerated in the demo `Pages/Components/` and `Pages/Primitives/` folders and indexed in the BRD §9 feature catalog.)_
 
 ## 4. Library lineage — how a styled component resolves
@@ -111,6 +147,8 @@ A reader chasing a bug starts at the demo page, drops into the styled component 
 
 ## 5. Known issues
 
+- **⚠ DevGuide 2026-09-13 — test page layout (`REQ-UI-020`):** on `/verify-tflens-3`, `demos/TrBlazeUI.Demo.Shared/Pages/VerifyTfLens3.razor` (the TR-038 badge matrix), the default Secondary and Destructive badges hold their label on one line as designed and spill out of their 150px boxes over the Truncate column at 1280. Test page only; it ships in no package.
+- **✅ FIXED 2026-09-12 and 2026-09-13, shipped in 2.0.6 — TfLens TR-028…TR-038 (`REQ-UI-020`, `REQ-UI-001`).** Chart `Options`/`OptionsConfigurator`/`ChartContainer.Bare`; chart data labels in the short form; `Badge.As`/`Wrap`/`Truncate`; `DataTableColumn.Align`; the `url(` class guard; `DataTable` `SearchText`/`ShowColumnChooser`; the phone sidebar width; and the circuit-teardown exception in `SelectContent` and five sibling primitives. Verified by `ui-tflens-2.spec.js` 37/37, `ui-tflens-3.spec.js` 70/70 and `req-ui-020.spec.ts`.
 - **✅ RESOLVED 2026-08-31 — TfLens consumer feedback (`REQ-UI-019`), fixed and awaiting release.** Verified: Release 0/0, `ui-tflens` **44/44**, all regressions green (**166/166** executed checks). Every item below is fixed; the measurements are the *pre-fix* observations kept for the record, each followed by its post-fix measurement. Triaged from `docs/TfLens-TrBlazeUI-Feedback.md`; TfLens built against **2.0.0**, so **five entries are stale** (TR-002/003/013/020/023 — fixed by the 2.1.0 REQ-UI-017 sweep; the action is *publish/upgrade*, not re-fix) and four more are substantially fixed with a residual. **Reproduced live on the Server demo** (Release 0/0, headless Chromium):
   - **TR-009 (`REQ-UI-005`, blocker)** — `/components/datatable` "Custom Cell Templates": 500 records bound with `ShowPagination="false"` render **5 body rows and no pager**. → **Fixed:** `ShowPagination` now gates the data; the harness renders all 12 rows, no pager. `DataTable.razor.cs:409-413` slices `.Skip().Take()` unconditionally; `ShowPagination` gates only the pager chrome (`:564-567`). Any grid that turns pagination off is silently truncated to `InitialPageSize` (default 5).
   - **TR-014 (`REQ-UI-004`, blocker)** — `/components/alert-dialog`: `[role="alertdialog"]` count is **1 before Escape and 1 after**. → **Fixed:** now **1 → 0**, and the `CloseOnEscape="false"` opt-out still holds. `AlertDialogContent.razor:13-19` hard-codes `CloseOnEscape="false"` with no parameter to override. Separately, `Dialog` loses Escape after a content re-render (element-level handler + a focus trap that only handles Tab); the document-level helper `click-outside.js:97 onEscapeKey` exists with **zero call sites**.
@@ -132,7 +170,7 @@ A reader chasing a bug starts at the demo page, drops into the styled component 
 - **✅ RESOLVED — SelectTrigger accessible name (TR-003, REQ-UI-014)** — _Fixed + verified 2026-07-22 (`*fix-issues`)._ The primitive `SelectTrigger` now emits a default `aria-labelledby` → the `SelectValue` span id (`GetDefaultLabelledBy()` → `SelectContext.ValueId`), giving the `<button role="combobox">` a non-empty accessible name from first render; it defers to a non-empty splatted `aria-label`/`aria-labelledby`. The styled `SelectTrigger` gains an `AriaLabel` param (emits `aria-label`, overrides the default per ARIA precedence). Verified on `/verify-ui014` (`tests/verify/ui-ui014.spec.js`, 8/8): axe `button-name` = **0 violations**; valued/placeholder/AriaLabel cases all named. Consumers can drop their per-Select `aria-label` workaround on upgrade to 2.0.1.
 - **✅ TR-014 (AstroLyfe post-upgrade) — Dialog double-offset — DEFENSIVELY HARDENED** — _Fixed 2026-07-22 (owner-requested)._ The double-offset couldn't be reproduced on current source, but `DialogContent`/`AlertDialogContent` were switched from translate-based centering to **auto-margin centering** (`fixed inset-0 m-auto grid h-fit max-h-[calc(100vh-2rem)]`) so the top can never go above `y=0` regardless of any stray `transform`/`translate` −50% offset stacking — the clipping is now structurally impossible. Slide animations dropped for zoom+fade; Sheet/Drawer untouched; `trblazeui.css` regenerated. Verified 23/23 (`ui-ui016.spec.js`): settled `transform:none` **and** `translate:none`, `top=16px` @1366/1280/390; AlertDialog centers on-screen (`top=269`).
 - **✅ RESOLVED — TR-066:** nested Dialog content renders inline within its containing document-level portal, avoiding stored-fragment disposal while preserving overlay positioning and focus containment. Runtime-confirmed 2026-08-25.
-- **Log noise on circuit teardown (cosmetic, observed 2026-08-11).** Closing a browser tab that had an open `Select` logs `JSDisconnectedException` from `SelectContent.DisposeAsync` (`src/TrBlazeUI.Primitives/Primitives/Select/SelectContent.razor:287`). It is the standard Blazor Server dispose race — the circuit is already gone when `IJSObjectReference.DisposeAsync()` runs — and has no user-visible effect, but the throw should be caught so hosts don't log a stack trace per disconnect. Deferred, not a release blocker.
+- **✅ FIXED 2026-09-13 — log noise on circuit teardown (TfLens TR-036).** Closing a page that had an open `Select` logged `JSDisconnectedException` from `SelectContent.DisposeAsync`. It is now caught at `src/TrBlazeUI.Primitives/Primitives/Select/SelectContent.razor:313` and `:325`, and the same guard was added to `DropdownMenuContent`, `PopoverContent`, `SheetContent`, `FocusManager` and `PositioningService`. Measured: 0 unhandled circuit exceptions after leaving the select, dropdown menu and popover pages.
 - **✅ RESOLVED 2.1.0 — the whole TechieBlog cycle (TR-001…TR-065, REQ-UI-017).** Catalog-wide attribute splatting (measured 344/344 + 59/59 by `tools/splat-audit`, not asserted); `Rating`/`Tabs`/`NavigationMenu`/`MarkdownEditor`/`Item` WCAG corrections; `Input`/`Textarea` keystroke loss on a Server circuit; `SelectValue` first-paint text; ordered portals so stacked dialogs are clickable by construction (TR-060); the full Tailwind utility scale in `trblazeui.css` (~906 KB min / ~97 KB gz, was ~88 KB); tokens re-solved as a contrast matrix by `tools/token-contrast.py` (18 failing pairings → 0, `--input` 1.26:1 → 3.11:1); and 9 new components. Verified 65/65 + 15/15 headless.
 - **⚠ Breaking for consumers (2.1.0):** `Rating` options changed from `<span role="radio">` to `<button role="radio">`; `TabsContent` always renders its panel element; the light `--input`/`--ring` and dark `--input`/`--accent`/`--destructive-foreground` tokens moved for contrast; the CSS bundle grew ~10×. See the CHANGELOG's "Behaviour changes to review before upgrading".
 - Status is reflected in `docs/TrBlazeUI-Checklist.md` (all REQs terminal). Screens are runtime-verified — the 2.1.0 set on 2026-08-11 (25/25), earlier key screens with screenshots in `docs/screenshots/TrBlazeUI/`; run `*devguide TrBlazeUI --update` for a fresh sweep after the next change.
@@ -173,6 +211,39 @@ Captured from the booted Blazor Server demo via headless Chromium (Playwright). 
 #### CenteredPanel (`/components/centered-panel`)
 ![CenteredPanel](screenshots/TrBlazeUI/centered-panel.png)
 
+### 6.3 The 2.0.6 changes (captured 2026-09-13 at 1366×900 and 390×844)
+
+#### Bar chart (`/charts/bar`)
+![Bar chart](screenshots/TrBlazeUI/chart-bar-2-0-6.png)
+![Bar chart at 390](screenshots/TrBlazeUI/chart-bar-2-0-6-mobile.png)
+
+#### Badge (`/components/badge`)
+![Badge](screenshots/TrBlazeUI/badge.png)
+![Badge at 390](screenshots/TrBlazeUI/badge-mobile.png)
+
+#### Select (`/components/select`)
+![Select](screenshots/TrBlazeUI/select.png)
+![Select at 390](screenshots/TrBlazeUI/select-mobile.png)
+
+#### NativeSelect (`/components/native-select`)
+![NativeSelect](screenshots/TrBlazeUI/native-select.png)
+![NativeSelect at 390](screenshots/TrBlazeUI/native-select-mobile.png)
+
+#### AlertDialog (`/components/alert-dialog`)
+![AlertDialog](screenshots/TrBlazeUI/alert-dialog.png)
+![AlertDialog at 390](screenshots/TrBlazeUI/alert-dialog-mobile.png)
+
+#### DataTable (`/components/datatable`)
+![DataTable](screenshots/TrBlazeUI/datatable-2-0-6.png)
+![DataTable at 390](screenshots/TrBlazeUI/datatable-2-0-6-mobile.png)
+
+#### Phone menu, opened (`/` at 390)
+![Phone menu](screenshots/TrBlazeUI/sidebar-phone-menu-mobile.png)
+
+#### TfLens test pages (`/verify-tflens-2`, `/verify-tflens-3`)
+![verify-tflens-2](screenshots/TrBlazeUI/verify-tflens-2.png)
+![verify-tflens-3](screenshots/TrBlazeUI/verify-tflens-3.png)
+
 ### 6.2 Earlier sampled key screens (2026-06-30; `datatable.png` recaptured 2026-07-21)
 
 #### Home (`/`)
@@ -191,4 +262,4 @@ Captured from the booted Blazor Server demo via headless Chromium (Playwright). 
 ![Icons](screenshots/TrBlazeUI/icons.png)
 
 ---
-Last updated: 2026-08-11 (handoff, 2.1.0 as-built) · RUNTIME-VERIFIED — 25/25 on the 2.1.0 screens 2026-08-11, plus 65/65 + 15/15 REQ-UI-017 gates; screenshots for the earlier sampled key screens in docs/screenshots/TrBlazeUI/
+Last updated: 2026-09-13 (handoff, 2.0.6 as-built) · RUNTIME-VERIFIED — 8 changed screens plus the phone menu on 2026-09-13 at 1366 and 390; the 2.1.0-era screens 25/25 on 2026-08-11; screenshots in docs/screenshots/TrBlazeUI/
