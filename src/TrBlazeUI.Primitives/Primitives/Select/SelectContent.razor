@@ -300,14 +300,32 @@ else
 
         await CleanupSelectAsync();
 
+        // A Blazor Server page normally ends with its circuit gone, and a module reference that
+        // belonged to a dead circuit cannot be released. That is ordinary teardown, not a fault,
+        // so it is swallowed here as DialogContent does. Unguarded, every navigation away from a
+        // page holding a Select logged "Unhandled exception in circuit" (TfLens TR-036).
         if (objClickOutsideModule != null)
         {
-            await objClickOutsideModule.DisposeAsync();
+            try
+            {
+                await objClickOutsideModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit already torn down - the module died with it.
+            }
         }
 
         if (objJsModule != null)
         {
-            await objJsModule.DisposeAsync();
+            try
+            {
+                await objJsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit already torn down - the module died with it.
+            }
         }
 
         objDotNetRef?.Dispose();

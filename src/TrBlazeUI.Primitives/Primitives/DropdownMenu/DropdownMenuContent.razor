@@ -390,19 +390,28 @@
 
         await CleanupAsync();
 
-        if (objClickOutsideModule != null)
+        // Same teardown shape as SelectContent (TfLens TR-036): on a dead circuit the module
+        // references cannot be released, and that is not an error.
+        try
         {
-            await objClickOutsideModule.DisposeAsync();
-        }
+            if (objClickOutsideModule != null)
+            {
+                await objClickOutsideModule.DisposeAsync();
+            }
 
-        if (objKeyboardNavModule != null)
-        {
-            await objKeyboardNavModule.DisposeAsync();
-        }
+            if (objKeyboardNavModule != null)
+            {
+                await objKeyboardNavModule.DisposeAsync();
+            }
 
-        if (objMatchWidthModule != null)
+            if (objMatchWidthModule != null)
+            {
+                await objMatchWidthModule.DisposeAsync();
+            }
+        }
+        catch (JSDisconnectedException)
         {
-            await objMatchWidthModule.DisposeAsync();
+            // Circuit already torn down - the modules died with it.
         }
 
         objDotNetRef?.Dispose();

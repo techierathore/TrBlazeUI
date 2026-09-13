@@ -274,6 +274,28 @@ public abstract class ChartBase<TItem> : ComponentBase where TItem : class
         : "Series";
 
     /// <summary>
+    /// Gets whether the built-in series draws data labels.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// ApexCharts rewrites <c>options.dataLabels.enabled</c> from the flags on its <b>series</b>
+    /// after everything the wrapper does, so a series that is not told to show labels switches
+    /// them off for the whole chart. The built-in series used to be given no flag at all, which
+    /// made <see cref="ShowDataLabels"/>, <c>Options.DataLabels.Enabled</c> and the
+    /// <see cref="OptionsConfigurator"/> equally unable to draw a label in the
+    /// <c>Items</c>/<c>XValue</c>/<c>YValue</c> form (TfLens TR-037).
+    /// </para>
+    /// <para>
+    /// Resolved by <see cref="FinalizeOptions"/> from the fully built options, so all three
+    /// routes now reach the series. The configurator runs last and has the final word;
+    /// <see cref="ShowDataLabels"/> set to <c>true</c> switches labels on even when
+    /// <c>Options</c> supplies its own <c>DataLabels</c> object, because
+    /// <c>DataLabels.Enabled</c> is a plain <c>bool</c> and cannot say "not set".
+    /// </para>
+    /// </remarks>
+    protected bool DefaultShowDataLabels { get; private set; }
+
+    /// <summary>
     /// Gets the message rendered in place of an empty chart canvas.
     /// </summary>
     protected string EmptyStateText =>
@@ -378,11 +400,17 @@ public abstract class ChartBase<TItem> : ComponentBase where TItem : class
             CssClass = "trblazeui-chart-tooltip"
         };
 
-        // Data labels
+        // Data labels. DataLabels.Enabled is a plain bool, so a caller who supplied a DataLabels
+        // object for its formatter or style cannot be told apart from one who switched labels off.
+        // ShowDataLabels="true" therefore turns labels on either way; it never turns them off.
         options.DataLabels ??= new DataLabels
         {
             Enabled = ShowDataLabels
         };
+        if (ShowDataLabels)
+        {
+            options.DataLabels.Enabled = true;
+        }
 
         // Title
         if (!string.IsNullOrEmpty(Title))
@@ -406,6 +434,10 @@ public abstract class ChartBase<TItem> : ComponentBase where TItem : class
     protected ApexChartOptions<TItem> FinalizeOptions(ApexChartOptions<TItem> aOptions)
     {
         OptionsConfigurator?.Invoke(aOptions);
+
+        // Read the data-label decision only now, after every route to it has had its say.
+        aOptions.DataLabels ??= new DataLabels { Enabled = ShowDataLabels };
+        DefaultShowDataLabels = aOptions.DataLabels.Enabled;
         return aOptions;
     }
 }

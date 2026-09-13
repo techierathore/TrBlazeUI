@@ -2264,7 +2264,7 @@ All six types inherit `ChartBase<TItem> where TItem : class`:
 | Class | string? | null | Additional CSS classes on the container |
 | ShowLegend | bool | true | Show the legend |
 | LegendPosition | LegendPosition | Bottom | Top, Bottom, Left, Right, Hidden |
-| ShowDataLabels | bool | false | Draw values on the chart elements |
+| ShowDataLabels | bool | false | Draw values on the chart elements. Works in both forms. In the shorthand, `Options.DataLabels.Enabled` and `OptionsConfigurator` reach the labels too. The configurator has the last word, and `true` here switches labels on even when `Options` brings its own `DataLabels` object, because `DataLabels.Enabled` is a plain `bool` and cannot say "not set". In the nested form, set `ShowDataLabels` on each `ApexPointSeries` you nest, because ApexCharts takes the label switch from the series |
 | ShowTooltip | bool | true | Tooltip on hover |
 | Title | string? | null | Chart title |
 | EnableAnimations | bool | true | Set false for large datasets |

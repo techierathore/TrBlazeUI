@@ -2,8 +2,12 @@
 // Each title starts with the checklist row id, which is how tf-verify-tests.sh maps a test to a row.
 // The measurements mirror tests/verify/ui-tflens-2.spec.js; this file is the runner-visible form.
 import { test, expect, Page } from '@playwright/test';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const BASE = process.env.BASE_URL || 'http://localhost:5213';
+const APP_LOG = process.env.APP_LOG || path.join(process.cwd(), 'tests', '.artifacts', 'verify', 'app-5213.log');
+const LABELS = '.apexcharts-datalabel, .apexcharts-datalabels text, .apexcharts-pie-label';
 
 async function openHarness(page: Page) {
   await page.goto(`${BASE}/verify-tflens-2`, { waitUntil: 'networkidle', timeout: 60000 });
@@ -178,6 +182,64 @@ test.describe('REQ-UI-020 â€” TfLens post-2.1.0 consumer-feedback fixes (TR-028â
     expect(geometry.badgeGap).toBeLessThanOrEqual(2);
   });
 
+  test('REQ-UI-020 TR-037 the chart shorthand draws data labels by every route that asks for them', async ({ page }) => {
+    await page.goto(`${BASE}/verify-tflens-3`, { waitUntil: 'networkidle', timeout: 60000 });
+    await page.waitForTimeout(3000);
+
+    const labels = (id: string) => page.locator(`[data-testid="${id}"]`).locator(LABELS);
+
+    // ShowDataLabels, Options.DataLabels.Enabled and the configurator each reach the built-in series.
+    expect(await labels('tr037-param').count()).toBeGreaterThanOrEqual(3);
+    expect(await labels('tr037-options').count()).toBeGreaterThanOrEqual(3);
+    const formatted = await labels('tr037-configurator').allTextContents();
+    expect(formatted.length).toBeGreaterThanOrEqual(3);
+    for (const text of formatted) {
+      expect(text.trim()).toMatch(/M$/);
+    }
+    // A sibling chart type takes the flag the same way.
+    expect(await labels('tr037-pie').count()).toBeGreaterThanOrEqual(1);
+    // Nothing asked for labels here, so there are none - and the bars are still drawn.
+    await expect(labels('tr037-off')).toHaveCount(0);
+    await expect(page.locator('[data-testid="tr037-off"] .apexcharts-bar-area')).toHaveCount(3);
+  });
+
+  test('REQ-UI-020 TR-038 Truncate and Wrap never change a Badge colour', async ({ page }) => {
+    await page.goto(`${BASE}/verify-tflens-3`, { waitUntil: 'networkidle', timeout: 60000 });
+    await page.waitForTimeout(1500);
+
+    const rows = await page.evaluate(() =>
+      [...document.querySelectorAll('[data-testid^="tr038-"][data-testid$="-default"]')].map(el => {
+        const variant = el.getAttribute('data-testid')!.replace(/^tr038-/, '').replace(/-default$/, '');
+        const color = (mode: string) =>
+          getComputedStyle(document.querySelector(`[data-testid="tr038-${variant}-${mode}"]`)!).color;
+        return { variant, def: color('default'), truncate: color('truncate'), wrap: color('wrap') };
+      }));
+
+    expect(rows.length).toBeGreaterThanOrEqual(7);
+    for (const row of rows) {
+      // The box paints red, so a badge that lost its own colour would read red here.
+      expect(row.def, `${row.variant} default`).not.toBe('rgb(220, 0, 0)');
+      expect(row.truncate, `${row.variant} truncate`).toBe(row.def);
+      expect(row.wrap, `${row.variant} wrap`).toBe(row.def);
+    }
+
+    const outline = page.locator('[data-testid="tr038-Outline-truncate"]');
+    await expect(outline).toHaveClass(/\btext-foreground\b/);
+    await expect(outline).toHaveClass(/\btext-ellipsis\b/);
+
+    // The merge: a non-colour text utility keeps the colour; same-axis pairs still conflict.
+    const cn = await page.locator('[data-testid^="tr038-cn-"]').allTextContents();
+    expect(cn.map(c => c.trim())).toEqual([
+      'text-foreground text-ellipsis',
+      'text-muted-foreground text-clip',
+      'text-foreground text-nowrap',
+      'text-primary-foreground text-balance',
+      'text-clip',
+      'text-nowrap',
+      'text-foreground',
+    ]);
+  });
+
   test('REQ-UI-020 the harness renders clean at 1280 and 390 with no sideways scroll', async ({ browser }) => {
     for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }]) {
       const page = await browser.newPage({ viewport });
@@ -186,6 +248,8 @@ test.describe('REQ-UI-020 â€” TfLens post-2.1.0 consumer-feedback fixes (TR-028â
       page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
 
       await openHarness(page);
+      await page.goto(`${BASE}/verify-tflens-3`, { waitUntil: 'networkidle', timeout: 60000 });
+      await page.waitForTimeout(3000);
 
       const overflow = await page.evaluate(() => ({
         scrollW: document.documentElement.scrollWidth,
@@ -272,6 +336,29 @@ test.describe('Rows the fix cycle touched', () => {
       await page.waitForTimeout(1800);
       const svgs = await page.locator('.apexcharts-svg').count();
       expect(svgs, `${route} chart renders`).toBeGreaterThan(0);
+    }
+  });
+
+  test('REQ-UI-001 TR-036 leaving a page with an opened Select logs no unhandled circuit exception', async ({ browser }) => {
+    test.skip(!fs.existsSync(APP_LOG), `server log not readable here (${APP_LOG}); set APP_LOG`);
+
+    for (const route of ['/verify-tflens-3', '/components/select']) {
+      const before = fs.readFileSync(APP_LOG, 'utf8').length;
+      const page = await browser.newPage();
+      await page.goto(`${BASE}${route}`, { waitUntil: 'networkidle', timeout: 60000 });
+      await page.waitForTimeout(2000);
+
+      await page.locator('button[role="combobox"]').first().click();
+      await expect(page.locator('[role="listbox"]').first()).toBeVisible();
+      await page.keyboard.press('Escape');
+
+      // A full navigation ends the circuit - the ordinary way a Blazor Server page ends.
+      await page.goto('about:blank');
+      await page.close();
+      await new Promise(r => setTimeout(r, 6000));
+
+      const added = fs.readFileSync(APP_LOG, 'utf8').slice(before);
+      expect((added.match(/Unhandled exception in circuit/g) || []).length, `${route} teardown`).toBe(0);
     }
   });
 

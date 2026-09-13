@@ -128,7 +128,14 @@ public class PositioningService : IPositioningService, IAsyncDisposable
 
         if (objModule != null)
         {
-            await objModule.DisposeAsync().ConfigureAwait(false);
+            try
+            {
+                await objModule.DisposeAsync().ConfigureAwait(false);
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit already torn down - the module died with it (TfLens TR-036).
+            }
         }
 
         objModuleLock.Dispose();
