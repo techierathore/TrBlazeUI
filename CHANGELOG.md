@@ -53,6 +53,14 @@ Verified 2026-08-31: Release build 0 warnings / 0 errors; **44/44** headless-Chr
   conflicted: setting a colour silently un-aligned an element and setting an alignment silently
   uncoloured it. **Both now survive together**, which changes the rendering of any element that
   passed one of each.
+- **`text-ellipsis` / `text-clip` and `text-wrap` / `text-nowrap` / `text-balance` / `text-pretty`
+  are now their own conflict groups too (TR-038).** They had the same fall-through as the alignment
+  classes, so `Badge Variant="Outline" Truncate="true"` lost `text-foreground` and inherited its
+  parent's colour. **An element that passed one of these beside a text colour now keeps both.**
+- **A shorthand chart (`Items` + `XValue` + `YValue`) now draws the data labels it asks for
+  (TR-037).** `ShowDataLabels="true"`, `Options.DataLabels.Enabled` and `OptionsConfigurator` were
+  all silently ignored in that form. **A chart that passed any of them will now show values on its
+  bars, slices or points**; drop the setting if you did not mean it.
 - **The phone sidebar is 18rem wide, not 16rem (TR-035).** `SidebarProvider`'s slid-out menu was
   sized with `--sidebar-width`; it now reads `--sidebar-width-mobile`, the token the stylesheet has
   always declared at 18rem and nothing ever read. Any app that compensated by redefining
@@ -123,6 +131,26 @@ for the first time on 2026-09-12 (axe-core, WCAG 2.1 A/AA, over `/components/sel
   no behaviour. For a checkbox drawn inside something that already owns the click and the name.
   `tabindex="-1"` is **not** a substitute: a negative tabindex still leaves an element focusable, so
   the nesting rule still fails on it — which is how this was first mis-fixed and caught.
+
+### Fixed — TfLens TR-036…TR-038 (filed 2026-09-12 against 2.1.0-ci.10)
+
+Verified 2026-09-13: build 0 warnings / 0 errors; **70/70** headless-Chromium checks
+(`tests/verify/ui-tflens-3.spec.js` on `/verify-tflens-3`) at 1280 and 390, the TR-028…TR-035
+suite `ui-tflens-2` still **37/37**, and REQ-UI-001 and REQ-UI-020 re-verified through their
+acceptance tests.
+
+- **Leaving a page that holds a `Select` logged an unhandled circuit exception (TR-036).**
+  `SelectContent.DisposeAsync` released two JavaScript module references with nothing around them,
+  so when the circuit had already gone, which is the ordinary way a Blazor Server page ends,
+  both threw `JSDisconnectedException`. It is now caught, as `DialogContent` already did. The same
+  unguarded release was also in `DropdownMenuContent`, `PopoverContent`, `SheetContent`,
+  `FocusManager` and `PositioningService`, and is fixed there as well.
+- **The chart shorthand could not draw data labels (TR-037).** ApexCharts takes the label switch
+  from its series, and the built-in series behind `Items`/`XValue`/`YValue` was never given one, so
+  it switched labels off after the wrapper had set them. The built-in series in all six chart
+  types now receives the final decision, resolved after `Options` and `OptionsConfigurator` have run.
+  The `OptionsConfigurator` example in the XML docs, which shows exactly this form, now works as written.
+- **`Truncate` removed the `Outline` badge's text colour (TR-038).** See the behaviour change above.
 
 ### Fixed — TfLens TR-028…TR-035 (filed after the 2026-08-31 reply)
 

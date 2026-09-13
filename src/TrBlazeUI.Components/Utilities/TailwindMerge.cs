@@ -105,6 +105,17 @@ public static class TailwindMerge
         ["text-start"] = "text-align",
         ["text-end"] = "text-align",
 
+        // Text Overflow and Text Wrap - two more bare `text-*` axes that are not colours. Left out
+        // of this table they matched the colour pattern as well, so `text-ellipsis` deleted a
+        // Badge's `text-foreground` under Truncate, and `text-nowrap` / `text-balance` would
+        // silently uncolour anything they were paired with (TfLens TR-038).
+        ["text-ellipsis"] = "text-overflow",
+        ["text-clip"] = "text-overflow",
+        ["text-wrap"] = "text-wrap",
+        ["text-nowrap"] = "text-wrap",
+        ["text-balance"] = "text-wrap",
+        ["text-pretty"] = "text-wrap",
+
         // Flex Wrap - a separate axis from flex-direction. Without this group,
         // "flex-wrap flex-nowrap" left both classes live and the cascade (not the caller)
         // picked the winner, so a nowrap override was silently inert (TR-027).

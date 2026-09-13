@@ -322,6 +322,10 @@ test.describe('Functional requirements', () => {
 
 test.describe('Non-functional requirements', () => {
   test('REQ-NFR-001 interactive components are keyboard operable and pass an accessibility scan', async ({ page }) => {
+    // Four page loads and four full accessibility scans take about 27 seconds on an idle machine,
+    // so the 30-second default failed this test on load alone when the whole suite ran at once
+    // (2026-09-13). The limit is about machine load, not about what the scan finds.
+    test.setTimeout(180_000);
     let AxeBuilder: any = null;
     // axe-core is installed in sibling consumer repos, not here (same arrangement ui-ui014 uses).
     for (const p of ['/mnt/c/1MyCode/AstroLyfe/node_modules/@axe-core/playwright',

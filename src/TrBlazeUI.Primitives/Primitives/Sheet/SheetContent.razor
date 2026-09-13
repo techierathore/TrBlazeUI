@@ -191,7 +191,14 @@
 
         if (objPortalModule != null)
         {
-            await objPortalModule.DisposeAsync();
+            try
+            {
+                await objPortalModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit already torn down - the module died with it (TfLens TR-036).
+            }
         }
 
         if (Context != null)

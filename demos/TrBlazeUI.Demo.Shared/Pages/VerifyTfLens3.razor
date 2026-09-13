@@ -1,0 +1,146 @@
+@page "/verify-tflens-3"
+@using ApexCharts
+@using TrBlazeUI.Components.Chart
+@using TrBlazeUI.Components.Utilities
+
+@* REQ-UI-020 / REQ-UI-001 verification harness — TfLens feedback TR-036 … TR-038
+   (docs/TfLens-TrBlazeUI-Feedback.md).
+   Not a documentation demo: every block here exists so the headless specs
+   (tests/verify/ui-tflens-3.spec.js, tests/verify/req-ui-020.spec.ts) can assert one criterion. *@
+
+<PageTitle>Verify TfLens TR-036…TR-038 - TrBlazeUI</PageTitle>
+
+<div class="p-6 space-y-10" data-testid="verify-heading">
+    <h1 class="text-2xl font-bold">TfLens TR-036…TR-038 verification harness</h1>
+
+    @* ============================ TR-037 — shorthand data labels ============================ *@
+    @* Each of the three routes to a data label, in the Items/XValue/YValue form. Before the fix
+       none of them drew a label, because the built-in series was never told to show one. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-037 · ShowDataLabels on the shorthand</h2>
+        <div data-testid="tr037-param">
+            <BarChart TItem="TokenRow" Items="@objTokens" Height="220px" ShowLegend="false"
+                      ShowDataLabels="true"
+                      XValue="@(aRow => aRow.Harness)" YValue="@(aRow => (decimal)aRow.Tokens)" />
+        </div>
+    </section>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-037 · Options.DataLabels.Enabled on the shorthand</h2>
+        <div data-testid="tr037-options">
+            <BarChart TItem="TokenRow" Items="@objTokens" Height="220px" ShowLegend="false"
+                      Options="@objLabelOptions"
+                      XValue="@(aRow => aRow.Harness)" YValue="@(aRow => (decimal)aRow.Tokens)" />
+        </div>
+    </section>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-037 · OptionsConfigurator on the shorthand, with a formatter</h2>
+        <div data-testid="tr037-configurator">
+            <BarChart TItem="TokenRow" Items="@objTokens" Height="220px" ShowLegend="false"
+                      OptionsConfigurator="@ConfigureLabels"
+                      XValue="@(aRow => aRow.Harness)" YValue="@(aRow => (decimal)aRow.Tokens)" />
+        </div>
+    </section>
+
+    @* The control: no route asks for labels, so none may appear. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-037 · no labels asked for</h2>
+        <div data-testid="tr037-off">
+            <BarChart TItem="TokenRow" Items="@objTokens" Height="220px" ShowLegend="false"
+                      XValue="@(aRow => aRow.Harness)" YValue="@(aRow => (decimal)aRow.Tokens)" />
+        </div>
+    </section>
+
+    @* A sibling chart type takes the same flag through the same built-in series. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-037 · a pie shorthand with labels</h2>
+        <div data-testid="tr037-pie" style="max-width:360px">
+            <PieChart TItem="TokenRow" Items="@objTokens" Height="240px" ShowDataLabels="true"
+                      XValue="@(aRow => aRow.Harness)" YValue="@(aRow => (decimal)aRow.Tokens)" />
+        </div>
+    </section>
+
+    @* ============================ TR-038 — Badge colour under Truncate / Wrap ============================ *@
+    @* The box paints red so that a badge which lost its own text colour would visibly inherit it. *@
+    <section class="space-y-3">
+        <h2 class="text-lg font-semibold">TR-038 · every Badge variant in every overflow mode</h2>
+        <div class="grid gap-2" style="color: rgb(220, 0, 0)" data-testid="tr038-matrix">
+            @foreach (var vVariant in Enum.GetValues<BadgeVariant>())
+            {
+                <div class="flex flex-wrap items-center gap-2" style="max-width:100%">
+                    <div style="width:150px"><Badge Variant="@vVariant" data-testid="@($"tr038-{vVariant}-default")">@vVariant label that is long</Badge></div>
+                    <div style="width:150px"><Badge Variant="@vVariant" Truncate="true" data-testid="@($"tr038-{vVariant}-truncate")">@vVariant label that is long</Badge></div>
+                    <div style="width:150px"><Badge Variant="@vVariant" Wrap="true" data-testid="@($"tr038-{vVariant}-wrap")">@vVariant label that is long</Badge></div>
+                </div>
+            }
+        </div>
+    </section>
+
+    @* The merge itself, on the pairings the entry names. Each item shows cn(first, second). *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-038 · the class merge on non-colour text utilities</h2>
+        <ul class="font-mono text-sm" data-testid="tr038-cn">
+            @for (var i = 0; i < CnProbes.Length; i++)
+            {
+                var vProbe = CnProbes[i];
+                <li data-testid="@($"tr038-cn-{i}")" data-input="@($"{vProbe.First} + {vProbe.Second}")">@ClassNames.cn(vProbe.First, vProbe.Second)</li>
+            }
+        </ul>
+    </section>
+
+    @* ============================ TR-036 — Select teardown ============================ *@
+    @* Open it, then leave the page: the server log must stay clean. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-036 · a Select whose page is left</h2>
+        <Select TValue="string" @bind-Value="objPeriod" data-testid="tr036-select">
+            <SelectTrigger>
+                <SelectValue Placeholder="Period" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem TValue="string" Value="@("all")" Text="All history">All history</SelectItem>
+                <SelectItem TValue="string" Value="@("30d")" Text="Last 30 days">Last 30 days</SelectItem>
+            </SelectContent>
+        </Select>
+        <div class="text-sm text-muted-foreground" data-testid="tr036-echo">selected: @objPeriod</div>
+    </section>
+</div>
+
+@code {
+    /// <summary>One harness's token total, the shape TfLens's comparison chart is drawn from.</summary>
+    public sealed record TokenRow(string Harness, long Tokens);
+
+    // The pairings TR-038 names: each non-colour text utility beside a colour must keep both, two
+    // utilities on the same axis must still conflict, and two colours must still conflict.
+    private static readonly (string First, string Second)[] CnProbes =
+    [
+        ("text-foreground", "text-ellipsis"),
+        ("text-muted-foreground", "text-clip"),
+        ("text-foreground", "text-nowrap"),
+        ("text-primary-foreground", "text-balance"),
+        ("text-ellipsis", "text-clip"),
+        ("text-wrap", "text-nowrap"),
+        ("text-red-500", "text-foreground")
+    ];
+
+    private readonly List<TokenRow> objTokens =
+    [
+        new("claude-code", 12_100_000),
+        new("codex", 37_100_000),
+        new("opencode", 1_600_000)
+    ];
+
+    private readonly ApexChartOptions<TokenRow> objLabelOptions = new()
+    {
+        DataLabels = new DataLabels { Enabled = true }
+    };
+
+    private string objPeriod = "all";
+
+    private static void ConfigureLabels(ApexChartOptions<TokenRow> aOptions)
+    {
+        aOptions.DataLabels ??= new DataLabels();
+        aOptions.DataLabels.Enabled = true;
+        aOptions.DataLabels.Formatter = "function (v) { return (v / 1e6).toFixed(1) + 'M' }";
+    }
+}

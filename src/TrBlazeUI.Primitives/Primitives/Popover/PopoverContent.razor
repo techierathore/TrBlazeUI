@@ -282,7 +282,14 @@
 
         if (objClickOutsideModule != null)
         {
-            await objClickOutsideModule.DisposeAsync();
+            try
+            {
+                await objClickOutsideModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit already torn down - the module died with it (TfLens TR-036).
+            }
         }
 
         objDotNetRef?.Dispose();
