@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="sub">Last rendered: 2026-08-31</div>
+    <div class="sub">Last rendered: 2026-09-13</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#table-of-contents">Table of Contents</a></li>
@@ -114,16 +114,18 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#app-shell-shared-services">2. App shell &amp;amp; shared services</a></li>
         <li><a href="#screen-map">3. Screen map</a></li>
         <li class="h3"><a href="#screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11">2.1.0 screens (added / changed by REQ-UI-017 — all runtime-verified 2026-08-11)</a></li>
+        <li class="h3"><a href="#screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes-runtime-verified-2026-09-13">2.0.6 screens (changed by REQ-UI-019 and REQ-UI-020, the TfLens passes — runtime-verified 2026-09-13)</a></li>
         <li><a href="#library-lineage-how-a-styled-component-resolves">4. Library lineage — how a styled component resolves</a></li>
         <li><a href="#known-issues">5. Known issues</a></li>
         <li><a href="#runtime-screenshots">6. Runtime screenshots</a></li>
         <li class="h3"><a href="#the-2-1-0-surface-captured-2026-08-11-at-handoff-1366-900">6.1 The 2.1.0 surface (captured 2026-08-11 at handoff, 1366×900)</a></li>
+        <li class="h3"><a href="#the-2-0-6-changes-captured-2026-09-13-at-1366-900-and-390-844">6.3 The 2.0.6 changes (captured 2026-09-13 at 1366×900 and 390×844)</a></li>
         <li class="h3"><a href="#earlier-sampled-key-screens-2026-06-30-datatable-png-recaptured-2026-07-21">6.2 Earlier sampled key screens (2026-06-30; datatable.png recaptured 2026-07-21)</a></li>
     </ol>
   </nav>
   <main>
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="subtitle">Rendered 2026-08-31 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
+    <div class="subtitle">Rendered 2026-09-13 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -133,15 +135,17 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#app-shell-shared-services">2. App shell &amp;amp; shared services</a></li>
         <li><a href="#screen-map">3. Screen map</a></li>
         <li class="h3"><a href="#screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11">2.1.0 screens (added / changed by REQ-UI-017 — all runtime-verified 2026-08-11)</a></li>
+        <li class="h3"><a href="#screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes-runtime-verified-2026-09-13">2.0.6 screens (changed by REQ-UI-019 and REQ-UI-020, the TfLens passes — runtime-verified 2026-09-13)</a></li>
         <li><a href="#library-lineage-how-a-styled-component-resolves">4. Library lineage — how a styled component resolves</a></li>
         <li><a href="#known-issues">5. Known issues</a></li>
         <li><a href="#runtime-screenshots">6. Runtime screenshots</a></li>
         <li class="h3"><a href="#the-2-1-0-surface-captured-2026-08-11-at-handoff-1366-900">6.1 The 2.1.0 surface (captured 2026-08-11 at handoff, 1366×900)</a></li>
+        <li class="h3"><a href="#the-2-0-6-changes-captured-2026-09-13-at-1366-900-and-390-844">6.3 The 2.0.6 changes (captured 2026-09-13 at 1366×900 and 390×844)</a></li>
         <li class="h3"><a href="#earlier-sampled-key-screens-2026-06-30-datatable-png-recaptured-2026-07-21">6.2 Earlier sampled key screens (2026-06-30; datatable.png recaptured 2026-07-21)</a></li>
       </ol>
     </div>
-<p><strong>Last updated:</strong> 2026-08-25 (targeted runtime verification)
-<strong>Verification status:</strong> ✅ <strong>RUNTIME-VERIFIED.</strong> Anonymous demo visitor exercised <code>/components/dialog</code> and <code>/verify-techieblog</code> on <strong>2026-08-25</strong> at desktop and 390px. Nested Dialog/Select behavior, focus, mouse/keyboard interaction, attribute forwarding, component feedback cases, render status, layout bounds and zero horizontal overflow passed (<code>ui-ui004.spec.js</code>; <code>ui-techieblog.spec.js</code> <strong>76/76</strong>). Release build: <strong>0 warnings / 0 errors</strong>.</p>
+<p><strong>Last updated:</strong> 2026-09-13 (handoff — as-built at 2.0.6)
+<strong>Verification status:</strong> ✅ <strong>RUNTIME-VERIFIED.</strong> Anonymous demo visitor drove the 8 screens changed by the TfLens passes on <strong>2026-09-13</strong> at 1366 and 390 wide, plus the phone menu at 390: all render, 0 console errors, 0 sideways scroll (screenshots in §6.3). Acceptance suite 33/33; Release build <strong>0 warnings / 0 errors</strong>. Earlier screens were last runtime-verified on 2026-08-25.</p>
 <blockquote>
 <p><strong>What this document is.</strong> The screen-by-screen, as-built map a developer uses to chase a bug or catch AI-hallucinated code. TrBlazeUI is a <strong>component library with a demo application</strong> and has <strong>no database, no API, no stored procedures, and no auth</strong> — so the usual <em>page → service → data-access → proc</em> lineage collapses to <strong>demo page → demo-shared composition → library component → primitive → JS interop / service</strong>. There is exactly one role: the <strong>anonymous demo visitor</strong>.</p>
 </blockquote>
@@ -251,6 +255,42 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>Typography</td><td><code>/components/typography</code></td><td><code>Pages/Components/TypographyDemo.razor</code></td><td><code>Typography*</code></td><td>2.1.0: <code>Size</code> replaces baked-in size classes; <code>ClassNames.cn</code> is variant-aware</td></tr>
 </tbody>
 </table>
+<h3 id="screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes-runtime-verified-2026-09-13">2.0.6 screens (changed by REQ-UI-019 and REQ-UI-020, the TfLens passes — runtime-verified 2026-09-13)<a class="anchor-link" href="#screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes-runtime-verified-2026-09-13">#</a></h3>
+<table>
+<thead><tr><th>Screen</th><th>Route</th><th>Demo page file</th><th>Library surface exercised</th><th>Seen 2026-09-13</th></tr></thead>
+<tbody>
+<tr><td>Bar chart</td><td><code>/charts/bar</code></td><td><code>Pages/Charts/BarChartDemo.razor</code></td><td><code>BarChart</code> → <code>ChartBase</code> → Blazor-ApexCharts</td><td>renders at 1366 and 390</td></tr>
+<tr><td>Badge</td><td><code>/components/badge</code></td><td><code>Pages/Components/BadgeDemo.razor</code></td><td><code>Badge</code> (<code>As</code>, <code>Wrap</code>, <code>Truncate</code>) → <code>ClassNames.cn</code> → <code>TailwindMerge</code></td><td>renders at 1366 and 390</td></tr>
+<tr><td>Select</td><td><code>/components/select</code></td><td><code>Pages/Components/SelectDemo.razor</code></td><td><code>Select</code> → <code>Primitives.Select.SelectContent</code></td><td>renders; leaving the page logs no server error</td></tr>
+<tr><td>NativeSelect</td><td><code>/components/native-select</code></td><td><code>Pages/Components/NativeSelectDemo.razor</code></td><td><code>NativeSelect</code> → <code>TailwindMerge.IsValidClassName</code> (chevron class)</td><td>renders with its arrow</td></tr>
+<tr><td>AlertDialog</td><td><code>/components/alert-dialog</code></td><td><code>Pages/Components/AlertDialogDemo.razor</code></td><td><code>AlertDialog</code> → Dialog primitive (<code>CloseOnEscape</code>, <code>Modal</code>)</td><td>renders at 1366 and 390</td></tr>
+<tr><td>DataTable</td><td><code>/components/datatable</code></td><td><code>Pages/Components/DataTableDemo.razor</code></td><td><code>DataTable</code> (<code>ShowPagination</code>, <code>SearchText</code>, <code>ShowColumnChooser</code>), <code>DataTableColumn.Align</code></td><td>renders at 1366 and 390</td></tr>
+<tr><td>Phone menu</td><td><code>/</code> at 390</td><td><code>Shared/MainLayout.razor</code></td><td><code>SidebarProvider</code> → <code>--sidebar-width-mobile</code></td><td>renders, 288px wide</td></tr>
+<tr><td>TfLens harness 2</td><td><code>/verify-tflens-2</code></td><td><code>Pages/VerifyTfLens2.razor</code></td><td>fixture for <code>tests/verify/ui-tflens-2.spec.js</code> (TR-028…TR-035)</td><td>renders; <strong>not consumer-facing</strong></td></tr>
+<tr><td>TfLens harness 3</td><td><code>/verify-tflens-3</code></td><td><code>Pages/VerifyTfLens3.razor</code></td><td>fixture for <code>tests/verify/ui-tflens-3.spec.js</code> (TR-036…TR-038)</td><td>renders; ⚠ badge matrix overlaps at 1280 (§5); <strong>not consumer-facing</strong></td></tr>
+</tbody>
+</table>
+<p>Call chain (chart data labels): <code>BarChart.razor.cs</code> <code>OnParametersSet</code> → <code>ChartBase.CreateBaseOptions</code> → <code>ChartBase.FinalizeOptions</code> → <code>BarChart.razor</code> built-in <code>ApexPointSeries ShowDataLabels="@DefaultShowDataLabels"</code> → Blazor-ApexCharts.</p>
+<p>Call chain (badge classes): <code>Badge.razor.cs</code> <code>CssClass</code> → <code>ClassNames.cn</code> → <code>TailwindMerge.Merge</code> → <code>ComputeBaseUtilityGroup</code>.</p>
+<p><strong>Where to break</strong></p>
+<table>
+<thead><tr><th>File:line</th><th>Function</th><th>Watch</th><th>It should hold</th></tr></thead>
+<tbody>
+<tr><td><code>src/TrBlazeUI.Components/Components/Chart/Core/ChartBase.cs:366</code></td><td><code>CreateBaseOptions</code></td><td><code>options.DataLabels.Enabled</code></td><td><code>true</code> whenever <code>ShowDataLabels</code> is <code>true</code> (set at line 412)</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/Chart/Core/ChartBase.cs:434</code></td><td><code>FinalizeOptions</code></td><td><code>DefaultShowDataLabels</code> (declared line 296)</td><td>the final label switch, after <code>OptionsConfigurator</code> (line 144) and <code>Options</code> (line 126)</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/Chart/Types/BarChart.razor:31</code></td><td>built-in series markup</td><td><code>ShowDataLabels</code> on <code>ApexPointSeries</code></td><td>the same value as <code>DefaultShowDataLabels</code>; the five sibling chart types carry the same line</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/Chart/Core/ChartContainer.razor.cs:57</code></td><td><code>Bare</code> parameter</td><td><code>Bare</code></td><td><code>true</code> drops the card border, shadow and padding</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Utilities/TailwindMerge.cs:401</code></td><td><code>ComputeBaseUtilityGroup</code></td><td>return value for <code>text-ellipsis</code></td><td><code>"text-overflow"</code> (table entry line 112), never <code>"text-color"</code> (colour check line 434)</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Utilities/TailwindMerge.cs:218</code></td><td><code>IsValidClassName</code></td><td>result for <code>bg-[url('data:image/svg+xml;…')]</code></td><td><code>true</code>; only executable payloads return <code>false</code></td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/Badge/Badge.razor.cs:143</code></td><td><code>CssClass</code></td><td>the merged class string</td><td>the variant's text colour <strong>and</strong> the overflow classes from <code>OverflowClass</code> (line 128)</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/Badge/Badge.razor.cs:81</code></td><td><code>As</code> parameter</td><td><code>As</code></td><td><code>"span"</code> unless the caller asked for <code>"div"</code></td></tr>
+<tr><td><code>src/TrBlazeUI.Primitives/Primitives/Select/SelectContent.razor:294</code></td><td><code>DisposeAsync</code></td><td>a <code>JSDisconnectedException</code></td><td>caught at lines 313 and 325, never logged as unhandled</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/DataTable/DataTable.razor.cs:211</code></td><td><code>SearchText</code> parameter</td><td><code>SearchText</code></td><td>the text the page's own filter box holds; <code>ShowColumnChooser</code> at line 228</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/Collapsible/CollapsibleTrigger.razor.cs:64</code></td><td><code>Class</code> parameter</td><td><code>Class</code></td><td>lands on the rendered <code>&lt;button&gt;</code></td></tr>
+<tr><td><code>DataTableColumn.Align</code></td><td><code>{unresolved — the parameter was not found under that name in DataTable/*.cs; the column behaviour itself is runtime-verified by req-ui-020.spec.ts TR-031}</code></td><td>—</td><td>—</td></tr>
+<tr><td><code>SidebarProvider</code> width parameters</td><td><code>{unresolved — Width/MobileWidth/IconWidth not found under those names in SidebarProvider.razor.cs; the 288px phone menu is runtime-verified}</code></td><td>—</td><td>—</td></tr>
+</tbody>
+</table>
 <p><em>(The remaining ~68 component demos and ~14 primitive demos follow the identical lineage shape; they are enumerated in the demo <code>Pages/Components/</code> and <code>Pages/Primitives/</code> folders and indexed in the BRD §9 feature catalog.)</em></p>
 <h2 id="library-lineage-how-a-styled-component-resolves">4. Library lineage — how a styled component resolves<a class="anchor-link" href="#library-lineage-how-a-styled-component-resolves">#</a></h2>
 <div class="diagram">
@@ -274,6 +314,10 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <p>A reader chasing a bug starts at the demo page, drops into the styled component (<code>.razor</code> markup + <code>.razor.cs</code> logic), then into the primitive it composes (for behavior/ARIA), and finally into the relevant JS interop file or DI service. Symbols that don't resolve to a real file/component in <code>src/</code> are hallucinations — verify against the folders listed in <code>docs/TrBlazeUI-Architecture.md §4</code>.</p>
 <h2 id="known-issues">5. Known issues<a class="anchor-link" href="#known-issues">#</a></h2>
 <ul>
+<li><strong>⚠ DevGuide 2026-09-13 — test page layout (<code>REQ-UI-020</code>):</strong> on <code>/verify-tflens-3</code>, <code>demos/TrBlazeUI.Demo.Shared/Pages/VerifyTfLens3.razor</code> (the TR-038 badge matrix), the default Secondary and Destructive badges hold their label on one line as designed and spill out of their 150px boxes over the Truncate column at 1280. Test page only; it ships in no package.
+</li>
+<li><strong>✅ FIXED 2026-09-12 and 2026-09-13, shipped in 2.0.6 — TfLens TR-028…TR-038 (<code>REQ-UI-020</code>, <code>REQ-UI-001</code>).</strong> Chart <code>Options</code>/<code>OptionsConfigurator</code>/<code>ChartContainer.Bare</code>; chart data labels in the short form; <code>Badge.As</code>/<code>Wrap</code>/<code>Truncate</code>; <code>DataTableColumn.Align</code>; the <code>url(</code> class guard; <code>DataTable</code> <code>SearchText</code>/<code>ShowColumnChooser</code>; the phone sidebar width; and the circuit-teardown exception in <code>SelectContent</code> and five sibling primitives. Verified by <code>ui-tflens-2.spec.js</code> 37/37, <code>ui-tflens-3.spec.js</code> 70/70 and <code>req-ui-020.spec.ts</code>.
+</li>
 <li><strong>✅ RESOLVED 2026-08-31 — TfLens consumer feedback (<code>REQ-UI-019</code>), fixed and awaiting release.</strong> Verified: Release 0/0, <code>ui-tflens</code> <strong>44/44</strong>, all regressions green (<strong>166/166</strong> executed checks). Every item below is fixed; the measurements are the <em>pre-fix</em> observations kept for the record, each followed by its post-fix measurement. Triaged from <code>docs/TfLens-TrBlazeUI-Feedback.md</code>; TfLens built against <strong>2.0.0</strong>, so <strong>five entries are stale</strong> (TR-002/003/013/020/023 — fixed by the 2.1.0 REQ-UI-017 sweep; the action is <em>publish/upgrade</em>, not re-fix) and four more are substantially fixed with a residual. <strong>Reproduced live on the Server demo</strong> (Release 0/0, headless Chromium):
 <ul>
 <li><strong>TR-009 (<code>REQ-UI-005</code>, blocker)</strong> — <code>/components/datatable</code> "Custom Cell Templates": 500 records bound with <code>ShowPagination="false"</code> render <strong>5 body rows and no pager</strong>. → <strong>Fixed:</strong> <code>ShowPagination</code> now gates the data; the harness renders all 12 rows, no pager. <code>DataTable.razor.cs:409-413</code> slices <code>.Skip().Take()</code> unconditionally; <code>ShowPagination</code> gates only the pager chrome (<code>:564-567</code>). Any grid that turns pagination off is silently truncated to <code>InitialPageSize</code> (default 5).
@@ -316,7 +360,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </li>
 <li><strong>✅ RESOLVED — TR-066:</strong> nested Dialog content renders inline within its containing document-level portal, avoiding stored-fragment disposal while preserving overlay positioning and focus containment. Runtime-confirmed 2026-08-25.
 </li>
-<li><strong>Log noise on circuit teardown (cosmetic, observed 2026-08-11).</strong> Closing a browser tab that had an open <code>Select</code> logs <code>JSDisconnectedException</code> from <code>SelectContent.DisposeAsync</code> (<code>src/TrBlazeUI.Primitives/Primitives/Select/SelectContent.razor:287</code>). It is the standard Blazor Server dispose race — the circuit is already gone when <code>IJSObjectReference.DisposeAsync()</code> runs — and has no user-visible effect, but the throw should be caught so hosts don't log a stack trace per disconnect. Deferred, not a release blocker.
+<li><strong>✅ FIXED 2026-09-13 — log noise on circuit teardown (TfLens TR-036).</strong> Closing a page that had an open <code>Select</code> logged <code>JSDisconnectedException</code> from <code>SelectContent.DisposeAsync</code>. It is now caught at <code>src/TrBlazeUI.Primitives/Primitives/Select/SelectContent.razor:313</code> and <code>:325</code>, and the same guard was added to <code>DropdownMenuContent</code>, <code>PopoverContent</code>, <code>SheetContent</code>, <code>FocusManager</code> and <code>PositioningService</code>. Measured: 0 unhandled circuit exceptions after leaving the select, dropdown menu and popover pages.
 </li>
 <li><strong>✅ RESOLVED 2.1.0 — the whole TechieBlog cycle (TR-001…TR-065, REQ-UI-017).</strong> Catalog-wide attribute splatting (measured 344/344 + 59/59 by <code>tools/splat-audit</code>, not asserted); <code>Rating</code>/<code>Tabs</code>/<code>NavigationMenu</code>/<code>MarkdownEditor</code>/<code>Item</code> WCAG corrections; <code>Input</code>/<code>Textarea</code> keystroke loss on a Server circuit; <code>SelectValue</code> first-paint text; ordered portals so stacked dialogs are clickable by construction (TR-060); the full Tailwind utility scale in <code>trblazeui.css</code> (~906 KB min / ~97 KB gz, was ~88 KB); tokens re-solved as a contrast matrix by <code>tools/token-contrast.py</code> (18 failing pairings → 0, <code>--input</code> 1.26:1 → 3.11:1); and 9 new components. Verified 65/65 + 15/15 headless.
 </li>
@@ -348,19 +392,43 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <p><img src="screenshots/TrBlazeUI/code-block.png" alt="CodeBlock" style="max-width:100%"></p>
 <h4 id="centeredpanel-components-centered-panel">CenteredPanel (<code>/components/centered-panel</code>)<a class="anchor-link" href="#centeredpanel-components-centered-panel">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/centered-panel.png" alt="CenteredPanel" style="max-width:100%"></p>
+<h3 id="the-2-0-6-changes-captured-2026-09-13-at-1366-900-and-390-844">6.3 The 2.0.6 changes (captured 2026-09-13 at 1366×900 and 390×844)<a class="anchor-link" href="#the-2-0-6-changes-captured-2026-09-13-at-1366-900-and-390-844">#</a></h3>
+<h4 id="bar-chart-charts-bar">Bar chart (<code>/charts/bar</code>)<a class="anchor-link" href="#bar-chart-charts-bar">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/chart-bar-2-0-6.png" alt="Bar chart" style="max-width:100%">
+<img src="screenshots/TrBlazeUI/chart-bar-2-0-6-mobile.png" alt="Bar chart at 390" style="max-width:100%"></p>
+<h4 id="badge-components-badge">Badge (<code>/components/badge</code>)<a class="anchor-link" href="#badge-components-badge">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/badge.png" alt="Badge" style="max-width:100%">
+<img src="screenshots/TrBlazeUI/badge-mobile.png" alt="Badge at 390" style="max-width:100%"></p>
+<h4 id="select-components-select">Select (<code>/components/select</code>)<a class="anchor-link" href="#select-components-select">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/select.png" alt="Select" style="max-width:100%">
+<img src="screenshots/TrBlazeUI/select-mobile.png" alt="Select at 390" style="max-width:100%"></p>
+<h4 id="nativeselect-components-native-select">NativeSelect (<code>/components/native-select</code>)<a class="anchor-link" href="#nativeselect-components-native-select">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/native-select.png" alt="NativeSelect" style="max-width:100%">
+<img src="screenshots/TrBlazeUI/native-select-mobile.png" alt="NativeSelect at 390" style="max-width:100%"></p>
+<h4 id="alertdialog-components-alert-dialog">AlertDialog (<code>/components/alert-dialog</code>)<a class="anchor-link" href="#alertdialog-components-alert-dialog">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/alert-dialog.png" alt="AlertDialog" style="max-width:100%">
+<img src="screenshots/TrBlazeUI/alert-dialog-mobile.png" alt="AlertDialog at 390" style="max-width:100%"></p>
+<h4 id="datatable-components-datatable">DataTable (<code>/components/datatable</code>)<a class="anchor-link" href="#datatable-components-datatable">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/datatable-2-0-6.png" alt="DataTable" style="max-width:100%">
+<img src="screenshots/TrBlazeUI/datatable-2-0-6-mobile.png" alt="DataTable at 390" style="max-width:100%"></p>
+<h4 id="phone-menu-opened-at-390">Phone menu, opened (<code>/</code> at 390)<a class="anchor-link" href="#phone-menu-opened-at-390">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/sidebar-phone-menu-mobile.png" alt="Phone menu" style="max-width:100%"></p>
+<h4 id="tflens-test-pages-verify-tflens-2-verify-tflens-3">TfLens test pages (<code>/verify-tflens-2</code>, <code>/verify-tflens-3</code>)<a class="anchor-link" href="#tflens-test-pages-verify-tflens-2-verify-tflens-3">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/verify-tflens-2.png" alt="verify-tflens-2" style="max-width:100%">
+<img src="screenshots/TrBlazeUI/verify-tflens-3.png" alt="verify-tflens-3" style="max-width:100%"></p>
 <h3 id="earlier-sampled-key-screens-2026-06-30-datatable-png-recaptured-2026-07-21">6.2 Earlier sampled key screens (2026-06-30; <code>datatable.png</code> recaptured 2026-07-21)<a class="anchor-link" href="#earlier-sampled-key-screens-2026-06-30-datatable-png-recaptured-2026-07-21">#</a></h3>
 <h4 id="home">Home (<code>/</code>)<a class="anchor-link" href="#home">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/home.png" alt="Home" style="max-width:100%"></p>
-<h4 id="datatable-components-datatable">DataTable (<code>/components/datatable</code>)<a class="anchor-link" href="#datatable-components-datatable">#</a></h4>
+<h4 id="datatable-components-datatable-2">DataTable (<code>/components/datatable</code>)<a class="anchor-link" href="#datatable-components-datatable-2">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/datatable.png" alt="DataTable" style="max-width:100%"></p>
-<h4 id="bar-chart-charts-bar">Bar Chart (<code>/charts/bar</code>)<a class="anchor-link" href="#bar-chart-charts-bar">#</a></h4>
+<h4 id="bar-chart-charts-bar-2">Bar Chart (<code>/charts/bar</code>)<a class="anchor-link" href="#bar-chart-charts-bar-2">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/chart-bar.png" alt="Bar Chart" style="max-width:100%"></p>
 <h4 id="toolbar-components-toolbar">Toolbar (<code>/components/toolbar</code>)<a class="anchor-link" href="#toolbar-components-toolbar">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/toolbar.png" alt="Toolbar" style="max-width:100%"></p>
 <h4 id="icons-icons">Icons (<code>/icons</code>)<a class="anchor-link" href="#icons-icons">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/icons.png" alt="Icons" style="max-width:100%"></p>
 <hr>
-<p>Last updated: 2026-08-11 (handoff, 2.1.0 as-built) · RUNTIME-VERIFIED — 25/25 on the 2.1.0 screens 2026-08-11, plus 65/65 + 15/15 REQ-UI-017 gates; screenshots for the earlier sampled key screens in docs/screenshots/TrBlazeUI/</p>
+<p>Last updated: 2026-09-13 (handoff, 2.0.6 as-built) · RUNTIME-VERIFIED — 8 changed screens plus the phone menu on 2026-09-13 at 1366 and 390; the 2.1.0-era screens 25/25 on 2026-08-11; screenshots in docs/screenshots/TrBlazeUI/</p>
   </main>
 </div>
 

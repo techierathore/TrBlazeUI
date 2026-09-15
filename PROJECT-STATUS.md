@@ -1,32 +1,31 @@
 ---
 project: TrBlazeUI
-last_updated: 2026-09-13
-current_phase: Verify — 1 not measurable, 34 of 35 verified
+last_updated: 2026-09-14
+current_phase: UAT — handoff done, 35 of 35 verified
 last_verified_build: PASS
-last_verified_date: 2026-09-13
+last_verified_date: 2026-09-14
 ---
 
 # TrBlazeUI — Status
 
 ## Where I am
 
-34 of 35 rows verified, none failing. All 15 functional and non-functional rows were
-re-checked against the running demo today: 14 passed, including the accessibility scan
-and the Codex agent packaging, whose test setup was rebuilt first. The one row left is
-publishing the packages to nuget.org. Its test can only be skipped here, because only a
-real publish proves it.
+All 35 rows are verified. TfLens TR-039 and TR-040 are fixed and re-verified. Leaving a chart page
+no longer logs an unobserved disconnect error, and `InputGroupInput` takes `DebounceMilliseconds`.
+REQ-UI-008 and REQ-UI-002 went back to Verified. Release build 0/0; 20/20 checks in
+`tests/verify/req-ui-020.spec.ts`. Both fixes wait in `[Unreleased]` for the next release after 2.0.6.
 
 ## Next command to run
 
 Claude Code:
 ```
-(owner) 1 row(s) cannot be measured here — create the data, change the acceptance line, or mark the row N/A: REQ-FN-004
+(owner) set current_phase to Released after UAT — no agent command
 ```
 OpenCode:
 ```
-(owner) 1 row(s) cannot be measured here — create the data, change the acceptance line, or mark the row N/A: REQ-FN-004
+(owner) set current_phase to Released after UAT — no agent command
 ```
-Every test carrying REQ-FN-004 is skipped, so another verify run changes nothing until the owner runs a real publish.
+Why: every row is terminal and handoff has run; waiting on the owner.
 
 ## Open requirements
 
@@ -34,18 +33,15 @@ Every test carrying REQ-FN-004 is skipped, so another verify run changes nothing
 |---|---|
 | Not Started | 0 |
 | In Progress | 0 |
-| Implemented | 1 |
+| Implemented | 0 |
 | Needs re-verify | 0 |
 | Blocked | 0 |
 
-- [ ] REQ-FN-004 — GitHub Packages CI/CD (publish-nuget.yml + build.yml) (Implemented)
+- None
 
 ## Known blockers
 
-- REQ-FN-004 waits on the owner. Everything up to the push is fixed and tested; only a real, non-dry-run publish proves the row.
-- The number for the next release is an open decision — `docs/TrBlazeUI-Decision-Request.md` holds it. nuget.org is live at 2.0.3, and the unreleased work changes existing behaviour, so the number is a signal rather than the next in sequence.
-- The `c2.0.5` release is deleted; its tag is still on the repository and is the owner's to delete, because agents never run git.
-- `/verify-trstudio` returns 404 and its page is missing from `demos/`, so REQ-UI-015's 14 checks cannot be reproduced. Its verdict rests on a run from 12 July.
+- None
 
 ## Verification log
 
@@ -53,11 +49,11 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 | Date | Phase | Result | Status table |
 |---|---|---|---|
-| 2026-09-12 | verify-phase | 33/35 Verified. 13 PASS, 1 FAIL (REQ-NFR-001), 1 not tested (REQ-FN-004) | docs/TrBlazeUI-Checklist.md#requirements-status |
-| 2026-09-12 | Fix-issues + verify | REQ-NFR-001 Verified — accessibility findings 37 nodes → 0. 5 rows re-verified. Build 0/0 | docs/TrBlazeUI-Checklist.md#requirements-status |
-| 2026-09-12 | triage-and-fix | 34/35 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-09-13 | triage-and-fix | 34/35 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-09-13 | verify-phase | 34/35 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-09-13 | verify-phase | 35/35 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-09-13 | handoff-phase | 35/35 Verified. Ready for UAT; 2.0.6 live on nuget.org. Build 0/0 | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-09-14 | triage-and-fix | 35/35 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 
@@ -69,6 +65,13 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 ## Deferred / future
 
-- Restore the `/verify-trstudio` harness page so REQ-UI-015's spec can run again.
-- Have a person test with real assistive technology; the scanner covers only part of accessibility.
-- Delete `scripts/release-*.sh` — dead code whose `components/v…` tag prefixes correspond to nothing in the build.
+- Release the TR-039/TR-040 fixes (`CHANGELOG.md` `[Unreleased]`).
+- Report `ApexChart.Dispose`'s unawaited release upstream; then drop `DisconnectSafeApexChart`.
+- Re-run REQ-FN-010's packaging test; it failed in the 2026-09-14 sweep.
+- Delete the stray `c2.0.5` tag (owner; agents never run git).
+- Restore `/verify-trstudio` so REQ-UI-015's spec runs.
+- Have a person test with real assistive technology.
+- Fix the overlapping badge matrix on `/verify-tflens-3`.
+- Update Architecture and DevGuide through `*amend-docs`.
+- `Directory.Build.props` fallback version still says 2.1.0.
+- Delete the unused `scripts/release-*.sh`.

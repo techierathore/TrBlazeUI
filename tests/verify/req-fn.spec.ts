@@ -148,7 +148,7 @@ test.describe('Functional requirements', () => {
     expect(log!, 'no undocumented-member warnings in the build').not.toMatch(/CS1591/);
   });
 
-  test('REQ-FN-004 the publish workflow resolves the version from the tag and guards the push', () => {
+  test('REQ-FN-004 the publish workflow resolves the version from the tag and guards the push', async () => {
     const publish = read('.github/workflows/publish-nuget.yml');
     const build = read('.github/workflows/build.yml');
     expect(build.length, 'build.yml is present').toBeGreaterThan(0);
@@ -177,10 +177,37 @@ test.describe('Functional requirements', () => {
       expect(out.trim(), `${f} parses`).toBe('ok');
     }
 
-    // The row's own acceptance says it closes only on an actual non-dry-run publish, which no
-    // check here can perform or observe - it is the owner's to run. Everything above is recorded,
-    // and the row is deliberately left short of Verified rather than promoted on the mechanism.
-    test.skip(true, 'closing condition is an owner-gated non-dry-run publish; not observable here');
+    // The closing condition itself: the owner's non-dry-run publish is observable from outside,
+    // on nuget.org. The latest published GitHub release names the tag; all five packages must be
+    // listed at that tag's version, and each must have been packed from the commit that tag
+    // points at - so a live version that came from somewhere else cannot pass.
+    const json = async (url: string) => {
+      const res = await fetch(url, { headers: { 'User-Agent': 'trblazeui-verify' } });
+      expect(res.ok, `${url} answers`).toBe(true);
+      return res.json();
+    };
+    const release = await json('https://api.github.com/repos/techierathore/TrBlazeUI/releases/latest');
+    const tag: string = release.tag_name;
+    // The same rule the workflow uses: strip any non-digit prefix from the tag.
+    const version = tag.replace(/^[^0-9]+/, '');
+    expect(version, `release tag ${tag} carries a version`).toMatch(/^\d+\.\d+\.\d+/);
+    const tagCommit: string = (await json(`https://api.github.com/repos/techierathore/TrBlazeUI/commits/${tag}`)).sha;
+
+    const packages = ['TrBlazeUI.Primitives', 'TrBlazeUI.Components', 'TrBlazeUI.Icons.Lucide',
+                      'TrBlazeUI.Icons.Heroicons', 'TrBlazeUI.Icons.Feather'];
+    for (const name of packages) {
+      const id = name.toLowerCase();
+      const index = await json(`https://api.nuget.org/v3-flatcontainer/${id}/index.json`);
+      expect(index.versions, `${name} ${version} is on nuget.org`).toContain(version);
+
+      const leaf = await json(`https://api.nuget.org/v3/registration5-semver1/${id}/${version}.json`);
+      expect(leaf.listed, `${name} ${version} is listed`).not.toBe(false);
+
+      const nuspecRes = await fetch(`https://api.nuget.org/v3-flatcontainer/${id}/${version}/${id}.nuspec`);
+      const nuspec = await nuspecRes.text();
+      expect(nuspec, `${name} ${version} nuspec carries that version`).toContain(`<version>${version}</version>`);
+      expect(nuspec, `${name} ${version} was packed from the ${tag} commit`).toContain(`commit="${tagCommit}"`);
+    }
   });
 
   test('REQ-FN-005 one shared version from the tag, with the package metadata declared', () => {

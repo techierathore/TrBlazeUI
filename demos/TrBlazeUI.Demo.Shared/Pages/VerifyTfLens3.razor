@@ -1,9 +1,10 @@
 @page "/verify-tflens-3"
 @using ApexCharts
 @using TrBlazeUI.Components.Chart
+@using TrBlazeUI.Components.InputGroup
 @using TrBlazeUI.Components.Utilities
 
-@* REQ-UI-020 / REQ-UI-001 verification harness — TfLens feedback TR-036 … TR-038
+@* REQ-UI-020 / REQ-UI-001 / REQ-UI-008 / REQ-UI-002 verification harness — TfLens feedback TR-036 … TR-040
    (docs/TfLens-TrBlazeUI-Feedback.md).
    Not a documentation demo: every block here exists so the headless specs
    (tests/verify/ui-tflens-3.spec.js, tests/verify/req-ui-020.spec.ts) can assert one criterion. *@
@@ -89,6 +90,36 @@
         </ul>
     </section>
 
+    @* ============================ TR-039 — chart teardown ============================ *@
+    @* The five charts above are the fixture: leave the page, force finalizers through /verify/gc, and
+       the server log must hold no unobserved task exception. *@
+
+    @* ============================ TR-040 — InputGroupInput debounce ============================ *@
+    @* The filter box TfLens draws: a leading icon, then the input. The debounced box must raise one
+       ValueChanged for a burst of keystrokes; the control box, with no debounce, raises one per key. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-040 · an InputGroupInput with a leading icon and a debounce</h2>
+        <div class="max-w-sm space-y-3">
+            <InputGroup>
+                <InputGroupAddon Align="InputGroupAlign.InlineStart">
+                    <LucideIcon Name="search" Size="16" />
+                </InputGroupAddon>
+                <InputGroupInput Value="@objFilter" ValueChanged="HandleDebouncedFilter" DebounceMilliseconds="600"
+                                 Placeholder="Filter misses" AriaLabel="Debounced filter" data-testid="tr040-debounced" />
+            </InputGroup>
+            <div class="text-sm text-muted-foreground" data-testid="tr040-debounced-echo">calls: @objDebouncedCalls; value: @objFilter</div>
+
+            <InputGroup>
+                <InputGroupAddon Align="InputGroupAlign.InlineStart">
+                    <LucideIcon Name="search" Size="16" />
+                </InputGroupAddon>
+                <InputGroupInput Value="@objImmediate" ValueChanged="HandleImmediateFilter"
+                                 Placeholder="No debounce" AriaLabel="Immediate filter" data-testid="tr040-immediate" />
+            </InputGroup>
+            <div class="text-sm text-muted-foreground" data-testid="tr040-immediate-echo">calls: @objImmediateCalls; value: @objImmediate</div>
+        </div>
+    </section>
+
     @* ============================ TR-036 — Select teardown ============================ *@
     @* Open it, then leave the page: the server log must stay clean. *@
     <section class="space-y-2">
@@ -136,6 +167,23 @@
     };
 
     private string objPeriod = "all";
+
+    private string? objFilter;
+    private int objDebouncedCalls;
+    private string? objImmediate;
+    private int objImmediateCalls;
+
+    private void HandleDebouncedFilter(string? aValue)
+    {
+        objFilter = aValue;
+        objDebouncedCalls++;
+    }
+
+    private void HandleImmediateFilter(string? aValue)
+    {
+        objImmediate = aValue;
+        objImmediateCalls++;
+    }
 
     private static void ConfigureLabels(ApexChartOptions<TokenRow> aOptions)
     {

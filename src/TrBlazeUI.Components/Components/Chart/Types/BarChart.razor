@@ -13,11 +13,11 @@
     }
     else
     {
-        <ApexChart TItem="TItem"
-                   Title="@Title"
-                   Options="@objOptions"
-                   Height="@Height"
-                   Width="@Width">
+        <DisconnectSafeApexChart TItem="TItem"
+                                 Title="@Title"
+                                 Options="@objOptions"
+                                 Height="@Height"
+                                 Width="@Width">
             @if (ChildContent is not null)
             {
                 @ChildContent
@@ -32,6 +32,6 @@
                                  XValue="@DefaultXValue"
                                  YValue="@DefaultYValue" />
             }
-        </ApexChart>
+        </DisconnectSafeApexChart>
     }
 </div>

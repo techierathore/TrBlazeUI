@@ -30,9 +30,24 @@ namespace TrBlazeUI.Components.InputGroup;
 /// &lt;/InputGroup&gt;
 /// </code>
 /// </example>
-public partial class InputGroupInput : ComponentBase
+public partial class InputGroupInput : ComponentBase, IDisposable
 {
     private ElementReference objInputRef;
+
+    private CancellationTokenSource? objDebounceCts;
+
+    /// <summary>
+    /// Gets or sets how long, in milliseconds, to wait after the last keystroke before raising
+    /// <c>ValueChanged</c>.
+    /// </summary>
+    /// <remarks>
+    /// Behaves exactly as <c>Input.DebounceMilliseconds</c>. Zero (the default) raises the callback on
+    /// every keystroke. A value in the 150-300 ms range lets a filter box drawn with a leading icon
+    /// re-filter once typing pauses instead of on every key (TfLens TR-040). The control's own DOM
+    /// value is never debounced - only the notification to the parent is.
+    /// </remarks>
+    [Parameter]
+    public int DebounceMilliseconds { get; set; }
 
     /// <summary>
     /// Gets or sets the type of input.
@@ -161,10 +176,60 @@ public partial class InputGroupInput : ComponentBase
         var newValue = args.Value?.ToString();
         Value = newValue;
 
-        if (ValueChanged.HasDelegate)
+        await NotifyValueChangedAsync(newValue);
+    }
+
+    /// <summary>
+    /// Raises <c>ValueChanged</c>, honouring <see cref="DebounceMilliseconds"/>.
+    /// </summary>
+    /// <remarks>
+    /// Steps: with no listener, stop; with no debounce, raise at once; otherwise cancel the pending
+    /// notification, wait out the debounce on a fresh token and raise only if no newer keystroke
+    /// cancelled it.
+    /// </remarks>
+    /// <param name="aValue">The new value.</param>
+    private async Task NotifyValueChangedAsync(string? aValue)
+    {
+        if (!ValueChanged.HasDelegate)
         {
-            await ValueChanged.InvokeAsync(newValue);
+            return;
         }
+
+        if (DebounceMilliseconds <= 0)
+        {
+            await ValueChanged.InvokeAsync(aValue);
+            return;
+        }
+
+        objDebounceCts?.Cancel();
+        objDebounceCts?.Dispose();
+
+        var vCts = new CancellationTokenSource();
+        objDebounceCts = vCts;
+
+        try
+        {
+            await Task.Delay(DebounceMilliseconds, vCts.Token);
+            await ValueChanged.InvokeAsync(aValue);
+        }
+        catch (OperationCanceledException)
+        {
+            // A newer keystroke superseded this one.
+        }
+    }
+
+    /// <summary>
+    /// Releases the debounce timer.
+    /// </summary>
+    /// <remarks>
+    /// Cancels a pending notification so a disposed control never calls back into its parent.
+    /// </remarks>
+    public void Dispose()
+    {
+        objDebounceCts?.Cancel();
+        objDebounceCts?.Dispose();
+        objDebounceCts = null;
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>

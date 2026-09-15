@@ -362,6 +362,54 @@ test.describe('Rows the fix cycle touched', () => {
     }
   });
 
+  test('REQ-UI-008 TR-039 leaving a page that holds a chart logs no unobserved task exception', async ({ browser }) => {
+    test.skip(!fs.existsSync(APP_LOG), `server log not readable here (${APP_LOG}); set APP_LOG`);
+    test.setTimeout(120000);
+
+    for (const route of ['/charts/bar', '/charts/pie', '/verify-tflens-3']) {
+      const before = fs.readFileSync(APP_LOG, 'utf8').length;
+      const page = await browser.newPage();
+      await page.goto(`${BASE}${route}`, { waitUntil: 'networkidle', timeout: 60000 });
+      await page.waitForTimeout(3000);
+      expect(await page.locator('.apexcharts-svg').count(), `${route} draws its charts`).toBeGreaterThan(0);
+
+      await page.goto('about:blank');
+      await page.close();
+      await new Promise(r => setTimeout(r, 4000));
+      // The fault only surfaces when its task is finalized, so force that rather than wait for a GC.
+      for (let i = 0; i < 3; i++) {
+        await fetch(`${BASE}/verify/gc`, { method: 'POST' });
+        await new Promise(r => setTimeout(r, 700));
+      }
+
+      const added = fs.readFileSync(APP_LOG, 'utf8').slice(before);
+      expect((added.match(/Unobserved task exception/g) || []).length, `${route} teardown`).toBe(0);
+      expect((added.match(/Unhandled exception in circuit/g) || []).length, `${route} circuit`).toBe(0);
+    }
+  });
+
+  test('REQ-UI-002 TR-040 InputGroupInput debounces ValueChanged and still binds', async ({ page }) => {
+    await page.goto(`${BASE}/verify-tflens-3`, { waitUntil: 'networkidle', timeout: 60000 });
+    await page.waitForTimeout(1500);
+
+    const debounced = page.locator('[data-testid="tr040-debounced"]');
+    await debounced.pressSequentially('escaped', { delay: 30 });
+    // The box itself shows every keystroke at once; only the notification waits.
+    await expect(debounced).toHaveValue('escaped');
+    const echo = page.locator('[data-testid="tr040-debounced-echo"]');
+    await expect(echo).toContainText('value: escaped', { timeout: 5000 });
+    // A burst of 7 keystrokes collapses. A loaded server can space two keys past the 600 ms window,
+    // so the bound is "fewer than one per key" rather than exactly one.
+    const calls = Number((await echo.textContent())!.match(/calls: (\d+)/)![1]);
+    expect(calls).toBeGreaterThanOrEqual(1);
+    expect(calls).toBeLessThan(7);
+
+    // With no debounce the same group raises one call per keystroke, as before.
+    await page.locator('[data-testid="tr040-immediate"]').pressSequentially('abc', { delay: 80 });
+    await page.waitForTimeout(600);
+    await expect(page.locator('[data-testid="tr040-immediate-echo"]')).toHaveText('calls: 3; value: abc');
+  });
+
   test('REQ-UI-001 the Collapsible primitive still opens, closes and takes a Class', async ({ page }) => {
     await page.goto(`${BASE}/verify-tflens-2`, { waitUntil: 'networkidle', timeout: 60000 });
     await page.waitForTimeout(1500);

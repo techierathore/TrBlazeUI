@@ -1204,6 +1204,18 @@ visible trigger button. `TimePicker` follows the same rule.
 </InputGroup>
 ```
 
+`InputGroupInput` takes the same `DebounceMilliseconds` as `Input` (default 0, one `ValueChanged` per
+keystroke). This is how to draw a filter box with a leading icon that re-filters only once typing pauses:
+
+```razor
+<InputGroup>
+    <InputGroupAddon Align="InputGroupAlign.InlineStart">
+        <LucideIcon Name="search" Size="16" />
+    </InputGroupAddon>
+    <InputGroupInput @bind-Value="filter" DebounceMilliseconds="150" AriaLabel="Filter" />
+</InputGroup>
+```
+
 ### ColorPicker
 
 ```razor

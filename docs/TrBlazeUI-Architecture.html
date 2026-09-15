@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Architecture</h1>
-    <div class="sub">Last rendered: 2026-08-31</div>
+    <div class="sub">Last rendered: 2026-09-13</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#table-of-contents">Table of Contents</a></li>
@@ -125,7 +125,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Architecture</h1>
-    <div class="subtitle">Rendered 2026-08-31 &middot; source <code>TrBlazeUI-Architecture.md</code></div>
+    <div class="subtitle">Rendered 2026-09-13 &middot; source <code>TrBlazeUI-Architecture.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -144,7 +144,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#sources-harvested">10. Sources harvested</a></li>
       </ol>
     </div>
-<p><strong>Last updated:</strong> 2026-08-11 (handoff — as-built at 2.1.0)
+<p><strong>Last updated:</strong> 2026-09-13 (handoff — as-built at 2.0.6, live on nuget.org)
 <strong>Status:</strong> Current (post-implementation). No structural change since the 2026-06-30 brownfield capture; the deltas are additive — 9 new component families (79 total), the full Tailwind utility scale in the shipped bundle, and two new verification tools (<code>tools/splat-audit</code>, <code>tools/token-contrast.py</code>) that turn previously-asserted invariants into measured ones.</p>
 <h2 id="table-of-contents">Table of Contents<a class="anchor-link" href="#table-of-contents">#</a></h2>
 <ol>
@@ -185,7 +185,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>HTML sanitization</td><td>HtmlSanitizer</td><td>9.0.892</td><td>Security layer for RichTextEditor output</td></tr>
 <tr><td>Versioning</td><td>(none - MSBuild property)</td><td>-</td><td>Shared version for all 5 packages, taken from the release tag and passed as <code>-p:Version=</code>; <code>Directory.Build.props</code> holds the local base (BRD-43)</td></tr>
 <tr><td>Blazor packages</td><td>Microsoft.AspNetCore.Components.*</td><td>10.0.2</td><td><code>.Web</code>, <code>.WebAssembly</code>, <code>.WebAssembly.DevServer</code>, <code>.WebAssembly.Server</code></td></tr>
-<tr><td>Distribution</td><td>GitHub Packages (NuGet)</td><td>—</td><td><code>nuget.pkg.github.com/techierathore</code></td></tr>
+<tr><td>Distribution</td><td>nuget.org (public releases) + GitHub Packages (CI builds)</td><td>—</td><td>nuget.org live at 2.0.6; <code>nuget.pkg.github.com/techierathore</code> carries the <code>-ci.*</code> builds</td></tr>
 <tr><td>AI tooling</td><td>TrBlazeUI agent skills</td><td>—</td><td><code>/trblazeui</code> Claude Code + OpenCode skills in <code>docs/skills/</code></td></tr>
 </tbody>
 </table>
@@ -323,7 +323,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </li>
 </ul>
 <h2 id="deployment-architecture">6. Deployment architecture<a class="anchor-link" href="#deployment-architecture">#</a></h2>
-<p>There is no server deployment. "Deployment" means <strong>publishing NuGet packages</strong> to GitHub Packages via GitHub Actions, plus running the demo apps locally.</p>
+<p>There is no server deployment. "Deployment" means <strong>publishing NuGet packages</strong> through GitHub Actions: public releases to nuget.org via <code>publish-nuget.yml</code> (live at 2.0.0, 2.0.3 and 2.0.6), CI builds to GitHub Packages, plus running the demo apps locally.</p>
 <div class="diagram">
   <div class="dt">
     <button data-zout title="Zoom out">&minus;</button>
@@ -370,7 +370,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </li>
 <li><strong>ADR-007 — Reactive portal refresh.</strong> <code>PortalService.RefreshPortal</code> + <code>OnPortalsChanged</code> so <code>PortalHost</code> (a layout sibling, not a descendant) re-renders on internal overlay state changes. Reason: fix the AppStudio-reported "static dialog" blocker.
 </li>
-<li><strong>ADR-008 — GitHub Packages distribution under <code>techierathore</code>.</strong> Chosen over nuget.org for the rename/beta phase; consumers configure a PAT-authenticated source.
+<li><strong>ADR-008 — GitHub Packages distribution under <code>techierathore</code>.</strong> Chosen over nuget.org for the rename/beta phase; consumers configure a PAT-authenticated source. <em>Superseded for public releases:</em> nuget.org is now the public feed (2.0.0, 2.0.3, 2.0.6, published through <code>publish-nuget.yml</code>); GitHub Packages keeps only the CI builds.
 </li>
 <li><strong>ADR-009 — Rename BlazorUI/BlazorBlueprint → TrBlazeUI.</strong> Namespaces, package names, CSS file, and service-registration method all renamed for the v2.0 fork; NOTICE retains original attribution per Apache 2.0.
 </li>
@@ -408,7 +408,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </li>
 </ul>
 <hr>
-<p>Last updated: 2026-06-30</p>
+<p>Last updated: 2026-09-13</p>
   </main>
 </div>
 
