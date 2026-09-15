@@ -11,7 +11,22 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
-Nothing yet.
+Closes TfLens TR-039 and TR-040 (`docs/TfLens-TrBlazeUI-Feedback.md`), both filed against 2.0.6.
+
+### Fixed
+
+- **Leaving a page that holds a chart no longer logs an unobserved `JSDisconnectedException` (TR-039).**
+  Blazor-ApexCharts releases its JavaScript module from `Dispose` without awaiting it (6.1.0 and
+  still 7.0.0), so every chart on a Blazor Server page faulted one orphaned task when the circuit
+  ended. All six chart types now render an internal `ApexChart` subclass whose teardown ignores a
+  closed connection on that release. Nothing changes while a chart is alive, and WebAssembly is
+  untouched. Measured: 5 charts left → 5 unobserved exceptions before, 0 after.
+
+### Added
+
+- **`InputGroupInput.DebounceMilliseconds` (TR-040)**, with the behaviour `Input` already has: 0 (the
+  default) raises `ValueChanged` per keystroke; any other value raises it once typing pauses. The box
+  itself still shows every keystroke immediately.
 
 ## [2.0.6] — 2026-09-13
 

@@ -6,6 +6,20 @@
 | Upstream | TrBlazeUI |
 | Updated | 2026-09-12 |
 
+> ## ✅ RESOLVED LIBRARY-SIDE 2026-09-14 — TR-039 and TR-040
+>
+> Filed by TfLens against 2.0.6; the entries themselves live in the TfLens copy of this file. Both
+> were reproduced on the unchanged library first, then fixed. REQ-UI-008 (TR-039) and REQ-UI-002
+> (TR-040) are re-verified. Release build **0 warnings / 0 errors**; **20/20** headless-Chromium
+> checks in `tests/verify/req-ui-020.spec.ts`. Both fixes are in the next release after 2.0.6.
+>
+> | Entry | What was actually wrong | What you get |
+> |---|---|---|
+> | **TR-039** — leaving a chart page logs an unobserved `JSDisconnectedException` | Confirmed: one per chart (5 on `/charts/bar`, 4 on `/charts/pie`, 5 on `/verify-tflens-3`, 0 on a page with none). Blazor-ApexCharts' `Dispose` starts the module release and never awaits it; 7.0.0 is the same. | All six chart types draw through `DisconnectSafeApexChart`, whose teardown ignores a closed connection. Measured: 0 after leaving each page. |
+> | **TR-040** — `InputGroupInput` has no `DebounceMilliseconds` | Confirmed exactly as filed. | `InputGroupInput.DebounceMilliseconds`, the same behaviour as `Input`'s. Measured: typing `escaped` raised 1 call with it; 3 keys without it raised 3. |
+>
+> TR-039 needs nothing on upgrade. For TR-040, give the `/misses` filter back `DebounceMilliseconds="150"`.
+
 > ## ✅ RESOLVED LIBRARY-SIDE 2026-09-13 — TR-036, TR-037 and TR-038
 >
 > All three were reproduced on the unchanged library first, then fixed. REQ-UI-001 (TR-036) and
