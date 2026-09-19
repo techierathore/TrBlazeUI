@@ -1,0 +1,348 @@
+@namespace TrBlazeUI.Components.DiffView
+
+@* Shows the difference between two texts. The comparison runs in .NET (TextDiff), so no script
+   library ships. Added and removed lines are tinted from the theme's --success and --destructive
+   tokens, and each also carries a +/- sign and screen-reader text, so the change is never shown by
+   colour alone. Unchanged stretches longer than the context fold into a button. *@
+
+<div class="@CssClass" data-slot="diff-view" data-mode="@(Mode == DiffViewMode.Inline ? "inline" : "side-by-side")" @attributes="AdditionalAttributes">
+    @if (ShowHeader)
+    {
+        <div data-slot="diff-view-header" class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-border bg-muted/50 px-3 py-2 text-xs">
+            @if (BeforeLabel != null || AfterLabel != null)
+            {
+                <span class="min-w-0 truncate font-mono">
+                    @(BeforeLabel ?? AfterLabel)
+                    @if (BeforeLabel != null && AfterLabel != null && BeforeLabel != AfterLabel)
+                    {
+                        <span class="text-muted-foreground"> → </span>@AfterLabel
+                    }
+                </span>
+            }
+            <span class="ml-auto flex shrink-0 items-center gap-2 font-mono" data-slot="diff-view-summary">
+                <span class="text-success">+@objAddedCount</span>
+                <span class="text-destructive">-@objRemovedCount</span>
+            </span>
+        </div>
+    }
+    @if (objHunks.Count == 0)
+    {
+        <p data-slot="diff-view-empty" class="px-3 py-6 text-center text-sm text-muted-foreground">@EmptyText</p>
+    }
+    else
+    {
+        <div class="overflow-x-auto">
+            @* Side by side keeps two readable columns on a phone by scrolling inside the frame. *@
+            <table class="@(Mode == DiffViewMode.Inline ? "w-full" : "w-full min-w-[40rem]") table-fixed border-collapse font-mono text-xs leading-5">
+                <colgroup>
+                    @if (Mode == DiffViewMode.Inline)
+                    {
+                        @if (ShowLineNumbers)
+                        {
+                            <col style="width: 3rem" />
+                            <col style="width: 3rem" />
+                        }
+                        <col style="width: 1.25rem" />
+                        <col />
+                    }
+                    else
+                    {
+                        @if (ShowLineNumbers)
+                        {
+                            <col style="width: 3rem" />
+                        }
+                        <col style="width: 1.25rem" />
+                        <col />
+                        @if (ShowLineNumbers)
+                        {
+                            <col style="width: 3rem" />
+                        }
+                        <col style="width: 1.25rem" />
+                        <col />
+                    }
+                </colgroup>
+                <tbody>
+                    @for (var vIndex = 0; vIndex < objHunks.Count; vIndex++)
+                    {
+                        var vHunk = objHunks[vIndex];
+                        var vGapStart = vIndex == 0 ? 0 : objHunks[vIndex - 1].EndIndex + 1;
+                        @RenderGap(vIndex, vGapStart, vHunk.StartIndex - 1)
+                        <tr data-slot="diff-hunk-header" data-hunk="@vHunk.Index">
+                            <td colspan="@ColumnCount" class="border-y border-border bg-muted/50 px-3 py-1">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="truncate text-muted-foreground">@vHunk.Header</span>
+                                    @if (HunkActions != null)
+                                    {
+                                        <span class="flex shrink-0 items-center gap-1 font-sans">@HunkActions(vHunk)</span>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                        @RenderLines(vHunk.Lines)
+                    }
+                    @RenderGap(objHunks.Count, objHunks[^1].EndIndex + 1, objLines.Count - 1)
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@code {
+    private readonly HashSet<int> objOpenGaps = [];
+    private IReadOnlyList<DiffLine> objLines = [];
+    private IReadOnlyList<DiffHunk> objHunks = [];
+    private int objAddedCount;
+    private int objRemovedCount;
+    private (string? Before, string? After, bool IgnoreWhitespace, int Context)? objComputedFor;
+
+    /// <summary>
+    /// Gets or sets the before text.
+    /// </summary>
+    [Parameter]
+    public string? Before { get; set; }
+
+    /// <summary>
+    /// Gets or sets the after text.
+    /// </summary>
+    [Parameter]
+    public string? After { get; set; }
+
+    /// <summary>
+    /// Gets or sets the layout. Default is <see cref="DiffViewMode.SideBySide"/>.
+    /// </summary>
+    [Parameter]
+    public DiffViewMode Mode { get; set; } = DiffViewMode.SideBySide;
+
+    /// <summary>
+    /// Gets or sets whether line numbers are shown. Default is true.
+    /// </summary>
+    [Parameter]
+    public bool ShowLineNumbers { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets how many unchanged lines stay visible around each change; longer unchanged
+    /// stretches fold into a "Show N unchanged lines" button. A negative value shows every line.
+    /// Default is 3.
+    /// </summary>
+    [Parameter]
+    public int ContextLines { get; set; } = 3;
+
+    /// <summary>
+    /// Gets or sets whether lines that differ only in whitespace count as unchanged.
+    /// </summary>
+    [Parameter]
+    public bool IgnoreWhitespace { get; set; }
+
+    /// <summary>
+    /// Gets or sets the before text's name shown in the header, for example a file path.
+    /// </summary>
+    [Parameter]
+    public string? BeforeLabel { get; set; }
+
+    /// <summary>
+    /// Gets or sets the after text's name shown in the header. When it equals
+    /// <see cref="BeforeLabel"/> only one name is shown.
+    /// </summary>
+    [Parameter]
+    public string? AfterLabel { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the header with the names and the added/removed counts is shown.
+    /// Default is true.
+    /// </summary>
+    [Parameter]
+    public bool ShowHeader { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets content drawn at the right of each part's header, for example Accept and Revert
+    /// buttons. The context is the part.
+    /// </summary>
+    [Parameter]
+    public RenderFragment<DiffHunk>? HunkActions { get; set; }
+
+    /// <summary>
+    /// Gets or sets the text shown when the two texts are the same. Default is <c>"No differences"</c>.
+    /// </summary>
+    [Parameter]
+    public string EmptyText { get; set; } = "No differences";
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Gets the parts of the current comparison.
+    /// </summary>
+    public IReadOnlyList<DiffHunk> Hunks => objHunks;
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        var vInputs = (Before, After, IgnoreWhitespace, ContextLines);
+        if (objComputedFor == vInputs)
+        {
+            return;
+        }
+
+        objLines = TextDiff.Compare(Before, After, IgnoreWhitespace);
+        objHunks = TextDiff.Hunks(objLines, ContextLines);
+        objAddedCount = objLines.Count(l => l.Kind == DiffLineKind.Added);
+        objRemovedCount = objLines.Count(l => l.Kind == DiffLineKind.Removed);
+        objOpenGaps.Clear();
+        objComputedFor = vInputs;
+    }
+
+    private int ColumnCount => (Mode == DiffViewMode.Inline ? 2 : 4) + (ShowLineNumbers ? 2 : 0);
+
+    private RenderFragment RenderGap(int aGapIndex, int aStart, int aEnd) => __builder =>
+    {
+        var vCount = aEnd - aStart + 1;
+        if (vCount <= 0)
+        {
+            return;
+        }
+
+        if (objOpenGaps.Contains(aGapIndex))
+        {
+            @RenderLines(objLines.Skip(aStart).Take(vCount).ToList())
+            return;
+        }
+
+        <tr data-slot="diff-fold">
+            <td colspan="@ColumnCount" class="bg-muted/30 p-0">
+                <button type="button"
+                        class="w-full px-3 py-1 text-left font-sans text-xs text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                        @onclick="() => { objOpenGaps.Add(aGapIndex); }">
+                    ⋯ Show @vCount unchanged @(vCount == 1 ? "line" : "lines")
+                </button>
+            </td>
+        </tr>
+    };
+
+    private RenderFragment RenderLines(IReadOnlyList<DiffLine> aLines) => __builder =>
+    {
+        if (Mode == DiffViewMode.Inline)
+        {
+            foreach (var vLine in aLines)
+            {
+                <tr data-kind="@KindName(vLine.Kind)">
+                    @if (ShowLineNumbers)
+                    {
+                        <td class="@NumberClass(vLine.Kind)">@vLine.OldNumber</td>
+                        <td class="@NumberClass(vLine.Kind)">@vLine.NewNumber</td>
+                    }
+                    @RenderSignAndText(vLine)
+                </tr>
+            }
+
+            return;
+        }
+
+        foreach (var (vLeft, vRight) in PairSides(aLines))
+        {
+            <tr data-kind="@(vLeft?.Kind == vRight?.Kind ? KindName(vLeft!.Kind) : "changed")">
+                @RenderSide(vLeft, true)
+                @RenderSide(vRight, false)
+            </tr>
+        }
+    };
+
+    private RenderFragment RenderSide(DiffLine? aLine, bool aIsBefore) => __builder =>
+    {
+        if (aLine == null)
+        {
+            if (ShowLineNumbers)
+            {
+                <td class="bg-muted/40"></td>
+            }
+            <td class="bg-muted/40"></td>
+            <td class="bg-muted/40 @(aIsBefore ? "border-r border-border" : null)"></td>
+            return;
+        }
+
+        if (ShowLineNumbers)
+        {
+            <td class="@NumberClass(aLine.Kind)">@(aIsBefore ? aLine.OldNumber : aLine.NewNumber)</td>
+        }
+        @RenderSignAndText(aLine, aIsBefore)
+    };
+
+    private RenderFragment RenderSignAndText(DiffLine aLine, bool aHasDivider = false) => __builder =>
+    {
+        <td aria-hidden="true" class="@SignClass(aLine.Kind)">@Sign(aLine.Kind)</td>
+        <td class="@TextClass(aLine.Kind, aHasDivider)">@if (aLine.Kind != DiffLineKind.Unchanged)
+            {
+                <span class="sr-only">@(aLine.Kind == DiffLineKind.Added ? "Added: " : "Removed: ")</span>
+            }@aLine.Text</td>
+    };
+
+    private static List<(DiffLine? Left, DiffLine? Right)> PairSides(IReadOnlyList<DiffLine> aLines)
+    {
+        var vRows = new List<(DiffLine? Left, DiffLine? Right)>();
+        var vRemoved = new List<DiffLine>();
+        var vAdded = new List<DiffLine>();
+        foreach (var vLine in aLines.Cast<DiffLine?>().Append(null))
+        {
+            if (vLine != null && vLine.Kind != DiffLineKind.Unchanged)
+            {
+                (vLine.Kind == DiffLineKind.Removed ? vRemoved : vAdded).Add(vLine);
+                continue;
+            }
+
+            for (var vI = 0; vI < Math.Max(vRemoved.Count, vAdded.Count); vI++)
+            {
+                vRows.Add((vI < vRemoved.Count ? vRemoved[vI] : null, vI < vAdded.Count ? vAdded[vI] : null));
+            }
+
+            vRemoved.Clear();
+            vAdded.Clear();
+            if (vLine != null)
+            {
+                vRows.Add((vLine, vLine));
+            }
+        }
+
+        return vRows;
+    }
+
+    private static string KindName(DiffLineKind aKind) => aKind switch
+    {
+        DiffLineKind.Added => "added",
+        DiffLineKind.Removed => "removed",
+        _ => "unchanged"
+    };
+
+    private static string Sign(DiffLineKind aKind) => aKind switch
+    {
+        DiffLineKind.Added => "+",
+        DiffLineKind.Removed => "-",
+        _ => " "
+    };
+
+    private static string NumberClass(DiffLineKind aKind) => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "select-none px-2 text-right align-top text-muted-foreground",
+        aKind == DiffLineKind.Added ? "bg-success/15" : aKind == DiffLineKind.Removed ? "bg-destructive/15" : null);
+
+    private static string SignClass(DiffLineKind aKind) => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "select-none text-center align-top",
+        aKind == DiffLineKind.Added ? "bg-success/10 text-success" : aKind == DiffLineKind.Removed ? "bg-destructive/10 text-destructive" : null);
+
+    private static string TextClass(DiffLineKind aKind, bool aHasDivider) => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "whitespace-pre-wrap pr-3 align-top [overflow-wrap:anywhere]",
+        aKind == DiffLineKind.Added ? "bg-success/10" : aKind == DiffLineKind.Removed ? "bg-destructive/10" : null,
+        aHasDivider ? "border-r border-border" : null);
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "w-full overflow-hidden rounded-md border border-border bg-background text-foreground",
+        Class
+    );
+}

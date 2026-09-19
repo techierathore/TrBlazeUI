@@ -148,6 +148,15 @@
   }
 }
 
+/* TreeView: the focusable element is the <li role="treeitem">, which also holds the open children,
+   so the ring goes on its own row rather than around the whole branch. */
+@layer components {
+  [role="treeitem"]:focus-visible > [data-slot="tree-item-row"] {
+    outline: 2px solid var(--ring);
+    outline-offset: -2px;
+  }
+}
+
 /* Navigation Menu keyboard navigation focus styling */
 @layer components {
   /* Remove browser default focus outline from the menu container */

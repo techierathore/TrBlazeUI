@@ -1,0 +1,134 @@
+@page "/components/diff-view"
+@using TrBlazeUI.Components.DiffView
+@using TrBlazeUI.Components.Toggle
+
+<PageTitle>Diff View Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-5xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Diff View Component</h1>
+        <p class="text-xl text-muted-foreground">
+            Shows the difference between a before and an after text, side by side or inline. The
+            comparison runs in .NET, so no script library ships.
+        </p>
+    </div>
+
+    <!-- Changes -->
+    <div class="space-y-4" data-testid="diff-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Changes</h2>
+            <p class="text-sm text-muted-foreground">
+                Added and removed lines are tinted from the theme and marked + and -. Unchanged stretches
+                longer than the context fold into a button. Each part has a slot for its own buttons.
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-4">
+            <ToggleGroup TValue="DiffViewMode" @bind-Value="objMode" Joined="true" AllowDeselect="false"
+                         Size="ToggleSize.Small" AriaLabel="Diff layout" data-testid="diff-mode">
+                <ToggleGroupItem TValue="DiffViewMode" Value="DiffViewMode.SideBySide" data-testid="diff-mode-side">Side by side</ToggleGroupItem>
+                <ToggleGroupItem TValue="DiffViewMode" Value="DiffViewMode.Inline" data-testid="diff-mode-inline">Inline</ToggleGroupItem>
+            </ToggleGroup>
+            <label class="flex items-center gap-2 text-sm">
+                <Checkbox @bind-Checked="objIgnoreWhitespace" data-testid="diff-ignore-ws" />
+                Ignore whitespace
+            </label>
+        </div>
+        <DiffView Before="@BeforeText" After="@AfterText" Mode="objMode" IgnoreWhitespace="objIgnoreWhitespace"
+                  BeforeLabel="src/Services/OrderService.cs" AfterLabel="src/Services/OrderService.cs"
+                  data-testid="diff-view">
+            <HunkActions>
+                <Button Size="ButtonSize.Small" Variant="ButtonVariant.Ghost" Class="h-6 px-2 text-xs"
+                        OnClick="@(() => objLastAction = $"Accepted part {context.Index + 1} ({context.Header})")"
+                        data-testid="@($"hunk-accept-{context.Index}")">Accept</Button>
+                <Button Size="ButtonSize.Small" Variant="ButtonVariant.Ghost" Class="h-6 px-2 text-xs"
+                        OnClick="@(() => objLastAction = $"Reverted part {context.Index + 1} ({context.Header})")">Revert</Button>
+            </HunkActions>
+        </DiffView>
+        <p class="text-sm text-muted-foreground" data-testid="diff-last-action">@(objLastAction ?? "No part accepted or reverted yet.")</p>
+    </div>
+
+    <!-- No Differences -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">No Differences</h2>
+        <DiffView Before="same text" After="same text" BeforeLabel="notes.md" data-testid="diff-empty" />
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">API Reference</h2>
+        <div class="border rounded-lg p-6 space-y-2 text-sm">
+            <p><strong>Before / After:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - The two texts</p>
+            <p><strong>Mode:</strong> <code class="bg-muted px-1 py-0.5 rounded">DiffViewMode</code> - SideBySide (default) or Inline</p>
+            <p><strong>ShowLineNumbers:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Line numbers (default true)</p>
+            <p><strong>ContextLines:</strong> <code class="bg-muted px-1 py-0.5 rounded">int</code> - Unchanged lines kept around each change (default 3; negative shows all)</p>
+            <p><strong>IgnoreWhitespace:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Lines differing only in whitespace count as unchanged</p>
+            <p><strong>BeforeLabel / AfterLabel / ShowHeader:</strong> Header with the names and the +/- counts</p>
+            <p><strong>HunkActions:</strong> <code class="bg-muted px-1 py-0.5 rounded">RenderFragment&lt;DiffHunk&gt;</code> - Buttons on each part's header</p>
+            <p><strong>EmptyText:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - Shown when the texts are the same</p>
+            <p><strong>TextDiff.Compare / TextDiff.Hunks:</strong> The comparison on its own, for code that needs the lines</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    private DiffViewMode objMode = DiffViewMode.SideBySide;
+    private bool objIgnoreWhitespace;
+    private string? objLastAction;
+
+    private const string BeforeText = """
+        using System;
+
+        namespace Shop.Services;
+
+        public class OrderService
+        {
+            private readonly IOrderStore objStore;
+
+            public OrderService(IOrderStore aStore)
+            {
+                objStore = aStore;
+            }
+
+            public decimal Total(Order aOrder)
+            {
+                var vTotal = 0m;
+                foreach (var vLine in aOrder.Lines)
+                {
+                    vTotal += vLine.Price * vLine.Quantity;
+                }
+                return vTotal;
+            }
+
+            public void Save(Order aOrder)
+            {
+                objStore.Save(aOrder);
+            }
+        }
+        """;
+
+    private const string AfterText = """
+        using System;
+
+        namespace Shop.Services;
+
+        public class OrderService
+        {
+            private readonly IOrderStore objStore;
+
+            public OrderService(IOrderStore aStore)
+            {
+                objStore = aStore;
+            }
+
+            public decimal Total(Order aOrder)
+            {
+                return aOrder.Lines.Sum(vLine => vLine.Price * vLine.Quantity);
+            }
+
+            public async Task SaveAsync(Order aOrder)
+            {
+                await objStore.SaveAsync(aOrder);
+            }
+        }
+        """;
+}

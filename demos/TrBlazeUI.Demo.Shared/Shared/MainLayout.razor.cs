@@ -88,6 +88,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         new("components/date-picker", "Date Picker"),
         new("components/date-range-picker", "Date Range Picker"),
         new("components/dialog", "Dialog"),
+        new("components/diff-view", "Diff View"),
         new("components/dropdown-menu", "Dropdown Menu"),
         new("components/drawer", "Drawer"),
         new("components/empty", "Empty"),
@@ -140,6 +141,7 @@ public partial class MainLayout : LayoutComponentBase, IDisposable
         new("components/toggle-group", "Toggle Group"),
         new("components/toolbar", "Toolbar"),
         new("components/tooltip", "Tooltip"),
+        new("components/tree-view", "Tree View"),
         new("components/typography", "Typography"),
     ];
 

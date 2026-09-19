@@ -273,6 +273,8 @@ builder.Services.AddScoped<ToastService>();  // Required for Toast notifications
 @using TrBlazeUI.Components.TimePicker
 @using TrBlazeUI.Components.Toggle
 @using TrBlazeUI.Components.Toolbar
+@using TrBlazeUI.Components.TreeView
+@using TrBlazeUI.Components.DiffView
 @using TrBlazeUI.Icons.Lucide.Components
 @using TrBlazeUI.Icons.Lucide.Data
 
@@ -610,6 +612,30 @@ Sub-components: `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `Ca
 </ScrollArea>
 ```
 
+A height or max-height on `Class` bounds the scrolling viewport; `Height` / `MaxHeight` set it on
+the viewport directly. Other parameters: `Orientation` (`Vertical`, `Horizontal`, `Both`), `Type`
+(scrollbar visibility), `ViewportClass`.
+
+**A log or chat that grows at the bottom: `StickToEnd="true"`.** The view follows new content
+(DOM changes and size changes, including text a child component updates on its own) until the
+reader scrolls up; it resumes when they scroll back to the end. `AtEndChanged` reports both, and
+`ScrollToEndAsync()` jumps back and resumes:
+
+```razor
+<ScrollArea @ref="logArea" StickToEnd="true" AtEndChanged="v => following = v" Class="h-[300px] rounded-md border">
+    <CodeBlock Code="@output" ShowCopyButton="false" Class="rounded-none border-0" />
+</ScrollArea>
+@if (!following)
+{
+    <Button Size="ButtonSize.Small" OnClick="() => logArea!.ScrollToEndAsync()">Jump to latest</Button>
+}
+
+@code {
+    private ScrollArea? logArea;
+    private bool following = true;
+}
+```
+
 ### Collapsible
 
 ```razor
@@ -639,6 +665,43 @@ a spacer inside the trigger has something to push against:
 
 `CollapsibleTrigger` also takes `AsChild` and splats unmatched attributes, so a `data-testid` or a
 custom component can be the trigger.
+
+### TreeView
+
+A file explorer, an outline, any hierarchy: rows open and close, one row is selected, and the
+keyboard works as in the WAI-ARIA tree (Up/Down move, Right opens or enters, Left closes or goes to
+the parent, Home/End, Enter/Space select, a letter jumps to the next row starting with it). Use this,
+not nested `Collapsible`s — those have no selection, no arrow keys and no indentation.
+
+```razor
+<TreeView @bind-SelectedValue="selectedPath" AriaLabel="Files">
+    <TreeItem Label="src" Value="src" DefaultExpanded="true">
+        <Icon><LucideIcon Name="folder" Size="16" /></Icon>
+        <Trailing><Badge Variant="BadgeVariant.Secondary">3</Badge></Trailing>
+        <ChildContent>
+            <TreeItem Label="Program.cs" Value="src/Program.cs">
+                <Icon><LucideIcon Name="file-code" Size="16" /></Icon>
+            </TreeItem>
+        </ChildContent>
+    </TreeItem>
+    @* Children loaded on demand: mark the branch, load in OnExpand, show Loading meanwhile *@
+    <TreeItem Label="packages" Value="packages" HasChildren="true" OnExpand="LoadPackagesAsync" Loading="isLoading">
+        @foreach (var p in packages)
+        {
+            <TreeItem Label="@p" Value="@($"packages/{p}")" />
+        }
+    </TreeItem>
+</TreeView>
+```
+
+- The trailing slot is `Trailing`, not `Badge` — a `Badge` component goes *inside* it.
+- `TreeView`: `SelectedValue`/`SelectedValueChanged` (string; unbound, the tree keeps it),
+  `ToggleOnClick` (default true — clicking a branch row also opens it; the chevron always does),
+  `Indent` (CSS length, default `1rem`), `AriaLabel`, `Class`.
+- `TreeItem`: `Label` or `LabelContent`, `Value`, `Icon`, `Trailing`, child rows as `ChildContent`,
+  `Expanded`/`ExpandedChanged` or `DefaultExpanded`, `HasChildren`, `OnExpand`, `Loading`,
+  `LoadingText`, `Disabled`, `Class`; unmatched attributes (`data-testid`) land on the `treeitem`.
+- Children render only while their branch is open, so a closed branch costs nothing.
 
 ---
 
@@ -1296,6 +1359,27 @@ selection. Use `ReadOnly` for display-only ratings — do not wrap an interactiv
     <LucideIcon Name="bold" Size="16" />
 </Toggle>
 ```
+
+### ToggleGroup
+
+Several toggles that keep the choice themselves: `Type="ToggleGroupType.Single"` (default, a radio
+group) or `Multiple` (`@bind-Values`, a `List<TValue>`). For a view switch in a toolbar —
+"Board | Table", "Side by side | Inline" — use `Joined="true"` (one control, shared border) and
+`AllowDeselect="false"` (exactly one stays chosen). Not two loose `Toggle`s, and not `Tabs`.
+
+```razor
+<ToggleGroup TValue="string" @bind-Value="view" Joined="true" AllowDeselect="false"
+             Variant="ToggleVariant.Outline" Size="ToggleSize.Small" AriaLabel="View">
+    <ToggleGroupItem TValue="string" Value="@("board")">Board</ToggleGroupItem>
+    <ToggleGroupItem TValue="string" Value="@("table")">Table</ToggleGroupItem>
+</ToggleGroup>
+```
+
+- `TValue` goes on the group **and** each item; string values need `Value="@("board")"`.
+- One Tab stop (the chosen item); the arrow keys move between items. Single choice renders
+  `role="radiogroup"` with `role="radio"` items; multiple renders `aria-pressed` buttons.
+- Other parameters: `DefaultValue` (unbound), `Variant`, `Size`, `Disabled`, `Class`; items take
+  `Disabled` and `Class`.
 
 ---
 
@@ -2411,6 +2495,31 @@ syntax highlighter; pass pre-highlighted markup through `Html` if you have one.
 ```razor
 <CodeBlock Language="csharp" Code="@snippet" />
 ```
+
+### DiffView
+
+The difference between two texts, side by side or inline, with line numbers. Added and removed
+lines are tinted from the theme (`--success`, `--destructive`) and marked `+`/`-`; unchanged
+stretches longer than `ContextLines` fold into a "Show N unchanged lines" button. The comparison
+runs in .NET (`TextDiff`, Myers' algorithm) — no script library.
+
+```razor
+<DiffView Before="@oldText" After="@newText" Mode="mode"
+          BeforeLabel="src/OrderService.cs" AfterLabel="src/OrderService.cs">
+    <HunkActions>
+        <Button Size="ButtonSize.Small" Variant="ButtonVariant.Ghost" OnClick="() => Accept(context)">Accept</Button>
+    </HunkActions>
+</DiffView>
+```
+
+- `Mode`: `DiffViewMode.SideBySide` (default) or `DiffViewMode.Inline` — pair it with a joined
+  `ToggleGroup TValue="DiffViewMode"` for the switch.
+- `HunkActions` is a `RenderFragment<DiffHunk>`; `context` has `Index`, `Header` (`@@ -12,7 +12,9 @@`),
+  `OldStart`/`OldCount`/`NewStart`/`NewCount`, `Lines`, `AddedCount`, `RemovedCount`.
+- Other parameters: `ShowLineNumbers` (true), `ContextLines` (3; negative shows everything),
+  `IgnoreWhitespace`, `ShowHeader` (true; names and `+N -M`), `EmptyText` ("No differences"), `Class`.
+- Need the lines in code? `TextDiff.Compare(before, after)` returns `DiffLine`s (`Kind`,
+  `OldNumber`, `NewNumber`, `Text`) and `TextDiff.Hunks(lines, context)` the parts.
 
 ### StatTile / StatGroup
 

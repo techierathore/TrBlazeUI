@@ -1,0 +1,146 @@
+@page "/components/tree-view"
+@using TrBlazeUI.Components.TreeView
+
+<PageTitle>Tree View Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Tree View Component</h1>
+        <p class="text-xl text-muted-foreground">
+            A hierarchy of rows that open and close, with one selected row, keyboard movement,
+            an icon and a trailing badge per row, and children loaded when a branch opens.
+        </p>
+    </div>
+
+    <!-- File Explorer -->
+    <div class="space-y-4" data-testid="tree-files-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">File Explorer</h2>
+            <p class="text-sm text-muted-foreground">
+                Click a folder to open it, or use the keyboard: Up and Down move, Right opens, Left closes
+                or goes to the parent, Home and End jump, Enter selects, and a letter jumps to the next row starting with it.
+            </p>
+        </div>
+        <div class="grid gap-4 md:grid-cols-[18rem_1fr]">
+            <div class="rounded-md border p-2">
+                <TreeView @bind-SelectedValue="objSelectedFile" AriaLabel="Files" data-testid="tree-files">
+                    <TreeItem Label="src" Value="src" DefaultExpanded="true" data-testid="tree-src">
+                        <Icon><LucideIcon Name="folder" Size="16" /></Icon>
+                        <ChildContent>
+                            <TreeItem Label="Components" Value="src/Components" data-testid="tree-components">
+                                <Icon><LucideIcon Name="folder" Size="16" /></Icon>
+                                <Trailing><Badge Variant="BadgeVariant.Secondary" Class="px-1.5 py-0 text-[10px]">3</Badge></Trailing>
+                                <ChildContent>
+                                    <TreeItem Label="Button.razor" Value="src/Components/Button.razor">
+                                        <Icon><LucideIcon Name="file-code" Size="16" /></Icon>
+                                    </TreeItem>
+                                    <TreeItem Label="DiffView.razor" Value="src/Components/DiffView.razor" data-testid="tree-diffview">
+                                        <Icon><LucideIcon Name="file-code" Size="16" /></Icon>
+                                        <Trailing><span class="font-mono text-xs font-semibold text-success" title="Added">A</span></Trailing>
+                                    </TreeItem>
+                                    <TreeItem Label="TreeView.razor" Value="src/Components/TreeView.razor">
+                                        <Icon><LucideIcon Name="file-code" Size="16" /></Icon>
+                                        <Trailing><span class="font-mono text-xs font-semibold text-primary" title="Modified">M</span></Trailing>
+                                    </TreeItem>
+                                </ChildContent>
+                            </TreeItem>
+                            <TreeItem Label="Program.cs" Value="src/Program.cs" data-testid="tree-program">
+                                <Icon><LucideIcon Name="file-code" Size="16" /></Icon>
+                            </TreeItem>
+                            <TreeItem Label="appsettings.json" Value="src/appsettings.json">
+                                <Icon><LucideIcon Name="file-json" Size="16" /></Icon>
+                            </TreeItem>
+                        </ChildContent>
+                    </TreeItem>
+                    <TreeItem Label="packages" Value="packages" HasChildren="true" OnExpand="LoadPackagesAsync"
+                              Loading="objIsLoadingPackages" data-testid="tree-packages">
+                        <Icon><LucideIcon Name="folder" Size="16" /></Icon>
+                        <ChildContent>
+                            @foreach (var vPackage in objPackages)
+                            {
+                                <TreeItem Label="@vPackage" Value="@($"packages/{vPackage}")">
+                                    <Icon><LucideIcon Name="file-text" Size="16" /></Icon>
+                                </TreeItem>
+                            }
+                        </ChildContent>
+                    </TreeItem>
+                    <TreeItem Label="README.md" Value="README.md" data-testid="tree-readme">
+                        <Icon><LucideIcon Name="file-text" Size="16" /></Icon>
+                    </TreeItem>
+                </TreeView>
+            </div>
+            <div class="rounded-md border p-4 text-sm">
+                <p class="text-muted-foreground">Selected</p>
+                <p class="font-mono" data-testid="tree-selected">@(objSelectedFile ?? "nothing")</p>
+                <p class="mt-4 text-muted-foreground">
+                    <strong>packages</strong> loads its children when first opened (0.8 s), showing a loading line meanwhile.
+                    Loaded @objLoadCount time(s).
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Usage</h2>
+        <pre class="overflow-x-auto rounded-md border bg-muted/30 p-4 text-xs"><code>&lt;TreeView @@bind-SelectedValue="selectedPath" AriaLabel="Files"&gt;
+    &lt;TreeItem Label="src" Value="src" DefaultExpanded="true"&gt;
+        &lt;Icon&gt;&lt;LucideIcon Name="folder" Size="16" /&gt;&lt;/Icon&gt;
+        &lt;Trailing&gt;&lt;Badge Variant="BadgeVariant.Secondary"&gt;3&lt;/Badge&gt;&lt;/Trailing&gt;
+        &lt;ChildContent&gt;
+            &lt;TreeItem Label="Program.cs" Value="src/Program.cs" /&gt;
+        &lt;/ChildContent&gt;
+    &lt;/TreeItem&gt;
+    @@* Children loaded on demand *@@
+    &lt;TreeItem Label="packages" HasChildren="true" OnExpand="LoadAsync" Loading="isLoading"&gt;
+        @@foreach (var p in packages) { &lt;TreeItem Label="@@p" Value="@@p" /&gt; }
+    &lt;/TreeItem&gt;
+&lt;/TreeView&gt;</code></pre>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">API Reference</h2>
+        <div class="border rounded-lg p-6 space-y-4 text-sm">
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">TreeView</h3>
+                <p><strong>SelectedValue / SelectedValueChanged:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - The selected row's Value; bind it or let the tree keep it</p>
+                <p><strong>ToggleOnClick:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Clicking a branch row also opens or closes it (default true)</p>
+                <p><strong>Indent:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Indent per level as a CSS length (default 1rem)</p>
+                <p><strong>AriaLabel:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Accessible name of the tree</p>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">TreeItem</h3>
+                <p><strong>Label / LabelContent:</strong> The row's text, or custom content</p>
+                <p><strong>Value:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Identifies the row for selection</p>
+                <p><strong>Icon / Trailing:</strong> <code class="bg-muted px-1 py-0.5 rounded">RenderFragment</code> - Leading icon, trailing content</p>
+                <p><strong>Expanded / ExpandedChanged / DefaultExpanded:</strong> Open state, bound or kept by the row</p>
+                <p><strong>HasChildren:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool?</code> - Mark a branch whose children load on demand</p>
+                <p><strong>OnExpand / Loading / LoadingText:</strong> Load children when the row opens and show a loading line</p>
+                <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - The row cannot be selected</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? objSelectedFile = "src/Program.cs";
+    private List<string> objPackages = [];
+    private bool objIsLoadingPackages;
+    private int objLoadCount;
+
+    private async Task LoadPackagesAsync()
+    {
+        if (objPackages.Count > 0)
+        {
+            return;
+        }
+
+        objIsLoadingPackages = true;
+        StateHasChanged();
+        await Task.Delay(800);
+        objPackages = ["TrBlazeUI.Components.2.0.8.nupkg", "TrBlazeUI.Primitives.2.0.8.nupkg", "TrBlazeUI.Icons.Lucide.2.0.8.nupkg"];
+        objLoadCount++;
+        objIsLoadingPackages = false;
+    }
+}

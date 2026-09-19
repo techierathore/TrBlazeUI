@@ -1,8 +1,13 @@
 @namespace TrBlazeUI.Components.Toggle
 @typeparam TValue
+@implements IDisposable
 
 <button type="button"
-        aria-pressed="@(IsPressed ? "true" : "false")"
+        role="@(IsSingle ? "radio" : null)"
+        aria-checked="@(IsSingle ? (IsPressed ? "true" : "false") : null)"
+        aria-pressed="@(IsSingle ? null : (IsPressed ? "true" : "false"))"
+        tabindex="@(Context == null || Context.IsTabStop(this) ? 0 : -1)"
+        data-slot="toggle-group-item"
         data-state="@(IsPressed ? "on" : "off")"
         disabled="@(Disabled || Context?.Disabled == true)"
         class="@CssClass"
@@ -27,8 +32,16 @@
     public RenderFragment? ChildContent { get; set; }
 
     private bool IsPressed => Context?.IsItemPressed(Value) == true;
+    private bool IsSingle => Context?.Type == ToggleGroupType.Single;
+    private bool IsJoined => Context?.Joined == true;
     private ToggleVariant Variant => Context?.Variant ?? ToggleVariant.Default;
     private ToggleSize Size => Context?.Size ?? ToggleSize.Default;
+
+    /// <inheritdoc />
+    protected override void OnInitialized() => Context?.Register(this);
+
+    /// <inheritdoc />
+    public void Dispose() => Context?.Unregister(this);
 
     private async Task HandleClick()
     {
@@ -53,6 +66,12 @@
         _ => "h-10 px-3"
     };
 
+    // Joined: the group draws the outer border and rounding; each item after the first draws the
+    // divider on its left, and the focus ring is inset so the group's overflow clip cannot cut it.
+    private string? JoinedClasses => IsJoined
+        ? "rounded-none border-0 not-first:border-l not-first:border-input focus-visible:ring-inset focus-visible:ring-offset-0"
+        : null;
+
     private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
         "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors",
         "hover:bg-muted hover:text-muted-foreground",
@@ -61,6 +80,7 @@
         "data-[state=on]:bg-accent data-[state=on]:text-accent-foreground",
         VariantClasses,
         SizeClasses,
+        JoinedClasses,
         Class
     );
 

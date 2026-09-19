@@ -1,14 +1,36 @@
 @namespace TrBlazeUI.Components.ScrollArea
+@implements IAsyncDisposable
+@inject IJSRuntime JS
 
 <div class="@CssClass" @attributes="AdditionalAttributes">
-    <div class="@ComputedViewportClass" style="@ViewportStyle">
+    <div @ref="objViewport" class="@ComputedViewportClass" style="@ViewportStyle" data-slot="scroll-area-viewport">
         @ChildContent
     </div>
 </div>
 
 @code {
+    private ElementReference objViewport;
+    private IJSObjectReference? objModule;
+    private DotNetObjectReference<ScrollArea>? objDotNetRef;
+    private bool objIsFollowing;
+
     [Parameter]
     public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the view stays at the newest content as content is added, like a build
+    /// log. Following stops when the reader scrolls away from the end and resumes when they scroll
+    /// back to it. Default is false.
+    /// </summary>
+    [Parameter]
+    public bool StickToEnd { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback raised when <see cref="StickToEnd"/> following stops (false, the
+    /// reader scrolled away) or resumes (true). Use it to show a "Jump to latest" button.
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> AtEndChanged { get; set; }
 
     [Parameter]
     public string? ViewportClass { get; set; }
@@ -27,6 +49,94 @@
 
     [Parameter]
     public string? MaxHeight { get; set; }
+
+    /// <summary>
+    /// Scrolls to the end of the content and, with <see cref="StickToEnd"/>, resumes following.
+    /// </summary>
+    /// <returns>A task that completes when the browser has scrolled.</returns>
+    public async Task ScrollToEndAsync()
+    {
+        try
+        {
+            objModule ??= await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/TrBlazeUI.Components/js/scroll-area.js");
+            await objModule.InvokeVoidAsync("scrollToEnd", objViewport);
+        }
+        catch (JSDisconnectedException)
+        {
+            // Expected during circuit disconnect in Blazor Server.
+        }
+        catch (InvalidOperationException)
+        {
+            // JS interop is unavailable during prerendering.
+        }
+    }
+
+    /// <summary>
+    /// Called from JavaScript when following stops or resumes.
+    /// </summary>
+    /// <param name="aIsAtEnd">True when the view is back at the end of the content.</param>
+    /// <returns>A task that completes when the callback has run.</returns>
+    [JSInvokable]
+    public Task OnAtEndChanged(bool aIsAtEnd) => AtEndChanged.InvokeAsync(aIsAtEnd);
+
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (StickToEnd == objIsFollowing)
+        {
+            return;
+        }
+
+        try
+        {
+            objModule ??= await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/TrBlazeUI.Components/js/scroll-area.js");
+            if (StickToEnd)
+            {
+                objDotNetRef ??= DotNetObjectReference.Create(this);
+                await objModule.InvokeVoidAsync("attach", objViewport, objDotNetRef);
+            }
+            else
+            {
+                await objModule.InvokeVoidAsync("detach", objViewport);
+            }
+
+            objIsFollowing = StickToEnd;
+        }
+        catch (JSDisconnectedException)
+        {
+            // Expected during circuit disconnect in Blazor Server.
+        }
+        catch (InvalidOperationException)
+        {
+            // JS interop is unavailable during prerendering.
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        if (objModule != null)
+        {
+            try
+            {
+                if (objIsFollowing)
+                {
+                    await objModule.InvokeVoidAsync("detach", objViewport);
+                }
+
+                await objModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Expected during circuit disconnect.
+            }
+        }
+
+        objDotNetRef?.Dispose();
+        GC.SuppressFinalize(this);
+    }
 
     private string ViewportStyle
     {
@@ -55,7 +165,9 @@
     };
 
     private string ComputedViewportClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
-        "w-full rounded-[inherit]",
+        // h-full + max-h-[inherit]: a height or max-height given to the root through Class must bound
+        // the viewport, or the viewport grows with its content and never scrolls.
+        "h-full max-h-[inherit] w-full rounded-[inherit]",
         Orientation switch
         {
             ScrollAreaOrientation.Vertical => "overflow-y-auto overflow-x-hidden",
