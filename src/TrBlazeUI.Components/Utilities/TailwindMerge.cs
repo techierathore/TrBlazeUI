@@ -116,6 +116,18 @@ public static class TailwindMerge
         ["text-balance"] = "text-wrap",
         ["text-pretty"] = "text-wrap",
 
+        // Border Style and Border Collapse - bare `border-*` words that are not colours. Left out of
+        // this table they matched the colour pattern, so `cn("border-dashed", "border-input")` kept
+        // only the colour and the dashes vanished (Chatur TR-004 follow-up, 2026-09-19).
+        ["border-solid"] = "border-style",
+        ["border-dashed"] = "border-style",
+        ["border-dotted"] = "border-style",
+        ["border-double"] = "border-style",
+        ["border-hidden"] = "border-style",
+        ["border-none"] = "border-style",
+        ["border-collapse"] = "border-collapse",
+        ["border-separate"] = "border-collapse",
+
         // Flex Wrap - a separate axis from flex-direction. Without this group,
         // "flex-wrap flex-nowrap" left both classes live and the cascade (not the caller)
         // picked the winner, so a nowrap override was silently inert (TR-027).
@@ -163,6 +175,7 @@ public static class TailwindMerge
     private static readonly Regex BgColorRegex = new(@"^bg-([a-z]+)(?:-(\d+))?$", RegexOptions.Compiled);
     private static readonly Regex BorderColorRegex = new(@"^border-([a-z]+)(?:-(\d+))?$", RegexOptions.Compiled);
     private static readonly Regex BorderWidthRegex = new(@"^border(-\d+)?$", RegexOptions.Compiled);
+    private static readonly Regex BorderSideWidthRegex = new(@"^border-([xytrblse])(-\d+)?$", RegexOptions.Compiled);
     private static readonly Regex OpacityRegex = new(@"^opacity-(\d+)$", RegexOptions.Compiled);
     private static readonly Regex ZIndexRegex = new(@"^z-(\d+|auto)$", RegexOptions.Compiled);
     private static readonly Regex GridColsRegex = new(@"^grid-cols-(\d+|none)$", RegexOptions.Compiled);
@@ -440,6 +453,15 @@ public static class TailwindMerge
         if (BgColorRegex.IsMatch(className))
         {
             return "background-color";
+        }
+
+        // Check one-side border widths (border-l, border-x-2) before colours: the colour pattern
+        // also matches "border-l", so cn("border-l", "border-input") used to drop the divider the
+        // caller asked for - a joined ToggleGroup rendered with no lines between its items.
+        var sideMatch = BorderSideWidthRegex.Match(className);
+        if (sideMatch.Success)
+        {
+            return "border-width-" + sideMatch.Groups[1].Value;
         }
 
         // Check border colors

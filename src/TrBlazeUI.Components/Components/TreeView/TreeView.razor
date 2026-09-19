@@ -1,0 +1,197 @@
+@namespace TrBlazeUI.Components.TreeView
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+@* A WAI-ARIA tree: one Tab stop (the selected row, else the first), arrow keys to move, Right and
+   Left to open and close, Enter or Space to select, and a letter to jump to the next row starting
+   with it. Children render only while their branch is open, so a branch can load them on demand
+   from TreeItem.OnExpand. *@
+
+<ul @ref="objRoot"
+    role="tree"
+    aria-label="@AriaLabel"
+    data-slot="tree-view"
+    class="@CssClass"
+    style="@RootStyle"
+    @attributes="AdditionalAttributes">
+    <CascadingValue Value="this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+</ul>
+
+@code {
+    private readonly List<TreeItem> objItems = [];
+    private ElementReference objRoot;
+    private IJSObjectReference? objModule;
+    private DotNetObjectReference<TreeView>? objDotNetRef;
+    private string? objInternalSelected;
+
+    /// <summary>
+    /// Gets or sets the tree's rows (<see cref="TreeItem"/> components).
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="TreeItem.Value"/> of the selected row. Use with
+    /// <c>@bind-SelectedValue</c>; leave unbound and the tree keeps the selection itself.
+    /// </summary>
+    [Parameter]
+    public string? SelectedValue { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback raised when a row is selected by click, Enter or Space.
+    /// </summary>
+    [Parameter]
+    public EventCallback<string?> SelectedValueChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether clicking a branch row also opens or closes it, as a file explorer does.
+    /// The chevron always toggles. Default is true.
+    /// </summary>
+    [Parameter]
+    public bool ToggleOnClick { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the indent per level as a CSS length. Default is <c>"1rem"</c>.
+    /// </summary>
+    [Parameter]
+    public string? Indent { get; set; }
+
+    /// <summary>
+    /// Gets or sets the accessible name of the tree, for example <c>"Files"</c>.
+    /// </summary>
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Gets the value of the selected row, whether the selection is bound or kept by the tree.
+    /// </summary>
+    public string? CurrentSelectedValue => SelectedValueChanged.HasDelegate ? SelectedValue : objInternalSelected;
+
+    /// <summary>
+    /// Called from JavaScript when a key asks a row to open, close or be selected.
+    /// </summary>
+    /// <param name="aItemId">The element id of the row.</param>
+    /// <param name="aAction">One of <c>expand</c>, <c>collapse</c> or <c>select</c>.</param>
+    /// <returns>A task that completes when the row has changed.</returns>
+    [JSInvokable]
+    public Task OnKeyAction(string aItemId, string aAction)
+    {
+        var vItem = objItems.FirstOrDefault(i => i.ElementId == aItemId);
+        if (vItem == null)
+        {
+            return Task.CompletedTask;
+        }
+
+        return aAction switch
+        {
+            "expand" => vItem.SetExpandedAsync(true),
+            "collapse" => vItem.SetExpandedAsync(false),
+            "select" => SelectAsync(vItem),
+            _ => Task.CompletedTask
+        };
+    }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet() => objInternalSelected ??= SelectedValue;
+
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        // Every visible row has registered by now; render once more so exactly one is the Tab stop.
+        StateHasChanged();
+
+        try
+        {
+            objModule = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/TrBlazeUI.Components/js/tree-view.js");
+            objDotNetRef = DotNetObjectReference.Create(this);
+            await objModule.InvokeVoidAsync("attach", objRoot, objDotNetRef);
+        }
+        catch (JSDisconnectedException)
+        {
+            // Expected during circuit disconnect in Blazor Server.
+        }
+        catch (InvalidOperationException)
+        {
+            // JS interop is unavailable during prerendering.
+        }
+    }
+
+    internal void Register(TreeItem aItem) => objItems.Add(aItem);
+
+    internal void Unregister(TreeItem aItem) => objItems.Remove(aItem);
+
+    internal bool IsSelected(TreeItem aItem) =>
+        aItem.Value != null && string.Equals(aItem.Value, CurrentSelectedValue, StringComparison.Ordinal);
+
+    internal bool IsTabStop(TreeItem aItem)
+    {
+        var vStop = objItems.FirstOrDefault(IsSelected) ?? objItems.FirstOrDefault();
+        return vStop == null || ReferenceEquals(vStop, aItem);
+    }
+
+    internal async Task SelectAsync(TreeItem aItem)
+    {
+        if (aItem.Disabled || aItem.Value == null)
+        {
+            return;
+        }
+
+        if (SelectedValueChanged.HasDelegate)
+        {
+            await SelectedValueChanged.InvokeAsync(aItem.Value);
+        }
+        else
+        {
+            objInternalSelected = aItem.Value;
+            StateHasChanged();
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        if (objModule != null)
+        {
+            try
+            {
+                await objModule.InvokeVoidAsync("detach", objRoot);
+                await objModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Expected during circuit disconnect.
+            }
+        }
+
+        objDotNetRef?.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    private string? RootStyle => string.IsNullOrWhiteSpace(Indent) ? null : $"--tree-indent: {Indent}";
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "m-0 list-none p-0 text-sm",
+        Class
+    );
+}

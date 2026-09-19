@@ -1,0 +1,76 @@
+@page "/verify-chatur"
+@using TrBlazeUI.Components.ScrollArea
+@using TrBlazeUI.Components.CodeBlock
+@using TrBlazeUI.Components.Toggle
+@using TrBlazeUI.Components.TreeView
+@using TrBlazeUI.Components.DiffView
+
+@* Compile check for the AI reference: each block below is the reference's own example for the
+   Chatur TR-001…TR-004 additions, as written there (REQ-UI-021). *@
+
+<PageTitle>Verify Chatur - TrBlazeUI</PageTitle>
+
+<div class="space-y-6 p-4">
+    <ScrollArea @ref="logArea" StickToEnd="true" AtEndChanged="v => following = v" Class="h-[300px] rounded-md border">
+        <CodeBlock Code="@output" ShowCopyButton="false" Class="rounded-none border-0" />
+    </ScrollArea>
+    @if (!following)
+    {
+        <Button Size="ButtonSize.Small" OnClick="() => logArea!.ScrollToEndAsync()">Jump to latest</Button>
+    }
+
+    <TreeView @bind-SelectedValue="selectedPath" AriaLabel="Files">
+        <TreeItem Label="src" Value="src" DefaultExpanded="true">
+            <Icon><LucideIcon Name="folder" Size="16" /></Icon>
+            <Trailing><Badge Variant="BadgeVariant.Secondary">3</Badge></Trailing>
+            <ChildContent>
+                <TreeItem Label="Program.cs" Value="src/Program.cs">
+                    <Icon><LucideIcon Name="file-code" Size="16" /></Icon>
+                </TreeItem>
+            </ChildContent>
+        </TreeItem>
+        <TreeItem Label="packages" Value="packages" HasChildren="true" OnExpand="LoadPackagesAsync" Loading="isLoading">
+            @foreach (var p in packages)
+            {
+                <TreeItem Label="@p" Value="@($"packages/{p}")" />
+            }
+        </TreeItem>
+    </TreeView>
+
+    <ToggleGroup TValue="string" @bind-Value="view" Joined="true" AllowDeselect="false"
+                 Variant="ToggleVariant.Outline" Size="ToggleSize.Small" AriaLabel="View">
+        <ToggleGroupItem TValue="string" Value="@("board")">Board</ToggleGroupItem>
+        <ToggleGroupItem TValue="string" Value="@("table")">Table</ToggleGroupItem>
+    </ToggleGroup>
+
+    <DiffView Before="@oldText" After="@newText" Mode="mode"
+              BeforeLabel="src/OrderService.cs" AfterLabel="src/OrderService.cs">
+        <HunkActions>
+            <Button Size="ButtonSize.Small" Variant="ButtonVariant.Ghost" OnClick="() => Accept(context)">Accept</Button>
+        </HunkActions>
+    </DiffView>
+</div>
+
+@code {
+    private ScrollArea? logArea;
+    private bool following = true;
+    private string output = "line 1\nline 2";
+    private string? selectedPath;
+    private bool isLoading;
+    private List<string> packages = [];
+    private string? view = "board";
+    private DiffViewMode mode = DiffViewMode.SideBySide;
+    private string oldText = "a\nb\nc";
+    private string newText = "a\nB\nc";
+    private string? accepted;
+
+    private async Task LoadPackagesAsync()
+    {
+        isLoading = true;
+        await Task.Delay(100);
+        packages = ["one", "two"];
+        isLoading = false;
+    }
+
+    private void Accept(DiffHunk aHunk) => accepted = aHunk.Header;
+}

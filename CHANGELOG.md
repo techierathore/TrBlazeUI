@@ -11,7 +11,39 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
-Closes TfLens TR-039 and TR-040 (`docs/TfLens-TrBlazeUI-Feedback.md`), both filed against 2.0.6.
+Closes TfLens TR-039 and TR-040 (`docs/TfLens-TrBlazeUI-Feedback.md`), both filed against 2.0.6,
+and Chatur TR-001 to TR-004 (`docs/Chatur-TrBlazeUI-Feedback.md`), filed against 2.0.7.
+
+### ⚠ Behaviour changes to review before upgrading
+
+- **Side borders and border styles now survive `Class` merging.** `cn()` used to read `border-l`,
+  `border-b`, `border-s` (and the other sides) and `border-dashed`/`border-solid`/… as border
+  *colours*, so a later colour class deleted them. `Timeline`'s vertical line (`border-s`) and
+  `FieldSeparator`'s rule (`border-t`) are drawn again, and a consumer `Class="border-b border-input"`
+  now gets its bottom border. Measured: Timeline rail 0px before, 1px after.
+- **A height given to `ScrollArea` through `Class` now bounds the scrolling viewport.**
+  `<ScrollArea Class="h-[300px]">` used to let the inner viewport grow with its content, so nothing
+  scrolled. A `ScrollArea` sized through `Height` / `MaxHeight`, or not sized at all, is unchanged.
+
+### Added — Chatur TR-001…TR-004
+
+- **`ScrollArea.StickToEnd` (TR-001)** keeps a growing log or chat at its newest line, stops
+  following when the reader scrolls up, and resumes when they scroll back to the end.
+  `AtEndChanged` reports both; `ScrollToEndAsync()` jumps back. Content changes are watched in the
+  browser, so text a child component updates on its own is followed too.
+- **`TreeView` and `TreeItem` (TR-002)**: expand and collapse, one selected row
+  (`@bind-SelectedValue`), the WAI-ARIA tree keyboard (arrows, Home/End, Enter/Space, type-ahead),
+  an `Icon` and a `Trailing` slot per row, indentation per level, and children loaded on demand
+  (`HasChildren` + `OnExpand` + `Loading`).
+- **`DiffView` and `TextDiff` (TR-003)**: before and after texts side by side or inline, line
+  numbers, added/removed lines tinted from `--success`/`--destructive` and marked `+`/`-`,
+  unchanged stretches folded, and a `HunkActions` slot on each part. The comparison is Myers'
+  algorithm in .NET: no script library. Checked against a reference comparison on 20,000 random
+  cases with 0 differences; a 20,000-line file compares in about 6 ms.
+- **`ToggleGroup.Joined`, `ToggleGroup.AllowDeselect` and `ToggleGroup.AriaLabel` (TR-004)**: one
+  joined control for a view switch that keeps exactly one choice. A single-choice group is now a
+  `radiogroup` of `radio` items with one Tab stop and arrow-key movement; a multiple-choice group
+  keeps `aria-pressed`. The AI reference now documents `ToggleGroup`, which it never listed.
 
 ### Fixed
 

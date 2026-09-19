@@ -1,6 +1,8 @@
 @page "/components/scroll-area"
 @using TrBlazeUI.Components.ScrollArea
 @using TrBlazeUI.Components.Separator
+@using TrBlazeUI.Components.CodeBlock
+@implements IDisposable
 
 <PageTitle>Scroll Area Component - TrBlazeUI</PageTitle>
 
@@ -79,6 +81,30 @@
         </ScrollArea>
     </div>
 
+    <!-- Stick To End -->
+    <div class="space-y-4" data-testid="stick-to-end-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Stick To End</h2>
+            <p class="text-sm text-muted-foreground">
+                <code class="bg-muted px-1 py-0.5 rounded">StickToEnd</code> keeps a growing log at its newest line.
+                Scroll up to read and following stops; scroll back to the bottom, or press Jump to latest, and it resumes.
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <Button Size="ButtonSize.Small" OnClick="ToggleBuild" data-testid="stick-to-end-toggle">@(objTimer == null ? "Start build" : "Stop build")</Button>
+            <Button Size="ButtonSize.Small" Variant="ButtonVariant.Outline" OnClick="AddLine" data-testid="stick-to-end-add">Add one line</Button>
+            @if (!objIsAtEnd)
+            {
+                <Button Size="ButtonSize.Small" Variant="ButtonVariant.Secondary" OnClick="JumpToLatest" data-testid="stick-to-end-jump">Jump to latest</Button>
+            }
+            <span class="text-sm text-muted-foreground" data-testid="stick-to-end-state">@(objIsAtEnd ? "Following" : "Paused - reading older lines")</span>
+        </div>
+        <ScrollArea @ref="objLogArea" StickToEnd="true" AtEndChanged="OnAtEndChanged"
+                    Class="h-[240px] w-full rounded-md border" data-testid="stick-to-end-area">
+            <CodeBlock Code="@objOutput" Language="build" ShowCopyButton="false" Class="rounded-none border-0" />
+        </ScrollArea>
+    </div>
+
     <!-- API Reference -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -92,6 +118,9 @@
                     <p><strong>Type:</strong> <code class="bg-muted px-1 py-0.5 rounded">ScrollAreaType</code> - Auto, Always, Hover, or Hidden</p>
                     <p><strong>Height:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - Fixed height (e.g., "200px")</p>
                     <p><strong>MaxHeight:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - Maximum height (e.g., "300px")</p>
+                    <p><strong>StickToEnd:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Follow new content until the reader scrolls away; resume at the end</p>
+                    <p><strong>AtEndChanged:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback&lt;bool&gt;</code> - Raised when following stops (false) or resumes (true)</p>
+                    <p><strong>ScrollToEndAsync():</strong> <code class="bg-muted px-1 py-0.5 rounded">Task</code> - Scrolls to the end and resumes following</p>
                 </div>
             </div>
         </div>
@@ -99,6 +128,47 @@
 </div>
 
 @code {
+    private ScrollArea? objLogArea;
+    private System.Threading.Timer? objTimer;
+    private bool objIsAtEnd = true;
+    private int objLineCount;
+    private string objOutput = "$ build started";
+
+    private void AddLine()
+    {
+        objLineCount++;
+        objOutput += $"\n[{objLineCount:D3}] Compiling step {objLineCount} of 200 ... ok";
+    }
+
+    private void ToggleBuild()
+    {
+        if (objTimer != null)
+        {
+            objTimer.Dispose();
+            objTimer = null;
+            return;
+        }
+
+        objTimer = new System.Threading.Timer(aState => InvokeAsync(() =>
+        {
+            AddLine();
+            StateHasChanged();
+        }), null, 0, 250);
+    }
+
+    private void OnAtEndChanged(bool aIsAtEnd) => objIsAtEnd = aIsAtEnd;
+
+    private async Task JumpToLatest()
+    {
+        if (objLogArea != null)
+        {
+            await objLogArea.ScrollToEndAsync();
+        }
+    }
+
+    /// <inheritdoc />
+    public void Dispose() => objTimer?.Dispose();
+
     private readonly string[] objTags = new[]
     {
         "React", "Vue", "Angular", "Svelte", "Blazor",

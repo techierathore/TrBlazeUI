@@ -193,6 +193,38 @@
         </div>
     </div>
 
+    <!-- Joined View Switch -->
+    <div class="space-y-4" data-testid="joined-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Joined View Switch</h2>
+            <p class="text-sm text-muted-foreground">
+                <code class="bg-muted px-1 py-0.5 rounded">Joined</code> draws the items as one control, and
+                <code class="bg-muted px-1 py-0.5 rounded">AllowDeselect="false"</code> keeps exactly one chosen.
+                Tab reaches the chosen item; the arrow keys move between the others.
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-4">
+            <ToggleGroup TValue="string" @bind-Value="objView" Joined="true" AllowDeselect="false"
+                         Variant="ToggleVariant.Outline" Size="ToggleSize.Small" AriaLabel="View" data-testid="view-switch">
+                <ToggleGroupItem TValue="string" Value="@("board")" data-testid="view-board">
+                    <LucideIcon Name="layout-grid" Class="mr-1.5 h-4 w-4" />Board
+                </ToggleGroupItem>
+                <ToggleGroupItem TValue="string" Value="@("table")" data-testid="view-table">
+                    <LucideIcon Name="table" Class="mr-1.5 h-4 w-4" />Table
+                </ToggleGroupItem>
+                <ToggleGroupItem TValue="string" Value="@("list")" data-testid="view-list">
+                    <LucideIcon Name="list" Class="mr-1.5 h-4 w-4" />List
+                </ToggleGroupItem>
+            </ToggleGroup>
+            <ToggleGroup TValue="string" @bind-Value="objDiffMode" Joined="true" AllowDeselect="false"
+                         Size="ToggleSize.Small" AriaLabel="Diff layout" data-testid="diff-switch">
+                <ToggleGroupItem TValue="string" Value="@("side")">Side by side</ToggleGroupItem>
+                <ToggleGroupItem TValue="string" Value="@("inline")">Inline</ToggleGroupItem>
+            </ToggleGroup>
+        </div>
+        <p class="text-sm text-muted-foreground" data-testid="view-selected">View: @objView · Layout: @objDiffMode</p>
+    </div>
+
     <!-- API Reference -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -208,6 +240,9 @@
                     <p><strong>Variant:</strong> <code class="bg-muted px-1 py-0.5 rounded">ToggleVariant</code> - Default or Outline</p>
                     <p><strong>Size:</strong> <code class="bg-muted px-1 py-0.5 rounded">ToggleSize</code> - Small, Default, or Large</p>
                     <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the entire group</p>
+                    <p><strong>Joined:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Draws the items as one joined control</p>
+                    <p><strong>AllowDeselect:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Single choice: pressing the chosen item clears it (default true)</p>
+                    <p><strong>AriaLabel:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Accessible name of the group</p>
                 </div>
             </div>
             <Separator />
@@ -225,4 +260,6 @@
 @code {
     private string? objAlignment = "center";
     private List<string>? objFormatting = new() { "bold" };
+    private string? objView = "board";
+    private string? objDiffMode = "side";
 }

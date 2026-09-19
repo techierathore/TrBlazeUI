@@ -3,16 +3,21 @@
 | | |
 |---|---|
 | App | TrBlazeUI |
-| Count | 34 logged: 13 open, 21 fixed, 0 will not fix |
+| Count | 40 logged: 18 open, 22 fixed, 0 will not fix |
 | Source | `docs/metrics/misses.jsonl`, one row per miss record. Rewritten by `tf-misses-md.sh` on every new record. Never edit it: a wrong row is corrected by a new record. |
-| Updated | 2026-09-14 |
+| Updated | 2026-09-19 |
 
 **Whose gap** answers the four questions of the miss protocol: **the app's spec** did not say it, so the checklist line is fixed; **the framework never said it**, so one requirement line and a check are added; **the check was too weak** (a review, or a script that did not fire), so the check is fixed; **said and ignored**, so the rule becomes a hook or is deleted. **not sorted** means the record predates the sort or nobody has answered yet; `bash .tfcore/utils/tf-emit.sh --amend <miss> sort <spec|unsaid|weak-check|ignored>` completes it.
 
-## Open (13)
+## Open (18)
 
 | Miss | Found | Whose gap | What went wrong |
 |---|---|---|---|
+| MISS-TrBlazeUI-20260919-05 (REQ-UI-002) | 2026-09-19 by owner | the check was too weak | TfLens TR-040: InputGroupInput has no DebounceMilliseconds, so a filter box drawn with a leading icon re-filters on every keystroke. Reproduced: the built XML documentation lists exactly the 15 members TfLens names and no debounce, while Input.DebounceMilliseconds exists. |
+| MISS-TrBlazeUI-20260919-04 (REQ-UI-008) | 2026-09-19 by owner | the check was too weak | TfLens TR-039: leaving a page that holds a chart logs an unobserved JSDisconnectedException from ApexChart.Dispose (fire-and-forget JSObjectReference.DisposeAsync). Reproduced on the unchanged library: /charts/bar 5 charts -> 5 unobserved exceptions, /charts/pie 4 -> 4, /verify-tflens-3 5 -> 5, /com |
+| MISS-TrBlazeUI-20260919-03 (REQ-UI-020) | 2026-09-19 by owner | the check was too weak | TfLens TR-038: Badge Variant=Outline Truncate=true loses text-foreground, because text-ellipsis falls into the bare text-colour merge group (reproduced on /verify-tflens-2 tr029-truncate) |
+| MISS-TrBlazeUI-20260919-02 (REQ-UI-020) | 2026-09-19 by owner | the check was too weak | TfLens TR-037: BarChart Items/XValue/YValue shorthand with ShowDataLabels=true draws no data labels; the built-in series never passes the flag and ApexCharts takes it from the series (reproduced: 0 labels at 1280 and 390 on /verify-tflens-2) |
+| MISS-TrBlazeUI-20260919-01 (REQ-UI-020) | 2026-09-19 by owner | the app's spec | TfLens post-2.1.0 consumer-feedback fixes (TR-028…TR-035) |
 | MISS-TrBlazeUI-20260914-04 (REQ-UI-020) | 2026-09-14 by owner | the check was too weak | TfLens TR-038: Badge Variant=Outline Truncate=true loses text-foreground, because text-ellipsis falls into the bare text-colour merge group (reproduced on /verify-tflens-2 tr029-truncate) |
 | MISS-TrBlazeUI-20260914-03 (REQ-UI-020) | 2026-09-14 by owner | the check was too weak | TfLens TR-037: BarChart Items/XValue/YValue shorthand with ShowDataLabels=true draws no data labels; the built-in series never passes the flag and ApexCharts takes it from the series (reproduced: 0 labels at 1280 and 390 on /verify-tflens-2) |
 | MISS-TrBlazeUI-20260914-02 (REQ-UI-001) | 2026-09-14 by owner | the check was too weak | TfLens TR-036: leaving a page that holds a Select logs 'Unhandled exception in circuit' because SelectContent.DisposeAsync awaits two JS module disposals without catching JSDisconnectedException (reproduced: 1 on /components/select) |
@@ -27,10 +32,11 @@
 | MISS-TrBlazeUI-20260831-11 (REQ-FN-004) | 2026-08-31 by owner | not sorted | no sentence recorded (wrong-behaviour, config, why: insufficient-verify-method) |
 | MISS-TrBlazeUI-20260831-07 (REQ-FN-004) | 2026-08-31 by owner | not sorted | no sentence recorded (wrong-behaviour, config, why: insufficient-verify-method) |
 
-## Fixed (21)
+## Fixed (22)
 
 | Miss | Found | Closed | Whose gap | What went wrong |
 |---|---|---|---|---|
+| MISS-TrBlazeUI-20260919-06 (REQ-UI-021) | 2026-09-19 by owner | 2026-09-19 by fix-issues | the app's spec | Chatur consumer-feedback fixes (TR-001…TR-004): ScrollArea StickToEnd, TreeView, DiffView, ToggleGroup |
 | MISS-TrBlazeUI-20260914-06 (REQ-UI-002) | 2026-09-14 by owner | 2026-09-14 by fix-issues | the check was too weak | TfLens TR-040: InputGroupInput has no DebounceMilliseconds, so a filter box drawn with a leading icon re-filters on every keystroke. Reproduced: the built XML documentation lists exactly the 15 members TfLens names and no debounce, while Input.DebounceMilliseconds exists. |
 | MISS-TrBlazeUI-20260914-05 (REQ-UI-008) | 2026-09-14 by owner | 2026-09-14 by fix-issues | the check was too weak | TfLens TR-039: leaving a page that holds a chart logs an unobserved JSDisconnectedException from ApexChart.Dispose (fire-and-forget JSObjectReference.DisposeAsync). Reproduced on the unchanged library: /charts/bar 5 charts -> 5 unobserved exceptions, /charts/pie 4 -> 4, /verify-tflens-3 5 -> 5, /com |
 | MISS-TrBlazeUI-20260913-03 (REQ-UI-020) | 2026-09-13 by owner | 2026-09-13 by fix-issues | the check was too weak | TfLens TR-038: Badge Variant=Outline Truncate=true loses text-foreground, because text-ellipsis falls into the bare text-colour merge group (reproduced on /verify-tflens-2 tr029-truncate) |

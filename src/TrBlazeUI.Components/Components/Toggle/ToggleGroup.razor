@@ -1,13 +1,29 @@
 @namespace TrBlazeUI.Components.Toggle
 @typeparam TValue
+@implements IAsyncDisposable
+@inject IJSRuntime JS
 
-<div role="group" class="@CssClass" @attributes="AdditionalAttributes">
+@* Single choice is a radio group (role="radio" + aria-checked on the items); multiple choice is a
+   set of pressed buttons (aria-pressed). One item is the Tab stop and the arrow keys move between
+   the rest, so a view switch in a toolbar costs one Tab, not one per option. *@
+
+<div @ref="objRoot"
+     role="@(Type == ToggleGroupType.Single ? "radiogroup" : "group")"
+     aria-label="@AriaLabel"
+     data-slot="toggle-group"
+     data-joined="@(Joined ? "true" : null)"
+     class="@CssClass"
+     @attributes="AdditionalAttributes">
     <CascadingValue Value="this" IsFixed="true">
         @ChildContent
     </CascadingValue>
 </div>
 
 @code {
+    private readonly List<ToggleGroupItem<TValue>> objItems = [];
+    private ElementReference objRoot;
+    private IJSObjectReference? objModule;
+
     [Parameter]
     public TValue? Value { get; set; }
 
@@ -35,6 +51,26 @@
     [Parameter]
     public bool Disabled { get; set; }
 
+    /// <summary>
+    /// Gets or sets whether the items are drawn as one joined control (shared border, square inner
+    /// corners, no gap) - the look of a "Board | Table" view switch. Default is false.
+    /// </summary>
+    [Parameter]
+    public bool Joined { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether pressing the chosen item of a single-choice group clears the choice.
+    /// Set false for a view switch, where exactly one option must stay chosen. Default is true.
+    /// </summary>
+    [Parameter]
+    public bool AllowDeselect { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the accessible name of the group, for example <c>"View"</c>.
+    /// </summary>
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
     [Parameter]
     public string? Class { get; set; }
 
@@ -48,6 +84,44 @@
     protected override void OnInitialized()
     {
         objInternalValue = DefaultValue;
+    }
+
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        // Every item has registered by now; render once more so exactly one of them is the Tab stop.
+        StateHasChanged();
+
+        try
+        {
+            objModule = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/TrBlazeUI.Components/js/roving-focus.js");
+            await objModule.InvokeVoidAsync("attach", objRoot, "[data-slot=toggle-group-item]");
+        }
+        catch (JSDisconnectedException)
+        {
+            // Expected during circuit disconnect in Blazor Server.
+        }
+        catch (InvalidOperationException)
+        {
+            // JS interop is unavailable during prerendering.
+        }
+    }
+
+    internal void Register(ToggleGroupItem<TValue> aItem) => objItems.Add(aItem);
+
+    internal void Unregister(ToggleGroupItem<TValue> aItem) => objItems.Remove(aItem);
+
+    internal bool IsTabStop(ToggleGroupItem<TValue> aItem)
+    {
+        var vEnabled = objItems.Where(i => !i.Disabled).ToList();
+        var vPressed = vEnabled.FirstOrDefault(i => IsItemPressed(i.Value));
+        return ReferenceEquals(vPressed ?? vEnabled.FirstOrDefault(), aItem);
     }
 
     internal bool IsItemPressed(TValue? itemValue)
@@ -73,7 +147,13 @@
         if (Type == ToggleGroupType.Single)
         {
             var currentValue = IsControlled ? Value : objInternalValue;
-            var newValue = EqualityComparer<TValue>.Default.Equals(currentValue, itemValue) ? default : itemValue;
+            var isCurrent = EqualityComparer<TValue>.Default.Equals(currentValue, itemValue);
+            if (isCurrent && !AllowDeselect)
+            {
+                return;
+            }
+
+            var newValue = isCurrent ? default : itemValue;
 
             if (IsControlled)
             {
@@ -111,8 +191,29 @@
         }
     }
 
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        if (objModule != null)
+        {
+            try
+            {
+                await objModule.InvokeVoidAsync("detach", objRoot);
+                await objModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Expected during circuit disconnect.
+            }
+        }
+
+        GC.SuppressFinalize(this);
+    }
+
     private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
-        "flex items-center justify-center gap-1",
+        Joined
+            ? "inline-flex w-fit items-stretch overflow-hidden rounded-md border border-input"
+            : "flex items-center justify-center gap-1",
         Class
     );
 

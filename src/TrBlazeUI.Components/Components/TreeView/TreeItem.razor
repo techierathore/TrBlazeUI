@@ -1,0 +1,267 @@
+@namespace TrBlazeUI.Components.TreeView
+@implements IDisposable
+
+<li id="@ElementId"
+    role="treeitem"
+    aria-level="@Level"
+    aria-expanded="@(IsBranch ? (IsExpanded ? "true" : "false") : null)"
+    aria-selected="@(IsSelected ? "true" : "false")"
+    aria-disabled="@(Disabled ? "true" : null)"
+    aria-busy="@(Loading ? "true" : null)"
+    tabindex="@(Tree == null || Tree.IsTabStop(this) ? 0 : -1)"
+    data-slot="tree-item"
+    data-state="@(IsBranch ? (IsExpanded ? "open" : "closed") : null)"
+    class="outline-none"
+    @attributes="AdditionalAttributes">
+    <div data-slot="tree-item-row"
+         class="@RowCssClass"
+         style="@RowStyle"
+         @onclick="HandleRowClickAsync">
+        @if (IsBranch)
+        {
+            <span data-slot="tree-item-chevron"
+                  aria-hidden="true"
+                  class="flex size-4 shrink-0 items-center justify-center text-muted-foreground"
+                  @onclick="HandleChevronClickAsync"
+                  @onclick:stopPropagation="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="@(IsExpanded ? "size-4 rotate-90 transition-transform" : "size-4 transition-transform")">
+                    <path d="m9 18 6-6-6-6" />
+                </svg>
+            </span>
+        }
+        else
+        {
+            <span class="size-4 shrink-0" aria-hidden="true"></span>
+        }
+        @if (Icon != null)
+        {
+            <span data-slot="tree-item-icon" aria-hidden="true" class="flex shrink-0 items-center text-muted-foreground">@Icon</span>
+        }
+        <span data-slot="tree-item-label" class="min-w-0 flex-1 truncate">
+            @if (LabelContent != null)
+            {
+                @LabelContent
+            }
+            else
+            {
+                @Label
+            }
+        </span>
+        @if (Trailing != null)
+        {
+            <span data-slot="tree-item-trailing" class="ml-auto flex shrink-0 items-center">@Trailing</span>
+        }
+    </div>
+    @if (IsBranch && IsExpanded)
+    {
+        <ul role="group" data-slot="tree-group" class="m-0 list-none p-0">
+            @if (Loading)
+            {
+                <li role="none" data-slot="tree-item-loading" class="flex items-center gap-2 py-1 text-muted-foreground" style="@LoadingStyle">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 animate-spin" aria-hidden="true">
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                    </svg>
+                    <span>@LoadingText</span>
+                </li>
+            }
+            <CascadingValue Value="this" Name="TreeParentItem">
+                @ChildContent
+            </CascadingValue>
+        </ul>
+    }
+</li>
+
+@code {
+    private readonly string objElementId = $"tree-item-{Guid.NewGuid():N}";
+    private bool objInternalExpanded;
+
+    [CascadingParameter]
+    private TreeView? Tree { get; set; }
+
+    [CascadingParameter(Name = "TreeParentItem")]
+    private TreeItem? ParentItem { get; set; }
+
+    /// <summary>
+    /// Gets or sets the value that identifies this row for selection, for example a file path.
+    /// A row without a value can be opened and closed but not selected.
+    /// </summary>
+    [Parameter]
+    public string? Value { get; set; }
+
+    /// <summary>
+    /// Gets or sets the row's text. Also used by type-to-jump.
+    /// </summary>
+    [Parameter]
+    public string? Label { get; set; }
+
+    /// <summary>
+    /// Gets or sets custom content shown instead of <see cref="Label"/>.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? LabelContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets the leading icon, for example a <c>LucideIcon</c>.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Icon { get; set; }
+
+    /// <summary>
+    /// Gets or sets trailing content at the row's end, for example a <c>Badge</c> with a count or
+    /// a change marker.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Trailing { get; set; }
+
+    /// <summary>
+    /// Gets or sets the child rows. They render only while this row is open.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether this row is a branch that can be opened. Leave null to decide from
+    /// whether <see cref="ChildContent"/> is set; set true for a branch whose children are loaded
+    /// on demand in <see cref="OnExpand"/>.
+    /// </summary>
+    [Parameter]
+    public bool? HasChildren { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the row is open. Use with <c>@bind-Expanded</c>; leave unbound and the
+    /// row keeps its own state, starting from <see cref="DefaultExpanded"/>.
+    /// </summary>
+    [Parameter]
+    public bool Expanded { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback raised when the row opens or closes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> ExpandedChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether an unbound row starts open. Default is false.
+    /// </summary>
+    [Parameter]
+    public bool DefaultExpanded { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback raised each time the row opens. Load the children here and set
+    /// <see cref="Loading"/> while they arrive.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnExpand { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the children are still loading. An open row shows a loading line.
+    /// </summary>
+    [Parameter]
+    public bool Loading { get; set; }
+
+    /// <summary>
+    /// Gets or sets the text of the loading line. Default is <c>"Loading…"</c>.
+    /// </summary>
+    [Parameter]
+    public string LoadingText { get; set; } = "Loading…";
+
+    /// <summary>
+    /// Gets or sets whether the row can be selected. A disabled branch can still be opened.
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes for the row.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered <c>treeitem</c> element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Gets the row's nesting level, starting at 1 for a top-level row.
+    /// </summary>
+    public int Level => (ParentItem?.Level ?? 0) + 1;
+
+    internal string ElementId => objElementId;
+
+    private bool IsBranch => HasChildren ?? ChildContent != null;
+
+    private bool IsExpanded => ExpandedChanged.HasDelegate ? Expanded : objInternalExpanded;
+
+    private bool IsSelected => Tree?.IsSelected(this) == true;
+
+    /// <summary>
+    /// Opens or closes the row, raising <see cref="ExpandedChanged"/> and, when opening,
+    /// <see cref="OnExpand"/>.
+    /// </summary>
+    /// <param name="aExpanded">True to open the row, false to close it.</param>
+    /// <returns>A task that completes when the callbacks have run.</returns>
+    public async Task SetExpandedAsync(bool aExpanded)
+    {
+        if (!IsBranch || aExpanded == IsExpanded)
+        {
+            return;
+        }
+
+        if (ExpandedChanged.HasDelegate)
+        {
+            await ExpandedChanged.InvokeAsync(aExpanded);
+        }
+        else
+        {
+            objInternalExpanded = aExpanded;
+            StateHasChanged();
+        }
+
+        if (aExpanded && OnExpand.HasDelegate)
+        {
+            await OnExpand.InvokeAsync();
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        objInternalExpanded = DefaultExpanded || Expanded;
+        Tree?.Register(this);
+    }
+
+    /// <inheritdoc />
+    public void Dispose() => Tree?.Unregister(this);
+
+    private async Task HandleRowClickAsync()
+    {
+        if (Tree != null)
+        {
+            await Tree.SelectAsync(this);
+        }
+
+        if (IsBranch && Tree?.ToggleOnClick != false)
+        {
+            await SetExpandedAsync(!IsExpanded);
+        }
+    }
+
+    private Task HandleChevronClickAsync() => SetExpandedAsync(!IsExpanded);
+
+    private string RowStyle => $"padding-inline-start: calc({Level - 1} * var(--tree-indent, 1rem) + 0.25rem)";
+
+    private string LoadingStyle => $"padding-inline-start: calc({Level} * var(--tree-indent, 1rem) + 1.5rem)";
+
+    private string RowCssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "flex h-8 cursor-pointer select-none items-center gap-1.5 rounded-sm pr-2 transition-colors",
+        IsSelected ? "bg-accent text-accent-foreground" : "hover:bg-accent/50",
+        Disabled ? "cursor-default opacity-50" : null,
+        Class
+    );
+}
