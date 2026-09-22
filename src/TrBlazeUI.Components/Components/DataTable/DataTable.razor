@@ -77,10 +77,15 @@
                                                carries the name and the checkbox is taken out of the
                                                tab order and hidden from assistive technology, so the
                                                trigger is not a button containing a focusable
-                                               role="checkbox" (REQ-NFR-001, 2026-09-12). *@
+                                               role="checkbox" (REQ-NFR-001, 2026-09-12).
+                                               Because the checkbox is decorative, the trigger's OWN
+                                               name has to carry the state a sighted user reads off
+                                               that checkbox - none, some or all - or the state is
+                                               available only by opening the menu (REQ-UI-005). *@
                                             <DropdownMenu @bind-Open="objSelectAllDropdownOpen">
                                                 <DropdownMenuTrigger Class="inline-flex items-center justify-center p-0 bg-transparent border-0 hover:bg-transparent focus:outline-none"
-                                                                     aria-label="Select rows - click to see options">
+                                                                     data-slot="datatable-select-all-trigger"
+                                                                     aria-label="@SelectAllTriggerLabel">
                                                     <Checkbox Checked="@IsAllSelected()"
                                                               Indeterminate="@IsSomeSelected()"
                                                               Decorative="true"
@@ -190,6 +195,16 @@
                 </TrBlazeUI.Primitives.Table.Table>
             }
         </div>
+
+        @if (SelectionMode == DataTableSelectionMode.Multiple)
+        {
+            @* The choose-all trigger's name is only read when it takes focus, so a selection made
+               anywhere else - a row checkbox, an item in the menu, or the page's own code - would
+               otherwise be silent. This region speaks the new count wherever the change came from
+               (REQ-UI-005). It is not announced on first render, which is what an aria-live region
+               is for: only changes are spoken. *@
+            <span class="sr-only" aria-live="polite" data-slot="datatable-selection-status">@SelectionStatusText</span>
+        }
 
         @if (ShouldShowPagination())
         {

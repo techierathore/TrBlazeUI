@@ -1,34 +1,66 @@
 @namespace TrBlazeUI.Components.Progress
+@using System.Globalization
 @using TrBlazeUI.Components.Utilities
 
 @*
     Progress component - displays a progress bar indicator.
+
+    Set Indeterminate when work is under way with no known end: the bar animates and
+    aria-valuenow is OMITTED, which is what tells assistive technology the value is unknown
+    (WAI-ARIA 1.2, role progressbar: "If the progressbar is indeterminate, authors SHOULD omit
+    the aria-valuenow attribute"). Value and Max are ignored in that mode, never fought over.
 *@
 
 <div role="progressbar"
      aria-valuemin="0"
-     aria-valuemax="@Max"
-     aria-valuenow="@Value"
+     aria-valuemax="@AriaValueMax"
+     aria-valuenow="@AriaValueNow"
+     data-slot="progress"
+     data-indeterminate="@(Indeterminate ? "true" : null)"
      class="@ContainerCssClass"
      @attributes="AdditionalAttributes">
-    <div class="@IndicatorCssClass"
-         style="transform: translateX(-@((100 - ProgressPercentage))%)">
-    </div>
+    @if (Indeterminate)
+    {
+        <div class="@IndeterminateIndicatorCssClass" data-slot="progress-indicator"></div>
+    }
+    else
+    {
+        <div class="@IndicatorCssClass"
+             data-slot="progress-indicator"
+             style="transform: translateX(-@(IndicatorOffset)%)">
+        </div>
+    }
 </div>
 
 @code {
     /// <summary>
     /// The current progress value.
+    /// Ignored when <see cref="Indeterminate"/> is <c>true</c>.
     /// </summary>
     [Parameter]
     public double Value { get; set; } = 0;
 
     /// <summary>
     /// The maximum value for the progress bar.
-    /// Default is 100.
+    /// Default is 100. Ignored when <see cref="Indeterminate"/> is <c>true</c>.
     /// </summary>
     [Parameter]
     public double Max { get; set; } = 100;
+
+    /// <summary>
+    /// Whether the bar shows work under way with no known end.
+    /// Default is <c>false</c>.
+    /// </summary>
+    /// <remarks>
+    /// When <c>true</c> the bar animates without claiming a percentage: <c>role="progressbar"</c>
+    /// stays, <c>aria-valuemin</c>/<c>aria-valuemax</c> keep their ARIA default range of 0-100,
+    /// and <c>aria-valuenow</c> is omitted entirely - the ARIA signal for "the value is unknown".
+    /// <see cref="Value"/> and <see cref="Max"/> are ignored. The animation is suppressed under
+    /// <c>prefers-reduced-motion: reduce</c>, which leaves a still bar that fades gently instead
+    /// of travelling. Give the bar an accessible name by splatting <c>aria-label</c> onto it.
+    /// </remarks>
+    [Parameter]
+    public bool Indeterminate { get; set; }
 
     /// <summary>
     /// Additional CSS classes to apply to the progress container.
@@ -54,6 +86,23 @@
     private double ProgressPercentage => Max > 0 ? Math.Min(100, Math.Max(0, (Value / Max) * 100)) : 0;
 
     /// <summary>
+    /// Gets the indicator's translate offset, culture-invariant so a comma decimal separator can
+    /// never reach the transform.
+    /// </summary>
+    private string IndicatorOffset => (100 - ProgressPercentage).ToString(CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// Gets the rendered aria-valuenow, or null when indeterminate so the attribute is omitted.
+    /// </summary>
+    private string? AriaValueNow => Indeterminate ? null : Value.ToString(CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// Gets the rendered aria-valuemax. Indeterminate bars keep the ARIA default of 100 because
+    /// Max is ignored in that mode.
+    /// </summary>
+    private string AriaValueMax => Indeterminate ? "100" : Max.ToString(CultureInfo.InvariantCulture);
+
+    /// <summary>
     /// Gets the computed CSS classes for the progress container.
     /// </summary>
     private string ContainerCssClass => ClassNames.cn(
@@ -62,10 +111,20 @@
     );
 
     /// <summary>
-    /// Gets the computed CSS classes for the progress indicator.
+    /// Gets the computed CSS classes for the determinate progress indicator.
     /// </summary>
     private string IndicatorCssClass => ClassNames.cn(
         "h-full w-full flex-1 bg-primary transition-all",
+        IndicatorClass
+    );
+
+    /// <summary>
+    /// Gets the computed CSS classes for the indeterminate progress indicator.
+    /// The travelling strip is positioned and animated by trblazeui-progress-indeterminate,
+    /// hand-authored in trblazeui-input.css alongside its reduced-motion fallback.
+    /// </summary>
+    private string IndeterminateIndicatorCssClass => ClassNames.cn(
+        "trblazeui-progress-indeterminate bg-primary",
         IndicatorClass
     );
 }

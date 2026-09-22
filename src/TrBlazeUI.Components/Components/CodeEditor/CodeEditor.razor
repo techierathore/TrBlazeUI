@@ -1,0 +1,403 @@
+@namespace TrBlazeUI.Components.CodeEditor
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+@* An editable code area: two-way bound text, a line-number gutter, and Tab that indents instead of
+   moving focus. Like CodeBlock it deliberately bundles NO syntax highlighter and NO editor library -
+   that is an application choice, and shipping one would drag a large JS dependency into every
+   consumer. Pass pre-highlighted markup through Html when you have one.
+
+   Wrapping: lines do NOT wrap. The textarea is wrap="off" and scrolls horizontally instead. That is
+   the only honest way to keep the gutter aligned - with soft wrap, one logical line paints as
+   several visual rows and every number below it is off by the overflow. Horizontal scroll keeps one
+   logical line on exactly one row, so number N always sits beside line N, and it is also what a
+   source editor does. The same choice is what lets the optional Html overlay line up with the text
+   it covers.
+
+   Keyboard: Tab indents and Shift+Tab outdents, so Tab cannot be used to leave the control. Press
+   Escape, then Tab, to move focus out (WCAG 2.1.2 - no keyboard trap). The hint element at the
+   bottom says so and is wired to the textarea with aria-describedby, so it is announced on focus
+   rather than being folklore. *@
+
+<div class="@CssClass" data-slot="code-editor" @attributes="AdditionalAttributes">
+    @if (!string.IsNullOrWhiteSpace(Language))
+    {
+        <div data-slot="code-editor-header" class="flex items-center justify-between border-b border-border bg-muted/50 px-3 py-1.5">
+            <span data-slot="code-editor-language" class="font-mono text-xs text-muted-foreground">@Language</span>
+        </div>
+    }
+    <div @ref="objBody" data-slot="code-editor-body" class="flex items-stretch">
+        @if (ShowLineNumbers)
+        {
+            <div data-slot="code-editor-gutter"
+                 aria-hidden="true"
+                 class="shrink-0 select-none overflow-hidden border-r border-border bg-muted/40 px-2 py-2 text-right font-mono text-sm leading-5 text-muted-foreground">
+                @for (var vNumber = 1; vNumber <= objLineCount; vNumber++)
+                {
+                    <div>@vNumber</div>
+                }
+            </div>
+        }
+        <div class="relative min-w-0 flex-1">
+            @if (Html != null)
+            {
+                <pre data-slot="code-editor-highlight" aria-hidden="true" class="@HighlightCssClass" style="@InputStyle"><code>@Html</code></pre>
+            }
+            <textarea @key="objValueSync.RenderKey"
+                      id="@Id"
+                      data-slot="code-editor-input"
+                      data-tab-size="@ClampedTabSize"
+                      data-use-spaces="@(UseSpaces ? "true" : "false")"
+                      class="@InputCssClass"
+                      style="@InputStyle"
+                      value="@objValueSync.RenderedValue"
+                      placeholder="@Placeholder"
+                      rows="@Rows"
+                      wrap="off"
+                      spellcheck="false"
+                      autocomplete="off"
+                      disabled="@Disabled"
+                      readonly="@ReadOnly"
+                      aria-label="@AriaLabel"
+                      aria-describedby="@DescribedBy"
+                      @onfocusin="HandleFocus"
+                      @onfocusout="HandleBlur"
+                      @oninput="HandleInput"></textarea>
+        </div>
+    </div>
+    <p id="@objHintId" data-slot="code-editor-hint" class="sr-only">@HintText</p>
+</div>
+
+@code {
+    /// <summary>Font, size, spacing and wrapping shared by the textarea, the gutter and the
+    /// highlight layer. They must match character for character or the three stop lining up.</summary>
+    private const string InputMetrics = "whitespace-pre px-3 py-2 font-mono text-sm leading-5";
+
+    private readonly TextValueSync objValueSync = new();
+    private readonly string objHintId = $"code-editor-hint-{Guid.NewGuid():N}";
+    private ElementReference objBody;
+    private IJSObjectReference? objModule;
+    private CancellationTokenSource? objDebounceCts;
+    private string? objDomText;
+    private int objLineCount = 1;
+    private bool objIsFocused;
+
+    /// <summary>
+    /// Gets or sets the text being edited. Use with <c>@bind-Value</c>.
+    /// </summary>
+    [Parameter]
+    public string? Value { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback raised when the text changes.
+    /// </summary>
+    /// <remarks>
+    /// Raised on every keystroke unless <see cref="DebounceMilliseconds"/> is set.
+    /// </remarks>
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets the language label shown in the header, for example <c>"csharp"</c>.
+    /// </summary>
+    /// <remarks>
+    /// It is a label only, exactly as on <c>CodeBlock</c>; nothing is highlighted from it.
+    /// The header is omitted when this is empty.
+    /// </remarks>
+    [Parameter]
+    public string? Language { get; set; }
+
+    /// <summary>
+    /// Gets or sets pre-highlighted markup painted behind the text.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Only pass markup you produced yourself or have sanitised - it is rendered as-is.
+    /// </para>
+    /// <para>
+    /// It must be the highlighted form of the <em>current</em> <see cref="Value"/>, re-generated
+    /// whenever the text changes: the editor paints its own text transparent so this layer is what
+    /// the user reads, and markup that lags behind the text shows the wrong characters until it
+    /// catches up. On a Blazor Server circuit, highlight on a debounce rather than per keystroke.
+    /// Leave it null - the default - and the text paints itself, which is always correct.
+    /// </para>
+    /// </remarks>
+    [Parameter]
+    public MarkupString? Html { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the line-number gutter is shown. Default is true.
+    /// </summary>
+    /// <remarks>
+    /// The gutter numbers logical lines and scrolls with the text. Lines do not wrap, so number N
+    /// always sits beside line N.
+    /// </remarks>
+    [Parameter]
+    public bool ShowLineNumbers { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets how many spaces one indent is, and how wide a tab character paints. Default is 4.
+    /// </summary>
+    /// <remarks>Clamped to 1-8.</remarks>
+    [Parameter]
+    public int TabSize { get; set; } = 4;
+
+    /// <summary>
+    /// Gets or sets whether Tab inserts spaces rather than a tab character. Default is true.
+    /// </summary>
+    [Parameter]
+    public bool UseSpaces { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets how many lines tall the editor is before it scrolls. Default is 12.
+    /// </summary>
+    [Parameter]
+    public int Rows { get; set; } = 12;
+
+    /// <summary>
+    /// Gets or sets whether the text can be read but not changed.
+    /// </summary>
+    /// <remarks>
+    /// Tab is not captured while read-only, so it moves focus as usual, and the hint says so.
+    /// </remarks>
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    /// <summary>
+    /// Gets or sets the placeholder shown while the editor is empty.
+    /// </summary>
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the editor is disabled.
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets the id of the textarea, for a <c>label</c> element's <c>for</c> attribute.
+    /// </summary>
+    [Parameter]
+    public string? Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the accessible name of the editor. Supply this or an associated label.
+    /// </summary>
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    /// <summary>
+    /// Gets or sets the id of an element describing the editor.
+    /// </summary>
+    /// <remarks>
+    /// The editor's own keyboard hint is always announced as well; this is added in front of it.
+    /// </remarks>
+    [Parameter]
+    public string? AriaDescribedBy { get; set; }
+
+    /// <summary>
+    /// Gets or sets how long, in milliseconds, to wait after the last keystroke before raising
+    /// <see cref="ValueChanged"/>. Default is 0, which raises it on every keystroke.
+    /// </summary>
+    /// <remarks>
+    /// A value in the 150-300 ms range cuts the per-keystroke round trips a Blazor <b>Server</b>
+    /// circuit would otherwise make. The editor's own text is never debounced - only the
+    /// notification to the parent is.
+    /// </remarks>
+    [Parameter]
+    public int DebounceMilliseconds { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Gets the number of lines the editor currently holds.
+    /// </summary>
+    public int LineCount => objLineCount;
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        objValueSync.OnValueSupplied(Value);
+
+        // While the caret is in the editor, TextValueSync holds a parent-supplied value back until
+        // blur, so the gutter must not count it yet. Typing lands here with Value already equal to
+        // objDomText (HandleInput assigns both), so the echo render costs nothing.
+        if (!objIsFocused && !string.Equals(Value, objDomText, StringComparison.Ordinal))
+        {
+            SyncLineCount(Value);
+        }
+    }
+
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            objModule = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/TrBlazeUI.Components/js/code-editor.js");
+            await objModule.InvokeVoidAsync("attach", objBody);
+        }
+        catch (JSDisconnectedException)
+        {
+            // Expected during circuit disconnect in Blazor Server.
+        }
+        catch (InvalidOperationException)
+        {
+            // JS interop is unavailable during prerendering.
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        if (objModule != null)
+        {
+            try
+            {
+                await objModule.InvokeVoidAsync("detach", objBody);
+                await objModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Expected during circuit disconnect.
+            }
+        }
+
+        objDebounceCts?.Cancel();
+        objDebounceCts?.Dispose();
+        objDebounceCts = null;
+        GC.SuppressFinalize(this);
+    }
+
+    private int ClampedTabSize => Math.Clamp(TabSize, 1, 8);
+
+    private string InputStyle => $"tab-size: {ClampedTabSize}; caret-color: var(--foreground);";
+
+    private string DescribedBy =>
+        string.IsNullOrWhiteSpace(AriaDescribedBy) ? objHintId : $"{AriaDescribedBy} {objHintId}";
+
+    private string HintText => ReadOnly || Disabled
+        ? "Code editor, read only. Tab moves focus as usual."
+        : $"Code editor. Tab inserts {IndentDescription}. Press Escape, then Tab, to move focus out of the editor.";
+
+    private string IndentDescription =>
+        UseSpaces ? $"{ClampedTabSize} space{(ClampedTabSize == 1 ? string.Empty : "s")}" : "a tab character";
+
+    // Built by concatenation rather than cn() so the metrics can never be merged away: the gutter,
+    // the textarea and the highlight layer only line up while all three carry InputMetrics intact.
+    private string InputCssClass => InputMetrics
+        + " relative block w-full resize-none overflow-auto border-0 bg-transparent outline-none"
+        + " placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+        + (Html != null ? " text-transparent" : " text-foreground");
+
+    private const string HighlightCssClass = InputMetrics
+        + " pointer-events-none absolute inset-0 m-0 overflow-hidden text-foreground";
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "w-full overflow-hidden rounded-md border border-input bg-background text-foreground",
+        "focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50",
+        "transition-[color,box-shadow]",
+        Class
+    );
+
+    private void SyncLineCount(string? aText)
+    {
+        objDomText = aText;
+        objLineCount = CountLines(aText);
+    }
+
+    private static int CountLines(string? aText)
+    {
+        if (string.IsNullOrEmpty(aText))
+        {
+            return 1;
+        }
+
+        var vCount = 1;
+        foreach (var vChar in aText)
+        {
+            if (vChar == '\n')
+            {
+                vCount++;
+            }
+        }
+
+        return vCount;
+    }
+
+    private void HandleFocus()
+    {
+        objIsFocused = true;
+        objValueSync.OnFocus();
+    }
+
+    private void HandleBlur()
+    {
+        objIsFocused = false;
+        objValueSync.OnBlur();
+
+        // OnBlur may have applied a value the parent supplied while the caret was here.
+        SyncLineCount(Value);
+    }
+
+    private async Task HandleInput(ChangeEventArgs aArgs)
+    {
+        var vNewValue = aArgs.Value?.ToString();
+
+        // Record what the DOM now holds BEFORE Value changes, so the render that follows this event
+        // does not write the (already stale) echo back over what the user is typing. See
+        // TextValueSync - this is the REQ-UI-017 Blazor Server keystroke fix.
+        objValueSync.OnUserInput(vNewValue);
+        Value = vNewValue;
+        SyncLineCount(vNewValue);
+
+        await NotifyValueChangedAsync(vNewValue);
+    }
+
+    private async Task NotifyValueChangedAsync(string? aValue)
+    {
+        if (!ValueChanged.HasDelegate)
+        {
+            return;
+        }
+
+        if (DebounceMilliseconds <= 0)
+        {
+            await ValueChanged.InvokeAsync(aValue);
+            return;
+        }
+
+        objDebounceCts?.Cancel();
+        objDebounceCts?.Dispose();
+
+        var vCts = new CancellationTokenSource();
+        objDebounceCts = vCts;
+
+        try
+        {
+            await Task.Delay(DebounceMilliseconds, vCts.Token);
+            await ValueChanged.InvokeAsync(aValue);
+        }
+        catch (OperationCanceledException)
+        {
+            // A newer keystroke superseded this one.
+        }
+    }
+}

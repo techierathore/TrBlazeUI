@@ -1,7 +1,11 @@
 @namespace TrBlazeUI.Components.Stepper
 
 @* Numbered steps for a multi-part flow or a series index. The list is a real <ol>, and the
-   current step is announced with aria-current="step" rather than by colour alone. *@
+   current step is announced with aria-current="step" rather than by colour alone.
+
+   Current says where the flow is; a step that knows better than its position - one that paused, or
+   that succeeded only on a second try - sets its own StepperItem.Status instead (REQ-UI-006).
+   Current still decides where aria-current lands, whether or not the steps carry statuses. *@
 
 <nav aria-label="@(AriaLabel ?? "Progress")" @attributes="AdditionalAttributes">
     <ol class="@CssClass">

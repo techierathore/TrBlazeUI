@@ -1,0 +1,296 @@
+@page "/components/typing"
+@implements IDisposable
+@using TrBlazeUI.Components.Typing
+@using TrBlazeUI.Components.Spinner
+@using TrBlazeUI.Components.Skeleton
+@using TrBlazeUI.Components.Progress
+
+<PageTitle>Typing Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Typing Component</h1>
+        <p class="text-xl text-muted-foreground">
+            Three small dots that sit inside a line of text and say the answer is still being written.
+            They scale with the font around them, so the sentence keeps growing without the indicator
+            taking a row of its own.
+        </p>
+    </div>
+
+    <!-- Inside a message that is still arriving -->
+    <div class="space-y-4" data-testid="typing-stream-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Inside a message that is still arriving</h2>
+            <p class="text-sm text-muted-foreground">
+                The sentence below is being appended to a word at a time. The dots stay at the end of
+                the last line, on the same baseline as the text, and move along with it as it grows.
+                This is the case none of the other indicators covered: <code class="bg-muted px-1 py-0.5 rounded">Skeleton</code>
+                is a still placeholder for content that has not loaded, <code class="bg-muted px-1 py-0.5 rounded">Progress</code>
+                wants a number, and <code class="bg-muted px-1 py-0.5 rounded">Spinner</code> reads as
+                "the screen is busy" rather than "the answer is still coming".
+            </p>
+        </div>
+        <div class="rounded-lg border p-4 space-y-3">
+            <div class="flex items-start gap-3">
+                <div class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <LucideIcon Name="sparkles" Size="16" />
+                </div>
+                <p class="text-sm leading-relaxed" data-testid="typing-stream-text">
+                    @objStreamedAnswer
+                    <Typing Label="Still writing the answer" data-testid="typing-inline" />
+                </p>
+            </div>
+        </div>
+        <p class="text-xs text-muted-foreground">
+            The dots are drawn in <code class="bg-muted px-1 py-0.5 rounded">currentColor</code> and sized
+            in <code class="bg-muted px-1 py-0.5 rounded">em</code>, so they inherit the message's colour
+            and size with nothing passed in.
+        </p>
+    </div>
+
+    <!-- Next to a Spinner -->
+    <div class="space-y-4" data-testid="typing-vs-spinner-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Typing or Spinner?</h2>
+            <p class="text-sm text-muted-foreground">
+                Both say "wait", but they say it about different things. Put them side by side and the
+                difference in meaning is hard to miss: the spinner belongs to the screen, the dots belong
+                to the sentence.
+            </p>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2">
+            <div class="rounded-lg border p-4 space-y-2" data-testid="typing-meaning">
+                <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    <span>Typing</span>
+                </div>
+                <p class="text-sm leading-relaxed">
+                    The recommended index is the one on <code class="bg-muted px-1 py-0.5 rounded">CustomerId</code>, because<Typing Label="Still writing the answer" data-testid="typing-in-sentence" />
+                </p>
+                <p class="text-xs text-muted-foreground">
+                    "This answer is still coming." Inline, inside the content, announced once as
+                    <code class="bg-muted px-1 py-0.5 rounded">Still writing the answer</code>.
+                </p>
+            </div>
+            <div class="rounded-lg border p-4 space-y-2" data-testid="spinner-meaning">
+                <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    <span>Spinner</span>
+                </div>
+                <div class="flex items-center gap-2 py-1">
+                    <Spinner Size="SpinnerSize.Small" data-testid="spinner-in-panel" />
+                    <span class="text-sm">Loading conversation…</span>
+                </div>
+                <p class="text-xs text-muted-foreground">
+                    "This area is busy." A block-level state for a panel that has no content yet, announced as
+                    <code class="bg-muted px-1 py-0.5 rounded">Loading</code>.
+                </p>
+            </div>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2">
+            <div class="rounded-lg border p-4 space-y-2" data-testid="skeleton-meaning">
+                <div class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Skeleton</div>
+                <div class="space-y-2 py-1">
+                    <Skeleton Class="h-3 w-full" />
+                    <Skeleton Class="h-3 w-4/5" />
+                </div>
+                <p class="text-xs text-muted-foreground">
+                    "Nothing has arrived yet." A still placeholder shaped like the content to come.
+                </p>
+            </div>
+            <div class="rounded-lg border p-4 space-y-2" data-testid="progress-meaning">
+                <div class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Progress</div>
+                <div class="py-3">
+                    <Progress Value="62" />
+                </div>
+                <p class="text-xs text-muted-foreground">
+                    "62% of the way there." Needs a number — or
+                    <code class="bg-muted px-1 py-0.5 rounded">Indeterminate="true"</code> when there isn't one.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sizes -->
+    <div class="space-y-4" data-testid="typing-sizes-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Sizes</h2>
+            <p class="text-sm text-muted-foreground">
+                The three steps keep <code class="bg-muted px-1 py-0.5 rounded">SpinnerSize</code>'s
+                16 : 24 : 40 proportions, but in <code class="bg-muted px-1 py-0.5 rounded">em</code>.
+                Each line below is a different font size and the default indicator follows it, so most
+                callers never need to set <strong>Size</strong> at all.
+            </p>
+        </div>
+        <div class="rounded-lg border p-4 space-y-3">
+            <p class="text-xs" data-testid="typing-line-xs">
+                Extra small line, default size<Typing data-testid="typing-default-xs" />
+            </p>
+            <p class="text-base" data-testid="typing-line-base">
+                Body line, default size<Typing data-testid="typing-default-base" />
+            </p>
+            <p class="text-2xl" data-testid="typing-line-2xl">
+                Large line, default size<Typing data-testid="typing-default-2xl" />
+            </p>
+            <Separator />
+            <p class="text-base">
+                Small<Typing Size="TypingSize.Small" data-testid="typing-small" />,
+                Default<Typing Size="TypingSize.Default" data-testid="typing-default" />,
+                Large<Typing Size="TypingSize.Large" data-testid="typing-large" /> — all on one
+                <code class="bg-muted px-1 py-0.5 rounded">text-base</code> line.
+            </p>
+        </div>
+    </div>
+
+    <!-- Accessibility -->
+    <div class="space-y-4" data-testid="typing-a11y-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Accessibility</h2>
+        </div>
+        <div class="rounded-lg border p-6 text-sm space-y-3">
+            <p>
+                The root is a <code class="bg-muted px-1 py-0.5 rounded">role="status"</code> region with
+                <code class="bg-muted px-1 py-0.5 rounded">aria-live="polite"</code> and
+                <code class="bg-muted px-1 py-0.5 rounded">aria-atomic="true"</code>, so it never interrupts
+                what the user is already hearing.
+            </p>
+            <p>
+                <strong>Label</strong> is rendered as visually hidden text <em>inside</em> that region rather
+                than as an <code class="bg-muted px-1 py-0.5 rounded">aria-label</code>. A live region announces
+                its contents, not its label — an <code class="bg-muted px-1 py-0.5 rounded">aria-label</code>
+                alone would go unread by most screen readers.
+            </p>
+            <p>
+                The dots are <code class="bg-muted px-1 py-0.5 rounded">aria-hidden</code> and animate entirely
+                in CSS. Nothing inside the region's text ever changes, so the announcement fires once when the
+                indicator appears and never repeats. A live region that re-announced on every animation frame
+                would be unusable.
+            </p>
+            <p>
+                Under <code class="bg-muted px-1 py-0.5 rounded">prefers-reduced-motion: reduce</code> every
+                transform is dropped and the dots fade slowly in place instead of moving.
+            </p>
+        </div>
+    </div>
+
+    <!-- Usage -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Usage</h2>
+        <pre class="overflow-x-auto rounded-md border bg-muted/30 p-4 text-xs"><code>@@* Inline, at the end of the text still being written *@@
+&lt;p class="text-sm"&gt;
+    @@streamedAnswer&lt;Typing Label="Still writing the answer" /&gt;
+&lt;/p&gt;
+
+@@* Only while the answer is still arriving *@@
+@@if (isStreaming)
+{
+    &lt;Typing Size="TypingSize.Small" Class="text-muted-foreground" /&gt;
+}</code></pre>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">API Reference</h2>
+        <div class="overflow-x-auto rounded-lg border">
+            <table class="w-full text-sm" data-testid="typing-api-table">
+                <thead>
+                    <tr class="border-b bg-muted/40 text-left">
+                        <th class="p-3 font-semibold">Parameter</th>
+                        <th class="p-3 font-semibold">Type</th>
+                        <th class="p-3 font-semibold">Default</th>
+                        <th class="p-3 font-semibold">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-b">
+                        <td class="p-3 font-mono">Size</td>
+                        <td class="p-3 font-mono text-xs">TypingSize</td>
+                        <td class="p-3 font-mono text-xs">TypingSize.Default</td>
+                        <td class="p-3 text-muted-foreground">Small, Default or Large. Sized in em, so the default already matches the surrounding font size.</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="p-3 font-mono">Label</td>
+                        <td class="p-3 font-mono text-xs">string</td>
+                        <td class="p-3 font-mono text-xs">"Still writing"</td>
+                        <td class="p-3 text-muted-foreground">The accessible name, announced once when the indicator appears. Rendered as visually hidden text inside the live region.</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="p-3 font-mono">Class</td>
+                        <td class="p-3 font-mono text-xs">string?</td>
+                        <td class="p-3 font-mono text-xs">null</td>
+                        <td class="p-3 text-muted-foreground">Additional CSS classes on the root. Dots use currentColor, so a text colour utility recolours them.</td>
+                    </tr>
+                    <tr>
+                        <td class="p-3 font-mono">AdditionalAttributes</td>
+                        <td class="p-3 font-mono text-xs">Dictionary&lt;string, object&gt;?</td>
+                        <td class="p-3 font-mono text-xs">null</td>
+                        <td class="p-3 text-muted-foreground">Any other HTML attribute (id, style, data-*, aria-*, event handlers) is splatted onto the root element.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    private static readonly string[] AnswerWords =
+    [
+        "The", "index", "you", "want", "is", "the", "one", "on", "CustomerId,", "because",
+        "every", "query", "on", "this", "screen", "filters", "by", "it", "first", "and",
+        "only", "then", "sorts", "by", "date."
+    ];
+
+    private readonly CancellationTokenSource objStreamCancellation = new();
+    private string objStreamedAnswer = string.Empty;
+
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        // Deliberately not awaited: the loop runs until the page is disposed, and a task that
+        // never completes must not be handed back to the renderer.
+        _ = InvokeAsync(StreamAnswerAsync);
+    }
+
+    /// <summary>
+    /// Appends the sample answer a word at a time, then starts over, so the indicator is always
+    /// sitting at the end of a sentence that is visibly growing.
+    /// </summary>
+    private async Task StreamAnswerAsync()
+    {
+        try
+        {
+            while (!objStreamCancellation.IsCancellationRequested)
+            {
+                foreach (var vWord in AnswerWords)
+                {
+                    await Task.Delay(180, objStreamCancellation.Token);
+                    objStreamedAnswer = objStreamedAnswer.Length == 0 ? vWord : $"{objStreamedAnswer} {vWord}";
+                    StateHasChanged();
+                }
+
+                await Task.Delay(2000, objStreamCancellation.Token);
+                objStreamedAnswer = string.Empty;
+                StateHasChanged();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // The page was left while the sample answer was still streaming.
+        }
+        catch (ObjectDisposedException)
+        {
+            // The circuit went away between a delay completing and the re-render.
+        }
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        objStreamCancellation.Cancel();
+        objStreamCancellation.Dispose();
+        GC.SuppressFinalize(this);
+    }
+}

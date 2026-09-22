@@ -1,0 +1,163 @@
+@namespace TrBlazeUI.Components.CodeEditor
+
+@* A strip of open files for an editor. This is a DOCUMENT tab strip, not the Tabs component, and it
+   deliberately carries no role="tab"/role="tablist".
+
+   Why: the WAI-ARIA tablist contract is all-or-nothing - roving tabindex (exactly one tab stop for
+   the whole strip), Left/Right/Home/End to move, and exactly one trigger reporting
+   aria-selected="true" under a role="tablist" ancestor. A strip whose tabs each also contain a
+   close button does not fit that contract: with a roving tabindex the close buttons are unreachable
+   by keyboard unless a second, non-standard key is invented for them. Half-implementing tablist is
+   what REQ-UI-017 forbids, so this is a plain list instead: every tab and every close button is an
+   ordinary button in the natural Tab order, the strip is named, and the active file is marked with
+   aria-current="true". Reach for Tabs when you want panels; reach for this when you want files.
+
+   An unsaved file is marked twice over - a dot glyph AND the words "unsaved changes" in the tab's
+   accessible name - so the mark survives both a screen reader and a user who cannot tell the dot's
+   colour from the label's. *@
+
+<div class="@CssClass" data-slot="editor-tabs" @attributes="AdditionalAttributes">
+    @* role="list" is redundant with <ul> but keeps list semantics in browsers that drop them when
+       list-style is removed. *@
+    <ul role="list" aria-label="@AriaLabel" class="m-0 flex w-max min-w-full list-none items-stretch p-0">
+        @foreach (var vItem in Items)
+        {
+            var vIsActive = string.Equals(vItem.Id, CurrentActiveId, StringComparison.Ordinal);
+            <li @key="vItem.Id"
+                data-slot="editor-tab"
+                data-tab-id="@vItem.Id"
+                data-active="@(vIsActive ? "true" : "false")"
+                data-dirty="@(vItem.IsDirty ? "true" : "false")"
+                class="@(vIsActive ? ActiveTabClass : InactiveTabClass)">
+                <button type="button"
+                        data-slot="editor-tab-label"
+                        aria-current="@(vIsActive ? "true" : null)"
+                        class="flex min-w-0 items-center gap-2 py-2 pl-3 pr-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                        @onclick="() => SelectAsync(vItem)">
+                    @if (vItem.IsDirty)
+                    {
+                        <span data-slot="editor-tab-dirty" aria-hidden="true" class="size-2 shrink-0 rounded-full bg-current"></span>
+                    }
+                    <span class="truncate">@vItem.Label</span>
+                    @if (vItem.IsDirty)
+                    {
+                        <span class="sr-only">, unsaved changes</span>
+                    }
+                </button>
+                <button type="button"
+                        data-slot="editor-tab-close"
+                        aria-label="@($"Close {vItem.Label}")"
+                        class="mx-1 inline-flex size-5 shrink-0 items-center justify-center rounded-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        @onclick="() => CloseAsync(vItem)">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="12"
+                         height="12"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2.5"
+                         stroke-linecap="round"
+                         stroke-linejoin="round"
+                         aria-hidden="true">
+                        <path d="M18 6 6 18" />
+                        <path d="m6 6 12 12" />
+                    </svg>
+                </button>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    private const string BaseTabClass = "flex min-w-0 max-w-[14rem] items-center border-r border-border";
+
+    private const string ActiveTabClass = BaseTabClass + " bg-background text-foreground";
+
+    private const string InactiveTabClass = BaseTabClass + " bg-muted/40 text-muted-foreground hover:text-foreground";
+
+    private string? objInternalActiveId;
+
+    /// <summary>
+    /// Gets or sets the open files, in the order they are shown.
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<EditorTabItem> Items { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the <see cref="EditorTabItem.Id"/> of the active file. Use with
+    /// <c>@bind-ActiveId</c>; leave it unbound and the strip keeps the active file itself.
+    /// </summary>
+    [Parameter]
+    public string? ActiveId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback raised when the active file changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<string?> ActiveIdChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback raised when a tab is clicked, whether or not it was already active.
+    /// </summary>
+    [Parameter]
+    public EventCallback<EditorTabItem> OnSelect { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback raised when a tab's close button is pressed.
+    /// </summary>
+    /// <remarks>
+    /// The strip does not remove the tab or choose the next active file - the caller owns the list,
+    /// and a dirty file usually needs a prompt first.
+    /// </remarks>
+    [Parameter]
+    public EventCallback<EditorTabItem> OnClose { get; set; }
+
+    /// <summary>
+    /// Gets or sets the accessible name of the strip. Default is <c>"Open files"</c>.
+    /// </summary>
+    [Parameter]
+    public string AriaLabel { get; set; } = "Open files";
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Gets the id of the active file, whether the strip is bound or keeps it itself.
+    /// </summary>
+    public string? CurrentActiveId => ActiveIdChanged.HasDelegate ? ActiveId : objInternalActiveId;
+
+    /// <inheritdoc />
+    protected override void OnParametersSet() =>
+        objInternalActiveId ??= ActiveId ?? (Items.Count > 0 ? Items[0].Id : null);
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "w-full overflow-x-auto border-b border-border bg-muted/20",
+        Class
+    );
+
+    private async Task SelectAsync(EditorTabItem aItem)
+    {
+        if (ActiveIdChanged.HasDelegate)
+        {
+            await ActiveIdChanged.InvokeAsync(aItem.Id);
+        }
+        else
+        {
+            objInternalActiveId = aItem.Id;
+        }
+
+        await OnSelect.InvokeAsync(aItem);
+    }
+
+    private Task CloseAsync(EditorTabItem aItem) => OnClose.InvokeAsync(aItem);
+}

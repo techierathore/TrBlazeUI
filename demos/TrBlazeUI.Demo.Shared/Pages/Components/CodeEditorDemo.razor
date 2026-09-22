@@ -1,0 +1,286 @@
+@page "/components/code-editor"
+@using TrBlazeUI.Components.CodeEditor
+
+<PageTitle>Code Editor Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Code Editor Component</h1>
+        <p class="text-xl text-muted-foreground">
+            An editable code area with a line-number gutter and a Tab key that indents instead of
+            moving focus, plus a strip of open files with a close button and an unsaved mark on each.
+        </p>
+        <p class="text-sm text-muted-foreground">
+            CodeBlock shows code; CodeEditor lets you change it. Neither bundles a syntax
+            highlighter - that is an application choice, and shipping one would drag a large
+            JavaScript dependency into every consumer. Pass your own highlighted markup through
+            <code class="bg-muted px-1 py-0.5 rounded">Html</code> if you have one.
+        </p>
+    </div>
+
+    <!-- Editing a file -->
+    <div class="space-y-4" data-testid="editor-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Editing a file</h2>
+            <p class="text-sm text-muted-foreground">
+                Click a tab to switch file. Type in the editor and its tab grows a dot and reads as
+                "unsaved changes" to a screen reader. The close button on each tab has its own
+                accessible name ("Close Program.cs") and raises
+                <code class="bg-muted px-1 py-0.5 rounded">OnClose</code> - the page owns the list,
+                so a real editor would prompt before dropping unsaved work.
+            </p>
+        </div>
+
+        <div class="overflow-hidden rounded-md border">
+            <EditorTabs Items="@OpenTabs"
+                        ActiveId="@objActiveId"
+                        ActiveIdChanged="HandleActiveChanged"
+                        OnClose="HandleCloseAsync"
+                        AriaLabel="Open files"
+                        data-testid="editor-tabs" />
+            @if (objActiveId != null)
+            {
+                <CodeEditor @key="objActiveId"
+                            Value="@ActiveText"
+                            ValueChanged="HandleTextChanged"
+                            Language="@ActiveLanguage"
+                            AriaLabel="@($"Source of {objActiveId}")"
+                            Rows="14"
+                            Class="rounded-none border-0"
+                            data-testid="code-editor" />
+            }
+            else
+            {
+                <p class="px-3 py-8 text-center text-sm text-muted-foreground" data-testid="editor-empty">
+                    No file is open.
+                </p>
+            }
+        </div>
+
+        <div class="grid gap-4 text-sm sm:grid-cols-3">
+            <div class="rounded-md border p-4">
+                <p class="text-muted-foreground">Active file</p>
+                <p class="font-mono" data-testid="editor-active">@(objActiveId ?? "none")</p>
+            </div>
+            <div class="rounded-md border p-4">
+                <p class="text-muted-foreground">Unsaved files</p>
+                <p class="font-mono" data-testid="editor-dirty-count">@objDirty.Count</p>
+            </div>
+            <div class="rounded-md border p-4">
+                <p class="text-muted-foreground">Last closed</p>
+                <p class="font-mono" data-testid="editor-last-closed">@(objLastClosed ?? "none")</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab indentation -->
+    <div class="space-y-4" data-testid="indent-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Tab indents, Escape then Tab leaves</h2>
+            <p class="text-sm text-muted-foreground">
+                Put the caret in the editor below and press Tab: it inserts two spaces rather than
+                jumping to the next control. Shift+Tab takes one indent back off. Select several
+                lines and Tab indents every one of them.
+            </p>
+            <p class="text-sm text-muted-foreground">
+                Capturing Tab would strand anyone navigating by keyboard, so there is a way out:
+                press <strong>Escape</strong>, then <strong>Tab</strong>, and focus moves on
+                normally. The editor says so itself - a hidden hint is wired to the textarea with
+                <code class="bg-muted px-1 py-0.5 rounded">aria-describedby</code>, so a screen
+                reader announces it on focus instead of leaving the user to guess.
+            </p>
+        </div>
+
+        <CodeEditor @bind-Value="objSnippet"
+                    Language="json"
+                    TabSize="2"
+                    Rows="8"
+                    AriaLabel="Sample configuration"
+                    data-testid="indent-editor" />
+
+        <div class="grid gap-4 text-sm sm:grid-cols-2">
+            <div class="rounded-md border p-4">
+                <p class="text-muted-foreground">Characters bound back</p>
+                <p class="font-mono" data-testid="indent-length">@SnippetLength</p>
+            </div>
+            <div class="rounded-md border p-4">
+                <p class="text-muted-foreground">Lines</p>
+                <p class="font-mono" data-testid="indent-lines">@SnippetLineCount</p>
+            </div>
+        </div>
+
+        <div class="rounded-md border border-alert-info bg-alert-info-bg p-4 text-sm">
+            <p class="text-alert-info-foreground">
+                Lines do not wrap. The editor scrolls sideways instead, because that is the only way
+                a gutter can stay honest: with soft wrap one logical line paints as several rows and
+                every number below it is off by the overflow. Line N always sits beside number N.
+            </p>
+        </div>
+    </div>
+
+    <!-- Usage -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Usage</h2>
+        <pre class="overflow-x-auto rounded-md border bg-muted/30 p-4 text-xs"><code>&lt;EditorTabs Items="@@openFiles" @@bind-ActiveId="activeId" OnClose="CloseAsync" /&gt;
+
+&lt;CodeEditor @@bind-Value="text"
+            Language="csharp"
+            TabSize="4"
+            UseSpaces="true"
+            Rows="14"
+            AriaLabel="Source of Program.cs" /&gt;
+
+@@code {
+    private string activeId = "Program.cs";
+    private string text = "";
+    private List&lt;EditorTabItem&gt; openFiles =
+    [
+        new("Program.cs", "Program.cs", IsDirty: true),
+        new("README.md", "README.md")
+    ];
+
+    private Task CloseAsync(EditorTabItem file)
+    {
+        openFiles.RemoveAll(f =&gt; f.Id == file.Id);
+        return Task.CompletedTask;
+    }
+}</code></pre>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">API Reference</h2>
+        <div class="border rounded-lg p-6 space-y-4 text-sm">
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">CodeEditor</h3>
+                <p><strong>Value / ValueChanged:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - The text; use <code class="bg-muted px-1 py-0.5 rounded">@@bind-Value</code></p>
+                <p><strong>Language:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Label shown in the header, as on CodeBlock (no highlighting is implied)</p>
+                <p><strong>Html:</strong> <code class="bg-muted px-1 py-0.5 rounded">MarkupString?</code> - Your own pre-highlighted markup, painted behind the text; rendered as-is, so sanitise it</p>
+                <p><strong>ShowLineNumbers:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Line-number gutter (default true)</p>
+                <p><strong>TabSize:</strong> <code class="bg-muted px-1 py-0.5 rounded">int</code> - Spaces per indent and the painted width of a tab character (default 4, clamped 1-8)</p>
+                <p><strong>UseSpaces:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Tab inserts spaces rather than a tab character (default true)</p>
+                <p><strong>Rows:</strong> <code class="bg-muted px-1 py-0.5 rounded">int</code> - Height in lines before it scrolls (default 12)</p>
+                <p><strong>ReadOnly / Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Read-only releases Tab, so focus moves as usual</p>
+                <p><strong>Placeholder:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Shown while the editor is empty</p>
+                <p><strong>Id / AriaLabel / AriaDescribedBy:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Naming; the keyboard hint is always described as well</p>
+                <p><strong>DebounceMilliseconds:</strong> <code class="bg-muted px-1 py-0.5 rounded">int</code> - Delay before ValueChanged on a Server circuit (default 0)</p>
+                <p><strong>LineCount:</strong> <code class="bg-muted px-1 py-0.5 rounded">int</code> - Lines currently held (read only)</p>
+                <p><strong>Class / additional attributes:</strong> Merged classes, and any HTML attribute forwarded to the root</p>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">EditorTabs</h3>
+                <p><strong>Items:</strong> <code class="bg-muted px-1 py-0.5 rounded">IReadOnlyList&lt;EditorTabItem&gt;</code> - The open files, in order</p>
+                <p><strong>ActiveId / ActiveIdChanged:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - The active file's Id; bind it or let the strip keep it</p>
+                <p><strong>OnSelect:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback&lt;EditorTabItem&gt;</code> - A tab was clicked</p>
+                <p><strong>OnClose:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback&lt;EditorTabItem&gt;</code> - A close button was pressed; the caller removes the tab</p>
+                <p><strong>AriaLabel:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - Name of the strip (default "Open files")</p>
+                <p><strong>Class / additional attributes:</strong> Merged classes, and any HTML attribute forwarded to the root</p>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">EditorTabItem</h3>
+                <p><strong>record EditorTabItem(string Id, string Label, bool IsDirty = false)</strong></p>
+                <p>A dirty tab shows a dot <em>and</em> reads as "unsaved changes", so the mark is never colour alone.</p>
+                <p>
+                    The strip is a plain list, not a tablist: every tab and every close button is an
+                    ordinary button in the Tab order, and the active file carries
+                    <code class="bg-muted px-1 py-0.5 rounded">aria-current="true"</code>. Use
+                    <code class="bg-muted px-1 py-0.5 rounded">Tabs</code> when you want panels.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private readonly Dictionary<string, string> objTexts = new(StringComparer.Ordinal)
+    {
+        ["Program.cs"] =
+            "using TrBlazeUI.Components.CodeEditor;\n" +
+            "\n" +
+            "var builder = WebApplication.CreateBuilder(args);\n" +
+            "builder.Services.AddRazorComponents()\n" +
+            "    .AddInteractiveServerComponents();\n" +
+            "\n" +
+            "var app = builder.Build();\n" +
+            "app.MapRazorComponents<App>()\n" +
+            "   .AddInteractiveServerRenderMode();\n" +
+            "app.Run();\n",
+        ["Editor.razor"] =
+            "@page \"/editor\"\n" +
+            "\n" +
+            "<CodeEditor @bind-Value=\"text\" Language=\"csharp\" />\n" +
+            "\n" +
+            "@code {\n" +
+            "    private string text = string.Empty;\n" +
+            "}\n",
+        ["appsettings.json"] =
+            "{\n" +
+            "  \"Logging\": {\n" +
+            "    \"LogLevel\": {\n" +
+            "      \"Default\": \"Information\"\n" +
+            "    }\n" +
+            "  }\n" +
+            "}\n"
+    };
+
+    private readonly Dictionary<string, string> objLanguages = new(StringComparer.Ordinal)
+    {
+        ["Program.cs"] = "csharp",
+        ["Editor.razor"] = "razor",
+        ["appsettings.json"] = "json"
+    };
+
+    private readonly List<string> objOpenIds = ["Program.cs", "Editor.razor", "appsettings.json"];
+
+    private readonly HashSet<string> objDirty = new(StringComparer.Ordinal) { "Editor.razor" };
+
+    private string? objActiveId = "Program.cs";
+
+    private string? objLastClosed;
+
+    private string? objSnippet =
+        "{\n" +
+        "  \"name\": \"trblazeui\",\n" +
+        "  \"tabSize\": 2\n" +
+        "}\n";
+
+    private int SnippetLength => objSnippet?.Length ?? 0;
+
+    private int SnippetLineCount => (objSnippet ?? string.Empty).Count(vChar => vChar == '\n') + 1;
+
+    private IReadOnlyList<EditorTabItem> OpenTabs =>
+        objOpenIds.Select(vId => new EditorTabItem(vId, vId, objDirty.Contains(vId))).ToList();
+
+    private string ActiveText =>
+        objActiveId != null && objTexts.TryGetValue(objActiveId, out var vText) ? vText : string.Empty;
+
+    private string? ActiveLanguage =>
+        objActiveId != null && objLanguages.TryGetValue(objActiveId, out var vLanguage) ? vLanguage : null;
+
+    private void HandleActiveChanged(string? aId) => objActiveId = aId;
+
+    private void HandleTextChanged(string? aText)
+    {
+        if (objActiveId == null)
+        {
+            return;
+        }
+
+        objTexts[objActiveId] = aText ?? string.Empty;
+        objDirty.Add(objActiveId);
+    }
+
+    private Task HandleCloseAsync(EditorTabItem aItem)
+    {
+        objOpenIds.Remove(aItem.Id);
+        objDirty.Remove(aItem.Id);
+        objLastClosed = aItem.Label;
+
+        if (string.Equals(objActiveId, aItem.Id, StringComparison.Ordinal))
+        {
+            objActiveId = objOpenIds.Count > 0 ? objOpenIds[0] : null;
+        }
+
+        return Task.CompletedTask;
+    }
+}

@@ -60,6 +60,42 @@
         </p>
     </div>
 
+    <!-- Position and removal -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Position and removal</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>ShowPosition</code> (on by default) prints each row's 1-based position, so the
+                announcement — "moved to position 3 of 5" — can be checked against the screen.
+                <code>AllowRemove</code> adds a remove button whose name reads "Remove Cue sheet",
+                the same shape as the move buttons, and raises <code>OnRemove</code> with the item
+                that went. A bound list is updated through <code>ItemsChanged</code> either way.
+            </p>
+        </div>
+        <div data-testid="sortable-removable">
+            <SortableList TItem="string" @bind-Items="objQueue" AllowRemove="true"
+                          OnRemove="@(v => objLastRemoved = v)" />
+        </div>
+        <p class="text-sm text-muted-foreground" data-testid="sortable-remove-result">
+            @(objLastRemoved is null ? "Nothing removed yet" : $"Removed: {objLastRemoved}")
+        </p>
+    </div>
+
+    <!-- Position off -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Without the position column</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>ShowPosition="false"</code> drops the number for a list whose rows already
+                carry their own ordinal — a numbered agenda, a ranked chart. The
+                <code>&lt;ol&gt;</code> still tells a screen reader "item 2 of 3".
+            </p>
+        </div>
+        <div data-testid="sortable-no-position">
+            <SortableList TItem="string" @bind-Items="objRanked" ShowPosition="false" />
+        </div>
+    </div>
+
     <!-- Usage -->
     <div class="space-y-4">
         <h2 class="text-2xl font-semibold">Usage</h2>
@@ -69,6 +105,12 @@
 
 @code {
     private IList<string> objSimple = ["Part one", "Part two", "Part three"];
+
+    private IList<string> objQueue = ["Cue sheet", "Opening titles", "Interview", "Credits"];
+
+    private IList<string> objRanked = ["1. Theming", "2. Primitives", "3. Data display"];
+
+    private string? objLastRemoved;
 
     private List<SeriesPart> objParts =
     [
@@ -88,5 +130,9 @@
                 <span class="font-medium">@part.Title</span>
             </ItemTemplate>
         </SortableList>
+
+        @* Positions are on by default; removal is opt-in: *@
+        <SortableList TItem="string" @bind-Items="queue"
+                      AllowRemove="true" OnRemove="@(v => lastRemoved = v)" />
         """;
 }

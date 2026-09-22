@@ -124,6 +124,75 @@
         </div>
     </div>
 
+    <!-- Indeterminate -->
+    <div class="space-y-4" data-testid="progress-indeterminate-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Indeterminate</h2>
+            <p class="text-sm text-muted-foreground">
+                Set <code class="text-xs bg-muted px-1 py-0.5 rounded">Indeterminate="true"</code> when work
+                is under way with no known end. The bar animates without claiming a percentage:
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">aria-valuenow</code> is omitted entirely,
+                which is the ARIA signal that the value is unknown.
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">Value</code> and
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">Max</code> are ignored in this mode
+                rather than fought over.
+            </p>
+        </div>
+        <div class="space-y-6">
+            <div class="space-y-2">
+                <span class="text-sm">Indeterminate — no percentage claimed</span>
+                <Progress Indeterminate="true" aria-label="Preparing your export" data-testid="progress-indeterminate" />
+                <p class="text-xs text-muted-foreground">
+                    Renders <code class="bg-muted px-1 py-0.5 rounded">role="progressbar"</code> with
+                    <code class="bg-muted px-1 py-0.5 rounded">aria-valuemin="0"</code> and
+                    <code class="bg-muted px-1 py-0.5 rounded">aria-valuemax="100"</code> (the ARIA defaults)
+                    and <strong>no</strong> <code class="bg-muted px-1 py-0.5 rounded">aria-valuenow</code>.
+                    Give it a name by splatting <code class="bg-muted px-1 py-0.5 rounded">aria-label</code>.
+                </p>
+            </div>
+            <div class="space-y-2">
+                <span class="text-sm">The same bar, determinate, for comparison</span>
+                <Progress Value="40" aria-label="Export 40 percent complete" data-testid="progress-determinate" />
+                <p class="text-xs text-muted-foreground">
+                    Carries <code class="bg-muted px-1 py-0.5 rounded">aria-valuenow="40"</code>, exactly as before.
+                    Nothing changes for existing callers when <strong>Indeterminate</strong> is left at its
+                    <code class="bg-muted px-1 py-0.5 rounded">false</code> default.
+                </p>
+            </div>
+            <div class="space-y-3">
+                <span class="text-sm">Toggle one bar between the two modes</span>
+                <Progress Indeterminate="@objIsIndeterminate" Value="65"
+                          aria-label="Sample task" data-testid="progress-toggle-bar" />
+                <div class="flex items-center gap-4">
+                    <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Small"
+                            data-testid="progress-indeterminate-toggle"
+                            OnClick="@(() => objIsIndeterminate = !objIsIndeterminate)">
+                        @(objIsIndeterminate ? "Show a percentage" : "Hide the percentage")
+                    </Button>
+                    <span class="text-sm text-muted-foreground" data-testid="progress-toggle-state">
+                        @(objIsIndeterminate ? "Indeterminate — aria-valuenow absent" : "Determinate — aria-valuenow 65")
+                    </span>
+                </div>
+                <p class="text-xs text-muted-foreground">
+                    The bar keeps <code class="bg-muted px-1 py-0.5 rounded">Value</code> set the whole time.
+                    While indeterminate that value is simply ignored, so flipping back restores the percentage
+                    without the caller re-supplying it.
+                </p>
+            </div>
+        </div>
+        <div class="rounded-lg border p-4 text-sm text-muted-foreground">
+            An indeterminate bar says "work is happening", not "your answer is being written". For text that
+            is still being composed inside a message, use the
+            <a href="/components/typing" class="text-primary underline underline-offset-2" data-testid="progress-typing-link">Typing</a>
+            indicator instead — it sits inline in the sentence it belongs to.
+        </div>
+        <p class="text-xs text-muted-foreground">
+            The travelling animation is dropped under
+            <code class="bg-muted px-1 py-0.5 rounded">prefers-reduced-motion: reduce</code>; the bar then
+            fades slowly in place instead of moving.
+        </p>
+    </div>
+
     <!-- Custom Styling -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -160,7 +229,7 @@
                     Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">double</code>
                 </p>
                 <p class="text-sm text-muted-foreground">
-                    The current progress value. Default: 0.
+                    The current progress value. Default: 0. Ignored when <strong>Indeterminate</strong> is true.
                 </p>
             </div>
             <Separator />
@@ -170,7 +239,20 @@
                     Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">double</code>
                 </p>
                 <p class="text-sm text-muted-foreground">
-                    The maximum value. Default: 100.
+                    The maximum value. Default: 100. Ignored when <strong>Indeterminate</strong> is true.
+                </p>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">Indeterminate</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">bool</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    Whether the bar shows work under way with no known end. Default: false.
+                    When true the bar animates, <strong>Value</strong> and <strong>Max</strong> are ignored,
+                    and <code class="text-xs bg-muted px-1 py-0.5 rounded">aria-valuenow</code> is omitted so
+                    assistive technology reports the value as unknown.
                 </p>
             </div>
             <Separator />
@@ -199,4 +281,5 @@
 
 @code {
     private double objProgressValue = 33;
+    private bool objIsIndeterminate;
 }

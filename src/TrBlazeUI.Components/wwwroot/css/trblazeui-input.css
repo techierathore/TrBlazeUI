@@ -743,7 +743,103 @@
 @source inline("scroll-{auto,smooth} scroll-m-{0,4,8,12,16,20,24} scroll-mt-{0,4,8,12,16,20,24}");
 @source inline("{first:,last:,odd:,even:,disabled:,group-hover:,peer-focus:}{border-b-0,border-t-0,bg-muted,opacity-50,underline,hidden,block}");
 
+/* Logical-property margins and lining figures. StepperItem pushes its Trailing fragment to the
+ * far edge with `ms-auto` and SortableList draws its row number with `tabular-nums`; both are
+ * single-use, so they lean entirely on the source scan. Safelisted so a scan that misses one
+ * degrades into a slightly larger bundle rather than a step whose trailing badge sits against
+ * its title (REQ-UI-006 / REQ-UI-017). */
+@source inline("{ms,me}-auto tabular-nums");
+
 /* Container-scale sizing (min-w-3xl etc). A wide DataTable inside an `overflow-x-auto` wrapper
  * needs a minimum width, and only the arbitrary-value form `min-w-[720px]` used to be reachable -
  * which the pre-built bundle can never generate. */
 @source inline("{sm:,md:,lg:,xl:,2xl:,}{w,min-w,max-w}-{3xs,2xs,xs,sm,md,lg,xl,2xl,3xl,4xl,5xl,6xl,7xl}");
+
+/* ---------------------------------------------------------------------------------------------
+ * "Still coming" indicators  (Typing component, Progress Indeterminate)  [REQ-UI-023]
+ *
+ * Hand-authored, not Tailwind-generated, for the same reason as the Grid system above: the
+ * bundle is pre-built, and these need `em`-relative sizing and per-dot @keyframes that no
+ * standard-scale utility expresses. `animate-pulse` / `animate-spin` / `animate-bounce` were all
+ * checked first - pulse is a whole-element opacity fade (that is Skeleton's "not loaded yet"),
+ * spin is Spinner's "the screen is busy", and bounce is a full 25% travel tuned for a block
+ * element, far too large for a dot sitting on a text baseline.
+ *
+ * Unlayered on purpose, exactly like `.trblazeui-grid`: unlayered rules win over `@layer`
+ * declarations regardless of specificity, so a Tailwind utility can never knock the positioning
+ * out from under the travelling Progress strip.
+ *
+ * REDUCED MOTION: the library had NO `prefers-reduced-motion` handling anywhere in this file
+ * before this block (two demo pages claimed it in prose; the CSS never did). Both animations
+ * below therefore ship their own `@media (prefers-reduced-motion: reduce)` override that drops
+ * every transform and leaves a slow opacity fade - still legible as "something is happening",
+ * with no movement.
+ * ------------------------------------------------------------------------------------------- */
+
+/* Typing: three dots that sit INSIDE a line of text. `inline-flex` + `vertical-align: baseline`
+   keeps them on the baseline of the sentence they end, so the sentence can grow around them
+   without the indicator reserving a row of its own. Everything is sized in `em`, so the dots
+   track the surrounding font size; `currentColor` makes them track its colour too. */
+.trblazeui-typing {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-end;
+  vertical-align: baseline;
+  gap: var(--trblazeui-typing-gap, 0.24em);
+  line-height: 1;
+}
+
+/* Sizes keep SpinnerSize's 16 : 24 : 40 proportions, expressed in em. */
+.trblazeui-typing-sm { --trblazeui-typing-dot: 0.27em; --trblazeui-typing-gap: 0.16em; }
+.trblazeui-typing-md { --trblazeui-typing-dot: 0.4em;  --trblazeui-typing-gap: 0.24em; }
+.trblazeui-typing-lg { --trblazeui-typing-dot: 0.67em; --trblazeui-typing-gap: 0.4em; }
+
+.trblazeui-typing-dot {
+  display: block;
+  flex: none;
+  width: var(--trblazeui-typing-dot, 0.4em);
+  height: var(--trblazeui-typing-dot, 0.4em);
+  border-radius: 9999px;
+  background-color: currentColor;
+  animation: trblazeui-typing-bounce 1.4s ease-in-out infinite both;
+}
+
+@keyframes trblazeui-typing-bounce {
+  0%, 60%, 100% { transform: translateY(0);     opacity: 0.4; }
+  30%           { transform: translateY(-55%);  opacity: 1; }
+}
+
+/* Progress Indeterminate: a partial-width strip travelling across the (overflow-hidden,
+   position: relative) track. It claims no percentage, which is the whole point - the component
+   omits aria-valuenow to match. */
+.trblazeui-progress-indeterminate {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  animation: trblazeui-progress-indeterminate 1.4s ease-in-out infinite;
+}
+
+@keyframes trblazeui-progress-indeterminate {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trblazeui-typing-dot {
+    animation: trblazeui-still-working 2s ease-in-out infinite both;
+  }
+
+  .trblazeui-progress-indeterminate {
+    width: 100%;
+    transform: none;
+    animation: trblazeui-still-working 2s ease-in-out infinite;
+  }
+}
+
+/* Opacity only - no transform, so nothing moves. */
+@keyframes trblazeui-still-working {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
