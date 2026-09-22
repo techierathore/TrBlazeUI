@@ -78,6 +78,63 @@
         }
     </div>
 
+    <!-- Choose-all announces its state -->
+    <div class="space-y-4 rounded-lg border border-alert-success bg-alert-success-bg p-6" data-testid="req-ui-005">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold text-alert-success-foreground">The choose-all control announces its state</h2>
+            <p class="text-sm text-alert-success-foreground">
+                When a table has more rows than one page, the header's choose-all control is a menu
+                trigger wrapping a decorative checkbox — the checkbox is a picture of the state, not
+                a control, so that the trigger is not a button containing a focusable
+                <code>role="checkbox"</code>. That left the none/some/all state visible but unsaid:
+                the trigger's name was the fixed string "Select rows - click to see options".
+                It now carries the count, and a live region speaks the new count wherever the change
+                came from — a row checkbox, the menu, or the page's own code.
+            </p>
+        </div>
+        <DataTable TData="Person"
+                   Data="@people"
+                   SelectionMode="DataTableSelectionMode.Multiple"
+                   @ref="objSelectionGrid"
+                   @bind-SelectedItems="objCountedSelection"
+                   InitialPageSize="5"
+                   data-testid="req-ui-005-grid">
+            <Columns>
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" Sortable />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Role)" Header="Role" />
+            </Columns>
+        </DataTable>
+        <div class="flex flex-wrap items-center gap-3">
+            <Button Variant="ButtonVariant.Outline" data-testid="req-ui-005-count"
+                    Disabled="@((objSelectionGrid?.SelectedCount ?? 0) == 0)">
+                Export @(objSelectionGrid?.SelectedCount ?? 0) selected
+            </Button>
+            <span class="text-sm text-muted-foreground">
+                That button's label reads <code>SelectedCount</code> off the grid captured with
+                <code>@@ref</code> — the count the consumer asked for, instead of reaching through
+                <code>SelectedItems</code> and counting it by hand.
+            </span>
+        </div>
+        <div class="space-y-2">
+            <p class="text-sm font-medium text-alert-success-foreground">One page: a real checkbox, unchanged</p>
+            <p class="text-sm text-muted-foreground">
+                When every row already fits on one page there is nothing to choose between, so the
+                header keeps the plain <code>Checkbox</code> it always had — named "Select all rows",
+                and indeterminate while only some of the rows are ticked.
+            </p>
+            <DataTable TData="ModerationRow"
+                       Data="@objModeration"
+                       SelectionMode="DataTableSelectionMode.Multiple"
+                       ShowPagination="false"
+                       data-testid="req-ui-005-single-page">
+                <Columns>
+                    <DataTableColumn TData="ModerationRow" TValue="string" Property="@(r => r.Author)" Header="Author" />
+                    <DataTableColumn TData="ModerationRow" TValue="string" Property="@(r => r.Post)" Header="Post" />
+                </Columns>
+            </DataTable>
+        </div>
+    </div>
+
     <!-- Custom Cell Templates -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -534,6 +591,11 @@
 
 @code {
     private DataTable<ModerationRow>? objModerationGrid;
+
+    // Captured so the page can read SelectedCount for its own button label (REQ-UI-005).
+    private DataTable<Person>? objSelectionGrid;
+
+    private IReadOnlyCollection<Person> objCountedSelection = Array.Empty<Person>();
 
     private readonly List<ModerationRow> objModeration =
     [

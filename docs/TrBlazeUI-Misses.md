@@ -3,9 +3,9 @@
 | | |
 |---|---|
 | App | TrBlazeUI |
-| Count | 40 logged: 18 open, 22 fixed, 0 will not fix |
+| Count | 48 logged: 18 open, 30 fixed, 0 will not fix |
 | Source | `docs/metrics/misses.jsonl`, one row per miss record. Rewritten by `tf-misses-md.sh` on every new record. Never edit it: a wrong row is corrected by a new record. |
-| Updated | 2026-09-19 |
+| Updated | 2026-09-22 |
 
 **Whose gap** answers the four questions of the miss protocol: **the app's spec** did not say it, so the checklist line is fixed; **the framework never said it**, so one requirement line and a check are added; **the check was too weak** (a review, or a script that did not fire), so the check is fixed; **said and ignored**, so the rule becomes a hook or is deleted. **not sorted** means the record predates the sort or nobody has answered yet; `bash .tfcore/utils/tf-emit.sh --amend <miss> sort <spec|unsaid|weak-check|ignored>` completes it.
 
@@ -13,6 +13,7 @@
 
 | Miss | Found | Whose gap | What went wrong |
 |---|---|---|---|
+| MISS-TrBlazeUI-20260922-01 (REQ-UI-021) | 2026-09-22 by owner | the app's spec | Chatur consumer-feedback fixes (TR-001…TR-004): ScrollArea StickToEnd, TreeView, DiffView, ToggleGroup |
 | MISS-TrBlazeUI-20260919-05 (REQ-UI-002) | 2026-09-19 by owner | the check was too weak | TfLens TR-040: InputGroupInput has no DebounceMilliseconds, so a filter box drawn with a leading icon re-filters on every keystroke. Reproduced: the built XML documentation lists exactly the 15 members TfLens names and no debounce, while Input.DebounceMilliseconds exists. |
 | MISS-TrBlazeUI-20260919-04 (REQ-UI-008) | 2026-09-19 by owner | the check was too weak | TfLens TR-039: leaving a page that holds a chart logs an unobserved JSDisconnectedException from ApexChart.Dispose (fire-and-forget JSObjectReference.DisposeAsync). Reproduced on the unchanged library: /charts/bar 5 charts -> 5 unobserved exceptions, /charts/pie 4 -> 4, /verify-tflens-3 5 -> 5, /com |
 | MISS-TrBlazeUI-20260919-03 (REQ-UI-020) | 2026-09-19 by owner | the check was too weak | TfLens TR-038: Badge Variant=Outline Truncate=true loses text-foreground, because text-ellipsis falls into the bare text-colour merge group (reproduced on /verify-tflens-2 tr029-truncate) |
@@ -25,23 +26,30 @@
 | MISS-TrBlazeUI-20260913-02 (REQ-UI-020) | 2026-09-13 by owner | the check was too weak | TfLens TR-037: BarChart Items/XValue/YValue shorthand with ShowDataLabels=true draws no data labels; the built-in series never passes the flag and ApexCharts takes it from the series (reproduced: 0 labels at 1280 and 390 on /verify-tflens-2) |
 | MISS-TrBlazeUI-20260912-13 (REQ-UI-003) | 2026-09-12 by owner | the check was too weak | TfLens TR-035 (Low, reproduced live at 390px) — the phone sidebar ignores the mobile width the library itself defines. Sidebar.razor.cs:112 GetMobileClasses() sizes the sheet with w-[var(--sidebar-width)]; --sidebar-width-mobile is declared as 18rem in trblazeui-input.css:11 and emitted in trblazeui |
 | MISS-TrBlazeUI-20260912-12 (REQ-UI-002) | 2026-09-12 by owner | the check was too weak | TfLens TR-032 (Low, reproduced live on /components/native-select @1280) — ROOT CAUSE FOUND, and it is not NativeSelect. The rendered <select> carries appearance-none bg-no-repeat bg-[length:1rem] bg-[right_0.5rem_center] pr-8 but NOT the bg-[url('data:image/svg+xml;...')] chevron class its own CssCl |
-| MISS-TrBlazeUI-20260912-11 (REQ-UI-005) | 2026-09-12 by owner | the check was too weak | TfLens TR-031 + TR-033 (both Low, reproduced live on /components/datatable @1280). TR-031: DataTableColumn HeaderClass='text-right' sets text-align on the th, but DataTable.razor:118 wraps the label in <div class='flex items-center gap-2'>, where text-align moves nothing — measured innerDisplay=flex |
 | MISS-TrBlazeUI-20260912-10 (REQ-UI-006) | 2026-09-12 by owner | the check was too weak | TfLens TR-029 + TR-034 (Medium/Low, both reproduced live on /components/badge). TR-034: every Badge renders a <div> — measured 36 badges on the page, tag set = [DIV], never a span — so a pill cannot sit inside a <p> without invalid HTML and can never match a mockup that draws it as <span class=badge |
 | MISS-TrBlazeUI-20260912-09 (REQ-UI-008) | 2026-09-12 by owner | the check was too weak | TfLens TR-028 (High, reproduced live on /charts/bar @1280): BarChart exposes no axis, grid or data-label control and no route to ApexChartOptions, so a chart cannot be made to match an approved design. Measured: 32 .apexcharts-gridline and 30 .apexcharts-yaxis-label rendered with no parameter to tur |
 | MISS-TrBlazeUI-20260912-08 (REQ-UI-020) | 2026-09-12 by owner | the app's spec | TfLens post-2.1.0 consumer-feedback fixes (TR-028…TR-035) |
 | MISS-TrBlazeUI-20260831-11 (REQ-FN-004) | 2026-08-31 by owner | not sorted | no sentence recorded (wrong-behaviour, config, why: insufficient-verify-method) |
 | MISS-TrBlazeUI-20260831-07 (REQ-FN-004) | 2026-08-31 by owner | not sorted | no sentence recorded (wrong-behaviour, config, why: insufficient-verify-method) |
 
-## Fixed (22)
+## Fixed (30)
 
 | Miss | Found | Closed | Whose gap | What went wrong |
 |---|---|---|---|---|
+| MISS-TrBlazeUI-20260922-08 (REQ-FN-006) | 2026-09-22 by owner | 2026-09-22 by fix-issues | the check was too weak | Chatur batch 2 read the deployed reference .trblazeui/TrBlazeUI-AI-Reference.md, which is still the 2.0.7 copy, and five of their ten entries follow from what that copy says. It has 0 mentions of TreeView, DiffView, StickToEnd and ToggleGroup - all four shipped in [Unreleased] for the previous Chatu |
+| MISS-TrBlazeUI-20260922-07 (REQ-UI-017) | 2026-09-22 by owner | 2026-09-22 by fix-issues | the check was too weak | Chatur TR-009 residual: SortableList shows no position number per row and offers no remove. Measured live on /components/sortable-list: 3 items, 3 move-up and 3 move-down buttons, first move-up disabled, move-down reorders 'Part one' to 'Part two' - so the buttons the entry asks for already exist an |
+| MISS-TrBlazeUI-20260922-06 (REQ-UI-006) | 2026-09-22 by owner | 2026-09-22 by fix-issues | the check was too weak | Chatur TR-004: a step cannot carry its own state. StepperItem takes only Title/Description and TimelineItem only a Current bool, so both work every step's state out from its position: a chain that paused in the middle, or a step that succeeded on a second try, cannot be drawn. Measured on source: St |
+| MISS-TrBlazeUI-20260922-05 (REQ-UI-025) | 2026-09-22 by owner | 2026-09-22 by fix-issues | the app's spec | List that drives a detail pane (NavList) |
+| MISS-TrBlazeUI-20260922-04 (REQ-UI-024) | 2026-09-22 by owner | 2026-09-22 by fix-issues | the app's spec | Panel for the output of a running command (LogView) |
+| MISS-TrBlazeUI-20260922-03 (REQ-UI-023) | 2026-09-22 by owner | 2026-09-22 by fix-issues | the app's spec | Inline indicator for work under way with no known end (Typing, Progress.Indeterminate) |
+| MISS-TrBlazeUI-20260922-02 (REQ-UI-022) | 2026-09-22 by owner | 2026-09-22 by fix-issues | the app's spec | Editable code area and an open-file tab strip (CodeEditor, EditorTabs) |
 | MISS-TrBlazeUI-20260919-06 (REQ-UI-021) | 2026-09-19 by owner | 2026-09-19 by fix-issues | the app's spec | Chatur consumer-feedback fixes (TR-001…TR-004): ScrollArea StickToEnd, TreeView, DiffView, ToggleGroup |
 | MISS-TrBlazeUI-20260914-06 (REQ-UI-002) | 2026-09-14 by owner | 2026-09-14 by fix-issues | the check was too weak | TfLens TR-040: InputGroupInput has no DebounceMilliseconds, so a filter box drawn with a leading icon re-filters on every keystroke. Reproduced: the built XML documentation lists exactly the 15 members TfLens names and no debounce, while Input.DebounceMilliseconds exists. |
 | MISS-TrBlazeUI-20260914-05 (REQ-UI-008) | 2026-09-14 by owner | 2026-09-14 by fix-issues | the check was too weak | TfLens TR-039: leaving a page that holds a chart logs an unobserved JSDisconnectedException from ApexChart.Dispose (fire-and-forget JSObjectReference.DisposeAsync). Reproduced on the unchanged library: /charts/bar 5 charts -> 5 unobserved exceptions, /charts/pie 4 -> 4, /verify-tflens-3 5 -> 5, /com |
 | MISS-TrBlazeUI-20260913-03 (REQ-UI-020) | 2026-09-13 by owner | 2026-09-13 by fix-issues | the check was too weak | TfLens TR-038: Badge Variant=Outline Truncate=true loses text-foreground, because text-ellipsis falls into the bare text-colour merge group (reproduced on /verify-tflens-2 tr029-truncate) |
 | MISS-TrBlazeUI-20260913-01 (REQ-UI-001) | 2026-09-13 by owner | 2026-09-13 by fix-issues | the check was too weak | TfLens TR-036: leaving a page that holds a Select logs 'Unhandled exception in circuit' because SelectContent.DisposeAsync awaits two JS module disposals without catching JSDisconnectedException (reproduced: 1 on /components/select) |
 | MISS-TrBlazeUI-20260912-14 (REQ-FN-005) | 2026-09-12 by owner | 2026-09-12 by fix-issues | the check was too weak | A release tag with any prefix other than 'v' killed the publish: tag 'c2.0.5' threw "Invalid semver version 'c2.0.5'" after the GitHub Release was already published. |
+| MISS-TrBlazeUI-20260912-11 (REQ-UI-005) | 2026-09-12 by owner | 2026-09-22 by fix-issues | the check was too weak | TfLens TR-031 + TR-033 (both Low, reproduced live on /components/datatable @1280). TR-031: DataTableColumn HeaderClass='text-right' sets text-align on the th, but DataTable.razor:118 wraps the label in <div class='flex items-center gap-2'>, where text-align moves nothing — measured innerDisplay=flex |
 | MISS-TrBlazeUI-20260912-07 (REQ-NFR-001) | 2026-09-12 by gate | 2026-09-12 by fix-issues | the app's spec | no sentence recorded (partial-implementation, src) |
 | MISS-TrBlazeUI-20260912-06 (REQ-UI-003) | 2026-09-12 by owner | 2026-09-12 by fix-issues | the check was too weak | TfLens TR-035 (Low, reproduced live at 390px) — the phone sidebar ignores the mobile width the library itself defines. Sidebar.razor.cs:112 GetMobileClasses() sizes the sheet with w-[var(--sidebar-width)]; --sidebar-width-mobile is declared as 18rem in trblazeui-input.css:11 and emitted in trblazeui |
 | MISS-TrBlazeUI-20260912-05 (REQ-UI-002) | 2026-09-12 by owner | 2026-09-12 by fix-issues | the check was too weak | TfLens TR-032 (Low, reproduced live on /components/native-select @1280) — ROOT CAUSE FOUND, and it is not NativeSelect. The rendered <select> carries appearance-none bg-no-repeat bg-[length:1rem] bg-[right_0.5rem_center] pr-8 but NOT the bg-[url('data:image/svg+xml;...')] chevron class its own CssCl |

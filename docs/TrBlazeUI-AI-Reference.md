@@ -5,6 +5,26 @@
 
 ---
 
+## Which control do I use for…
+
+Start here. Each row is a problem on a screen and the control that already solves it. If your
+problem is in this table, the control exists — do not hand-build it.
+
+| What you need on the screen | Use this | Section |
+|---|---|---|
+| A tree of files and folders — a nested list that opens and closes, one row selected, arrow keys | `TreeView` + `TreeItem` | §3 |
+| Compare two texts — before and after, side by side or inline, with line numbers | `DiffView` (and `TextDiff` when you want the lines in code) | §8 |
+| Let the user choose rows in a table — a box per row, a choose-all in the header, a count | `DataTable` with `SelectionMode="DataTableSelectionMode.Multiple"` and `@bind-SelectedItems` | §6 |
+| Let the user set the order of a list — move up and move down | `SortableList` (real buttons; there is no dragging) | §8 |
+| A switch inside a table cell — on and off per row, at the height of the row | `Switch Size="SwitchSize.Small"` inside a `DataTableColumn` `CellTemplate` | §5 |
+| Follow a growing log or chat — keep the newest line in view, stop when the reader scrolls up | `ScrollArea StickToEnd="true"` | §3 |
+| Edit a source file — line numbers, and Tab inserting an indent instead of moving focus | `CodeEditor` (and `EditorTabs` for the open-file strip) | §Added |
+| Show the output of a running command — lines marked ordinary, warning or failure | `LogView` | §Added |
+| Show that an answer is still being written — inside the message, while its text grows | `Typing` (or `Progress Indeterminate="true"` for a bar) | §Added |
+| A list of multi-line rows that drives a detail pane beside it | `NavList<TItem>` | §Added |
+
+---
+
 ## CRITICAL: Rules You MUST Follow
 
 These rules are non-negotiable. Violating them produces broken or inconsistent UI.
@@ -183,11 +203,26 @@ builder.Services.AddScoped<ToastService>();  // Required for Toast notifications
 >   `Collapsible`, `Accordion`, `DropdownMenu`, `Tabs`, `Tooltip`, `Dialog`, `Popover`, `HoverCard`.
 >   **Safe set: `TrBlazeUI.Components.*` plus `TrBlazeUI.Primitives` and
 >   `TrBlazeUI.Primitives.Services`. Never the other `Primitives.*` sub-namespaces.**
+> - Two primitive namespaces are **not** in the shadowing list above and are still left out of the
+>   block on purpose, because they are per-file tools rather than page furniture:
+>   `TrBlazeUI.Primitives.Floating` (one type, `FloatingPortal` — internal positioning plumbing;
+>   use `PortalHost` from `TrBlazeUI.Primitives.Services` instead) and `TrBlazeUI.Primitives.Table`
+>   (the raw `Table` / `TableHeader` / `TableRow` / `TableCell` family under `DataTable`). Add
+>   `@using TrBlazeUI.Primitives.Table` **at the top of the one file** that hand-builds a plain
+>   table; it also brings `SelectionMode`, `SortDirection` and `ColumnDefinition` into scope, which
+>   are common names in application code, so it does not belong in every page. For an ordinary data
+>   grid use `DataTable` (§6) and import nothing extra.
 > - `@using ApexCharts` is required by the chart family (see §8) — the charts are a
 >   Blazor-ApexCharts wrapper and the series types come from that package.
-> - The block below lists **every one of the 79 `TrBlazeUI.Components.*` component namespaces
->   in the 2.1.0 assembly.** Copy it whole. A partial copy is the single most common cause of a
->   silently broken page — see the RZ10012 note under the block.
+> - The block below lists **every one of the 85 `TrBlazeUI.Components.*` component namespaces
+>   in the next release's assembly** — one per component folder, including `TreeView`, `DiffView`
+>   and the four added since 2.0.7 (`CodeEditor`, `LogView`, `NavList`, `Typing`). Copy it
+>   whole. A partial copy is the single most common cause of a silently broken page — see the
+>   RZ10012 note under the block.
+> - **If you are on 2.0.7 or earlier, drop those last four lines.** A missing `@using` gives a
+>   silent RZ10012 warning, but a `@using` for a namespace your installed package does not have is
+>   CS0246 — a hard compile error. This document ships with the package, so if you are reading it
+>   from your own `.trblazeui/` folder it already matches your version and you can copy it whole.
 
 ```razor
 @using TrBlazeUI.Components
@@ -241,6 +276,10 @@ builder.Services.AddScoped<ToastService>();  // Required for Toast notifications
 @using TrBlazeUI.Components.CenteredPanel
 @using TrBlazeUI.Components.AnchorNav
 @using TrBlazeUI.Components.CodeBlock
+@using TrBlazeUI.Components.CodeEditor
+@using TrBlazeUI.Components.LogView
+@using TrBlazeUI.Components.NavList
+@using TrBlazeUI.Components.Typing
 @using TrBlazeUI.Components.PasswordStrength
 @using TrBlazeUI.Components.SortableList
 @using TrBlazeUI.Components.Accordion
@@ -303,7 +342,7 @@ silently at runtime; the compiler does not diagnose the missing namespace.
 > component" — a later edit that adds the component will fail the same silent way.
 >
 > **This list must be regenerated from the assembly, not hand-maintained.** A previous hand-edited
-> revision of this document listed 49 of the 79 namespaces; the 30 omissions (including
+> revision of this document listed 49 of the namespaces then shipping; the 30 omissions (including
 > `TrBlazeUI.Components.Empty`, whose component this very document documents in §6) reached
 > consumers and produced exactly the silent failure above. Regenerate with
 > `dotnet run --project tools/splat-audit -- <bin dir>`, which already reflects over the built
@@ -613,10 +652,24 @@ Sub-components: `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `Ca
 ```
 
 A height or max-height on `Class` bounds the scrolling viewport; `Height` / `MaxHeight` set it on
-the viewport directly. Other parameters: `Orientation` (`Vertical`, `Horizontal`, `Both`), `Type`
-(scrollbar visibility), `ViewportClass`.
+the viewport directly.
 
-**A log or chat that grows at the bottom: `StickToEnd="true"`.** The view follows new content
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| StickToEnd | bool | false | Keep the newest content in view as it arrives — see below |
+| AtEndChanged | EventCallback<bool> | - | Reports whether the view is at the end right now |
+| Height | string? | null | CSS length on the viewport, e.g. `"300px"` |
+| MaxHeight | string? | null | CSS length on the viewport |
+| Orientation | ScrollAreaOrientation | Vertical | `Vertical`, `Horizontal`, `Both` |
+| Type | ScrollAreaType | Hover | When the scrollbar is shown |
+| ViewportClass | string? | null | Extra classes on the inner viewport |
+| Class | string? | null | Additional CSS classes |
+
+#### Follow a growing log, a build's output, or a chat — `StickToEnd`
+
+**A panel that grows at the bottom and should keep the newest line in view: `StickToEnd="true"`.**
+This is the control for the output of a running command, a chat transcript, or any list that is
+appended to while the reader watches. The view follows new content
 (DOM changes and size changes, including text a child component updates on its own) until the
 reader scrolls up; it resumes when they scroll back to the end. `AtEndChanged` reports both, and
 `ScrollToEndAsync()` jumps back and resumes:
@@ -666,9 +719,10 @@ a spacer inside the trigger has something to push against:
 `CollapsibleTrigger` also takes `AsChild` and splats unmatched attributes, so a `data-testid` or a
 custom component can be the trigger.
 
-### TreeView
+### TreeView — a tree of files and folders, or any nested list
 
-A file explorer, an outline, any hierarchy: rows open and close, one row is selected, and the
+**This is the tree control.** A file explorer, a folder tree of unknown depth, an outline, any
+hierarchy: rows open and close, one row is selected, and the
 keyboard works as in the WAI-ARIA tree (Up/Down move, Right opens or enters, Left closes or goes to
 the parent, Home/End, Enter/Space select, a letter jumps to the next row starting with it). Use this,
 not nested `Collapsible`s — those have no selection, no arrow keys and no indentation.
@@ -694,14 +748,42 @@ not nested `Collapsible`s — those have no selection, no arrow keys and no inde
 </TreeView>
 ```
 
+**TreeView**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| SelectedValue | string? | null | The selected row's `Value` |
+| SelectedValueChanged | EventCallback<string?> | - | Two-way: `@bind-SelectedValue`. Leave it unbound and the tree keeps the selection itself |
+| ToggleOnClick | bool | true | Clicking a branch row also opens and closes it; the chevron always does |
+| Indent | string? | null | CSS length per level, default `1rem` |
+| AriaLabel | string? | null | Name for the tree, e.g. `"Files"` |
+| ChildContent | RenderFragment? | null | The top-level `TreeItem` rows |
+| Class | string? | null | Additional CSS classes |
+
+**TreeItem**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| Label | string? | null | The row's text |
+| LabelContent | RenderFragment? | null | The row's text as markup, instead of `Label` |
+| Value | string? | null | The row's identity; this is what `SelectedValue` holds |
+| Icon | RenderFragment? | null | Leading slot — put a `<LucideIcon>` in it |
+| Trailing | RenderFragment? | null | Trailing slot — a `Badge`, a count, a button |
+| ChildContent | RenderFragment? | null | The child rows. Use the explicit `<ChildContent>` tag whenever you also use `<Icon>` or `<Trailing>` |
+| Expanded | bool | false | Open state |
+| ExpandedChanged | EventCallback<bool> | - | Two-way: `@bind-Expanded` |
+| DefaultExpanded | bool | false | Open to begin with, then the row keeps its own state |
+| HasChildren | bool? | null | Mark a branch whose children are not rendered yet |
+| OnExpand | EventCallback | - | Fired the first time the branch opens — load the children here |
+| Loading | bool | false | Show the loading row while `OnExpand` runs |
+| LoadingText | string | "Loading…" | Text of that row |
+| Disabled | bool | false | The row cannot be selected or opened |
+| Class | string? | null | Additional CSS classes |
+
 - The trailing slot is `Trailing`, not `Badge` — a `Badge` component goes *inside* it.
-- `TreeView`: `SelectedValue`/`SelectedValueChanged` (string; unbound, the tree keeps it),
-  `ToggleOnClick` (default true — clicking a branch row also opens it; the chevron always does),
-  `Indent` (CSS length, default `1rem`), `AriaLabel`, `Class`.
-- `TreeItem`: `Label` or `LabelContent`, `Value`, `Icon`, `Trailing`, child rows as `ChildContent`,
-  `Expanded`/`ExpandedChanged` or `DefaultExpanded`, `HasChildren`, `OnExpand`, `Loading`,
-  `LoadingText`, `Disabled`, `Class`; unmatched attributes (`data-testid`) land on the `treeitem`.
+- Unmatched attributes (`data-testid`, `aria-*`) land on the element carrying `role="treeitem"`.
 - Children render only while their branch is open, so a closed branch costs nothing.
+- Live example: `/components/tree-view` in the demo app. The root renders `role="tree"`.
 
 ---
 
@@ -1022,14 +1104,15 @@ Sub-components: `ButtonIcon`
 </div>
 ```
 
-### Switch
+### Switch — including a small switch inside a table cell
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | Checked | bool | false | On/off state |
 | CheckedChanged | EventCallback<bool> | - | Two-way: @bind-Checked |
-| Size | SwitchSize | Medium | Small, Medium, Large |
+| Size | SwitchSize | Medium | `Small` (20px tall), `Medium` (24px), `Large` (28px) |
 | Disabled | bool | false | Disabled state |
+| AriaLabel | string? | null | Name for a switch with no visible label — required in a table cell |
 | Id | string? | null | Element ID |
 | Class | string? | null | Additional CSS classes |
 
@@ -1039,6 +1122,34 @@ Sub-components: `ButtonIcon`
     <Label For="airplane-mode">Airplane Mode</Label>
 </div>
 ```
+
+#### A switch in a table cell — use `Size="SwitchSize.Small"`
+
+`Switch` is not only a form control. `Size="SwitchSize.Small"` is 20px tall; a `DataTable` body
+cell at the default `Comfortable` density is about 53px tall, so a small switch sits in a row
+without making it taller than its neighbours. Do not hand-build a toggle out of `.toggle` classes
+and do not reach for `Checkbox` when the meaning is "on or off", not "chosen".
+
+There is no label beside a switch in a cell — the column header is the label — so give it
+`AriaLabel` per row, or the screen reader reads an unnamed control.
+
+```razor
+<DataTableColumn TData="Feature" TValue="bool" Property="@(f => f.Enabled)"
+                 Header="Enabled" Width="110px" Align="DataTableColumnAlign.Center">
+    <CellTemplate Context="feature">
+        <Switch Size="SwitchSize.Small"
+                Checked="@feature.Enabled"
+                AriaLabel="@($"Enable {feature.Name}")"
+                CheckedChanged="@(async (bool v) => await SetEnabledAsync(feature, v))" />
+    </CellTemplate>
+</DataTableColumn>
+```
+
+Bind with `Checked` + `CheckedChanged` rather than `@bind-Checked` here, so the page can save the
+change. Setting a property on a bound row does not re-render the grid on its own — reassign `Data`
+or call `Refresh()` (see "Mutating a row in place" under `DataTable`).
+
+`Small` also suits a dense settings list or a toolbar; `Large` is for a single prominent switch.
 
 ### Select (Generic)
 
@@ -1375,11 +1486,30 @@ group) or `Multiple` (`@bind-Values`, a `List<TValue>`). For a view switch in a 
 </ToggleGroup>
 ```
 
-- `TValue` goes on the group **and** each item; string values need `Value="@("board")"`.
+**ToggleGroup<TValue>**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| TValue | type param | required | The value type; goes on the group **and** on each item |
+| Type | ToggleGroupType | Single | `Single` (one choice) or `Multiple` (several) |
+| Value | TValue? | null | The chosen value when `Type="Single"` |
+| ValueChanged | EventCallback<TValue?> | - | Two-way: `@bind-Value` |
+| Values | List<TValue>? | null | The chosen values when `Type="Multiple"` |
+| ValuesChanged | EventCallback<List<TValue>> | - | Two-way: `@bind-Values` |
+| DefaultValue | TValue? | null | Initial value when you leave the group unbound |
+| Joined | bool | false | One control with a shared border, for a view switch in a toolbar |
+| AllowDeselect | bool | true | `false` keeps exactly one item chosen |
+| Variant | ToggleVariant | Default | `Default` or `Outline` |
+| Size | ToggleSize | Default | `Small`, `Default`, `Large` |
+| Disabled | bool | false | Disables the whole group |
+| AriaLabel | string? | null | Name for the group |
+| Class | string? | null | Additional CSS classes |
+
+**ToggleGroupItem<TValue>** takes `TValue`, `Value`, `Disabled`, `Class` and its content.
+
+- String values need `Value="@("board")"` — the plain `Value="board"` form cannot infer `TValue`.
 - One Tab stop (the chosen item); the arrow keys move between items. Single choice renders
   `role="radiogroup"` with `role="radio"` items; multiple renders `aria-pressed` buttons.
-- Other parameters: `DefaultValue` (unbound), `Variant`, `Size`, `Disabled`, `Class`; items take
-  `Disabled` and `Class`.
 
 ---
 
@@ -1464,13 +1594,13 @@ overflows, which is visible. Say which behaviour you want:
 `Wrap` also drops the `rounded-full` pill radius to a corner radius, because a 999px radius on a
 three-line box turns the end caps into deep arcs that cut into the first and last lines.
 
-### DataTable (Generic)
+### DataTable (Generic) — rows, sorting, paging, and letting the user choose rows
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | TData | type param | - | Data item type (class) |
 | Data | IEnumerable<TData> | required | Data source |
-| SelectionMode | DataTableSelectionMode | None | None, Single, Multiple |
+| SelectionMode | DataTableSelectionMode | None | **Turns row choosing on.** `None`, `Single` (click a row), `Multiple` (a real column of boxes plus a choose-all). See "Letting the user choose rows" below |
 | ShowToolbar | bool | false | Opt in to the search / column-visibility toolbar. This decides where the grid's chrome is drawn, **not** whether filtering is available — see `SearchText` |
 | SearchText | string? | null | Two-way (`@bind-SearchText`): the grid's global search text. Bind it to host the filter input anywhere — a card header, a page filter bar — and still get the grid's own filtering over its `Filterable` columns. The built-in toolbar box writes back through the same binding |
 | ShowColumnChooser | bool | true | `false` drops the toolbar's `Columns` dropdown and keeps the search box. Ignored when `ShowToolbar` is false |
@@ -1480,9 +1610,73 @@ three-line box turns the end caps into deep arcs that cut into the first and las
 | IsLoading | bool | false | Loading state |
 | InitialPageSize | int | 5 | Initial rows per page |
 | PageSizes | int[] | [5,10,20,50,100] | Page size options |
-| SelectedItems | IReadOnlyCollection<TData> | [] | Two-way: @bind-SelectedItems |
+| SelectedItems | IReadOnlyCollection<TData> | [] | Two-way: `@bind-SelectedItems` — the rows the user has chosen. `SelectedItems.Count` is the count to put on a button or a banner |
 | MinWidth | string? | null | CSS length, e.g. `"720px"`. Set it on wide tables: the grid's wrapper scrolls horizontally, but a `w-full` table with no minimum just shrinks and the right-hand columns are squeezed away with no scrollbar. |
 | Class | string? | null | Additional CSS classes |
+
+#### Letting the user choose rows — `SelectionMode` + `@bind-SelectedItems`
+
+**The grid already does this; do not put a plain `Checkbox` in the first column.** Set
+`SelectionMode` and bind `SelectedItems`, and the grid renders the choosing column itself:
+
+- a box on every row, each with its own name for a screen reader;
+- a choose-all box in the header that also shows the part-chosen (indeterminate) state, and offers
+  "Select all on this page" / "Select all N items" / "Clear selection" when the grid is paged;
+- the chosen rows handed back through `@bind-SelectedItems`, so `SelectedItems.Count` is the count
+  your page puts on a banner or uses to enable its own button.
+
+`DataTableSelectionMode.Multiple` gives the column of boxes. `Single` gives no column — clicking a
+row chooses it and clears the previous one. `None` (the default) is why a plain `DataTable` looks
+as though it cannot do this at all.
+
+```razor
+@if (objChosen.Count > 0)
+{
+    <Alert Class="mb-4">
+        <AlertTitle>@objChosen.Count file(s) chosen</AlertTitle>
+    </Alert>
+}
+
+<DataTable TData="ChangedFile" Data="@objFiles"
+           SelectionMode="DataTableSelectionMode.Multiple"
+           @bind-SelectedItems="objChosen">
+    <Columns>
+        <DataTableColumn TData="ChangedFile" TValue="string" Property="@(f => f.Path)"
+                         Header="File" Sortable Filterable
+                         CellClass="whitespace-nowrap" HeaderClass="whitespace-nowrap" />
+        <DataTableColumn TData="ChangedFile" TValue="string" Property="@(f => f.Change)" Header="Change" />
+    </Columns>
+</DataTable>
+
+<Button Disabled="@(objChosen.Count == 0)" OnClick="CommitAsync">
+    Commit @objChosen.Count file(s)
+</Button>
+
+@code {
+    private record ChangedFile(string Path, string Change);
+
+    private readonly List<ChangedFile> objFiles =
+    [
+        new("src/Program.cs", "modified"),
+        new("src/Order.cs", "added"),
+    ];
+
+    private IReadOnlyCollection<ChangedFile> objChosen = Array.Empty<ChangedFile>();
+
+    private Task CommitAsync() => Task.CompletedTask;
+}
+```
+
+`SelectedCount` is a read-only property on the grid giving the number of chosen rows across every
+page — handy for labelling your own button ("Commit 3 files"). `SelectedItems.Count` gives the
+same number whenever you have bound `SelectedItems`. A complete page using this is in §10, "CRUD
+Page with DataTable + Dialog". Live example: `/components/datatable`.
+
+When the grid holds more rows than one page, the choose-all cell is a menu offering "select all on
+this page" and "select all N" rather than a plain box. Its accessible name carries the state —
+"No rows selected, 500 in all — choose rows", "3 of 500 rows selected — choose rows", "All 500
+rows selected — choose rows" — and a polite live region announces the count when it changes, so
+the state is not sighted-only.
 
 > **BEHAVIOUR CHANGE — `ShowPagination="false"` now renders every row.**
 > It was previously a chrome-only switch: the page window was applied unconditionally, so a grid with
@@ -2496,9 +2690,11 @@ syntax highlighter; pass pre-highlighted markup through `Html` if you have one.
 <CodeBlock Language="csharp" Code="@snippet" />
 ```
 
-### DiffView
+### DiffView — compare two texts side by side (before and after)
 
-The difference between two texts, side by side or inline, with line numbers. Added and removed
+**This is the difference viewer.** Give it a before text and an after text; do not put two
+`CodeBlock`s in a grid and colour the lines yourself. The difference between two texts, side by
+side or inline, with line numbers. Added and removed
 lines are tinted from the theme (`--success`, `--destructive`) and marked `+`/`-`; unchanged
 stretches longer than `ContextLines` fold into a "Show N unchanged lines" button. The comparison
 runs in .NET (`TextDiff`, Myers' algorithm) — no script library.
@@ -2512,14 +2708,28 @@ runs in .NET (`TextDiff`, Myers' algorithm) — no script library.
 </DiffView>
 ```
 
-- `Mode`: `DiffViewMode.SideBySide` (default) or `DiffViewMode.Inline` — pair it with a joined
-  `ToggleGroup TValue="DiffViewMode"` for the switch.
-- `HunkActions` is a `RenderFragment<DiffHunk>`; `context` has `Index`, `Header` (`@@ -12,7 +12,9 @@`),
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| Before | string? | null | The old text |
+| After | string? | null | The new text |
+| Mode | DiffViewMode | SideBySide | `SideBySide` or `Inline` — pair it with a joined `ToggleGroup TValue="DiffViewMode"` for the switch |
+| ShowLineNumbers | bool | true | Line numbers on both sides |
+| ContextLines | int | 3 | Unchanged lines kept around each change; a negative value shows everything |
+| IgnoreWhitespace | bool | false | Treat lines differing only in spacing as unchanged |
+| BeforeLabel | string? | null | Name over the left side, e.g. the file path |
+| AfterLabel | string? | null | Name over the right side |
+| ShowHeader | bool | true | The names and the `+N -M` counts |
+| HunkActions | RenderFragment<DiffHunk>? | null | Buttons beside each changed part; `context` is the `DiffHunk` |
+| EmptyText | string | "No differences" | Shown when the two texts match |
+| Class | string? | null | Additional CSS classes |
+
+- `context` on `HunkActions` has `Index`, `Header` (`@@ -12,7 +12,9 @@`),
   `OldStart`/`OldCount`/`NewStart`/`NewCount`, `Lines`, `AddedCount`, `RemovedCount`.
-- Other parameters: `ShowLineNumbers` (true), `ContextLines` (3; negative shows everything),
-  `IgnoreWhitespace`, `ShowHeader` (true; names and `+N -M`), `EmptyText` ("No differences"), `Class`.
-- Need the lines in code? `TextDiff.Compare(before, after)` returns `DiffLine`s (`Kind`,
-  `OldNumber`, `NewNumber`, `Text`) and `TextDiff.Hunks(lines, context)` the parts.
+- The rendered `DiffView` also exposes `Hunks` through `@ref`, if the page needs the same parts.
+- Need the lines in code instead of on the screen? `TextDiff.Compare(before, after)` returns
+  `DiffLine`s (`Kind`, `OldNumber`, `NewNumber`, `Text`) and `TextDiff.Hunks(lines, context)`
+  groups them. `TextDiff` is a static class in `TrBlazeUI.Components.DiffView`.
+- Live example: `/components/diff-view`.
 
 ### StatTile / StatGroup
 
@@ -2545,6 +2755,11 @@ The value and caption expose stable `data-slot="stat-tile-value"` and
 </Timeline>
 ```
 
+`TimelineItem` also takes **`Status`** (`StepStatus?`, from `TrBlazeUI.Components.Stepper`) when an
+entry needs to say what happened to it rather than only where it sits — see the Stepper section
+below. `Current="true"` emits `aria-current="step"` and a visually hidden "(current entry)", so it
+is not signalled by the marker's fill alone.
+
 ### Stepper
 
 Numbered steps for a multi-part flow or a series index. The current step carries
@@ -2557,6 +2772,37 @@ Numbered steps for a multi-part flow or a series index. The current step carries
     <StepperItem Title="Publish" />
 </Stepper>
 ```
+
+#### A step that carries its own state
+
+By default a step's state comes from its position relative to `Current`: everything before it is
+finished, everything after is not started. That cannot draw a chain that paused in the middle, or
+a step that succeeded only on a second try. Give a step **`Status`** and it says what happened to
+it instead:
+
+```razor
+<Stepper Current="3" Orientation="StepperOrientation.Vertical" AriaLabel="Release pipeline">
+    <StepperItem Title="Restore"  Status="StepStatus.Done">
+        <Trailing><span class="text-xs text-muted-foreground">4s</span></Trailing>
+    </StepperItem>
+    <StepperItem Title="Build"    Status="StepStatus.Retried" Description="Succeeded on the second run" />
+    <StepperItem Title="Test"     Status="StepStatus.Running" />
+    <StepperItem Title="Sign off" Status="StepStatus.Waiting" Description="Needs the owner" />
+    <StepperItem Title="Publish"  Status="StepStatus.Pending" />
+</Stepper>
+```
+
+| Member | Type | Default | Description |
+|---|---|---|---|
+| `StepperItem.Status` | `StepStatus?` | `null` | `Pending`, `Running`, `Waiting`, `Done`, `Retried`, `Failed`. Leave it null to keep the position-derived behaviour. |
+| `StepperItem.Trailing` | `RenderFragment?` | `null` | Content at the step's trailing edge — a duration, a badge, a link. |
+| `Stepper.Orientation` | `StepperOrientation` | `Horizontal` | `Vertical` runs the steps top to bottom. |
+
+Each status has its own glyph **and** its own accessible name (`Done` is `✓` named "Done",
+`Failed` is `✕` named "Failed", and so on), so the state is never carried by colour alone.
+`aria-current="step"` still follows `Stepper.Current`, not `Status`. `StepStatus` lives in
+`TrBlazeUI.Components.Stepper`; `Timeline` reuses it, so a page using it on a `TimelineItem` needs
+that `@using`.
 
 ### AnchorNav (in-page navigation with scrollspy)
 
@@ -2576,16 +2822,63 @@ current path. This preserves a nested route even when the document declares `<ba
 }
 ```
 
-### SortableList
+### SortableList — let the user set the order (move up / move down buttons)
 
-Reorderable list driven by real buttons rather than drag-and-drop, so it works with a keyboard, a
-screen reader and a touch screen, and every move is announced.
+**This is the ordered list.** Each row carries a move-up and a move-down button — **real buttons,
+not drag-and-drop**, so it works with a keyboard, a screen reader and a touch screen, and every
+move is announced. The first row's up button and the last row's down button are disabled. The list
+owns the positions: it writes the reordered collection back through `@bind-Items`, so a fallback
+chain, a priority order or a run order needs no reordering code of your own.
+
+There is nothing to drag. If you were looking for dragging, this is still the control you want.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| TItem | type param | required | The item type |
+| Items | IList<TItem> | [] | The list, in its current order |
+| ItemsChanged | EventCallback<IList<TItem>> | - | Two-way: `@bind-Items`. Fires with the new order after every move |
+| ItemTemplate | RenderFragment<TItem>? | null | How one row is drawn; `context` is the item |
+| ItemLabel | Func<TItem, string>? | null | The row's name, used for the buttons' accessible names and the move announcement |
+| ShowPosition | bool | **true** | The 1-based position shown on each row. See the behaviour note below. |
+| AllowRemove | bool | false | Adds a remove button per row, named "Remove {item}" |
+| OnRemove | EventCallback<TItem> | - | Raised after the row is taken out and `ItemsChanged` has fired |
+| Class | string? | null | Additional CSS classes |
+
+> **BEHAVIOUR CHANGE — `ShowPosition` defaults to `true`.**
+> Every existing `SortableList` gains a position number on each row. Pass `ShowPosition="false"`
+> to keep the previous look. The default is `true` because a list whose order matters is far
+> easier to read when each row says where it is, which is why it was asked for.
+
+Removing a row writes the shortened list back through `@bind-Items` before `OnRemove` fires, and
+the removal is announced through the same live region as a move ("Cue sheet removed, 3 items
+left"). The position is `aria-hidden` — an `<ol>` already conveys position to a screen reader, and
+saying it twice is noise.
 
 ```razor
-<SortableList TItem="SeriesPart" @bind-Items="objParts" ItemLabel="@(p => p.Title)">
-    <ItemTemplate Context="part">@part.Title</ItemTemplate>
+<SortableList TItem="ModelTier" @bind-Items="objChain" ItemLabel="@(t => t.Name)"
+              AllowRemove="true" OnRemove="DropTierAsync">
+    <ItemTemplate Context="tier">
+        <span class="flex w-full items-center gap-2">
+            <span class="font-medium">@tier.Name</span>
+            <span class="text-muted-foreground">@tier.Provider</span>
+        </span>
+    </ItemTemplate>
 </SortableList>
+
+@code {
+    private record ModelTier(string Name, string Provider);
+
+    private IList<ModelTier> objChain =
+    [
+        new("Primary", "Anthropic"),
+        new("Fallback", "OpenAI"),
+        new("Last resort", "Local"),
+    ];
+}
 ```
+
+Position numbers are yours to draw, as above — the list does not number the rows itself. Live
+example: `/components/sortable-list`.
 
 ### PasswordStrength
 
@@ -3308,6 +3601,189 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
 
 ---
 
+## Added after 2.0.7, not yet published
+
+**Read this before reporting a control as missing.** The copy of this document at
+`.trblazeui/TrBlazeUI-AI-Reference.md` inside a consumer's repository is deployed by the installed
+NuGet package. It changes only when that package is upgraded. So the copy you are reading there is
+your installed version's reference, not the latest one — a control added since your version will be
+absent from it, and absent from your `bin` folder, even though it exists. The current copy lives in
+the library repository at `docs/TrBlazeUI-AI-Reference.md`; check it, and the `[Unreleased]` section
+of `CHANGELOG.md`, before concluding that something does not exist.
+
+### Already documented above, shipping in the next release
+
+These are described in full, with parameter tables and examples, in the sections named. They are
+merged and documented but not yet in a published package, so a consumer on 2.0.7 will not see them
+until the next release.
+
+| Control | Section |
+|---|---|
+| `TreeView`, `TreeItem` — a tree of files and folders | §3 |
+| `DiffView`, `TextDiff` — compare two texts side by side or inline | §8 |
+| `ScrollArea.StickToEnd` — follow a growing log or chat | §3 |
+| `ToggleGroup.Joined` / `AllowDeselect` / `AriaLabel` — a joined view switch | §5 |
+
+### Added in this release — built and checked, not yet published
+
+These are built, and their behaviour is checked in a running browser
+(`tests/verify/ui-chatur-2.spec.js`). A consumer on 2.0.7 will not see any of them until the next
+release. Full parameter tables follow in the sections named above.
+
+Each of them brings a new `TrBlazeUI.Components.*` namespace, and all four are now **in** the
+`_Imports.razor` block in §1, which lists 85 namespaces. If you are still on 2.0.7 or earlier,
+drop those four lines when you copy the block: a `@using` for a namespace your installed package
+does not contain is a compile error (CS0246), not the silent RZ10012 warning a *missing* `@using`
+gives.
+
+#### CodeEditor — edit a source file
+
+An editable code area. The Tab key inserts an indent instead of moving focus; press **Escape, then
+Tab** to move focus out (the control says so through `aria-describedby`, so it is not a keyboard
+trap). Lines do not wrap — the text scrolls sideways — because with soft wrap one logical line
+paints as several rows and every gutter number below it would be wrong.
+
+No syntax highlighter is bundled, for the same reason `CodeBlock` bundles none: it would drag a
+large JavaScript dependency into every consumer. Pass your own highlighted markup through `Html`.
+
+```razor
+<CodeEditor @bind-Value="objSource" Language="csharp" TabSize="4" Rows="20" />
+```
+
+| Parameter | Type | Default | What it does |
+|---|---|---|---|
+| `Value` / `ValueChanged` | `string?` | `null` | The text. Use `@bind-Value`. |
+| `Language` | `string?` | `null` | Label in the header; the header is omitted when empty. |
+| `Html` | `MarkupString?` | `null` | Your own pre-highlighted markup, painted behind the text. Must track `Value` or the reader sees stale characters. |
+| `ShowLineNumbers` | `bool` | `true` | The gutter. |
+| `TabSize` | `int` | `4` | Clamped 1–8. |
+| `UseSpaces` | `bool` | `true` | Spaces rather than a tab character. |
+| `Rows` | `int` | `12` | Visible rows. |
+| `ReadOnly` / `Disabled` | `bool` | `false` | Read-only releases the Tab key entirely. |
+| `Placeholder` | `string?` | `null` | |
+| `Id` / `AriaLabel` / `AriaDescribedBy` | `string?` | `null` | Your `AriaDescribedBy` is prepended to the built-in hint, not replaced. |
+| `DebounceMilliseconds` | `int` | `0` | 0 raises `ValueChanged` per keystroke; any other value raises it once typing pauses. |
+| `Class` | `string?` | `null` | |
+| `LineCount` (read-only) | `int` | — | |
+
+#### EditorTabs — a strip of open files
+
+Not `Tabs`. Each tab has a close button of its own and a mark for unsaved work, and the strip is a
+plain list rather than a `role="tablist"`: a tablist's roving `tabindex` would put the close
+buttons out of keyboard reach. The active file carries `aria-current="true"`. An unsaved file is
+marked twice — a dot whose *presence* carries it, and `", unsaved changes"` in the tab's
+accessible name — so it is never colour alone.
+
+`EditorTabs` does not remove a closed tab or pick the next file: you own the list, and an unsaved
+file usually needs a prompt first.
+
+```razor
+<EditorTabs Items="@objOpenFiles" @bind-ActiveId="objActiveFile" OnClose="CloseFileAsync" />
+```
+
+| Parameter | Type | Default | What it does |
+|---|---|---|---|
+| `Items` | `IReadOnlyList<EditorTabItem>` | `[]` | `record EditorTabItem(string Id, string Label, bool IsDirty = false)` |
+| `ActiveId` / `ActiveIdChanged` | `string?` | `null` | Use `@bind-ActiveId`. |
+| `OnSelect` / `OnClose` | `EventCallback<EditorTabItem>` | — | |
+| `AriaLabel` | `string` | `"Open files"` | |
+| `Class` | `string?` | `null` | |
+
+#### LogView — the output of a running command
+
+Lines arrive one at a time, each marked ordinary, success, warning or failure. The panel keeps its
+height and follows the newest line until the reader scrolls up, then offers a way back. Appending
+a line does **not** re-render the list: lines are cut into blocks of 128 and a full block never
+renders again.
+
+The enum is `LogLineKind`, **not** `LogLevel` — `LogLevel` would collide with
+`Microsoft.Extensions.Logging.LogLevel` the moment you have both `@using`s.
+
+```razor
+<LogView Lines="@objBuildOutput" Height="20rem" MaxLines="2000" ShowTimestamps="true" />
+```
+
+| Parameter | Type | Default | What it does |
+|---|---|---|---|
+| `Lines` | `IReadOnlyList<LogLine>?` | `null` | `record LogLine(string Text, LogLineKind Kind = Ordinary, DateTimeOffset? Timestamp = null)`; `enum LogLineKind { Ordinary, Success, Warning, Failure }` |
+| `Height` / `MaxHeight` | `string?` | `null` / `"24rem"` | CSS lengths, as `ScrollArea` expresses them. |
+| `Follow` | `bool` | `true` | Drives `ScrollArea.StickToEnd`. |
+| `AtEndChanged` | `EventCallback<bool>` | — | Fires false when the reader scrolls up, true when they return. |
+| `MaxLines` | `int?` | `null` | Caps the panel; the oldest lines are dropped and a note says how many. **This caps the panel, not your own buffer** — cap that too. |
+| `ShowTimestamps` / `TimestampFormat` | `bool` / `string` | `false` / `"HH:mm:ss"` | |
+| `LineTemplate` | `RenderFragment<LogLine>?` | `null` | |
+| `ShowJumpToNewest` / `JumpToNewestText` | `bool` / `string` | `true` / `"Jump to newest"` | |
+| `AriaLabel` / `EmptyText` | `string` | `"Command output"` / `"No output yet"` | |
+| `Class` | `string?` | `null` | |
+
+Members: `ScrollToEndAsync()`, `IsAtEnd`, `HeldLineCount`, `DroppedLineCount`.
+
+There is deliberately no `role="log"`: that carries an implicit `aria-live="polite"` and would
+announce every line of a build. The panel is a labelled region, and a separate status region
+announces one summary per burst of output.
+
+#### Typing — an answer is still being written
+
+Three moving dots, sized in `em` so they match the text they sit in, for work that is under way
+with no known end. Use it instead of `Spinner` when text is being composed inline: `Spinner` reads
+as "the screen is busy", this reads as "the answer is still coming". Honours
+`prefers-reduced-motion`.
+
+```razor
+<p>@objAnswer @if (objStillWriting) { <Typing /> }</p>
+```
+
+| Parameter | Type | Default |
+|---|---|---|
+| `Size` | `TypingSize` — `Small`, `Default`, `Large` | `Default` |
+| `Label` | `string` | `"Still writing"` — the accessible name, announced once |
+| `Class` | `string?` | `null` |
+
+For a bar rather than dots, `Progress` gains **`Indeterminate`** (`bool`, default `false`). When
+true it animates without claiming a percentage and **omits `aria-valuenow`**, which is what tells
+assistive technology the value is unknown; `Value` and `Max` are ignored.
+
+#### NavList&lt;TItem&gt; — a list that drives a detail pane
+
+A list of multi-line rows — a name, some badges, a couple of values — where one row is chosen and
+the rest of the screen follows it. The arrow keys move between rows and the list is one tab stop.
+
+By default it is a `role="listbox"` of `role="option"`, because choosing a row changes what the
+*same* screen shows and navigates nowhere. Set `Mode="NavListMode.Navigation"` for a real `<nav>`
+of links with `aria-current="page"` when the rows do navigate.
+
+**There is no `ListDetail` component and there will not be one** — the two-pane split is the
+page's own layout. Compose it with `Grid` or `ResizablePanelGroup`; `/components/nav-list` shows
+both.
+
+```razor
+<NavList TItem="Role" Items="@objRoles" ItemId="@(r => r.Id)" @bind-SelectedId="objRoleId" AriaLabel="Roles">
+    <ItemTemplate Context="role">
+        <div class="font-medium">@role.Name</div>
+        <div class="text-xs text-muted-foreground">@role.Summary</div>
+    </ItemTemplate>
+</NavList>
+```
+
+| Parameter | Type | Default | What it does |
+|---|---|---|---|
+| `Items` | `IReadOnlyList<TItem>` | `[]` | Required. |
+| `ItemTemplate` | `RenderFragment<TItem>?` | `null` | Falls back to `ToString()`. |
+| `ItemId` | `Func<TItem, string>?` | `null` | Identity. Without it, `EqualityComparer<TItem>.Default`. |
+| `SelectedId` / `SelectedIdChanged` | `string?` | `null` | **Preferred.** A re-fetched list holds new instances, so an object-valued selection silently stops matching. |
+| `Selected` / `SelectedChanged` | `TItem?` | `default` | Object-valued binding; may be bound at the same time as `SelectedId`, which wins for display. |
+| `Mode` | `NavListMode` — `Select`, `Navigation` | `Select` | |
+| `ItemHref` | `Func<TItem, string?>?` | `null` | `Navigation` mode only. |
+| `Orientation` | `NavListOrientation` — `Vertical`, `Horizontal` | `Vertical` | Picks which arrow keys move. |
+| `ItemDisabled` | `Func<TItem, bool>?` | `null` | Disabled rows take no tab stop and the arrows skip them. |
+| `EmptyContent` | `RenderFragment?` | `null` | |
+| `AriaLabel` / `Class` | `string?` | `null` | |
+
+Members: `CurrentSelectedId`, `CurrentSelected`, `SelectAsync(TItem)`. There is no type-ahead: a
+row is several lines with no single label to match on.
+
+---
+
 ## Quick Reference: Two-Way Binding Patterns
 
 | Component | Binding Pattern | Type |
@@ -3332,6 +3808,12 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
 | Collapsible | `@bind-Open="bln"` | bool |
 | DataTable | `@bind-SelectedItems="col"` | IReadOnlyCollection<TData> |
 | MultiSelect | `@bind-SelectedValues="list"` | List<string> |
+| TreeView | `@bind-SelectedValue="str"` | string? |
+| TreeItem | `@bind-Expanded="bln"` | bool |
+| SortableList | `@bind-Items="list"` | IList<TItem> |
+| ToggleGroup (Single) | `@bind-Value="val"` | TValue? |
+| ToggleGroup (Multiple) | `@bind-Values="list"` | List<TValue> |
+| AnchorNav | `@bind-ActiveId="str"` | string |
 
 ## Quick Reference: Common CSS Utility Classes
 

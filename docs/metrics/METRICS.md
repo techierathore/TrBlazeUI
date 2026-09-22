@@ -9,70 +9,60 @@
      across project_type, across attribution confidence, or across cost attribution.
      No "total" row, no "overall" line, no averaged intro sentence. -->
 
-**Snapshot as of 2026-09-19** · project_type `library` · schema v1
+**Snapshot as of 2026-09-22** · project_type `library` · schema v1
 
 | Stream | Records | Span |
 |---|---|---|
-| `runs.jsonl` | 31 live runs counted, 3 voided | 2026-08-11 → 2026-09-19 |
-| `gates.jsonl` | 122 (0 backfilled) | 2026-08-25 → 2026-09-19 |
-| `sessions.jsonl` | 8 | 2026-08-09 → 2026-09-15 |
-| `commits.jsonl` | 63 | 2026-02-09 → 2026-09-15 |
-| `misses.jsonl` | 40 miss + 25 miss-fix + 1 miss-amend | 2026-08-31 → 2026-09-19 |
+| `runs.jsonl` | 35 live runs counted, 3 voided | 2026-08-11 → 2026-09-22 |
+| `gates.jsonl` | 139 (0 backfilled) | 2026-08-25 → 2026-09-22 |
+| `sessions.jsonl` | 9 | 2026-08-09 → 2026-09-22 |
+| `commits.jsonl` | 64 | 2026-02-09 → 2026-09-15 |
+| `misses.jsonl` | 48 miss + 33 miss-fix + 1 miss-amend | 2026-08-31 → 2026-09-22 |
 
 Every record on every stream was written live. **Nothing here is backfilled**, so no
 provenance column appears below.
 
-**Three run records are voided** and are outside every figure on this page, as at the
-last snapshot. All three are the same mistake: a `verify-phase` record written by a
-verifier chained inside a fix, given the fix's start time. They are from
-2026-09-12T08:54:30Z, 2026-09-13T12:16:23Z and 2026-09-14T18:51:15Z. The gate records
-from all three stand; only their cost and duration are not counted. Today's verifier
-record was written with its own start time (2026-09-19T09:02:52Z), so it needed no void.
+**Three run records are voided** and are outside every figure on this page. All three are
+the same mistake: a `verify-phase` record written by a verifier chained inside a fix,
+given the fix's start time. They are from 2026-09-12T08:54:30Z, 2026-09-13T12:16:23Z and
+2026-09-14T18:51:15Z. The gate records from all three stand; only their cost and duration
+are not counted. Today's verifier record was written with its own start time
+(2026-09-22T14:25:04Z), so it needed no void.
 
-### What is new since the 2026-09-14 snapshot
+### What is new since the 2026-09-19 snapshot
 
-One piece of work: `*triage-and-fix TrBlazeUI docs/Chatur-TrBlazeUI-Feedback.md`,
-started 2026-09-19T08:17:18Z. It opened **one new row, REQ-UI-021** (Chatur TR-001 to
-TR-004: ScrollArea StickToEnd, TreeView, DiffView, joined ToggleGroup), logged it as a
-spec miss (`MISS-TrBlazeUI-20260919-06`), fixed it, and the chained verifier
-(`verify-phase`, started 2026-09-19T09:02:52Z) marked it **Verified**.
+One piece of work: `*triage-and-fix TrBlazeUI docs/Chatur-TrBlazeUI-Feedback.md`, started
+2026-09-22T13:27:38Z, against Chatur's **second** batch of ten findings. It opened four new
+rows (REQ-UI-022 `CodeEditor`/`EditorTabs`, REQ-UI-023 `Typing`/`Progress.Indeterminate`,
+REQ-UI-024 `LogView`, REQ-UI-025 `NavList`), demoted four existing ones (REQ-UI-005,
+REQ-UI-006, REQ-UI-017, REQ-FN-006), fanned out six builder subagents, and the chained
+verifier (`verify-phase`, started 2026-09-22T14:25:04Z) marked all eight **Verified**.
 
-> **Today's telemetry is inflated by a framework defect, and the inflated records
-> cannot be removed.** When the triage closed, `tf-triage.sh close` replayed old actions
-> still held in `tests/.artifacts/verify/triage.json` (from the runs of 2026-09-12 to
-> 2026-09-14) and wrote them again under today's run id, 2026-09-19T08:17:18Z. That
-> added **13 spurious `escaped` gate records** and **5 duplicate misses**
-> (`MISS-TrBlazeUI-20260919-01` to `-05`) for bugs already fixed on 2026-09-13 and
-> 2026-09-14. The streams are append-only and there is no record type that withdraws a
-> gate record or a miss, so they stay, and **every escape, gate-catch and miss figure
-> below counts them as the tool prints it.** Nothing on this page is corrected by hand.
-> Filed upstream as **TF-001** in `docs/TrBlazeUI-TechieFlow-Feedback.md`.
+Five of the ten reported findings were not defects in the library at all — two named
+controls that already exist unreleased, three named controls documented in the very copy
+of the reference the reporter was reading. Only REQ-FN-006 carries that as a defect. That
+shape does not appear anywhere in the figures below, because the streams count rows, not
+report accuracy; it is recorded here because it is the most useful thing this run learned.
 
-The 13 replayed gate records (`gates.jsonl` lines 108–120, all `gate:"escaped"`, all
-run id 2026-09-19T08:17:18Z):
+> **TF-001 is still live, and today's telemetry is inflated again.** `tf-triage.sh close`
+> still replays actions it did not write. Today it reported *"9 row(s) logged — 9 gate
+> record(s) (escaped), 8 miss(es)"* for a run that logged **8** rows. The ninth is
+> **REQ-UI-021**, the row the 2026-09-19 run created and which this run never touched:
+> one `escaped` record under run id `2026-09-22T13:27:38Z`, and one miss,
+> **`MISS-TrBlazeUI-20260922-01`**, which has **no `miss-fix`** because there was nothing
+> to fix — so it sits on the open-miss count permanently.
+>
+> The hand-trim applied on 2026-09-19 is why one leaked today rather than thirteen. It is
+> not a fix: `close` still reads a list it does not empty. The action list was trimmed
+> again after this run. Streams are append-only and no record type withdraws a gate record
+> or a miss, so **every escape, gate-catch and open-miss figure below counts these as the
+> tool prints them.** Nothing on this page is corrected by hand.
+> Filed as **TF-001** in `docs/TrBlazeUI-TechieFlow-Feedback.md`, now with a
+> "Still happening — 2026-09-22" section.
 
-| REQ | Replayed records |
-|---|---|
-| REQ-UI-020 | 3 |
-| REQ-UI-002 | 2 |
-| REQ-UI-008 | 2 |
-| REQ-UI-001 | 1 |
-| REQ-UI-003 | 1 |
-| REQ-UI-005 | 1 |
-| REQ-UI-006 | 1 |
-| REQ-FN-004 | 1 |
-| REQ-FN-005 | 1 |
-
-Only one gate record under that run id is genuine: **REQ-UI-021** (line 121). The TF-001
-entry names seven of these REQs; the stream also carries replayed records for
-REQ-UI-005 and REQ-UI-006, so the list above is the one to trust.
-
-**Attempt numbers on those rows are now overstated.** Each gate record's `attempt` is
-counted from the records before it, so every replayed record pushed its REQ's counter
-forward: by three for REQ-UI-020, by two for REQ-UI-002 and REQ-UI-008, and by one for
-the other six. The next live verify of any of those rows will carry an attempt number
-that high. The first-pass rate is not affected, because every one of these rows was
-already scored before today.
+Running total of records this defect has added: **14 spurious `escaped` gate records**
+(13 on 2026-09-19, 1 on 2026-09-22) and **6 spurious misses** that will never be resolved
+(`MISS-TrBlazeUI-20260919-01` to `-05`, `MISS-TrBlazeUI-20260922-01`).
 
 ---
 
@@ -82,15 +72,20 @@ already scored before today.
 
 | Provenance | project_type | REQs scored | First-pass | Rate |
 |---|---|---|---|---|
-| **Live** | library | 28 | 10 | **36%** |
+| **Live** | library | 33 | 10 | **30%** |
 
 **Excluded from the live rate:** none. No REQ carries backfilled history.
 
-**This is 36% passing on their first *graded* attempt, not on their first *build*.**
-Gate records began on 2026-08-25, when most of the catalogue was already built. The
-rate was 37% at the last snapshot; the change is REQ-UI-021, newly scored. Its first
-gate record is the escape the triage wrote when it opened the row, so its `Verified`
-today is attempt 2.
+**This is 30% passing on their first *graded* attempt, not on their first *build*.** Gate
+records began on 2026-08-25, when most of the catalogue was already built. The rate was
+36% at the last snapshot over 28 REQs; it fell because five newly-scored rows all entered
+at attempt 2. Four of those five are REQ-UI-022 to REQ-UI-025, whose first gate record is
+the escape the triage wrote when it opened the row — a row opened by a triage can never
+score first-pass, by construction. The fifth is REQ-UI-021, entered by the replay above.
+
+That construction is worth naming plainly: **every consumer-feedback row this project
+opens is born at attempt 2**, so a falling first-pass rate here is partly a measure of how
+much consumer feedback is arriving, not only of how well the work is done.
 
 ---
 
@@ -100,15 +95,15 @@ today is attempt 2.
 
 | project_type | Gate | Failures | Share |
 |---|---|---|---|
-| **library** | escaped — no gate caught it | 64 | 98% |
-| **library** | acceptance | 1 | 2% |
+| **library** | escaped — no gate caught it | 73 | 99% |
+| **library** | acceptance | 1 | 1% |
 
-Counts over 65 failures, as the tool reports them. The escape *rate* is in §3.
+Counts over 74 failures, as the tool reports them. The escape *rate* is in §3.
 
-**The escaped count is inflated twice over, and neither is corrected here.** 13 of the
-64 escaped records are today's replay (listed above). The 2026-09-14 snapshot already
-reported the same fault once before: that day's close also rewrote 11 earlier actions as
-new escaped records. Both sets stay in the count.
+**The escaped count is inflated three times over, and none of it is corrected here.**
+14 of the 73 escaped records are TF-001 replays (13 on 2026-09-19, 1 today). The
+2026-09-14 snapshot reported the same fault once before: that day's close rewrote 11
+earlier actions as new escaped records. All of them stay in the count.
 
 | Gate | Added | Runs | Caught |
 |---|---|---|---|
@@ -116,8 +111,10 @@ new escaped records. Both sets stay in the count.
 | assets | 2026-08-31 | 0 | 0 |
 | mockup-parity | 2026-08-31 | 0 | 0 |
 
-**A library can never fail the visual-truth or mockup-parity gate**, because it has
-no screens of its own. That is why `project_type` separation is enforced.
+The assets gate **did** run today (9 routes, 6 assets each, 0 missing) but caught nothing,
+so it is still 0 caught. **A library can never fail the visual-truth or mockup-parity
+gate**, because it has no screens of its own — the demo app's pages are not the library.
+That is why `project_type` separation is enforced.
 
 ---
 
@@ -126,233 +123,164 @@ no screens of its own. That is why `project_type` separation is enforced.
 Two different questions, from two different streams, reported side by side and never
 merged into one number.
 
-| Source | Definition | Rate |
-|---|---|---|
-| `gates.jsonl` (live, library) | of graded failures, the share no gate caught | **94%** |
-| `misses.jsonl` | of logged misses, the share found by the owner or in production | **82%** |
+| Source | Definition | Rate | n |
+|---|---|---|---|
+| `gates.jsonl` | failures whose gate was `escaped` | **96%** | 74 failures |
+| `misses.jsonl` | misses found by owner or production rather than by a gate | see §4 | 48 misses |
 
-Both figures include today's replayed records: the 13 spurious escaped gate records in
-the first, the 5 duplicate misses (all `found_by: owner`) in the second. The gate stream
-counts *grading events*; the miss stream counts *defects*. At the last snapshot these
-read 94% and 79%.
+Both are inflated by the TF-001 replays described above, and the `gates.jsonl` figure is
+the one most distorted by them: a replayed record is *always* an escape, so the defect can
+only push this number up.
+
+**A 96% escape rate on a component library is a real signal even after that discount.**
+This project's defects are found by the applications that consume it, not by its own
+gates, and that is what the shape of the work makes likely: a library's acceptance tests
+exercise the API it meant to ship, while a consumer exercises the API they expected to
+find. Today's run is the clearest example on record — see §4.
 
 ---
 
 ## 4. Miss attribution and rework cost
 
-### 4.1 Counts — poolable
-
-40 misses logged, 25 miss-fixes recorded, **18 still open**, 22 resolved, 0 orphan
-fixes, 0 won't-fix, 1 amendment applied.
-
-**Five of the 18 open misses are today's duplicates** (`MISS-TrBlazeUI-20260919-01` to
-`-05`). They describe bugs fixed on 2026-09-13 and 2026-09-14 and have no fix record of
-their own, so the tool counts them open. The genuine new miss, `-06` for REQ-UI-021, is
-closed `Verified`.
-
-| Class | Count |
+| Figure | Value |
 |---|---|
-| wrong-behaviour | 17 |
-| regression | 11 |
-| unspecified-gap | 6 |
-| partial-implementation | 4 |
-| missed-requirement | 1 |
-| scope-creep | 1 |
+| Misses logged | 48 |
+| Resolved | 30 |
+| Open | 18 |
+| `wont-fix` | 0 |
+| Amendments applied | 1 (0 orphaned) |
+| Miss-fix records | 33 (0 orphaned) |
 
-| Found by | Count |
-|---|---|
-| owner | 33 |
-| library-feedback | 6 |
-| gate | 1 |
+Of the 18 open, **6 are the TF-001 phantoms** and can never be resolved, because they
+record work that was never open. The honest open count for real work is **12**.
 
-**Design-miss share: 15%** (was 12%). Two `unspecified-gap` records arrived today:
-REQ-UI-021's genuine one, and duplicate `-01`. The duplicates also account for three of
-the `regression` records and one `wrong-behaviour` record.
+### Why the miss was missed
 
-| Duplicate miss | REQ | Class |
+Over the 47 of 48 records that carry the field (1 does not; 0 predate its introduction):
+
+| `why_missed` | Count | Share |
 |---|---|---|
-| MISS-TrBlazeUI-20260919-01 | REQ-UI-020 | unspecified-gap |
-| MISS-TrBlazeUI-20260919-02 | REQ-UI-020 | regression |
-| MISS-TrBlazeUI-20260919-03 | REQ-UI-020 | wrong-behaviour |
-| MISS-TrBlazeUI-20260919-04 | REQ-UI-008 | regression |
-| MISS-TrBlazeUI-20260919-05 | REQ-UI-002 | regression |
+| insufficient-verify-method | 33 | 70% |
+| missing-checklist-item | 13 | 28% |
+| instruction-ignored | 1 | 2% |
 
-### 4.2 `why_missed` — over the records that carry the field
+### Whose gap it was
 
-39 of 40 eligible records carry it; **0 predate the field**, and 0 escapes are
-missing it. The one without it is completed with
-`tf-emit.sh --amend <miss_id> why_missed <value>`.
+Over the 37 records that carry `sort` (11 predate the field and are outside this
+denominator):
 
-| why_missed | Count |
-|---|---|
-| insufficient-verify-method | 30 |
-| missing-checklist-item | 8 |
-| instruction-ignored | 1 |
-
-Four of the `insufficient-verify-method` records and one `missing-checklist-item`
-record are today's duplicates. REQ-UI-021's miss is `missing-checklist-item`: the four
-Chatur requests were features the checklist never listed.
-
-### 4.3 `sort` — whose gap it was
-
-29 of 29 eligible records carry `sort`; **11 predate the field** and are outside the
-denominator.
-
-| sort | Count |
-|---|---|
-| weak-check | 23 |
-| spec | 6 |
-
-Four `weak-check` and one `spec` are duplicates; REQ-UI-021's is `spec`.
-
-### 4.4 Attribution — `linked` records only
-
-**8 of 40 misses are attributed; 32 are excluded** because their
-`origin_confidence` is not `linked`. None of today's six misses is linked, so the
-attributed set is unchanged.
-
-| Origin phase | Misses |
-|---|---|
-| fix-issues | 6 |
-| build-phase | 2 |
-
-| Origin model | Misses |
-|---|---|
-| claude-opus-5 | 7 |
-| unrecorded | 1 |
-
-| Origin agent | Misses |
-|---|---|
-| general-purpose | 4 |
-| flow-master | 3 |
-| trblazeui | 1 |
-
-> **These rankings are observational, not causal.** Which model and agent get the hard
-> work is not random: a phase that handles consumer-feedback defects will out-miss one
-> that renders a document, whatever drives it. With n=8, no percentage is printed.
-
-### 4.5 Rework cost
-
-| Measure | Value | Records |
+| `sort` | Count | Share |
 |---|---|---|
-| Tokens per miss — **measured** (`cost_attribution: sole`) | 139,895.0 | 4 |
-| Tokens per miss — *apportioned* (`shared`) | 98,297.0 | 14 |
-| Unattributable | — | 7 |
+| weak-check — the line existed, the check let it through | 26 | 70% |
+| spec — the spec never had it | 11 | 30% |
 
-0 `sole` repairs are missing their token window. List price over the 4 measured
-records: **$26.20 per miss**, a price and not a bill.
+Today added 4 `spec` (the four new components — the library genuinely never had them) and
+4 `weak-check`. That split is the run in miniature: half the batch was missing capability,
+half was capability that existed and was not found.
 
-The measured figure rose from 58,942.7 (n=3) because one new `sole` record arrived:
-REQ-UI-021's fix, whose window is today's whole triage-and-fix run (382,752 output
-tokens on the record). That run did four features' work for one REQ, so it weighs
-heavily in a set of four.
+### Rework cost
 
-`cost_usd` is `null` on every record: all were produced on Claude Code, which exposes
-no cost source. **Tokens are the measurement; dollars are list price.** Measured and
-apportioned stay two columns, never one number.
+**Measured and apportioned are separate columns and are never added together.**
+
+| Attribution | Records | Tokens per miss |
+|---|---|---|
+| `sole` — one miss, one repair window | 4 | **139,895** (measured) |
+| `shared:n` — one window repaired several | 22 | not a headline figure; apportioned only |
+| `none` | counted, costed at nothing | — |
+
+`tokens_unrecorded_sole_n` is 0, so no repair was averaged in as free.
+
+**Attribution excluded: 39 of 48 misses.** Per-phase, per-agent and per-model miss rates
+run over `origin_confidence:"linked"` records only, and 39 records are not linked. That
+leaves too few to publish a per-agent or per-model rate: **insufficient data (n=9)**.
+
+**A per-model miss rate would be observational, not causal, and is not printed here.**
+Which model gets the hard work is not random.
 
 ---
 
 ## 5. Effort per phase
 
-*Time, tokens, model and fan-out, grouped by `cmd`. A fact about runs, not tickets.*
+*About the RUN, not the ticket. There is no cycle-time-per-feature on this page and there
+will not be one — the unit of work in this framework is the run.*
 
-31 live run records counted. **Token-window coverage: `tree` 9 · `main` 15 · `none` 5
-· absent 2.** Only the 9 `tree` records read a subagent transcript, so fan-out figures
-cover those alone; a `0` on a `main` record means *not observed*.
+35 live run records. **Token-window coverage: `tree` 13 · `main` 15 · `none` 5 · absent 2.**
+A window is only as good as its scope: `tree` saw the subagents, `main` did not look, and
+`none`/absent measured nothing and is excluded from every token figure rather than averaged
+in as a zero.
 
-| Phase | Runs | Wall clock | Tokens out | Tokens in | % out | % time |
-|---|---|---|---|---|---|---|
-| build-phase | 2 | 5h42m | 80.9k | 182 | 3% | 38% |
-| triage-and-fix | 5 | 3h20m | 1.5M | 13.3k | 46% | 22% |
-| fix-issues | 6 | 2h23m | 856.6k | 2.6k | 27% | 16% |
-| handoff-phase | 2 | 1h01m | 383.2k | 2.7k | 12% | 7% |
-| triage-issues | 2 | 58m50s | 126.7k | 544 | 4% | 6% |
-| verify-phase | 7 | 51m39s | 147.9k | 1.5k | 5% | 6% |
-| amend-docs | 2 | 32m03s | 49.6k | 68 | 2% | 4% |
-| refresh-status | 1 | 8m44s | 0 | 0 | 0% | 1% |
-| log-miss | 2 | 5m49s | 52.5k | 118 | 2% | 1% |
-| metrics-report | 2 | 5m29s | 34.1k | 92 | 1% | 1% |
+| Phase | Runs | Wall clock | Tokens out | % out | % time |
+|---|---|---|---|---|---|
+| fix-issues | 8 | 3h21m | 1.5M | 39% | 21% |
+| triage-and-fix | 6 | 3h26m | 1.5M | 39% | 21% |
+| handoff-phase | 2 | 1h01m | 383.2k | 10% | 6% |
+| verify-phase | 8 | 56m23s | 161.0k | 4% | 6% |
+| triage-issues | 2 | 58m50s | 126.7k | 3% | 6% |
+| build-phase | 2 | 5h42m | 80.9k | 2% | 35% |
+| log-miss | 2 | 5m49s | 52.5k | 1% | 1% |
+| amend-docs | 2 | 32m03s | 49.6k | 1% | 3% |
+| metrics-report | 2 | 5m29s | 34.1k | 1% | 1% |
+| refresh-status | 1 | 8m44s | 0 | 0% | 1% |
 
-Token figures cover only runs whose window was computable: `amend-docs` 1 of 2,
-`build-phase` 1 of 2, `fix-issues` 5 of 6, `handoff-phase` 1 of 2, `triage-issues` 1 of
-2, `verify-phase` 6 of 7, `refresh-status` 0 of 1, and every run of the other phases.
-Unmeasured runs are **excluded, never counted as zero**, which is why `refresh-status`
-shows `0`. Every measured run was 100% `claude-opus-5`.
+**`build-phase` taking 35% of wall clock on 2% of output is a fact about what that phase
+is, not a finding about it** — it waits on builds. The same caution applies to every row:
+these are phase shapes, not performance rankings.
 
-**Today's triage-and-fix run is filed under `fix-issues`, not `triage-and-fix`.** The
-triage close was called with `--cmd fix-issues`, so its run record (started
-2026-09-19T08:17:18Z, 45m34s, 382.8k output tokens) landed in the `fix-issues` row;
-the `triage-and-fix` row still holds the same 5 runs as on 2026-09-14. A second
-`fix-issues` record, 2 seconds long with no REQs and no token window, was written at
-the close (started 2026-09-19T09:07:22Z); it adds a run to the count and nothing else.
+### The two heaviest phases
 
-**`*build-phase` costing more wall clock than `*log-miss` is a fact about what those
-phases are, not a finding about either.** The warning in §4.4 applies here too.
+**`fix-issues`** — 8 runs, tokens measured on 7 (1 unmeasured and excluded), 220.7k out per
+run (median 67.3k). Fan-out **observed on 5 of 8 runs**; the other 3 were not `tree` scope,
+so their 0 means *not looked*, not *none*. Over the 5 observed: 12 spawns, 2 runs fanned
+out, 506.7k output tokens inside subagents = **46% of this phase's observed output**.
+Declared 9 vs **measured 12** — `subagents` is typed by the agent, `subagent_runs` is
+counted from the harness store, and **where they disagree the measured one is right.**
+19 REQ touches, 67 files written. List price $258.86 over 7 runs.
 
-Fixing reported defects remains this project's dominant cost: `triage-and-fix` alone
-carries 46% of all output tokens in 22% of the wall clock, and `fix-issues` (which now
-includes today's triage run) carries 27% in 16%.
-`build-phase` is the reverse, 38% of the wall clock for 3% of the output, because its
-time goes into builds and smokes.
+**`triage-and-fix`** — 6 runs, tokens measured on all 6, 253.9k out per run (median 156.2k).
+Fan-out **observed on 1 of 6 runs**; the other 5 were not `tree` scope. 17 REQ touches, 108
+files written. List price $156.59 over 6 runs.
 
-**Fan-out.** Where `subagents` (typed by the agent) and `subagent_runs` (counted from
-the harness store) disagree, **the measured figure is right** (SCHEMA §2.6).
+The fan-out denominators are the weak point of this whole section: on the two phases that
+actually fan out, only 6 of 14 runs were observed at all. Any statement about how much work
+happens inside subagents rests on those 6.
 
-| Phase | Observed runs | Declared | Measured spawns |
-|---|---|---|---|
-| fix-issues | 3 of 6 | 3 | 6 |
-| triage-issues | 1 of 2 | 1 | 4 |
-| build-phase | 1 of 2 | 2 | 0 |
-| metrics-report | 1 of 2 | 1 | 1 |
+### Models and money
 
-No `triage-and-fix` run is `tree` scope, so its fan-out is not observed on any of its 5
-runs. Today's `fix-issues` record is `main` scope and declared the literal string
-`none` as a subagent kind; that entry is a label, not a spawn.
+Every measured run on this project is `claude-opus-5` through `claude-code`, so there is no
+per-model split to draw.
 
----
+**`cost_usd` is `null` on every Claude Code record** — no cost source exists, and inventing
+one would be an estimate presented as a measurement. What is shown instead is **list price**:
+the published rate applied to the tokens on the record, worked out at report time and never
+stored. It is a price, not a bill, and it is what makes a subscription run comparable with a
+metered one. **$566.71 of list price over 28 records.** No rate-card estimate appears
+anywhere else on this page.
 
-## 6. Poolable figures
-
-Comparable across `project_type` and provenance.
-
-| Measure | Value |
+| Pooled figure | Value |
 |---|---|
-| Runs | 31 — `verify-phase` 7 · `fix-issues` 6 · `triage-and-fix` 5 · `amend-docs` 2 · `build-phase` 2 · `handoff-phase` 2 · `log-miss` 2 · `metrics-report` 2 · `triage-issues` 2 · `refresh-status` 1 |
-| Rework ratio | insufficient data (n=2 `build-phase` runs) |
-| Batch size | insufficient data (REQs per `build-phase` run) |
-| REQ throughput | 9.63 REQs/hour (median across runs) |
-| Sessions / tokens | 8 sessions, 3,541,214 tokens |
-| Tokens per `Verified` REQ | 62,126.6 |
-| List price | $461.58 over 24 priced runs |
-| List price per `Verified` REQ | $8.10 |
-| Commit cadence | 2.42 commits/active day (63 commits over 26 days) |
+| Tokens (all streams) | 3,992,393 |
+| Tokens per `Verified` REQ | 61,421 |
+| List price per `Verified` REQ | $8.72 |
+| Commits | 64 over 27 active days (2.37/day) |
+| Median throughput | 10.44 REQs/hour |
+
+Commit-derived metrics are exempt from the provenance separations: `git log` is a real
+append-only log and commit volume is comparable across project types. The commit-telemetry
+hook is installed on this clone, so the commit count is not understated.
+
+`rework_ratio` is **insufficient data (n=2 `build-phase` runs)**.
 
 ---
 
-## 7. What is missing
+## 6. What is missing
 
-- **Today's figures carry 13 spurious gate records and 5 duplicate misses** (TF-001,
-  top of page). No record type exists to withdraw either, so they stay in the escape
-  rate, the gate-catch distribution, the miss counts and the open-miss count. The fix
-  belongs upstream: `close` should skip actions older than `--started`, and the schema
-  needs a withdraw record for gates and misses like the one runs already have
-  (`run-void`, SCHEMA §2.7).
-- **The five duplicate misses stay open** unless the owner closes them. They do not
-  describe open bugs.
-- **The session stream stops at 2026-09-15.** The 2026-09-14 session has now arrived;
-  today's session has no record yet, so session tokens and tokens per `Verified` REQ in
-  §6 are understated for today.
-- **The commit hook is present** (`commit_hook: true`), so the cadence figure in §6 is
-  sound.
-- **5 run records measured no tokens** (`none` scope, including today's 2-second
-  `fix-issues` record) and **2 carry no window at all**. They are excluded from every
-  token figure rather than averaged in as zero.
-- **32 of 40 misses are unattributed.** Until `origin_confidence: linked` is the norm,
-  §4.4 can carry counts only.
-- **1 miss record carries no `why_missed`**; `tf-emit.sh --amend` is the remedy.
-- **11 misses predate the `sort` field**; `tf-emit.sh --amend <miss_id> sort <value>`
-  sorts them.
-- **No perf budget is declared on any row**, so the perf gate has never run.
-- **No run record for this report.** This snapshot was produced without writing a
-  `metrics-report` record to `runs.jsonl`, so its own time and tokens are not in §5.
+- **No perf, assets-catch or mockup-parity history.** The assets gate ran today and caught
+  nothing; the other two have never run. A library has no mockups and declares no perf
+  budgets, so two of the three may never produce a figure.
+- **Attribution on 39 of 48 misses is not `linked`**, which is what keeps §4 from carrying a
+  per-phase or per-agent rate.
+- **Fan-out is unobserved on 8 of the 14 runs in the two phases that fan out.**
+- **Six misses and fourteen gate records are phantoms** from TF-001 and cannot be withdrawn.
+  A `miss-void` record, in the shape of the existing `run-void`, would let this report exclude
+  them honestly instead of re-explaining them in prose every time. That is now the most
+  valuable thing the framework could add for this project's numbers.

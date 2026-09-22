@@ -1,0 +1,390 @@
+@typeparam TItem
+@namespace TrBlazeUI.Components.NavList
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+@* A flat list of multi-line rows where exactly one row is chosen and the rest of the screen
+   follows it. One Tab stop (the chosen row, else the first), arrow keys to move, Home and End to
+   jump, Enter or Space to choose.
+
+   Mode picks the semantic, because these are two different controls: Select renders a
+   role="listbox" of role="option" rows carrying aria-selected - the choice stays on this screen
+   and drives a detail pane. Navigation renders a <nav> of links carrying aria-current="page" -
+   picking a row takes the reader somewhere else. Guessing between them is the usual mistake, so
+   it is a parameter. *@
+
+@{
+    var vTabStopIndex = ResolveTabStopIndex();
+}
+
+@if (Mode == NavListMode.Navigation)
+{
+    <nav @ref="objRoot"
+         aria-label="@AriaLabel"
+         data-slot="nav-list"
+         data-orientation="@OrientationValue"
+         class="@CssClass"
+         @attributes="AdditionalAttributes">
+        @if (ItemList.Count == 0)
+        {
+            <div data-slot="nav-list-empty" class="px-3 py-6 text-center text-sm text-muted-foreground">@EmptyContent</div>
+        }
+        else
+        {
+            @foreach (var (vItem, vIndex) in ItemList.Select((aRow, aPosition) => (aRow, aPosition)))
+            {
+                var vIsDisabled = IsDisabled(vItem);
+                var vIsChosen = IsChosen(vItem);
+                <a @key="RowKey(vItem, vIndex)"
+                   href="@(ItemHref?.Invoke(vItem))"
+                   data-slot="nav-list-option"
+                   data-index="@vIndex"
+                   data-state="@(vIsChosen ? "selected" : null)"
+                   aria-current="@(vIsChosen ? "page" : null)"
+                   aria-disabled="@(vIsDisabled ? "true" : null)"
+                   tabindex="@(vIndex == vTabStopIndex ? 0 : -1)"
+                   class="@RowCssClass(vIsChosen, vIsDisabled)"
+                   @onclick="@(() => SelectAsync(vItem))">
+                    @RowTemplate(vItem)
+                </a>
+            }
+        }
+    </nav>
+}
+else
+{
+    <ul @ref="objRoot"
+        role="listbox"
+        aria-label="@AriaLabel"
+        aria-orientation="@OrientationValue"
+        data-slot="nav-list"
+        data-orientation="@OrientationValue"
+        class="@CssClass"
+        @attributes="AdditionalAttributes">
+        @if (ItemList.Count == 0)
+        {
+            <li role="presentation" data-slot="nav-list-empty" class="px-3 py-6 text-center text-sm text-muted-foreground">@EmptyContent</li>
+        }
+        else
+        {
+            @foreach (var (vItem, vIndex) in ItemList.Select((aRow, aPosition) => (aRow, aPosition)))
+            {
+                var vIsDisabled = IsDisabled(vItem);
+                var vIsChosen = IsChosen(vItem);
+                <li @key="RowKey(vItem, vIndex)"
+                    role="option"
+                    data-slot="nav-list-option"
+                    data-index="@vIndex"
+                    data-state="@(vIsChosen ? "selected" : null)"
+                    aria-selected="@(vIsChosen ? "true" : "false")"
+                    aria-disabled="@(vIsDisabled ? "true" : null)"
+                    tabindex="@(vIndex == vTabStopIndex ? 0 : -1)"
+                    class="@RowCssClass(vIsChosen, vIsDisabled)"
+                    @onclick="@(() => SelectAsync(vItem))">
+                    @RowTemplate(vItem)
+                </li>
+            }
+        }
+    </ul>
+}
+
+@code {
+    private static readonly RenderFragment<TItem> DefaultItemTemplate =
+        aItem => builder => builder.AddContent(0, aItem?.ToString());
+
+    private ElementReference objRoot;
+    private IJSObjectReference? objModule;
+    private string? objInternalId;
+    private TItem? objInternalItem;
+    private bool objIsSeeded;
+
+    /// <summary>
+    /// Gets or sets the rows, in display order.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public IReadOnlyList<TItem> Items { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets how one row is rendered. A row is a block, not a line, so this is where a
+    /// name, some badges and a couple of values go. Defaults to the item's <c>ToString()</c>.
+    /// </summary>
+    [Parameter]
+    public RenderFragment<TItem>? ItemTemplate { get; set; }
+
+    /// <summary>
+    /// Gets or sets the function returning a row's stable id, for example a role's key. Supplying
+    /// it is what makes <see cref="SelectedId"/> usable, and it is the recommended way to carry a
+    /// selection across a re-fetch: a re-fetched list holds new object instances, so an
+    /// object-valued selection stops matching while an id-valued one does not.
+    /// </summary>
+    [Parameter]
+    public Func<TItem, string>? ItemId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the id of the chosen row. Use with <c>@bind-SelectedId</c> together with
+    /// <see cref="ItemId"/>. This is the primary selection parameter; leave both selection
+    /// parameters unbound and the list keeps the choice itself.
+    /// </summary>
+    [Parameter]
+    public string? SelectedId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback raised with the chosen row's id when a row is chosen.
+    /// </summary>
+    [Parameter]
+    public EventCallback<string?> SelectedIdChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets the chosen row itself. Use with <c>@bind-Selected</c> when the detail pane
+    /// wants the object rather than its id. It can be bound alongside
+    /// <see cref="SelectedId"/>; both are raised when a row is chosen, and when both are bound the
+    /// id decides which row reads as chosen.
+    /// </summary>
+    [Parameter]
+    public TItem? Selected { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback raised with the chosen row when a row is chosen.
+    /// </summary>
+    [Parameter]
+    public EventCallback<TItem?> SelectedChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ARIA semantic the list renders with. Default is
+    /// <see cref="NavListMode.Select"/> — a listbox of options whose choice drives the rest of the
+    /// screen. Use <see cref="NavListMode.Navigation"/> only when picking a row navigates.
+    /// </summary>
+    [Parameter]
+    public NavListMode Mode { get; set; } = NavListMode.Select;
+
+    /// <summary>
+    /// Gets or sets the function returning a row's URL. Required in
+    /// <see cref="NavListMode.Navigation"/> mode and ignored otherwise.
+    /// </summary>
+    [Parameter]
+    public Func<TItem, string?>? ItemHref { get; set; }
+
+    /// <summary>
+    /// Gets or sets the axis the rows lay out on and the arrow keys that move between them.
+    /// Default is <see cref="NavListOrientation.Vertical"/>.
+    /// </summary>
+    [Parameter]
+    public NavListOrientation Orientation { get; set; } = NavListOrientation.Vertical;
+
+    /// <summary>
+    /// Gets or sets the function deciding whether a row can be chosen. A disabled row is skipped
+    /// by the arrow keys and never takes the Tab stop.
+    /// </summary>
+    [Parameter]
+    public Func<TItem, bool>? ItemDisabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets what is shown in place of the rows when <see cref="Items"/> is empty.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? EmptyContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets the accessible name of the list, for example <c>"Roles"</c>.
+    /// </summary>
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Gets the id of the chosen row, whether the choice is bound or kept by the list.
+    /// </summary>
+    public string? CurrentSelectedId =>
+        SelectedIdChanged.HasDelegate ? SelectedId
+        : SelectedChanged.HasDelegate ? (Selected != null ? ItemId?.Invoke(Selected) : null)
+        : objInternalId;
+
+    /// <summary>
+    /// Gets the chosen row, whether the choice is bound or kept by the list.
+    /// </summary>
+    public TItem? CurrentSelected =>
+        SelectedChanged.HasDelegate ? Selected
+        : SelectedIdChanged.HasDelegate ? FindById(SelectedId)
+        : objInternalItem;
+
+    /// <summary>
+    /// Chooses a row, raising whichever of <see cref="SelectedIdChanged"/> and
+    /// <see cref="SelectedChanged"/> are bound, and keeping the choice internally when neither is.
+    /// A disabled row is ignored.
+    /// </summary>
+    /// <param name="aItem">The row to choose.</param>
+    /// <returns>A task that completes when the callbacks have run.</returns>
+    public async Task SelectAsync(TItem aItem)
+    {
+        if (IsDisabled(aItem))
+        {
+            return;
+        }
+
+        if (SelectedIdChanged.HasDelegate)
+        {
+            await SelectedIdChanged.InvokeAsync(ItemId?.Invoke(aItem));
+        }
+
+        if (SelectedChanged.HasDelegate)
+        {
+            await SelectedChanged.InvokeAsync(aItem);
+        }
+
+        if (!SelectedIdChanged.HasDelegate && !SelectedChanged.HasDelegate)
+        {
+            objInternalId = ItemId?.Invoke(aItem);
+            objInternalItem = aItem;
+            StateHasChanged();
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        if (objIsSeeded || SelectedIdChanged.HasDelegate || SelectedChanged.HasDelegate)
+        {
+            return;
+        }
+
+        // Unbound but given a starting choice: adopt it once, then the list owns the selection.
+        objIsSeeded = true;
+        objInternalId = SelectedId ?? (Selected != null ? ItemId?.Invoke(Selected) : null);
+        objInternalItem = Selected != null ? Selected : FindById(SelectedId);
+    }
+
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            objModule = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/TrBlazeUI.Components/js/nav-list.js");
+            await objModule.InvokeVoidAsync("attach", objRoot, OrientationValue);
+        }
+        catch (JSDisconnectedException)
+        {
+            // Expected during circuit disconnect in Blazor Server.
+        }
+        catch (InvalidOperationException)
+        {
+            // JS interop is unavailable during prerendering.
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        if (objModule != null)
+        {
+            try
+            {
+                await objModule.InvokeVoidAsync("detach", objRoot);
+                await objModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Expected during circuit disconnect.
+            }
+        }
+
+        GC.SuppressFinalize(this);
+    }
+
+    private IReadOnlyList<TItem> ItemList => Items ?? [];
+
+    private RenderFragment<TItem> RowTemplate => ItemTemplate ?? DefaultItemTemplate;
+
+    private string OrientationValue => Orientation == NavListOrientation.Horizontal ? "horizontal" : "vertical";
+
+    private bool IsDisabled(TItem aItem) => ItemDisabled?.Invoke(aItem) == true;
+
+    private object RowKey(TItem aItem, int aIndex) => ItemId?.Invoke(aItem) ?? (object)aIndex;
+
+    private TItem? FindById(string? aId)
+    {
+        var vItemId = ItemId;
+        if (aId == null || vItemId == null)
+        {
+            return default;
+        }
+
+        foreach (var vItem in ItemList)
+        {
+            if (string.Equals(vItemId(vItem), aId, StringComparison.Ordinal))
+            {
+                return vItem;
+            }
+        }
+
+        return default;
+    }
+
+    private bool IsChosen(TItem aItem)
+    {
+        var vItemId = ItemId;
+        var vChosenId = CurrentSelectedId;
+        if (vItemId != null && vChosenId != null)
+        {
+            return string.Equals(vItemId(aItem), vChosenId, StringComparison.Ordinal);
+        }
+
+        var vChosen = CurrentSelected;
+        return vChosen != null && EqualityComparer<TItem>.Default.Equals(aItem, vChosen);
+    }
+
+    private int ResolveTabStopIndex()
+    {
+        var vList = ItemList;
+        var vFirstEnabled = -1;
+
+        for (var vIndex = 0; vIndex < vList.Count; vIndex++)
+        {
+            if (IsDisabled(vList[vIndex]))
+            {
+                continue;
+            }
+
+            if (IsChosen(vList[vIndex]))
+            {
+                return vIndex;
+            }
+
+            vFirstEnabled = vFirstEnabled < 0 ? vIndex : vFirstEnabled;
+        }
+
+        return vFirstEnabled;
+    }
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "flex gap-1 text-sm",
+        Orientation == NavListOrientation.Horizontal ? "flex-row overflow-x-auto" : "flex-col",
+        Mode == NavListMode.Select ? "m-0 list-none p-0" : null,
+        Class
+    );
+
+    private string RowCssClass(bool aIsChosen, bool aIsDisabled) => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "flex w-full cursor-pointer select-none items-start gap-3 rounded-md px-3 py-2.5 text-left text-inherit no-underline outline-none transition-colors",
+        "focus-visible:ring-2 focus-visible:ring-ring",
+        Orientation == NavListOrientation.Horizontal ? "w-auto shrink-0 items-center" : null,
+        aIsChosen ? "bg-accent text-accent-foreground" : "hover:bg-accent/50",
+        aIsDisabled ? "cursor-default opacity-50" : null
+    );
+}

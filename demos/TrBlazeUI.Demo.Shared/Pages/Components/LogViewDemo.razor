@@ -1,0 +1,331 @@
+@page "/components/log-view"
+@using TrBlazeUI.Components.LogView
+@implements IDisposable
+
+<PageTitle>Log View Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Log View Component</h1>
+        <p class="text-xl text-muted-foreground">
+            A panel for the output of a running command. It takes the lines one at a time, marks each
+            as ordinary, a success, a warning or a failure, holds its height, and follows the newest
+            line until the reader scrolls back.
+        </p>
+    </div>
+
+    <!-- Build output -->
+    <div class="space-y-4" data-testid="log-build-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">A build, writing as it goes</h2>
+            <p class="text-sm text-muted-foreground">
+                A timer writes a line every 120&nbsp;ms, the way a build writes to a Run screen. The panel
+                holds a fixed 20&nbsp;rem and stays on the newest line. Scroll up while it runs and following
+                stops at once, the state below changes, and a "Jump to newest" button appears over the panel;
+                scroll back to the bottom and following resumes on its own.
+            </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+            <Button Size="ButtonSize.Small" OnClick="StartAsync" Disabled="objIsRunning" data-testid="log-demo-start">
+                @(objLines.Count == 0 ? "Run build" : "Run again")
+            </Button>
+            <Button Size="ButtonSize.Small" Variant="ButtonVariant.Outline" OnClick="Stop" Disabled="!objIsRunning" data-testid="log-demo-stop">
+                Stop
+            </Button>
+            <Button Size="ButtonSize.Small" Variant="ButtonVariant.Outline" OnClick="AddBurst" data-testid="log-demo-burst">
+                Add 400 lines
+            </Button>
+            <Button Size="ButtonSize.Small" Variant="ButtonVariant.Outline" OnClick="AddWarning" data-testid="log-demo-add-warning">
+                Add a warning
+            </Button>
+            <Button Size="ButtonSize.Small" Variant="ButtonVariant.Outline" OnClick="AddFailure" data-testid="log-demo-add-failure">
+                Add a failure
+            </Button>
+            <Button Size="ButtonSize.Small" Variant="ButtonVariant.Ghost" OnClick="Clear" data-testid="log-demo-clear">
+                Clear
+            </Button>
+        </div>
+
+        <LogView @ref="objLogView"
+                 Lines="objLines"
+                 Height="20rem"
+                 MaxLines="2000"
+                 ShowTimestamps="true"
+                 AtEndChanged="OnAtEndChanged"
+                 AriaLabel="Build output"
+                 data-testid="log-demo-panel" />
+
+        <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+            <p>
+                <span class="text-muted-foreground">Following:</span>
+                <span class="font-medium" data-testid="log-demo-follow-state">@(objIsFollowing ? "Following newest" : "Paused — scrolled up")</span>
+            </p>
+            <p>
+                <span class="text-muted-foreground">Lines:</span>
+                <span class="font-mono" data-testid="log-demo-count">@objLines.Count</span>
+            </p>
+            <p>
+                <span class="text-muted-foreground">Build:</span>
+                <span class="font-medium" data-testid="log-demo-run-state">@(objIsRunning ? "running" : "idle")</span>
+            </p>
+            @if (!objIsFollowing)
+            {
+                <Button Size="ButtonSize.Small" Variant="ButtonVariant.Secondary" OnClick="JumpAsync" data-testid="log-demo-jump">
+                    Jump to newest (ScrollToEndAsync)
+                </Button>
+            }
+        </div>
+    </div>
+
+    <!-- Kinds -->
+    <div class="space-y-4" data-testid="log-kinds-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">The four kinds</h2>
+            <p class="text-sm text-muted-foreground">
+                Colour is never the only signal (WCAG&nbsp;1.4.1). A warning also carries a <code class="bg-muted px-1 py-0.5 rounded">!</code>,
+                a failure a <code class="bg-muted px-1 py-0.5 rounded">×</code> and a success a <code class="bg-muted px-1 py-0.5 rounded">✓</code>,
+                each with a visually hidden word ("Warning: ", "Failure: ", "Success: ") that a screen reader
+                reads before the text. Every row carries <code class="bg-muted px-1 py-0.5 rounded">data-log-kind</code>
+                so a consumer can restyle without forking the component.
+            </p>
+        </div>
+        <LogView Lines="objKindLines" Follow="false" MaxHeight="12rem" AriaLabel="Line kinds" data-testid="log-kinds-panel" />
+    </div>
+
+    <!-- Cap -->
+    <div class="space-y-4" data-testid="log-capped-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Capping a long build</h2>
+            <p class="text-sm text-muted-foreground">
+                An uncapped log in a long-running build eventually takes the browser down with it.
+                <code class="bg-muted px-1 py-0.5 rounded">MaxLines</code> drops the oldest lines and notes how many
+                went. This panel keeps 10; each click adds 6.
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <Button Size="ButtonSize.Small" OnClick="AddCapped" data-testid="log-capped-add">Add 6 lines</Button>
+            <Button Size="ButtonSize.Small" Variant="ButtonVariant.Ghost" OnClick="ClearCapped" data-testid="log-capped-clear">Clear</Button>
+        </div>
+        <LogView Lines="objCappedLines" MaxLines="10" MaxHeight="12rem" AriaLabel="Capped output" data-testid="log-capped-panel" />
+    </div>
+
+    <!-- Template -->
+    <div class="space-y-4" data-testid="log-template-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Your own line</h2>
+            <p class="text-sm text-muted-foreground">
+                <code class="bg-muted px-1 py-0.5 rounded">LineTemplate</code> replaces the marker, timestamp and text.
+                The row, its colour and its <code class="bg-muted px-1 py-0.5 rounded">data-log-kind</code> hook stay the panel's.
+            </p>
+        </div>
+        <LogView Lines="objKindLines" Follow="false" MaxHeight="12rem" AriaLabel="Templated output" data-testid="log-template-panel">
+            <LineTemplate Context="vLine">
+                <span class="w-20 shrink-0 select-none uppercase opacity-70">@vLine.Kind</span>
+                <span class="min-w-0 flex-1 whitespace-pre-wrap">@vLine.Text</span>
+            </LineTemplate>
+        </LogView>
+    </div>
+
+    <!-- Code -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Usage</h2>
+        <pre class="overflow-x-auto rounded-md border bg-muted/30 p-4 text-xs"><code>&lt;LogView Lines="lines" Height="20rem" MaxLines="5000" ShowTimestamps="true"
+         AtEndChanged="v =&gt; following = v" AriaLabel="Build output" /&gt;
+
+@@code {
+    // Append to the SAME list and call StateHasChanged: only the tail block re-renders.
+    private readonly List&lt;LogLine&gt; lines = [];
+
+    private void OnOutput(string text) =&gt;
+        lines.Add(new LogLine(text, LogLineKind.Ordinary, DateTimeOffset.Now));
+
+    private void OnWarning(string text) =&gt;
+        lines.Add(new LogLine(text, LogLineKind.Warning, DateTimeOffset.Now));
+}</code></pre>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">API Reference</h2>
+        <div class="border rounded-lg p-6 space-y-6 text-sm">
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">LogView</h3>
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b text-muted-foreground">
+                            <th class="py-1 pr-3 font-medium">Parameter</th>
+                            <th class="py-1 pr-3 font-medium">Type</th>
+                            <th class="py-1 pr-3 font-medium">Default</th>
+                            <th class="py-1 font-medium">What it does</th>
+                        </tr>
+                    </thead>
+                    <tbody class="align-top">
+                        <tr class="border-b border-border/50"><td class="py-1 pr-3 font-mono">Lines</td><td class="py-1 pr-3 font-mono text-xs">IReadOnlyList&lt;LogLine&gt;?</td><td class="py-1 pr-3 font-mono text-xs">null</td><td class="py-1">The lines, oldest first. Consumed by growth — append to the same list.</td></tr>
+                        <tr class="border-b border-border/50"><td class="py-1 pr-3 font-mono">Height</td><td class="py-1 pr-3 font-mono text-xs">string?</td><td class="py-1 pr-3 font-mono text-xs">null</td><td class="py-1">Fixed height as a CSS length, same as ScrollArea.Height.</td></tr>
+                        <tr class="border-b border-border/50"><td class="py-1 pr-3 font-mono">MaxHeight</td><td class="py-1 pr-3 font-mono text-xs">string?</td><td class="py-1 pr-3 font-mono text-xs">"24rem"</td><td class="py-1">Tallest it grows before it scrolls, same as ScrollArea.MaxHeight.</td></tr>
+                        <tr class="border-b border-border/50"><td class="py-1 pr-3 font-mono">Follow</td><td class="py-1 pr-3 font-mono text-xs">bool</td><td class="py-1 pr-3 font-mono text-xs">true</td><td class="py-1">Stay on the newest line; maps onto ScrollArea.StickToEnd.</td></tr>
+                        <tr class="border-b border-border/50"><td class="py-1 pr-3 font-mono">AtEndChanged</td><td class="py-1 pr-3 font-mono text-xs">EventCallback&lt;bool&gt;</td><td class="py-1 pr-3 font-mono text-xs">—</td><td class="py-1">false when the reader scrolls up and following stops, true when it resumes.</td></tr>
+                        <tr class="border-b border-border/50"><td class="py-1 pr-3 font-mono">MaxLines</td><td class="py-1 pr-3 font-mono text-xs">int?</td><td class="py-1 pr-3 font-mono text-xs">null</td><td class="py-1">Cap; the oldest lines are dropped and counted in a note above the first kept line.</td></tr>
+                        <tr class="border-b border-border/50"><td class="py-1 pr-3 font-mono">ShowTimestamps</td><td class="py-1 pr-3 font-mono text-xs">bool</td><td class="py-1 pr-3 font-mono text-xs">false</td><td class="py-1">Show each line's Timestamp before its text.</td></tr>
+                        <tr class="border-b border-border/50"><td class="py-1 pr-3 font-mono">TimestampFormat</td><td class="py-1 pr-3 font-mono text-xs">string</td><td class="py-1 pr-3 font-mono text-xs">"HH:mm:ss"</td><td class="py-1">Format used for a shown timestamp, in the current culture.</td></tr>
+                        <tr class="border-b border-border/50"><td class="py-1 pr-3 font-mono">LineTemplate</td><td class="py-1 pr-3 font-mono text-xs">RenderFragment&lt;LogLine&gt;?</td><td class="py-1 pr-3 font-mono text-xs">null</td><td class="py-1">Replaces the marker, timestamp and text; the row and its hook stay.</td></tr>
+                        <tr class="border-b border-border/50"><td class="py-1 pr-3 font-mono">ShowJumpToNewest</td><td class="py-1 pr-3 font-mono text-xs">bool</td><td class="py-1 pr-3 font-mono text-xs">true</td><td class="py-1">Show the built-in jump button while following is stopped.</td></tr>
+                        <tr class="border-b border-border/50"><td class="py-1 pr-3 font-mono">JumpToNewestText</td><td class="py-1 pr-3 font-mono text-xs">string</td><td class="py-1 pr-3 font-mono text-xs">"Jump to newest"</td><td class="py-1">Label on that button.</td></tr>
+                        <tr class="border-b border-border/50"><td class="py-1 pr-3 font-mono">AriaLabel</td><td class="py-1 pr-3 font-mono text-xs">string</td><td class="py-1 pr-3 font-mono text-xs">"Command output"</td><td class="py-1">Accessible name of the panel's region.</td></tr>
+                        <tr class="border-b border-border/50"><td class="py-1 pr-3 font-mono">EmptyText</td><td class="py-1 pr-3 font-mono text-xs">string</td><td class="py-1 pr-3 font-mono text-xs">"No output yet"</td><td class="py-1">Shown while there are no lines.</td></tr>
+                        <tr class="border-b border-border/50"><td class="py-1 pr-3 font-mono">Class</td><td class="py-1 pr-3 font-mono text-xs">string?</td><td class="py-1 pr-3 font-mono text-xs">null</td><td class="py-1">Extra classes on the root.</td></tr>
+                        <tr><td class="py-1 pr-3 font-mono">…</td><td class="py-1 pr-3 font-mono text-xs">splatted</td><td class="py-1 pr-3 font-mono text-xs">—</td><td class="py-1">id, style, data-*, aria-* and handlers go to the root element.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">Members</h3>
+                <p><strong>ScrollToEndAsync():</strong> <code class="bg-muted px-1 py-0.5 rounded">Task</code> - jump to the newest line and resume following</p>
+                <p><strong>IsAtEnd:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - whether the panel is following right now</p>
+                <p><strong>HeldLineCount / DroppedLineCount:</strong> <code class="bg-muted px-1 py-0.5 rounded">int</code> - lines currently held, and lines MaxLines has dropped</p>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">LogLine / LogLineKind</h3>
+                <p><strong>LogLine(Text, Kind, Timestamp):</strong> a record — <code class="bg-muted px-1 py-0.5 rounded">string</code>, <code class="bg-muted px-1 py-0.5 rounded">LogLineKind</code> (default Ordinary), <code class="bg-muted px-1 py-0.5 rounded">DateTimeOffset?</code> (default null)</p>
+                <p><strong>LogLineKind:</strong> <code class="bg-muted px-1 py-0.5 rounded">Ordinary</code>, <code class="bg-muted px-1 py-0.5 rounded">Success</code>, <code class="bg-muted px-1 py-0.5 rounded">Warning</code>, <code class="bg-muted px-1 py-0.5 rounded">Failure</code>. Deliberately not called <code class="bg-muted px-1 py-0.5 rounded">LogLevel</code>, which would collide with Microsoft.Extensions.Logging.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private const int BuildLineCount = 48;
+
+    private static readonly (string Text, LogLineKind Kind)[] BuildScript =
+    [
+        ("Determining projects to restore...", LogLineKind.Ordinary),
+        ("Restored /src/TrBlazeUI.Primitives/TrBlazeUI.Primitives.csproj (in 412 ms).", LogLineKind.Ordinary),
+        ("Restored /src/TrBlazeUI.Components/TrBlazeUI.Components.csproj (in 733 ms).", LogLineKind.Ordinary),
+        ("TrBlazeUI.Primitives -> /src/TrBlazeUI.Primitives/bin/Release/net10.0/TrBlazeUI.Primitives.dll", LogLineKind.Ordinary),
+        ("Components/Chart/Chart.razor.cs(84,17): warning CS0618: 'ApexOptions.Theme' is obsolete", LogLineKind.Warning),
+        ("Compiling Razor components...", LogLineKind.Ordinary),
+        ("Components/DataTable/DataTable.razor(211,9): warning IDE0090: 'new' expression can be simplified", LogLineKind.Warning),
+        ("TrBlazeUI.Components -> /src/TrBlazeUI.Components/bin/Release/net10.0/TrBlazeUI.Components.dll", LogLineKind.Ordinary),
+        ("Running Tailwind over Components/**/*.razor ...", LogLineKind.Ordinary),
+        ("Rebuilt wwwroot/trblazeui.css in 1.9 s (312 kB)", LogLineKind.Ordinary),
+        ("Test run for TrBlazeUI.Tests.dll (net10.0)", LogLineKind.Ordinary),
+        ("Passed!  - Failed: 0, Passed: 214, Skipped: 2", LogLineKind.Success),
+        ("Publishing demos/TrBlazeUI.Demo.Server ...", LogLineKind.Ordinary),
+        ("demos/TrBlazeUI.Demo.Wasm: could not reach nuget.org, using cached packages", LogLineKind.Warning),
+        ("Packing TrBlazeUI.Components 2.1.0 ...", LogLineKind.Ordinary),
+        ("Build succeeded in 24.8 s", LogLineKind.Success)
+    ];
+
+    private readonly List<LogLine> objLines = [];
+    private readonly List<LogLine> objCappedLines = [];
+    private readonly List<LogLine> objKindLines =
+    [
+        new LogLine("dotnet build TrBlazeUI.sln -c Release", LogLineKind.Ordinary),
+        new LogLine("Determining projects to restore...", LogLineKind.Ordinary),
+        new LogLine("Components/Chart/Chart.razor.cs(84,17): warning CS0618: 'ApexOptions.Theme' is obsolete", LogLineKind.Warning),
+        new LogLine("Components/LogView/LogView.razor(12,5): error CS0103: the name 'objLines' does not exist", LogLineKind.Failure),
+        new LogLine("Passed!  - Failed: 0, Passed: 214, Skipped: 2", LogLineKind.Success)
+    ];
+
+    private LogView? objLogView;
+    private CancellationTokenSource? objRunCts;
+    private bool objIsRunning;
+    private bool objIsFollowing = true;
+    private bool objIsDisposed;
+    private int objCappedCount;
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        objIsDisposed = true;
+        objRunCts?.Cancel();
+        objRunCts?.Dispose();
+        objRunCts = null;
+        GC.SuppressFinalize(this);
+    }
+
+    private async Task StartAsync()
+    {
+        if (objIsRunning)
+        {
+            return;
+        }
+
+        objLines.Clear();
+        objRunCts?.Dispose();
+        objRunCts = new CancellationTokenSource();
+        objIsRunning = true;
+        var vToken = objRunCts.Token;
+
+        try
+        {
+            using var vTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(120));
+            while (objLines.Count < BuildLineCount && await vTimer.WaitForNextTickAsync(vToken))
+            {
+                var vStep = BuildScript[objLines.Count % BuildScript.Length];
+                objLines.Add(new LogLine(vStep.Text, vStep.Kind, DateTimeOffset.Now));
+                StateHasChanged();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Stop was pressed, or the page went away.
+        }
+
+        objIsRunning = false;
+        if (!objIsDisposed)
+        {
+            StateHasChanged();
+        }
+    }
+
+    private void Stop() => objRunCts?.Cancel();
+
+    private void AddBurst()
+    {
+        for (var vIndex = 0; vIndex < 400; vIndex++)
+        {
+            var vStep = BuildScript[(objLines.Count + vIndex) % BuildScript.Length];
+            objLines.Add(new LogLine(vStep.Text, vStep.Kind, DateTimeOffset.Now));
+        }
+    }
+
+    private void AddWarning() =>
+        objLines.Add(new LogLine("warning NU1701: package restored from a fallback folder", LogLineKind.Warning, DateTimeOffset.Now));
+
+    private void AddFailure() =>
+        objLines.Add(new LogLine("error MSB3073: the command \"tailwindcss\" exited with code 1", LogLineKind.Failure, DateTimeOffset.Now));
+
+    private void Clear()
+    {
+        Stop();
+        objLines.Clear();
+    }
+
+    private void AddCapped()
+    {
+        for (var vIndex = 0; vIndex < 6; vIndex++)
+        {
+            objCappedCount++;
+            var vText = "step " + objCappedCount.ToString(System.Globalization.CultureInfo.InvariantCulture) + " of the build";
+            objCappedLines.Add(new LogLine(vText, LogLineKind.Ordinary));
+        }
+    }
+
+    private void ClearCapped()
+    {
+        objCappedLines.Clear();
+        objCappedCount = 0;
+    }
+
+    private void OnAtEndChanged(bool aIsAtEnd) => objIsFollowing = aIsAtEnd;
+
+    private async Task JumpAsync()
+    {
+        if (objLogView != null)
+        {
+            await objLogView.ScrollToEndAsync();
+        }
+    }
+}

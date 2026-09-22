@@ -1,0 +1,137 @@
+@namespace TrBlazeUI.Components.LogView
+@using System.Globalization
+@using System.ComponentModel
+@attribute [EditorBrowsable(EditorBrowsableState.Never)]
+
+@* One fixed-size block of a LogView's lines.
+
+   This exists for one reason: speed. Blazor rebuilds and diffs the whole render tree of a
+   component every time it renders, so a log kept in a single @foreach costs O(total lines) for
+   every single line appended - the consumer's exact complaint ("re-rendered on every line").
+   LogView cuts its lines into blocks of LogView.ChunkSize and gives each block a Version that only
+   changes when that block's own lines change. A block that is full never changes again, so
+   ShouldRender below returns false for it forever and only the tail block is rebuilt on an append.
+
+   Not intended to be used directly; it is the rendering half of LogView and its parameters are set
+   by LogView alone. *@
+
+@for (var vIndex = 0; vIndex < Lines.Count; vIndex++)
+{
+    var vLine = Lines[vIndex];
+    <div @key="FirstId + vIndex"
+         data-slot="log-view-line"
+         data-log-kind="@KindName(vLine.Kind)"
+         class="@RowClass(vLine.Kind)">
+        @if (LineTemplate != null)
+        {
+            @LineTemplate(vLine)
+        }
+        else
+        {
+            <span aria-hidden="true" class="w-3 shrink-0 select-none text-center">@Marker(vLine.Kind)</span>
+            @if (ScreenReaderPrefix(vLine.Kind) is string vPrefix)
+            {
+                <span class="sr-only">@vPrefix</span>
+            }
+            @if (ShowTimestamps && vLine.Timestamp.HasValue)
+            {
+                <span class="shrink-0 select-none tabular-nums text-muted-foreground">@(vLine.Timestamp.Value.ToString(TimestampFormat, CultureInfo.CurrentCulture))</span>
+            }
+            <span class="min-w-0 flex-1 whitespace-pre-wrap [overflow-wrap:anywhere]">@vLine.Text</span>
+        }
+    </div>
+}
+
+@code {
+    private int objRenderedVersion = -1;
+
+    /// <summary>
+    /// Gets or sets this block's lines. Set by <see cref="LogView"/>.
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<LogLine> Lines { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the sequence number of this block's first line. Used with the line's position
+    /// as the render key of the rendered row, so a row keeps its DOM element when older lines are
+    /// dropped by <see cref="LogView.MaxLines"/>.
+    /// </summary>
+    [Parameter]
+    public long FirstId { get; set; }
+
+    /// <summary>
+    /// Gets or sets a number that changes whenever this block's lines change. The block re-renders
+    /// only when it changes.
+    /// </summary>
+    [Parameter]
+    public int Version { get; set; }
+
+    /// <summary>
+    /// Gets or sets content rendered in place of the built-in marker, timestamp and text.
+    /// It is read when the block first renders; see <see cref="LogView.LineTemplate"/>.
+    /// </summary>
+    [Parameter]
+    public RenderFragment<LogLine>? LineTemplate { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether a line's timestamp is shown.
+    /// </summary>
+    [Parameter]
+    public bool ShowTimestamps { get; set; }
+
+    /// <summary>
+    /// Gets or sets the format string used for a line's timestamp.
+    /// </summary>
+    [Parameter]
+    public string TimestampFormat { get; set; } = "HH:mm:ss";
+
+    /// <inheritdoc />
+    protected override bool ShouldRender() => Version != objRenderedVersion;
+
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender) => objRenderedVersion = Version;
+
+    /// <summary>
+    /// Gets the value written to <c>data-log-kind</c>, the per-line CSS hook a consumer can style
+    /// without forking the component.
+    /// </summary>
+    /// <param name="aKind">The line's kind.</param>
+    /// <returns>A lower-case name for the kind.</returns>
+    private static string KindName(LogLineKind aKind) => aKind switch
+    {
+        LogLineKind.Success => "success",
+        LogLineKind.Warning => "warning",
+        LogLineKind.Failure => "failure",
+        _ => "ordinary"
+    };
+
+    // WCAG 1.4.1: colour is never the only signal. Every non-ordinary line carries a marker glyph
+    // for sighted readers and a visually hidden word for screen readers as well as its colour.
+    private static string Marker(LogLineKind aKind) => aKind switch
+    {
+        LogLineKind.Success => "✓",
+        LogLineKind.Warning => "!",
+        LogLineKind.Failure => "×",
+        _ => " "
+    };
+
+    private static string? ScreenReaderPrefix(LogLineKind aKind) => aKind switch
+    {
+        LogLineKind.Success => "Success: ",
+        LogLineKind.Warning => "Warning: ",
+        LogLineKind.Failure => "Failure: ",
+        _ => null
+    };
+
+    // Colours come from the theme's tokens, never literals. --alert-warning-foreground rather than
+    // --alert-warning because the -foreground pair is the one tuned for text in both light and dark.
+    private static string RowClass(LogLineKind aKind) => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "flex items-start gap-2 px-3",
+        aKind switch
+        {
+            LogLineKind.Success => "text-success",
+            LogLineKind.Warning => "text-alert-warning-foreground",
+            LogLineKind.Failure => "text-destructive",
+            _ => "text-foreground"
+        });
+}

@@ -4,88 +4,225 @@
 |---|---|
 | App | Chatur |
 | Upstream | TrBlazeUI |
-| Updated | 2026-09-19 |
+| Updated | 2026-09-21 |
 
 ## Summary
 
-4 entries: 0 blocking now, 4 filed and not blocking, 0 fixed upstream.
+10 entries: 0 blocking now, 0 filed and not blocking, 10 fixed upstream.
 
-Nothing is blocked.
+All ten were answered on 2026-09-22 and none has been re-checked in Chatur yet. Six were
+fixed in code; four needed no code, because the control already existed.
+
+Nothing is blocked. All ten were found while designing Chatur's screens on day one, against the 2.0.7 component reference; the mockups are drawn from controls that do exist, and each entry says what was used instead.
+
+> **Upstream reply 2026-09-22 — read it before acting on this file.** Four entries
+> (TR-001, TR-002, TR-005, TR-009) and most of a fifth (TR-008) report controls that
+> already exist. Two of them are unreleased and genuinely invisible on 2.0.7; three were
+> documented in the very copy of the reference this file cites. The other six entries are
+> built and waiting on the next release. Full answer in
+> "[Replies from TrBlazeUI](#replies-from-trblazeui)" at the foot of this file.
 
 ## Entries
 
-### TR-001 — ScrollArea cannot stay at the newest line while content is added
-
-- **Severity:** minor
-- **Blocks:** no — the Workbench output pane is designed as a plain ScrollArea around a CodeBlock; lines still appear as they arrive, and the design work carried on.
-- **Repro:** Put text that grows line by line inside a ScrollArea:
-  ```razor
-  <ScrollArea Class="h-[300px]"><CodeBlock Code="@output" /></ScrollArea>
-  ```
-- **Expected:** A way to keep the view at the bottom while new lines arrive, which stops when the reader scrolls up and resumes when they return to the bottom.
-- **Actual:** The reference for version 2.0.7 lists only `Class` for ScrollArea. The view stays where it is, so a running build's newest line is off screen.
-- **Encountered in:** `*day1-greenfield Chatur`, mockups step, Workbench output panel (BRD-2, BRD-5, BRD-11).
-- **Workaround:** none. The pane does not follow the newest line until the library offers it.
-- **Suggested fix:** Add a `StickToEnd` parameter to ScrollArea (or a small `LogView` control built on it) that follows new content unless the reader has scrolled away.
-
-### TR-002 — No tree view control
+### TR-001 — There is no tree control for files and folders
 
 - **Severity:** major
-- **Blocks:** no — nothing in phase 1 needs it; the later-phase screens are drawn with a tree and the design work carried on. It will block the Files screen (phase 2) if still missing then.
-- **Repro:** Look for a tree in the component reference, version 2.0.7:
-  ```
-  grep -i "tree" TrBlazeUI-AI-Reference.md      (no control found)
-  ```
-- **Expected:** A `TreeView` with expand and collapse, one selected row, keyboard arrows, an icon and a trailing badge per row, and loading of children on demand.
-- **Actual:** No such control. The nearest is `Collapsible` with `Item` rows, which has no keyboard movement, no selection and no indentation rules.
-- **Encountered in:** `*day1-greenfield Chatur`, mockups for Files, Chat, Changes, Source control and the Analyst desk (phases 2 to 4).
-- **Workaround:** none. The screens name `Collapsible` with `Item` rows until the control exists.
-- **Suggested fix:** Add `TreeView` and `TreeItem` to `TrBlazeUI.Components`.
+- **Blocks:** no — the Editor mockup draws the tree with nested Collapsible and SidebarMenu items, and the work carried on
+- **Repro:** Look for a tree in `.trblazeui/TrBlazeUI-AI-Reference.md` 2.0.7: sections 3 to 8 hold no control that shows a nested, expandable list of items with icons and a selected row.
+- **Expected:** A `Tree` (or `TreeView`) taking a nested list, with expand and collapse, a selected item bound two ways, an icon per item and keyboard movement.
+- **Actual:** The closest are `Collapsible` and the Sidebar menu components, which are built for a fixed two-level menu, not for a folder tree of unknown depth.
+- **Encountered in:** BRD-80, the Editor screen of Chatur phase 1
+- **Workaround:** Nested `Collapsible` inside a `ScrollArea`, with the indentation done by hand in the markup.
+- **Suggested fix:** Add a generic `Tree<TItem>` with `Items`, `ChildrenSelector`, `@bind-Selected`, `ExpandedIds` and an item template.
 
-### TR-003 — No control that shows the difference between two texts
+### TR-002 — There is no side-by-side difference viewer
 
 - **Severity:** major
-- **Blocks:** no — nothing in phase 1 needs it; the Changes screen (phase 3) is drawn and the design work carried on. It will block Changes if still missing then.
-- **Repro:**
-  ```
-  grep -i "diff" TrBlazeUI-AI-Reference.md      (no control found)
-  ```
-- **Expected:** A `DiffView` taking a before and an after text: side by side or inline, line numbers, added and removed lines tinted from the theme, parts that can be folded, and a slot for buttons on each part.
-- **Actual:** No such control; `CodeBlock` shows one text in one colour.
-- **Encountered in:** `*day1-greenfield Chatur`, mockups for Changes (phase 3) and Documents "Compare with the previous version" (phase 2).
-- **Workaround:** none.
-- **Suggested fix:** Add `DiffView` to `TrBlazeUI.Components`, with the line comparison done in .NET so no script library is needed.
+- **Blocks:** no — the Changes and Source control mockups put two `CodeBlock` panels in a two-column grid and colour the changed lines by hand
+- **Repro:** Look for a difference or comparison control in the 2.0.7 reference: section 8 has `CodeBlock` and `Prose`, and neither compares two texts.
+- **Expected:** A `Diff` control taking a before text and an after text, showing them side by side or one above the other, with added, removed and unchanged lines marked and line numbers on both sides.
+- **Actual:** `CodeBlock` shows one text with no line marking, so a before and after view has to be assembled and coloured by the application.
+- **Encountered in:** BRD-64 and BRD-86, the Changes and Source control screens of Chatur phase 1
+- **Workaround:** Two `CodeBlock` panels in a grid, with line classes written by the application.
+- **Suggested fix:** Add `Diff` with `Before`, `After`, `Mode` (side by side or inline), `ShowLineNumbers` and a per-line CSS hook.
 
-### TR-004 — No joined button group for choosing one of a few views
+### TR-003 — CodeBlock cannot be edited
 
 - **Severity:** minor
-- **Blocks:** no — the mockups draw two `Toggle`s side by side, and the design work carried on.
-- **Repro:** Try to build "Side by side | Inline" or "Board | Table" as one joined control:
-  ```razor
-  <Toggle>Board</Toggle><Toggle>Table</Toggle>   @* two loose toggles; nothing keeps exactly one pressed *@
-  ```
-- **Expected:** A `ToggleGroup` (single or multiple choice) that draws its items joined and keeps the single choice itself.
-- **Actual:** Only a lone `Toggle`; `Tabs` is the wrong meaning for a view switch inside a toolbar.
-- **Encountered in:** `*day1-greenfield Chatur`, mockups for Changes, Reports and Board (phases 3 and 5).
-- **Workaround:** none; each screen would have to keep the single choice by hand.
-- **Suggested fix:** Add `ToggleGroup` and `ToggleGroupItem`.
+- **Blocks:** no — the Editor mockup draws the editing area as a `Textarea` in a monospace font, which is what Chatur's quick edits need
+- **Repro:** `CodeBlock` in section 8 of the 2.0.7 reference renders text for reading; it takes no value binding and no change event.
+- **Expected:** An editable code area: a value bound two ways, a language for the highlighting, line numbers, and the tab key inserting an indent instead of moving focus.
+- **Actual:** The only editable text controls are `Textarea`, `MarkdownEditor` and `RichTextEditor`; none highlights code, and the last two are wrong for source files.
+- **Encountered in:** BRD-82, the Editor screen of Chatur phase 1
+- **Workaround:** `Textarea` with a monospace class. Chatur's editor is for quick edits, so this is enough for now.
+- **Suggested fix:** Either make `CodeBlock` take `@bind-Value` with an `Editable` flag, or add a `CodeEditor` beside it. An editor also needs a strip of open-file tabs, which `Tabs` is not: each tab needs a close button and a mark for unsaved work.
 
+### TR-004 — A step cannot carry its own state in Stepper or Timeline
 
-## Resolution status (TrBlazeUI, fixed upstream 2026-09-19)
+- **Severity:** major
+- **Blocks:** no — the run and process screens draw their step lists by hand, and the work carried on
+- **Repro:** `Stepper` in section 8 of the 2.0.7 reference takes `Current="2"` and `StepperItem Title/Description`; `Timeline` takes `Current="true"` per item. Both work out every other step's state from its position.
+- **Expected:** Each step says what happened to it: finished, finished after a retry, running, waiting for the owner, failed, still to come — and can carry a subtitle and something at its trailing edge.
+- **Actual:** A chain that paused in the middle, or a step that succeeded only on a second try, cannot be drawn: anything before `Current` is finished and anything after is not started.
+- **Encountered in:** BRD-101 and BRD-118 to BRD-125, the Process run and End-to-end run screens
+- **Workaround:** Hand-built rows with a badge per row, using the `.steps` and `.step` classes.
+- **Suggested fix:** `StepperItem Status="Done|Running|Waiting|Failed|Pending"`, `Orientation="Vertical"`, and a template for trailing content.
 
-All four are fixed in the library source under REQ-UI-021 and ship in the next release after
-2.0.7 (`CHANGELOG.md`, `[Unreleased]`). Release build 0 warnings / 0 errors. 87 of 87 browser checks
-pass at 1280 and 390 (`tests/verify/ui-chatur.spec.js`), and the verifier marked the row Verified.
+### TR-005 — There is no small switch for a table cell
 
-| Entry | What you get | Verify from here |
-|---|---|---|
-| **TR-001** | `ScrollArea StickToEnd="true"` follows new lines, stops when the reader scrolls up, and starts again at the bottom. `AtEndChanged` tells you when it stops or starts, and `ScrollToEndAsync()` is for a "Jump to latest" button. Also fixed: your exact repro, `Class="h-[300px]"`, now limits the scrolling area; before, the inner area grew with its content and never scrolled. | Wrap the Workbench output in `<ScrollArea StickToEnd="true" Class="h-[300px]">` and stream lines into the `CodeBlock`. |
-| **TR-002** | `TreeView` and `TreeItem`: open and close, one selected row (`@bind-SelectedValue`), arrow keys, Home and End, Enter, type-to-jump, an `Icon` and a `Trailing` slot per row, and children loaded on demand (`HasChildren` + `OnExpand` + `Loading`). The trailing slot is called `Trailing`, not `Badge`, so a `Badge` can go inside it. | Swap the `Collapsible` + `Item` rows on Files for `TreeView`. |
-| **TR-003** | `DiffView` with `Before` and `After`: side by side or inline, line numbers, added and removed lines tinted from the theme, unchanged parts folded, and a `HunkActions` slot on each part. The comparison runs in .NET (`TextDiff`), with no script library. | Put `DiffView` on Changes and on Documents "Compare with the previous version". |
-| **TR-004** | `ToggleGroup` already existed but was missing from the reference. It now takes `Joined="true"` (one joined control) and `AllowDeselect="false"` (exactly one stays chosen). There is one Tab stop and arrow keys move between the options. | Replace the two loose `Toggle`s with `<ToggleGroup Joined="true" AllowDeselect="false">`. |
+- **Severity:** minor
+- **Blocks:** no — the Licence and Integrations mockups use a hand-reset button with the `.toggle` classes
+- **Repro:** `Switch` in section 5 of the 2.0.7 reference is a form control sized and laid out for a form row, with its label beside it.
+- **Expected:** A small, label-less switch that sits in a table cell as the row's on and off, at the height of the row.
+- **Actual:** Dropped into a cell, the form-sized switch makes the row taller than every other row, and its label slot is wasted.
+- **Encountered in:** BRD-144 and BRD-152, the features list and the published actions
+- **Workaround:** The `.toggle` classes on a button with the browser's own styling reset.
+- **Suggested fix:** A `Size` of `Small` on `Switch` with no label slot, or say in the catalogue which control belongs in a table cell.
 
-**One thing to know before upgrading.** A class list that pairs a one-side border with a border
-colour, such as `border-b border-input`, used to lose the one-side border when merged. It now keeps
-it, so a border you asked for and never saw may appear.
+### TR-006 — There is nothing to show that an answer is still arriving
 
-**Please re-test and reopen anything that still bites.**
+- **Severity:** minor
+- **Blocks:** no — the Chat mockup draws three dots by hand, and the work carried on
+- **Repro:** In the 2.0.7 reference, `Skeleton` is a still placeholder for content that has not loaded and `Progress` needs a number. Neither says "this is being written now".
+- **Expected:** A small indicator for work that is under way with no known end — three moving dots, or a bar that does not claim a percentage — that can sit inside a message while its text grows.
+- **Actual:** `Spinner` is the nearest, and it reads as "the screen is busy", not as "the answer is still coming".
+- **Encountered in:** BRD-47, the Chat screen of Chatur phase 1
+- **Workaround:** Three inline dots in the muted colour, inside the message being written.
+- **Suggested fix:** Add `Typing` (or an `Indeterminate` mode on `Progress`) that can be placed inline.
+
+### TR-007 — There is no control for the output of a command
+
+- **Severity:** major
+- **Blocks:** no — Run and Process run use a hand-built panel, and the work carried on
+- **Repro:** The 2.0.7 reference has `CodeBlock` for a block of code and `Prose` for rendered HTML. Neither takes lines as they arrive, colours a line by what it is, or holds a height and follows the newest line.
+- **Expected:** A panel for the output of a running command: lines added one at a time, each able to read as ordinary, a warning or a failure, a height it keeps, and a follow-the-end setting the reader can turn off while scrolling back.
+- **Actual:** `CodeBlock` takes one finished string with no per-line hook, so a build's output has to be assembled and coloured by the application and re-rendered on every line.
+- **Encountered in:** BRD-23 and BRD-101, the Run and Process run screens
+- **Workaround:** A hand-built panel in a monospace font with a class per line, in `chatur.css`.
+- **Suggested fix:** Add `LogView` taking lines with a level each, plus `MaxHeight` and `Follow`.
+
+### TR-008 — DataTable cannot let the user choose rows
+
+- **Severity:** major
+- **Blocks:** no — the Source control mockup puts a plain checkbox in the first cell, and the work carried on
+- **Repro:** `DataTable` in section 6 of the 2.0.7 reference renders rows from a list. It documents `@bind-SelectedItems` in the binding table, but no column, no header control and no way to turn choosing on.
+- **Expected:** A choosing column: a box on each row, a choose-all in the header that also shows a part-chosen state, the chosen rows bound two ways, and a count the page can read to label its own button.
+- **Actual:** The box, its label for a screen reader, the choose-all, the count and the enabling of the submit button are all left to the application, so every table that needs choosing writes them again.
+- **Encountered in:** BRD-87, checking in the chosen files on Source control
+- **Workaround:** A plain checkbox in the first cell, with the count written by hand.
+- **Suggested fix:** `SelectionMode` on `DataTable` with a real choosing column, plus a documented `SelectedCount`. While that is open: a one-line command sitting in a table cell has no copy affordance either — `CodeBlock` has one, but a cell is not a code block.
+
+### TR-009 — There is no list whose order the user sets
+
+- **Severity:** minor
+- **Blocks:** no — the routing tab builds its chain from cards and buttons, and the work carried on
+- **Repro:** The 2.0.7 reference has `SortableList` in section 8, which reorders by dragging. There is no list that also offers move-up and move-down buttons, or that owns its items' positions.
+- **Expected:** An ordered list where each row carries its position, a way up, a way down and a way out, and the order is bound two ways — dragging is not enough on its own, because a chain of three models is quicker to fix with two buttons.
+- **Actual:** The position number, both buttons, the remove and the reordering are all written by the application, so every screen with a priority order writes them again.
+- **Encountered in:** BRD-40, the fallback chain on the routing tab
+- **Workaround:** A card per tier holding rows of badge and buttons.
+- **Suggested fix:** `OrderedList<TItem>` with `@bind-Items`, buttons as well as dragging, and a position shown per row.
+
+### TR-010 — A list cannot drive a detail pane
+
+- **Severity:** major
+- **Blocks:** no — the roles tab hand-builds its left-hand list, and the work carried on
+- **Repro:** `DataTable` renders rows but they cannot act as navigation that chooses what the rest of the screen shows; `Tabs` carries a label per item and no more.
+- **Expected:** A list where each row holds several lines — a name, some badges, a couple of values — one row is chosen, the choice is bound two ways, and the arrow keys move between rows.
+- **Actual:** The rows are anchors laid out by hand, so the chosen state, the keyboard and the layout are the application's to get right every time.
+- **Encountered in:** BRD-53 and BRD-56, the roles tab, which is a list beside the role being edited
+- **Workaround:** Hand-built anchors with an inline layout and a chosen class.
+- **Suggested fix:** A `ListDetail` or a `NavList<TItem>` with an item template and `@bind-Selected`. This is the commonest shape in the whole product and it has no control.
+
+## Replies from TrBlazeUI
+
+<!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
+
+### 2026-09-22 — all ten answered; six needed code, four did not
+
+Thank you — this was a useful batch, and the four entries we are pushing back on are the
+most useful part of it, because they point at our documentation rather than at our code.
+
+**First, a numbering problem.** This batch starts again at TR-001, and your previous batch
+also used TR-001 to TR-004 for different things (those became `ScrollArea.StickToEnd`,
+`TreeView`, `DiffView` and the joined `ToggleGroup`). We have recorded this one as
+"Chatur batch 2" throughout. Please keep numbering upward from TR-010 next time, or the
+two records cannot be told apart.
+
+**Everything below is built and checked in a running browser, but not yet published.** It
+is in `CHANGELOG.md` under `[Unreleased]`, waiting on the release after 2.0.7.
+
+#### The four that need no code from us
+
+| Entry | What is actually there |
+|---|---|
+| **TR-001** tree control | `TreeView` + `TreeItem` **already exist** — expand/collapse, `@bind-SelectedValue`, the full WAI-ARIA tree keyboard, an `Icon` and `Trailing` slot per row, and children loaded on demand. They shipped for **your previous batch**. Live at `/components/tree-view`. |
+| **TR-002** difference viewer | `DiffView` + `TextDiff` **already exist** — side by side or inline, line numbers, added/removed tinting, folded unchanged stretches. Also from your previous batch. Live at `/components/diff-view`. |
+| **TR-005** small switch for a cell | `Size="SwitchSize.Small"` already exists **and is documented in the copy you read**, at line 775. Measured: the three switch heights are **20 / 24 / 28 px** and a DataTable body cell is **53 px**, so the small one does not stretch a row. |
+| **TR-009** list whose order the user sets | `SortableList` is **already button-driven**. The reference you read describes it at line 1818, verbatim, as *"Reorderable list driven by real buttons rather than drag-and-drop"* — the entry says it "reorders by dragging". Measured live: 3 move-up and 3 move-down buttons, the first up disabled, and move-down reordering correctly. |
+
+**TR-008 is mostly in the same group.** `DataTable` has had a real choosing column all
+along: `SelectionMode="DataTableSelectionMode.Multiple"` is documented at line 1136, six
+lines above the `SelectedItems` row you found, with a worked `@bind-SelectedItems` example
+at line 2230. Measured live: 5 per-row checkboxes and a working count. **One part of your
+entry was a genuine defect and we have fixed it** — see below.
+
+**Why this happened, and what we changed because of it.** TR-001 and TR-002 are our fault
+in a way worth explaining: the copy at `.trblazeui/TrBlazeUI-AI-Reference.md` in your
+repository is deployed by the **installed NuGet package** and only changes when you upgrade
+it. Yours is the 2.0.7 copy, and `TreeView`, `DiffView`, `StickToEnd` and `ToggleGroup` are
+all unreleased, so they are genuinely invisible to you. That is a release problem, not a
+documentation one, and the answer is the next publish.
+
+TR-005, TR-008 and TR-009 are different: those answers were in the copy you had, and you
+did not find them. That is still our problem — a reference nobody can search is a reference
+that does not work. So the reference now opens with a **"Which control do I use for…"**
+index that maps a problem on a screen straight to the control, and the headings name the
+problem: *"DataTable — rows, sorting, paging, and letting the user choose rows"*,
+*"SortableList — let the user set the order (move up / move down buttons)"*,
+*"Switch — including a small switch inside a table cell"*. It also now states plainly that
+the copy in your repository is your installed version's reference, not the latest one.
+
+**Please start at that index.** If your problem is in it, the control exists.
+
+#### The six we built
+
+| Entry | What you get |
+|---|---|
+| **TR-003** editable code | **`CodeEditor`** — `@bind-Value`, line numbers, `TabSize`/`UseSpaces`, and **Tab inserts an indent instead of moving focus**. Press **Escape, then Tab** to move focus out; the control says so through `aria-describedby`, so it is not a keyboard trap. Plus **`EditorTabs`**, the open-file strip you asked for: a close button per tab and an unsaved mark. |
+| **TR-004** per-step state | **`StepStatus`** — `Pending`, `Running`, `Waiting`, `Done`, `Retried`, `Failed` — on `StepperItem.Status` and `TimelineItem.Status`, plus `StepperItem.Trailing`. A paused chain and a second-attempt success both draw correctly now. `Stepper.Orientation="Vertical"` already existed, so that half of your ask was already met. |
+| **TR-006** answer still arriving | **`Typing`** — three dots sized in `em` so they match the text they sit in, and **`Progress.Indeterminate`** for a bar that does not claim a percentage. |
+| **TR-007** command output | **`LogView`** — lines marked ordinary / success / warning / failure, a height it keeps, and the newest line followed until the reader scrolls back, with a jump-back control. `MaxLines` caps it. Appending a line does **not** re-render the list, which was your specific complaint. |
+| **TR-008** (the real part) | The multi-page choose-all control announced nothing about its state: its only name was the fixed "Select rows - click to see options". It now reads "No rows selected, 500 in all - choose rows", then "1 of 500 rows selected - choose rows", with a polite live region for changes. New read-only **`SelectedCount`**. |
+| **TR-009** (the real part) | `SortableList` gains **`ShowPosition`** (the position per row, default **on**) and **`AllowRemove`** / **`OnRemove`** (the way out). |
+| **TR-010** list → detail | **`NavList<TItem>`** — multi-line rows, `@bind-SelectedId`, arrow keys, one tab stop, disabled rows skipped. |
+
+#### Three decisions you should know about before you use these
+
+1. **There is no `ListDetail`, and there will not be one.** You asked for "a `ListDetail` or
+   a `NavList<TItem>`". The two-pane split is your page's layout, not a control's — compose
+   it with `Grid` or `ResizablePanelGroup`. Both compositions are shown on
+   `/components/nav-list` so you can copy one.
+2. **`NavList` is a `role="listbox"` by default, not a nav.** Choosing a role changes what
+   the same screen shows and navigates nowhere, so `aria-current="page"` would be a lie. If
+   your rows really do navigate, pass `Mode="NavListMode.Navigation"` and you get a real
+   `<nav>` of links. Prefer **`@bind-SelectedId`** over `@bind-Selected`: after a re-fetch
+   your list holds new instances and an object-valued selection silently stops matching.
+3. **`EditorTabs` is not a `role="tablist"`.** A tablist's roving `tabindex` would put your
+   per-tab close buttons out of keyboard reach, so it is a plain list with `aria-current`.
+   If you were planning to style it as tabs, the semantics are deliberately different.
+
+Two smaller things: **`CodeEditor` does not wrap lines** (with soft wrap one logical line
+paints as several rows and every gutter number below it is wrong), and **no syntax
+highlighter is bundled** — pass your own markup through `Html`, the same bargain
+`CodeBlock` makes.
+
+#### What we need from you
+
+When the next release is out, upgrade and re-check the six built entries against your own
+screens — particularly `LogView` on the Process run screen and `NavList` on the roles tab,
+since those are the two where your real usage will be heavier than our demo. Tell us what
+does not fit. The four we pushed back on need nothing from you except a look at the new
+index at the top of the reference.
+
+---

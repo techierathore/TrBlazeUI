@@ -1,0 +1,80 @@
+@namespace TrBlazeUI.Components.Typing
+@using TrBlazeUI.Components.Utilities
+
+@* Typing component - three moving dots that say an answer is still being WRITTEN.
+
+   It is deliberately not a Spinner ("the screen is busy") and not a Skeleton ("content that has
+   not loaded yet"): it sits INLINE, at the end of the text it belongs to, and scales with that
+   text's font size, so the sentence can keep growing around it.
+
+   Accessibility: the visible dots are aria-hidden and the accessible name is a visually hidden
+   span INSIDE the role="status" region. A live region announces its CONTENTS, not its
+   aria-label, so the name has to be real text. Because the dots animate purely in CSS, nothing
+   in the region's text ever changes, so the announcement fires once when the indicator appears
+   and never repeats - an aria-live region that re-announced on every frame would be unusable. *@
+
+<span role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      data-slot="typing"
+      class="@CssClass"
+      @attributes="AdditionalAttributes">
+    <span class="sr-only" data-slot="typing-label">@Label</span>
+    <span class="trblazeui-typing-dot" aria-hidden="true" style="animation-delay: 0ms"></span>
+    <span class="trblazeui-typing-dot" aria-hidden="true" style="animation-delay: 160ms"></span>
+    <span class="trblazeui-typing-dot" aria-hidden="true" style="animation-delay: 320ms"></span>
+</span>
+
+@code {
+    /// <summary>
+    /// Gets or sets the size of the dots relative to the surrounding text.
+    /// Default is <see cref="TypingSize.Default"/>, which matches the font size it is written in.
+    /// </summary>
+    [Parameter]
+    public TypingSize Size { get; set; } = TypingSize.Default;
+
+    /// <summary>
+    /// Gets or sets the accessible name announced when the indicator appears, for example
+    /// <c>"Still writing the answer"</c>. Default is <c>"Still writing"</c>.
+    /// </summary>
+    /// <remarks>
+    /// The text is rendered visually hidden inside the <c>role="status"</c> region rather than as
+    /// an <c>aria-label</c>, because a live region announces its contents. Say what is still
+    /// coming ("Still writing the answer"), not that the screen is busy.
+    /// </remarks>
+    [Parameter]
+    public string Label { get; set; } = "Still writing";
+
+    /// <summary>
+    /// Gets or sets additional CSS classes applied to the indicator.
+    /// </summary>
+    /// <remarks>
+    /// The dots are drawn in <c>currentColor</c> and sized in <c>em</c>, so they inherit the colour
+    /// and the size of the text around them. Pass a text colour utility (for example
+    /// <c>text-muted-foreground</c>) only when the dots should differ from that text.
+    /// </remarks>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Gets the computed CSS classes for the indicator.
+    /// </summary>
+    private string CssClass => ClassNames.cn(
+        "trblazeui-typing",
+        Size switch
+        {
+            TypingSize.Small => "trblazeui-typing-sm",
+            TypingSize.Default => "trblazeui-typing-md",
+            TypingSize.Large => "trblazeui-typing-lg",
+            _ => "trblazeui-typing-md"
+        },
+        Class
+    );
+}

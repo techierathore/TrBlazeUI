@@ -1,19 +1,21 @@
 ---
 project: TrBlazeUI
-last_updated: 2026-09-19
-current_phase: UAT — handoff done, 36 of 36 verified
+last_updated: 2026-09-22
+current_phase: UAT — handoff done, 40 of 40 verified
 last_verified_build: PASS
-last_verified_date: 2026-09-19
+last_verified_date: 2026-09-22
 ---
 
 # TrBlazeUI — Status
 
 ## Where I am
 
-All 36 rows are verified. Chatur TR-001 to TR-004 are fixed under new row REQ-UI-021: ScrollArea
-`StickToEnd`, new `TreeView` and `DiffView`, and a joined `ToggleGroup`. A class-merge fix brings
-back side borders, such as Timeline's rail. The Release build is 0/0, and 87 of 87 browser checks pass in
-`tests/verify/ui-chatur.spec.js`. The fixes are in `[Unreleased]`, waiting for the release after 2.0.7.
+All 40 rows are verified. Chatur's second feedback batch of ten is answered: six needed code
+and are built — `CodeEditor`/`EditorTabs`, `Typing`, `Progress.Indeterminate`, `LogView`,
+`NavList`, `StepStatus` on Stepper and Timeline, plus `SortableList` position and remove, and a
+`DataTable` choose-all that announces its state. Four needed none; those controls already
+existed. The AI reference gained a "Which control do I use for…" index. Release build 0/0;
+80/80 new browser checks and 333/333 regression checks pass.
 
 ## Next command to run
 
@@ -49,11 +51,11 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 | Date | Phase | Result | Status table |
 |---|---|---|---|
-| 2026-09-13 | verify-phase | 34/35 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-09-13 | verify-phase | 35/35 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-09-13 | handoff-phase | 35/35 Verified. Ready for UAT; 2.0.6 live on nuget.org. Build 0/0 | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-09-14 | triage-and-fix | 35/35 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-09-19 | triage-and-fix | 36/36 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-09-22 | triage-and-fix | 40/40 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 
@@ -61,17 +63,19 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 ## Standards compliance
 
-- Last check 2026-09-19: 0 findings, see the checklist Remarks.
+- Last check 2026-09-22: 0 findings, see the checklist Remarks.
 
 ## Deferred / future
 
-- Release the Chatur and TfLens fixes (`CHANGELOG.md` `[Unreleased]`).
-- Publish 2.0.7 to nuget.org; REQ-FN-004's test expects it.
-- Re-run `tests/package/codex-agent-deployment.sh` for REQ-FN-010.
-- TF-001 put 13 old check records and 5 old misses into today's metrics.
+- Publish the `[Unreleased]` fixes: two Chatur entries close on the publish alone, and
+  REQ-FN-004's test fails until 2.0.7 ships.
+- Re-run `tests/package/codex-agent-deployment.sh` for REQ-FN-010; its test fails until then.
+- TF-001 recurred: a sixth phantom miss (REQ-UI-021). Asked upstream for `miss-void`.
+- `tools/splat-audit` throws on the library assembly alone.
 - Report `ApexChart.Dispose` upstream; then drop `DisconnectSafeApexChart`.
 - Delete the stray `c2.0.5` tag (owner).
 - Restore `/verify-trstudio` for REQ-UI-015.
 - Test with real assistive technology.
 - Fix the badge overlap on `/verify-tflens-3`.
-- Fix the 2.1.0 fallback version in `Directory.Build.props`.
+- Fix the 2.1.0 fallback in `Directory.Build.props`.
+- Fold `tree-view.js`, `nav-list.js` and `roving-focus.js` into one `roving-list.js`.

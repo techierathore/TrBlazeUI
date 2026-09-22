@@ -1,7 +1,20 @@
 @namespace TrBlazeUI.Components.Stepper
 
-<li class="@CssClass" aria-current="@(objIsCurrent ? "step" : null)" @attributes="AdditionalAttributes">
-    <span class="@MarkerCssClass" aria-hidden="true">@objNumber</span>
+@* One step. Without Status the step derives its look from its position relative to the stepper's
+   Current, which is what every existing caller gets. With Status the step draws what actually
+   happened - paused, retried, failed - which a position can never express (REQ-UI-006). Either way
+   the marker carries a glyph and, when a status is set, its own accessible name, so the state is
+   never signalled by colour alone. *@
+
+<li class="@CssClass"
+    aria-current="@(objIsCurrent ? "step" : null)"
+    data-status="@StatusName"
+    @attributes="AdditionalAttributes">
+    <span class="@MarkerCssClass"
+          data-slot="stepper-item-marker"
+          role="@(Status.HasValue ? "img" : null)"
+          aria-label="@(Status.HasValue ? StepStatusPresentation.Label(Status.Value) : null)"
+          aria-hidden="@(Status.HasValue ? null : "true")">@MarkerText</span>
     <span class="min-w-0">
         <span class="block text-sm font-medium">@Title</span>
         @if (!string.IsNullOrWhiteSpace(Description))
@@ -14,6 +27,10 @@
         }
         @ChildContent
     </span>
+    @if (Trailing != null)
+    {
+        <span class="ms-auto flex shrink-0 items-center gap-2">@Trailing</span>
+    }
 </li>
 
 @code {
@@ -43,6 +60,34 @@
     public string? Description { get; set; }
 
     /// <summary>
+    /// Gets or sets what became of this step, when the step knows better than its position does.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Leave it null — the default — and the step looks exactly as it always has: done when it sits
+    /// before the stepper's <c>Current</c>, current when it is <c>Current</c>, pending after it. No
+    /// existing caller changes.
+    /// </para>
+    /// <para>
+    /// Set it and the step draws that state instead, which is the only way to show a chain that
+    /// paused in the middle or a step that succeeded on a second try. <c>aria-current="step"</c>
+    /// still follows the stepper's <c>Current</c>, because "which step are we on" and "how did this
+    /// step end" are two different questions (REQ-UI-006).
+    /// </para>
+    /// </remarks>
+    [Parameter]
+    public StepStatus? Status { get; set; }
+
+    /// <summary>
+    /// Gets or sets content drawn at the step's trailing edge — a duration, a badge, a retry button.
+    /// </summary>
+    /// <remarks>
+    /// It is pushed to the far edge of the step, so it lines up down a vertical stepper.
+    /// </remarks>
+    [Parameter]
+    public RenderFragment? Trailing { get; set; }
+
+    /// <summary>
     /// Gets or sets extra content rendered under the label.
     /// </summary>
     [Parameter]
@@ -64,6 +109,25 @@
     /// <inheritdoc />
     protected override void OnInitialized() => objNumber = objStepper?.NextIndex() ?? 1;
 
+    private string? StatusName => Status.HasValue ? StepStatusPresentation.Name(Status.Value) : null;
+
+    // Pending has no glyph of its own, so the step keeps showing its number - a pending step is
+    // still the fourth step.
+    private string MarkerText
+    {
+        get
+        {
+            var vNumber = objNumber.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            if (!Status.HasValue)
+            {
+                return vNumber;
+            }
+
+            var vGlyph = StepStatusPresentation.Glyph(Status.Value);
+            return vGlyph.Length > 0 ? vGlyph : vNumber;
+        }
+    }
+
     private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
         "flex items-start gap-3",
         Class
@@ -71,10 +135,12 @@
 
     private string MarkerCssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
         "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-sm font-semibold",
-        objCurrentStep > objNumber
-            ? "border-primary bg-primary text-primary-foreground"
-            : objIsCurrent
-                ? "border-primary text-primary"
-                : "border-border text-muted-foreground"
+        Status.HasValue
+            ? StepStatusPresentation.MarkerColourClass(Status.Value)
+            : objCurrentStep > objNumber
+                ? "border-primary bg-primary text-primary-foreground"
+                : objIsCurrent
+                    ? "border-primary text-primary"
+                    : "border-border text-muted-foreground"
     );
 }

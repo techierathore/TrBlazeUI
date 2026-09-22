@@ -1,7 +1,17 @@
 @namespace TrBlazeUI.Components.Timeline
+@using TrBlazeUI.Components.Stepper
 
-<li class="@CssClass" @attributes="AdditionalAttributes">
-    <span class="@MarkerCssClass" aria-hidden="true">@Marker</span>
+@* One dated entry. Current says where the reader is; Status says what became of the entry, which a
+   position can never express - an entry that paused, or that succeeded only on a second try
+   (REQ-UI-006). The status is drawn with its own glyph and its own accessible name as well as its
+   own colour, so it is never signalled by colour alone. *@
+
+<li class="@CssClass" data-status="@StatusName" aria-current="@(Current ? "step" : null)" @attributes="AdditionalAttributes">
+    <span class="@MarkerCssClass"
+          data-slot="timeline-item-marker"
+          role="@(Status.HasValue ? "img" : null)"
+          aria-label="@(Status.HasValue ? StepStatusPresentation.Label(Status.Value) : null)"
+          aria-hidden="@(Status.HasValue ? null : "true")">@if (Marker != null) { @Marker } else { @MarkerGlyph }</span>
     @if (!string.IsNullOrWhiteSpace(Meta))
     {
         <div class="text-xs font-medium text-muted-foreground">@Meta</div>
@@ -9,6 +19,10 @@
     @if (!string.IsNullOrWhiteSpace(Title))
     {
         <h3 class="text-base font-semibold tracking-tight">@Title</h3>
+    }
+    @if (Current)
+    {
+        <span class="sr-only">(current entry)</span>
     }
     @if (!string.IsNullOrWhiteSpace(Subtitle))
     {
@@ -42,14 +56,38 @@
     /// <summary>
     /// Gets or sets content rendered in the marker dot, for example an icon or a number.
     /// </summary>
+    /// <remarks>
+    /// It replaces the status glyph when both are set; the status still supplies the marker's
+    /// colours and its accessible name, so a custom marker never costs the entry its text
+    /// alternative.
+    /// </remarks>
     [Parameter]
     public RenderFragment? Marker { get; set; }
 
     /// <summary>
     /// Gets or sets whether this entry is the current/active one, which fills the marker.
     /// </summary>
+    /// <remarks>
+    /// It also puts <c>aria-current="step"</c> and an <c>sr-only</c> "(current entry)" label on the
+    /// entry, so "where the reader is" is not signalled by the fill alone (WCAG 1.4.1). Unchanged
+    /// by <see cref="Status"/>: "which entry are we on" and "how did this entry end" are two
+    /// different questions.
+    /// </remarks>
     [Parameter]
     public bool Current { get; set; }
+
+    /// <summary>
+    /// Gets or sets what became of this entry.
+    /// </summary>
+    /// <remarks>
+    /// Leave it null — the default — and the marker looks exactly as it always has: filled when
+    /// <see cref="Current"/>, outlined otherwise. Set it and the marker draws that state instead,
+    /// which is what a run log needs: a step that is waiting, one that was retried, one that failed
+    /// (REQ-UI-006). The same enum drives <c>StepperItem.Status</c>, so the same run drawn as a
+    /// stepper and as a timeline cannot disagree.
+    /// </remarks>
+    [Parameter]
+    public StepStatus? Status { get; set; }
 
     /// <summary>
     /// Gets or sets the entry body.
@@ -70,15 +108,23 @@
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
+    private string? StatusName => Status.HasValue ? StepStatusPresentation.Name(Status.Value) : null;
+
+    private string MarkerGlyph => Status.HasValue ? StepStatusPresentation.Glyph(Status.Value) : string.Empty;
+
     private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
         "relative ms-6 pb-8 last:pb-0",
         Class
     );
 
+    // The status colours are merged last, so a filled status (Done, Retried, Failed) replaces the
+    // bg-background the marker needs to sit opaquely on the rail, and an outlined one keeps it.
     private string MarkerCssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
-        "absolute -start-9 flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-semibold",
-        Current
-            ? "border-primary bg-primary text-primary-foreground"
-            : "border-border bg-background text-muted-foreground"
+        "absolute -start-9 flex h-5 w-5 items-center justify-center rounded-full border bg-background text-[10px] font-semibold",
+        Status.HasValue
+            ? StepStatusPresentation.MarkerColourClass(Status.Value)
+            : Current
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-background text-muted-foreground"
     );
 }

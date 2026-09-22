@@ -11,10 +11,112 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
-Closes TfLens TR-039 and TR-040 (`docs/TfLens-TrBlazeUI-Feedback.md`), both filed against 2.0.6,
-and Chatur TR-001 to TR-004 (`docs/Chatur-TrBlazeUI-Feedback.md`), filed against 2.0.7.
+Closes TfLens TR-039 and TR-040 (`docs/TfLens-TrBlazeUI-Feedback.md`), both filed against 2.0.6;
+Chatur's first batch, TR-001 to TR-004 (`docs/Chatur-TrBlazeUI-Feedback.md`), filed against 2.0.7;
+and Chatur's **second** batch of ten, filed 2026-09-21, also against 2.0.7. That second batch
+renumbered from TR-001, so its ids collide with the first batch's; it is referred to here as
+"Chatur batch 2" throughout.
+
+Five of batch 2's ten entries reported controls that already exist. Four of those five — a tree,
+a difference viewer, a small switch for a table cell, and an ordered list with move-up and
+move-down buttons — needed no code at all; they needed the reference to be findable. See
+"Documentation" below.
 
 ### ⚠ Behaviour changes to review before upgrading
+
+- **`SortableList` now shows each row's position.** `ShowPosition` is a new parameter defaulting
+  to `true`, so every existing `SortableList` gains a 1-based number on each row. Pass
+  `ShowPosition="false"` to keep the previous look. (Chatur batch 2 TR-009.)
+- **`TimelineItem Current="true"` now emits `aria-current="step"`** and a visually hidden
+  "(current entry)". It was previously signalled by the marker's fill alone, which is a WCAG 1.4.1
+  failure. Nothing visual changes.
+- **`Progress` renders `aria-valuenow` culture-invariantly.** It was `aria-valuenow="@Value"`,
+  which emitted `33,5` in a comma-decimal culture. Determinate bars are otherwise unchanged.
+
+### Added — Chatur batch 2
+
+- **`CodeEditor` and `EditorTabs` (TR-003)**: an editable code area with `@bind-Value`, a line-number
+  gutter, and **Tab inserting an indent instead of moving focus** — with Escape-then-Tab as the way
+  out, announced through `aria-describedby`, so it is not a keyboard trap. `TabSize`, `UseSpaces`,
+  `ReadOnly`, `DebounceMilliseconds`. Lines do not wrap, because with soft wrap one logical line
+  paints as several rows and every gutter number below it is wrong. No syntax highlighter is
+  bundled — `Html` takes your own, on `CodeBlock`'s precedent. `EditorTabs` is a strip of open
+  files, each with its own close button and an unsaved mark carried by a dot's *presence* and by
+  `", unsaved changes"` in the accessible name. It is deliberately not a `role="tablist"`: a
+  tablist's roving `tabindex` would put the close buttons out of keyboard reach.
+- **`StepperItem.Status`, `StepperItem.Trailing` and `TimelineItem.Status` (TR-004)**: a new
+  `StepStatus` enum — `Pending`, `Running`, `Waiting`, `Done`, `Retried`, `Failed` — so a step can
+  say what happened to it rather than only where it sits. A chain that paused in the middle, or a
+  step that succeeded on a second try, can now be drawn. Each status has its own glyph *and* its
+  own accessible name, so it is never colour alone. With `Status` left null, behaviour is
+  unchanged. `Stepper.Orientation="Vertical"` already existed.
+- **`Typing` and `Progress.Indeterminate` (TR-006)**: three moving dots sized in `em` to match the
+  text they sit in, for an answer that is still arriving — `Spinner` reads as "the screen is busy",
+  this reads as "the answer is still coming". `Progress.Indeterminate` animates without claiming a
+  percentage and **omits `aria-valuenow`**, which is what tells assistive technology the value is
+  unknown. Both honour `prefers-reduced-motion` — **the first place in the library that does**; the
+  Dialog and Sheet demo pages had claimed it in prose while the CSS never implemented it.
+- **`LogView` (TR-007)**: a panel for the output of a running command. Lines marked `Ordinary`,
+  `Success`, `Warning` or `Failure` (the enum is `LogLineKind`, not `LogLevel`, which would collide
+  with `Microsoft.Extensions.Logging.LogLevel`), a height it keeps, and the newest line followed
+  through `ScrollArea.StickToEnd` until the reader scrolls up. `MaxLines` caps the panel and says
+  how many lines it dropped. Appending a line does not re-render the list: lines are cut into
+  blocks of 128 and a full block never renders again — about 600 render-tree frames per appended
+  line at 10,000 lines, against about 40,000 for a single `@foreach`. There is deliberately no
+  `role="log"`, whose implicit `aria-live` would announce every line of a build; one summary is
+  announced per burst instead.
+- **`NavList<TItem>` (TR-010)**: a list of multi-line rows that drives a detail pane — the shape
+  Chatur called "the commonest in the whole product". `@bind-SelectedId` (preferred, because a
+  re-fetched list holds new instances and an object-valued selection silently stops matching) or
+  `@bind-Selected`, arrow-key movement, one tab stop, and disabled rows the arrows skip. A
+  `role="listbox"` of options by default, since choosing a row changes what the same screen shows;
+  `Mode="Navigation"` gives a real `<nav>` of links with `aria-current="page"`. There is no
+  `ListDetail` and there will not be one — the two-pane split is the page's own layout, composed
+  from `Grid` or `ResizablePanelGroup`, as `/components/nav-list` shows.
+- **`DataTable.SelectedCount` (TR-008)**: a read-only count of the chosen rows across every page,
+  for labelling your own button.
+
+### Fixed — Chatur batch 2
+
+- **The multi-page choose-all control in `DataTable` announced nothing about its state (TR-008).**
+  When a grid holds more rows than one page, that cell is a menu, and its only accessible name was
+  the fixed "Select rows - click to see options"; the checkbox inside it is decorative and hidden
+  from assistive technology by design (REQ-NFR-001). A sighted user could see none/some/all and a
+  screen-reader user could not. The trigger's name now carries the state and the counts, and a
+  polite live region announces changes. Measured on `/components/datatable`: the name reads "No
+  rows selected, 500 in all - choose rows", then "1 of 500 rows selected - choose rows" after one
+  row is chosen. The rest of TR-008 did not reproduce — the choosing column, the per-row box and
+  `@bind-SelectedItems` all worked already.
+- **`SortableList` offered no way to take a row out (TR-009).** New `AllowRemove` and `OnRemove`;
+  removal writes the shortened list back through `@bind-Items` and is announced through the
+  existing live region. The rest of TR-009 did not reproduce — the move-up and move-down buttons
+  the entry asked for already existed and worked.
+
+### Documentation — Chatur batch 2
+
+The deployed copy of the AI reference at `.trblazeui/TrBlazeUI-AI-Reference.md` comes from the
+installed package and changes only on upgrade, so Chatur were reading 2.0.7 while `TreeView`,
+`DiffView`, `ScrollArea.StickToEnd` and `ToggleGroup` sat unreleased. That explains TR-001 and
+TR-002. It does **not** explain TR-005, TR-008 and TR-009, whose answers were all in the copy they
+had — `SelectionMode` in the same parameter table as `SelectedItems`, `Size="SwitchSize.Small"`,
+and SortableList described verbatim as "driven by real buttons rather than drag-and-drop". Those
+three were findable and not found, so the reference now:
+
+- opens with a **"Which control do I use for…"** index mapping a problem on a screen to the control
+  that already solves it;
+- names the problem in the heading — "DataTable — rows, sorting, paging, **and letting the user
+  choose rows**", "SortableList — **let the user set the order (move up / move down buttons)**",
+  "Switch — **including a small switch inside a table cell**", "TreeView — **a tree of files and
+  folders**", "DiffView — **compare two texts side by side**";
+- replaces bullet lists with real parameter tables for `TreeView`, `TreeItem`, `DiffView`,
+  `ScrollArea`, `ToggleGroup`, `SortableList` and the new components;
+- states plainly that the copy in a consumer's repository is their installed version's reference,
+  not the latest, and says where to check the current one.
+
+The §1 `_Imports.razor` block was verified complete against the source tree (81 of 81 namespaces;
+the prose had said 79) and now carries the four new namespaces, at 85. A consumer still on 2.0.7
+must drop those four lines: a `@using` for a namespace the installed package lacks is CS0246, a
+hard error, not the silent RZ10012 a missing one gives.
 
 - **Side borders and border styles now survive `Class` merging.** `cn()` used to read `border-l`,
   `border-b`, `border-s` (and the other sides) and `border-dashed`/`border-solid`/… as border

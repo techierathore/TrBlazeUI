@@ -1,6 +1,7 @@
 @page "/components/stepper"
 @using TrBlazeUI.Components.Stepper
 @using TrBlazeUI.Components.Button
+@using TrBlazeUI.Components.Badge
 
 <PageTitle>Stepper Component - TrBlazeUI</PageTitle>
 
@@ -59,6 +60,49 @@
         </div>
     </div>
 
+    <!-- Per-step status -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">A step that carries its own state</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>Current</code> alone can only say "everything before here worked". A real
+                pipeline pauses, retries and fails, so each step can set its own
+                <code>Status</code> — <code>Pending</code>, <code>Running</code>,
+                <code>Waiting</code>, <code>Done</code>, <code>Retried</code> or
+                <code>Failed</code>. <code>Trailing</code> puts content at the step's far edge.
+                Leave <code>Status</code> unset and the step behaves exactly as it always has.
+            </p>
+        </div>
+        <div class="rounded-lg border p-6">
+            <Stepper Current="3" Orientation="StepperOrientation.Vertical" AriaLabel="Release pipeline">
+                <StepperItem Title="Checkout" Description="Fetched the tag" Status="StepStatus.Done"
+                             data-testid="step-done">
+                    <Trailing><Badge Variant="BadgeVariant.Secondary">4s</Badge></Trailing>
+                </StepperItem>
+                <StepperItem Title="Restore" Description="Succeeded on the second try"
+                             Status="StepStatus.Retried" data-testid="step-retried">
+                    <Trailing><Badge Variant="BadgeVariant.Secondary">1m 12s</Badge></Trailing>
+                </StepperItem>
+                <StepperItem Title="Build" Description="Compiling the solution" Status="StepStatus.Running"
+                             data-testid="step-running">
+                    <Trailing><Badge Variant="BadgeVariant.Secondary">running</Badge></Trailing>
+                </StepperItem>
+                <StepperItem Title="Sign" Description="Waiting for the release approval"
+                             Status="StepStatus.Waiting" data-testid="step-waiting" />
+                <StepperItem Title="Publish" Description="The feed rejected the package"
+                             Status="StepStatus.Failed" data-testid="step-failed" />
+                <StepperItem Title="Announce" Status="StepStatus.Pending" data-testid="step-pending" />
+            </Stepper>
+        </div>
+        <div class="rounded-lg border border-alert-info bg-alert-info-bg p-4 text-sm text-alert-info-foreground">
+            Each marker is a <code>role="img"</code> with its status as the accessible name
+            ("Failed"), and each status has its own glyph as well as its own colour — so the state
+            survives a greyscale screen and a screen reader alike (WCAG 1.4.1). The stepper's
+            <code>Current</code> is still 3, so <code>aria-current="step"</code> lands on
+            <strong>Build</strong> no matter what the other steps report.
+        </div>
+    </div>
+
     <!-- Series index -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -102,5 +146,15 @@
         </Stepper>
 
         @code { private int current = 2; }
+
+        @* A step that knows better than its position: *@
+        <Stepper Current="3" Orientation="StepperOrientation.Vertical" AriaLabel="Release pipeline">
+            <StepperItem Title="Checkout" Status="StepStatus.Done">
+                <Trailing><Badge Variant="BadgeVariant.Secondary">4s</Badge></Trailing>
+            </StepperItem>
+            <StepperItem Title="Restore" Status="StepStatus.Retried" />
+            <StepperItem Title="Build" Status="StepStatus.Running" />
+            <StepperItem Title="Publish" Status="StepStatus.Failed" />
+        </Stepper>
         """;
 }

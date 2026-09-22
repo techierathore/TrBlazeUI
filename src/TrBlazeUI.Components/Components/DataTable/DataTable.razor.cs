@@ -737,6 +737,67 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         objFilteredData.Count();
 
     /// <summary>
+    /// Gets the number of rows currently selected, across every page.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A count the page can read to label its own control — "Export 3 selected" — without reaching
+    /// through <see cref="SelectedItems"/> and counting it by hand (REQ-UI-005).
+    /// </para>
+    /// <para>
+    /// It reads the grid's own selection state rather than the <see cref="SelectedItems"/>
+    /// parameter, so it is right whether or not the caller bound that parameter. Capture the grid
+    /// with <c>@ref</c> to read it:
+    /// </para>
+    /// <code>
+    /// &lt;DataTable TData="Person" Data="@objPeople" @ref="objGrid"
+    ///            SelectionMode="DataTableSelectionMode.Multiple" /&gt;
+    /// &lt;Button&gt;Export @(objGrid?.SelectedCount ?? 0) selected&lt;/Button&gt;
+    /// </code>
+    /// </remarks>
+    public int SelectedCount => objTableState.Selection.SelectedCount;
+
+    /// <summary>
+    /// Gets the accessible name of the choose-all trigger, which carries the current selection
+    /// state because the checkbox inside it is decorative.
+    /// </summary>
+    /// <remarks>
+    /// Reads "No rows selected, 500 in all - choose rows", "3 of 500 rows selected - choose rows"
+    /// or "All 500 rows selected - choose rows", so a screen-reader user hears the none/some/all
+    /// distinction a sighted user reads off the checkbox (REQ-UI-005).
+    /// </remarks>
+    private string SelectAllTriggerLabel => $"{SelectionStatusText} - choose rows";
+
+    /// <summary>
+    /// Gets the sentence describing how much of the filtered set is selected.
+    /// </summary>
+    /// <remarks>
+    /// Shared by the trigger's name and the live region so the two can never disagree. The count is
+    /// the whole selection, not the current page, because that is what a caller acts on.
+    /// </remarks>
+    private string SelectionStatusText
+    {
+        get
+        {
+            var vTotal = GetTotalFilteredItemCount();
+            var vSelected = SelectedCount;
+            var vRowWord = vTotal == 1 ? "row" : "rows";
+
+            if (vSelected == 0)
+            {
+                return $"No rows selected, {vTotal} in all";
+            }
+
+            if (vSelected >= vTotal)
+            {
+                return $"All {vTotal} {vRowWord} selected";
+            }
+
+            return $"{vSelected} of {vTotal} {vRowWord} selected";
+        }
+    }
+
+    /// <summary>
     /// Opens the select-all dropdown menu.
     /// </summary>
     private void OpenSelectAllDropdown()

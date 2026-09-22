@@ -1,0 +1,470 @@
+@page "/components/nav-list"
+@using TrBlazeUI.Components.NavList
+@using TrBlazeUI.Components.Grid
+@using TrBlazeUI.Components.Resizable
+
+<PageTitle>Nav List Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Nav List Component</h1>
+        <p class="text-xl text-muted-foreground">
+            A flat list of multi-line rows where exactly one row is chosen and the rest of the
+            screen follows it. The choice is carried two ways, the arrow keys move through the
+            rows, and the list is a single Tab stop.
+        </p>
+    </div>
+
+    <!-- Roles: a list driving a detail pane -->
+    <div class="space-y-4" data-testid="navlist-roles-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">A list that drives a detail pane</h2>
+            <p class="text-sm text-muted-foreground">
+                This is the roles tab, in full. Each row carries a name, its badges and a couple of
+                values; picking one row changes what the pane on the right shows. Click a row, or
+                Tab into the list once and use Up and Down, Home and End, then Enter or Space.
+            </p>
+        </div>
+        <div class="grid gap-4 md:grid-cols-5">
+            <div class="md:col-span-2 rounded-md border p-2">
+                <NavList TItem="RoleRow"
+                         Items="objRoles"
+                         ItemId="@(aRole => aRole.Id)"
+                         @bind-SelectedId="objSelectedRoleId"
+                         ItemDisabled="@(aRole => aRole.IsRetired)"
+                         AriaLabel="Roles"
+                         data-testid="navlist-roles">
+                    <ItemTemplate Context="vRole">
+                        <div class="min-w-0 flex-1 space-y-1" data-testid="@($"navlist-role-{vRole.Id}")">
+                            <div class="flex items-center gap-2">
+                                <span class="truncate font-medium">@vRole.Name</span>
+                                <Badge Variant="@(vRole.IsBuiltIn ? BadgeVariant.Secondary : BadgeVariant.Outline)"
+                                       Class="px-1.5 py-0 text-xs">
+                                    @(vRole.IsBuiltIn ? "built-in" : "custom")
+                                </Badge>
+                                @if (vRole.IsRetired)
+                                {
+                                    <Badge Variant="BadgeVariant.Warning" Class="px-1.5 py-0 text-xs">retired</Badge>
+                                }
+                            </div>
+                            <p class="truncate text-xs text-muted-foreground">@vRole.Summary</p>
+                            <p class="text-xs text-muted-foreground">
+                                <span class="font-mono">@vRole.MemberCount</span> members
+                                &middot;
+                                <span class="font-mono">@vRole.PermissionCount</span> permissions
+                            </p>
+                        </div>
+                    </ItemTemplate>
+                    <EmptyContent>No roles yet.</EmptyContent>
+                </NavList>
+            </div>
+            <div class="md:col-span-3 rounded-md border p-4" data-testid="navlist-detail">
+                @if (SelectedRole is { } vSelected)
+                {
+                    <div class="space-y-3">
+                        <div class="space-y-1">
+                            <h3 class="text-lg font-semibold" data-testid="navlist-detail-name">@vSelected.Name</h3>
+                            <p class="font-mono text-xs text-muted-foreground" data-testid="navlist-detail-id">@vSelected.Id</p>
+                        </div>
+                        <p class="text-sm" data-testid="navlist-detail-summary">@vSelected.Summary</p>
+                        <div class="flex gap-6 text-sm">
+                            <div>
+                                <p class="text-muted-foreground">Members</p>
+                                <p class="font-mono" data-testid="navlist-detail-members">@vSelected.MemberCount</p>
+                            </div>
+                            <div>
+                                <p class="text-muted-foreground">Permissions</p>
+                                <p class="font-mono" data-testid="navlist-detail-permissions">@vSelected.PermissionCount</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-sm text-muted-foreground" data-testid="navlist-detail-empty">Pick a role.</p>
+                }
+            </div>
+        </div>
+        <p class="text-sm text-muted-foreground">
+            Chosen id: <span class="font-mono" data-testid="navlist-selected-id">@(objSelectedRoleId ?? "nothing")</span>.
+            <strong>Archivist</strong> is retired, so it is disabled: the arrow keys skip it and it
+            cannot be chosen.
+        </p>
+    </div>
+
+    <!-- Two-way binding on the object -->
+    <div class="space-y-4" data-testid="navlist-object-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Binding the object instead of the id</h2>
+            <p class="text-sm text-muted-foreground">
+                <code class="rounded bg-muted px-1 py-0.5">@@bind-Selected</code> hands the detail
+                pane the row itself. Prefer <code class="rounded bg-muted px-1 py-0.5">@@bind-SelectedId</code>
+                when the list is re-fetched, because a re-fetch makes new objects and an
+                object-valued selection stops matching; an id-valued one does not. Both can be bound
+                at once.
+            </p>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2">
+            <div class="rounded-md border p-2">
+                <NavList TItem="EnvironmentRow"
+                         Items="objEnvironments"
+                         @bind-Selected="objSelectedEnvironment"
+                         AriaLabel="Environments"
+                         data-testid="navlist-environments">
+                    <ItemTemplate Context="vEnvironment">
+                        <div class="min-w-0 flex-1">
+                            <p class="font-medium">@vEnvironment.Name</p>
+                            <p class="text-xs text-muted-foreground">@vEnvironment.Region</p>
+                        </div>
+                    </ItemTemplate>
+                </NavList>
+            </div>
+            <div class="rounded-md border p-4 text-sm">
+                <p class="text-muted-foreground">Bound object</p>
+                <p class="font-mono" data-testid="navlist-environment-selected">
+                    @(objSelectedEnvironment is null ? "null" : $"{objSelectedEnvironment.Name} ({objSelectedEnvironment.Region})")
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty, horizontal, navigation -->
+    <div class="space-y-4" data-testid="navlist-variants-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Empty, horizontal and navigation</h2>
+            <p class="text-sm text-muted-foreground">
+                <code class="rounded bg-muted px-1 py-0.5">EmptyContent</code> stands in for the rows
+                when there are none. <code class="rounded bg-muted px-1 py-0.5">Orientation</code>
+                lays the rows out in a row and moves with Left and Right instead of Up and Down.
+                <code class="rounded bg-muted px-1 py-0.5">Mode</code> switches the ARIA semantic:
+                the default <code class="rounded bg-muted px-1 py-0.5">Select</code> is a listbox of
+                options whose choice drives this screen, while
+                <code class="rounded bg-muted px-1 py-0.5">Navigation</code> is a nav of links that
+                take the reader elsewhere.
+            </p>
+        </div>
+        <div class="grid gap-4 md:grid-cols-3">
+            <div class="rounded-md border p-2">
+                <p class="px-2 pb-2 text-xs font-semibold text-muted-foreground">Empty</p>
+                <NavList TItem="RoleRow" Items="objNoRoles" AriaLabel="Archived roles" data-testid="navlist-empty">
+                    <EmptyContent>
+                        <span data-testid="navlist-empty-text">No archived roles.</span>
+                    </EmptyContent>
+                </NavList>
+            </div>
+            <div class="rounded-md border p-2">
+                <p class="px-2 pb-2 text-xs font-semibold text-muted-foreground">Horizontal</p>
+                <NavList TItem="EnvironmentRow"
+                         Items="objEnvironments"
+                         Orientation="NavListOrientation.Horizontal"
+                         AriaLabel="Environment tabs"
+                         data-testid="navlist-horizontal">
+                    <ItemTemplate Context="vEnvironment">
+                        <span class="whitespace-nowrap font-medium">@vEnvironment.Name</span>
+                    </ItemTemplate>
+                </NavList>
+            </div>
+            <div class="rounded-md border p-2">
+                <p class="px-2 pb-2 text-xs font-semibold text-muted-foreground">Navigation</p>
+                <NavList TItem="LinkRow"
+                         Items="objLinks"
+                         Mode="NavListMode.Navigation"
+                         ItemId="@(aLink => aLink.Href)"
+                         ItemHref="@(aLink => aLink.Href)"
+                         SelectedId="/components/nav-list"
+                         AriaLabel="Related components"
+                         data-testid="navlist-nav">
+                    <ItemTemplate Context="vLink">
+                        <span class="font-medium">@vLink.Label</span>
+                    </ItemTemplate>
+                </NavList>
+            </div>
+        </div>
+    </div>
+
+    <!-- ListDetail composition -->
+    <div class="space-y-4" data-testid="navlist-listdetail-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">There is no ListDetail component — compose one</h2>
+            <p class="text-sm text-muted-foreground">
+                A two-pane layout is a page-level concern, not a control: how wide the list is, where
+                it collapses, what the pane does on a phone, and where the heading sits all belong to
+                the page. <code class="rounded bg-muted px-1 py-0.5">NavList</code> is the control;
+                the layout is <code class="rounded bg-muted px-1 py-0.5">Grid</code> when the split is
+                fixed and <code class="rounded bg-muted px-1 py-0.5">ResizablePanelGroup</code> when
+                the reader should be able to drag it. Both already ship.
+            </p>
+        </div>
+        <h3 class="text-base font-semibold">With Grid (fixed split, collapses on a phone)</h3>
+        <Grid Columns="12" Spacing="4" data-testid="navlist-grid-composition">
+            <GridItem Xs="12" Md="4">
+                <div class="rounded-md border p-2">
+                    <NavList TItem="RoleRow"
+                             Items="objRoles"
+                             ItemId="@(aRole => aRole.Id)"
+                             @bind-SelectedId="objGridRoleId"
+                             AriaLabel="Roles (grid)"
+                             data-testid="navlist-grid-list">
+                        <ItemTemplate Context="vRole">
+                            <span class="font-medium">@vRole.Name</span>
+                        </ItemTemplate>
+                    </NavList>
+                </div>
+            </GridItem>
+            <GridItem Xs="12" Md="8">
+                <div class="rounded-md border p-4 text-sm" data-testid="navlist-grid-detail">
+                    @(objRoles.FirstOrDefault(aRole => aRole.Id == objGridRoleId)?.Summary ?? "Pick a role.")
+                </div>
+            </GridItem>
+        </Grid>
+
+        <h3 class="text-base font-semibold">With ResizablePanelGroup (the reader drags the split)</h3>
+        <div class="h-64 rounded-md border">
+            <ResizablePanelGroup Direction="ResizableDirection.Horizontal" data-testid="navlist-resizable-composition">
+                <ResizablePanel DefaultSize="35" MinSize="20">
+                    <div class="p-2">
+                        <NavList TItem="RoleRow"
+                                 Items="objRoles"
+                                 ItemId="@(aRole => aRole.Id)"
+                                 @bind-SelectedId="objResizableRoleId"
+                                 AriaLabel="Roles (resizable)"
+                                 data-testid="navlist-resizable-list">
+                            <ItemTemplate Context="vRole">
+                                <span class="font-medium">@vRole.Name</span>
+                            </ItemTemplate>
+                        </NavList>
+                    </div>
+                </ResizablePanel>
+                <ResizableHandle />
+                <ResizablePanel DefaultSize="65" MinSize="30">
+                    <div class="p-4 text-sm" data-testid="navlist-resizable-detail">
+                        @(objRoles.FirstOrDefault(aRole => aRole.Id == objResizableRoleId)?.Summary ?? "Pick a role.")
+                    </div>
+                </ResizablePanel>
+            </ResizablePanelGroup>
+        </div>
+    </div>
+
+    <!-- Usage -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Usage</h2>
+        <pre class="overflow-x-auto rounded-md border bg-muted/30 p-4 text-xs"><code>&lt;NavList TItem="Role"
+         Items="roles"
+         ItemId="@@(r =&gt; r.Id)"
+         @@bind-SelectedId="selectedRoleId"
+         ItemDisabled="@@(r =&gt; r.IsRetired)"
+         AriaLabel="Roles"&gt;
+    &lt;ItemTemplate Context="role"&gt;
+        &lt;div class="min-w-0 flex-1 space-y-1"&gt;
+            &lt;div class="flex items-center gap-2"&gt;
+                &lt;span class="truncate font-medium"&gt;@@role.Name&lt;/span&gt;
+                &lt;Badge Variant="BadgeVariant.Secondary"&gt;built-in&lt;/Badge&gt;
+            &lt;/div&gt;
+            &lt;p class="text-xs text-muted-foreground"&gt;@@role.MemberCount members&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/ItemTemplate&gt;
+    &lt;EmptyContent&gt;No roles yet.&lt;/EmptyContent&gt;
+&lt;/NavList&gt;
+
+@@* The detail pane is ordinary markup that reads the same field. *@@
+&lt;RoleDetail Role="roles.FirstOrDefault(r =&gt; r.Id == selectedRoleId)" /&gt;</code></pre>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">API Reference</h2>
+        <div class="overflow-x-auto rounded-lg border">
+            <table class="w-full text-sm" data-testid="navlist-api-table">
+                <thead class="bg-muted/30">
+                    <tr>
+                        <th class="p-3 text-left font-semibold">Parameter</th>
+                        <th class="p-3 text-left font-semibold">Type</th>
+                        <th class="p-3 text-left font-semibold">Default</th>
+                        <th class="p-3 text-left font-semibold">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">Items</td>
+                        <td class="p-3 font-mono text-xs">IReadOnlyList&lt;TItem&gt;</td>
+                        <td class="p-3 font-mono text-xs">[]</td>
+                        <td class="p-3">The rows, in display order. Required.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">ItemTemplate</td>
+                        <td class="p-3 font-mono text-xs">RenderFragment&lt;TItem&gt;?</td>
+                        <td class="p-3 font-mono text-xs">null</td>
+                        <td class="p-3">How one row is rendered; a row is a block, so several lines fit. Falls back to <code>ToString()</code>.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">ItemId</td>
+                        <td class="p-3 font-mono text-xs">Func&lt;TItem, string&gt;?</td>
+                        <td class="p-3 font-mono text-xs">null</td>
+                        <td class="p-3">A row's stable id. Supplying it is what makes <code>SelectedId</code> usable.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">SelectedId / SelectedIdChanged</td>
+                        <td class="p-3 font-mono text-xs">string?</td>
+                        <td class="p-3 font-mono text-xs">null</td>
+                        <td class="p-3">The chosen row's id. The primary selection parameter — it survives a re-fetch.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">Selected / SelectedChanged</td>
+                        <td class="p-3 font-mono text-xs">TItem?</td>
+                        <td class="p-3 font-mono text-xs">default</td>
+                        <td class="p-3">The chosen row itself. Can be bound alongside <code>SelectedId</code>; when both are bound the id decides which row reads as chosen.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">Mode</td>
+                        <td class="p-3 font-mono text-xs">NavListMode</td>
+                        <td class="p-3 font-mono text-xs">Select</td>
+                        <td class="p-3"><code>Select</code> renders <code>role="listbox"</code> / <code>role="option"</code> / <code>aria-selected</code>. <code>Navigation</code> renders a <code>&lt;nav&gt;</code> of links with <code>aria-current="page"</code>.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">ItemHref</td>
+                        <td class="p-3 font-mono text-xs">Func&lt;TItem, string?&gt;?</td>
+                        <td class="p-3 font-mono text-xs">null</td>
+                        <td class="p-3">A row's URL. Required in <code>Navigation</code> mode, ignored otherwise.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">Orientation</td>
+                        <td class="p-3 font-mono text-xs">NavListOrientation</td>
+                        <td class="p-3 font-mono text-xs">Vertical</td>
+                        <td class="p-3">The layout axis and the arrow keys that move between rows.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">ItemDisabled</td>
+                        <td class="p-3 font-mono text-xs">Func&lt;TItem, bool&gt;?</td>
+                        <td class="p-3 font-mono text-xs">null</td>
+                        <td class="p-3">Whether a row can be chosen. A disabled row is skipped by the arrow keys and never takes the Tab stop.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">EmptyContent</td>
+                        <td class="p-3 font-mono text-xs">RenderFragment?</td>
+                        <td class="p-3 font-mono text-xs">null</td>
+                        <td class="p-3">Shown in place of the rows when <code>Items</code> is empty.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">AriaLabel</td>
+                        <td class="p-3 font-mono text-xs">string?</td>
+                        <td class="p-3 font-mono text-xs">null</td>
+                        <td class="p-3">The accessible name of the list.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">Class</td>
+                        <td class="p-3 font-mono text-xs">string?</td>
+                        <td class="p-3 font-mono text-xs">null</td>
+                        <td class="p-3">Additional CSS classes on the root.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">AdditionalAttributes</td>
+                        <td class="p-3 font-mono text-xs">Dictionary&lt;string, object&gt;?</td>
+                        <td class="p-3 font-mono text-xs">null</td>
+                        <td class="p-3">Any other HTML attribute or event handler, splatted onto the root (REQ-UI-012).</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="text-sm text-muted-foreground">
+            <code class="rounded bg-muted px-1 py-0.5">CurrentSelectedId</code> and
+            <code class="rounded bg-muted px-1 py-0.5">CurrentSelected</code> are public read-only
+            properties on the component, so a <code class="rounded bg-muted px-1 py-0.5">@@ref</code>
+            can read the choice whether it is bound or kept by the list.
+        </p>
+    </div>
+
+    <!-- Keyboard -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Keyboard</h2>
+        <div class="overflow-x-auto rounded-lg border">
+            <table class="w-full text-sm">
+                <tbody>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">Tab</td>
+                        <td class="p-3">Enters the list once — the chosen row is the only Tab stop (a roving <code>tabindex</code>), falling back to the first enabled row.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">Down / Up</td>
+                        <td class="p-3">Moves to the next and previous enabled row (Right / Left when <code>Orientation="Horizontal"</code>). The page does not scroll.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">Home / End</td>
+                        <td class="p-3">Jumps to the first and last enabled row.</td>
+                    </tr>
+                    <tr class="border-t">
+                        <td class="p-3 font-mono">Enter / Space</td>
+                        <td class="p-3">Chooses the focused row — the same code path a click takes.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    private readonly List<RoleRow> objRoles =
+    [
+        new("owner", "Owner", "Full control of the workspace, its billing and its members.", 2, 48, true, false),
+        new("admin", "Administrator", "Manages members, roles and integrations, but not billing.", 7, 39, true, false),
+        new("editor", "Editor", "Creates and edits content, and publishes to staging.", 23, 21, true, false),
+        new("reviewer", "Reviewer", "Comments on and approves content, but cannot publish.", 11, 12, false, false),
+        new("viewer", "Viewer", "Reads everything the workspace has published.", 164, 4, true, false),
+        new("archivist", "Archivist", "Retired in 2.1 — its permissions moved to Administrator.", 0, 0, false, true)
+    ];
+
+    private readonly List<RoleRow> objNoRoles = [];
+
+    private readonly List<EnvironmentRow> objEnvironments =
+    [
+        new("Production", "eu-west-1"),
+        new("Staging", "eu-west-1"),
+        new("Development", "local")
+    ];
+
+    private readonly List<LinkRow> objLinks =
+    [
+        new("Tree View", "/components/tree-view"),
+        new("Nav List", "/components/nav-list"),
+        new("Data Table", "/components/data-table")
+    ];
+
+    private string? objSelectedRoleId = "editor";
+    private string? objGridRoleId = "owner";
+    private string? objResizableRoleId = "owner";
+    private EnvironmentRow? objSelectedEnvironment;
+
+    private RoleRow? SelectedRole => objRoles.FirstOrDefault(aRole => aRole.Id == objSelectedRoleId);
+
+    /// <summary>
+    /// A role on the roles tab: the multi-line shape a NavList row is built for.
+    /// </summary>
+    /// <param name="Id">The role's stable key.</param>
+    /// <param name="Name">The role's display name.</param>
+    /// <param name="Summary">One line describing what the role may do.</param>
+    /// <param name="MemberCount">How many members hold the role.</param>
+    /// <param name="PermissionCount">How many permissions the role grants.</param>
+    /// <param name="IsBuiltIn">Whether the role ships with the product.</param>
+    /// <param name="IsRetired">Whether the role is retired and can no longer be chosen.</param>
+    public sealed record RoleRow(
+        string Id,
+        string Name,
+        string Summary,
+        int MemberCount,
+        int PermissionCount,
+        bool IsBuiltIn,
+        bool IsRetired);
+
+    /// <summary>
+    /// A deployment environment, used to show object-valued binding and the horizontal layout.
+    /// </summary>
+    /// <param name="Name">The environment's display name.</param>
+    /// <param name="Region">Where the environment runs.</param>
+    public sealed record EnvironmentRow(string Name, string Region);
+
+    /// <summary>
+    /// A link, used to show Navigation mode.
+    /// </summary>
+    /// <param name="Label">The link's text.</param>
+    /// <param name="Href">Where the link goes.</param>
+    public sealed record LinkRow(string Label, string Href);
+}

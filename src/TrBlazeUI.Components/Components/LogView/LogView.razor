@@ -1,0 +1,555 @@
+@namespace TrBlazeUI.Components.LogView
+@using System.Globalization
+@using TrBlazeUI.Components.ScrollArea
+@implements IDisposable
+
+@* A panel for the output of a running command.
+
+   Takes the lines one at a time, marks each as ordinary, a success, a warning or a failure, holds
+   its height, and follows the newest line until the reader scrolls back.
+
+   Following is NOT reimplemented here: ScrollArea.StickToEnd already keeps a growing log at its
+   newest line, stops when the reader scrolls up, resumes when they scroll back, reports both
+   through AtEndChanged and watches the DOM so content a child renders on its own is followed too.
+   LogView adds the part ScrollArea has no opinion about: per-line kinds, a marker and a
+   screen-reader word next to the colour (WCAG 1.4.1), a per-line CSS hook, a cap on how many lines
+   are held, and - the consumer's actual complaint - appending a line without rebuilding the whole
+   list (see LogViewChunk).
+
+   Screen readers: the lines are deliberately NOT a live region. A log that speaks every line as a
+   build writes it is unusable, and role="log" carries an implicit aria-live="polite", so that role
+   is avoided outright. The lines sit in a plain labelled region and a separate visually hidden
+   role="status" announces one summary ("412 lines, 3 warnings, 1 failure.") once the output has
+   been quiet for a moment. *@
+
+<div class="@CssClass"
+     data-slot="log-view"
+     data-at-end="@(objIsAtEnd ? "true" : "false")"
+     data-line-count="@objHeld"
+     role="region"
+     aria-label="@AriaLabel"
+     @attributes="AdditionalAttributes">
+    <div class="relative">
+        <ScrollArea @ref="objScrollArea"
+                    StickToEnd="Follow"
+                    AtEndChanged="OnAtEndChangedAsync"
+                    Height="@Height"
+                    MaxHeight="@MaxHeight"
+                    Type="ScrollAreaType.Always"
+                    ViewportClass="py-2">
+            <div data-slot="log-view-lines" class="font-mono text-xs leading-5">
+                @if (objDroppedCount > 0)
+                {
+                    <div data-slot="log-view-dropped" class="px-3 pb-1 font-sans text-muted-foreground">
+                        @(DroppedTextFor(objDroppedCount))
+                    </div>
+                }
+                @if (objHeld == 0)
+                {
+                    <p data-slot="log-view-empty" class="px-3 py-6 text-center font-sans text-sm text-muted-foreground">@EmptyText</p>
+                }
+                else
+                {
+                    foreach (var vChunk in objChunks)
+                    {
+                        <LogViewChunk @key="vChunk.Id"
+                                      Lines="vChunk.Lines"
+                                      FirstId="vChunk.FirstId"
+                                      Version="vChunk.Version"
+                                      LineTemplate="LineTemplate"
+                                      ShowTimestamps="ShowTimestamps"
+                                      TimestampFormat="@TimestampFormat" />
+                    }
+                }
+            </div>
+        </ScrollArea>
+        @if (Follow && ShowJumpToNewest && !objIsAtEnd && objHeld > 0)
+        {
+            <button type="button"
+                    data-slot="log-view-jump"
+                    class="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-border bg-popover px-3 py-1 text-xs font-medium text-popover-foreground shadow-md hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    @onclick="ScrollToEndAsync">
+                @JumpToNewestText
+            </button>
+        }
+    </div>
+    <div data-slot="log-view-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true">@objAnnouncement</div>
+</div>
+
+@code {
+    /// <summary>How many lines one <see cref="LogViewChunk"/> holds before a new block is started.</summary>
+    private const int ChunkSize = 128;
+
+    /// <summary>How long the output must be quiet before the summary is announced, in milliseconds.</summary>
+    private const int QuietMilliseconds = 1500;
+
+    /// <summary>Stands in for a null <see cref="Lines"/> so the rest of the code needs no null checks.</summary>
+    private static readonly LogLine[] EmptyLines = [];
+
+    private readonly List<LogChunkState> objChunks = [];
+    private readonly CancellationTokenSource objLifetimeCts = new();
+    private TrBlazeUI.Components.ScrollArea.ScrollArea? objScrollArea;
+    private IReadOnlyList<LogLine>? objSourceLines;
+    private LogLine? objFirstSourceLine;
+    private LogLine? objLastConsumedLine;
+    private (string? Height, string? MaxHeight, bool Follow, int? MaxLines, bool ShowTimestamps,
+        string TimestampFormat, string? Class, string AriaLabel, string EmptyText,
+        bool ShowJumpToNewest, string JumpToNewestText) objSignature;
+    private string? objAnnouncement;
+    private long objNextLineId;
+    private int objNextChunkId;
+    private int objConsumed;
+    private int objHeld;
+    private int objDroppedCount;
+    private int objWarningCount;
+    private int objFailureCount;
+    private int objAppendStamp;
+    private bool objIsAnnouncePending;
+    private bool objHasSignature;
+    private bool objIsAtEnd = true;
+    private bool objShouldRender = true;
+    private bool objIsDisposed;
+
+    /// <summary>
+    /// Gets or sets the lines to show, oldest first. <c>null</c> is treated as no lines.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The panel consumes the list by growth: it remembers how many lines it has already taken and
+    /// on the next render takes only the ones added since. Appending to the <em>same</em>
+    /// <c>List&lt;LogLine&gt;</c> and calling <c>StateHasChanged</c> is the cheapest way to feed it,
+    /// and rebuilding an immutable list per line (<c>lines = [.. lines, next]</c>) is recognised as
+    /// growth too, by comparing the first and last already-consumed lines rather than the whole list.
+    /// </para>
+    /// <para>
+    /// Anything else - a shorter list, or a different list whose first and last consumed lines do
+    /// not match - is treated as a new log and the panel rebuilds. Replacing lines in place without
+    /// changing the count is the one change the panel cannot see; clear the list, or hand it a new
+    /// one, to reset it.
+    /// </para>
+    /// </remarks>
+    [Parameter]
+    public IReadOnlyList<LogLine>? Lines { get; set; }
+
+    /// <summary>
+    /// Gets or sets the panel's fixed height as a CSS length, for example <c>"20rem"</c>. Expressed
+    /// the same way as <see cref="TrBlazeUI.Components.ScrollArea.ScrollArea.Height"/> so the two agree. Default is
+    /// <c>null</c>, which lets <see cref="MaxHeight"/> decide.
+    /// </summary>
+    [Parameter]
+    public string? Height { get; set; }
+
+    /// <summary>
+    /// Gets or sets the tallest the panel grows before it scrolls, as a CSS length. Expressed the
+    /// same way as <see cref="TrBlazeUI.Components.ScrollArea.ScrollArea.MaxHeight"/>. Default is <c>"24rem"</c>; set it
+    /// to <c>null</c> to let the panel grow with its content.
+    /// </summary>
+    [Parameter]
+    public string? MaxHeight { get; set; } = "24rem";
+
+    /// <summary>
+    /// Gets or sets whether the panel keeps the newest line in view as lines arrive. Following
+    /// stops on its own when the reader scrolls up and resumes when they scroll back to the end;
+    /// both are reported through <see cref="AtEndChanged"/>. Default is true.
+    /// </summary>
+    [Parameter]
+    public bool Follow { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the callback raised when following stops because the reader scrolled up
+    /// (<c>false</c>) or resumes because they scrolled back to the newest line (<c>true</c>). Use it
+    /// to show your own "jump to newest" control; <see cref="IsAtEnd"/> reads the same state.
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> AtEndChanged { get; set; }
+
+    /// <summary>
+    /// Gets or sets the most lines the panel holds. When more arrive the oldest are dropped from
+    /// the panel and a "… N earlier lines dropped" note appears above the first line kept; the
+    /// dropped lines are gone from the panel and cannot be scrolled back to. Default is
+    /// <c>null</c>, no cap. A value below 1 is treated as no cap.
+    /// </summary>
+    /// <remarks>
+    /// The list passed to <see cref="Lines"/> is never modified - it is an
+    /// <see cref="IReadOnlyList{T}"/> and the panel does not own it. This caps the panel's own
+    /// buffer and the number of rows in the page, which is what makes a long build survivable in the
+    /// browser; cap your own buffer as well if it is the application's memory you are protecting.
+    /// </remarks>
+    [Parameter]
+    public int? MaxLines { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether a line's <see cref="LogLine.Timestamp"/> is shown before its text.
+    /// Lines with no timestamp are unaffected. Default is false.
+    /// </summary>
+    [Parameter]
+    public bool ShowTimestamps { get; set; }
+
+    /// <summary>
+    /// Gets or sets the format used for a shown timestamp, in the current culture. Default is
+    /// <c>"HH:mm:ss"</c>.
+    /// </summary>
+    [Parameter]
+    public string TimestampFormat { get; set; } = "HH:mm:ss";
+
+    /// <summary>
+    /// Gets or sets content rendered in place of the built-in marker, timestamp and text. The row
+    /// element, its <c>data-log-kind</c> hook and its colour are still the panel's, so a template
+    /// that only wants to change the text keeps everything else.
+    /// </summary>
+    /// <remarks>
+    /// Read when a block of lines first renders. A block that is already full never renders again
+    /// (that is what makes appending cheap), so changing the template afterwards does not redraw
+    /// lines already on screen.
+    /// </remarks>
+    [Parameter]
+    public RenderFragment<LogLine>? LineTemplate { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the panel shows its own "jump to newest" button while following is
+    /// stopped. Default is true. Set it to false to draw your own from
+    /// <see cref="AtEndChanged"/> and <see cref="ScrollToEndAsync"/>.
+    /// </summary>
+    [Parameter]
+    public bool ShowJumpToNewest { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the label on the built-in jump button. Default is <c>"Jump to newest"</c>.
+    /// </summary>
+    [Parameter]
+    public string JumpToNewestText { get; set; } = "Jump to newest";
+
+    /// <summary>
+    /// Gets or sets the accessible name of the panel. Default is <c>"Command output"</c>.
+    /// </summary>
+    [Parameter]
+    public string AriaLabel { get; set; } = "Command output";
+
+    /// <summary>
+    /// Gets or sets the text shown while there are no lines. Default is <c>"No output yet"</c>.
+    /// </summary>
+    [Parameter]
+    public string EmptyText { get; set; } = "No output yet";
+
+    /// <summary>
+    /// Gets or sets additional CSS classes.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    /// Gets whether the newest line is in view, which is the same as whether the panel is
+    /// following. False while the reader has scrolled up.
+    /// </summary>
+    public bool IsAtEnd => objIsAtEnd;
+
+    /// <summary>
+    /// Gets how many lines <see cref="MaxLines"/> has dropped from the panel so far.
+    /// </summary>
+    public int DroppedLineCount => objDroppedCount;
+
+    /// <summary>
+    /// Gets how many lines the panel is currently holding, after any <see cref="MaxLines"/> drop.
+    /// </summary>
+    public int HeldLineCount => objHeld;
+
+    /// <summary>
+    /// Scrolls to the newest line and resumes following.
+    /// </summary>
+    /// <returns>A task that completes when the browser has scrolled.</returns>
+    public async Task ScrollToEndAsync()
+    {
+        if (objScrollArea != null)
+        {
+            await objScrollArea.ScrollToEndAsync();
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        var vSignature = (Height, MaxHeight, Follow, MaxLines, ShowTimestamps, TimestampFormat,
+            Class, AriaLabel, EmptyText, ShowJumpToNewest, JumpToNewestText);
+
+        // A splatted attribute dictionary is rebuilt by the parent on every one of its renders, so
+        // comparing it would defeat ShouldRender for everyone. Consumers who splat pay one render.
+        if (!objHasSignature || !objSignature.Equals(vSignature) || AdditionalAttributes != null)
+        {
+            objSignature = vSignature;
+            objHasSignature = true;
+            objShouldRender = true;
+        }
+
+        var vLines = Lines ?? EmptyLines;
+        if (!IsContinuationOf(vLines))
+        {
+            ResetBuffer();
+            objShouldRender = true;
+        }
+
+        objSourceLines = vLines;
+
+        if (vLines.Count > objConsumed)
+        {
+            for (var vIndex = objConsumed; vIndex < vLines.Count; vIndex++)
+            {
+                Append(vLines[vIndex]);
+            }
+
+            objFirstSourceLine = vLines[0];
+            objLastConsumedLine = vLines[^1];
+            objConsumed = vLines.Count;
+            objShouldRender = true;
+            ScheduleAnnouncement();
+        }
+
+        TrimToMaxLines();
+    }
+
+    /// <inheritdoc />
+    protected override bool ShouldRender()
+    {
+        var vRender = objShouldRender;
+        objShouldRender = false;
+        return vRender;
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        objIsDisposed = true;
+        objLifetimeCts.Cancel();
+        objLifetimeCts.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    private async Task OnAtEndChangedAsync(bool aIsAtEnd)
+    {
+        if (objIsAtEnd == aIsAtEnd)
+        {
+            return;
+        }
+
+        objIsAtEnd = aIsAtEnd;
+        objShouldRender = true;
+        StateHasChanged();
+        await AtEndChanged.InvokeAsync(aIsAtEnd);
+    }
+
+    /// <summary>
+    /// Decides whether the list handed in is the same log, grown, or a different one.
+    /// </summary>
+    /// <param name="aLines">The list from <see cref="Lines"/>.</param>
+    /// <returns>True when the already-consumed lines are still the leading part of the list.</returns>
+    /// <remarks>
+    /// The same instance is a continuation by definition. A different instance still counts when it
+    /// is no shorter and its first and last already-consumed lines compare equal, which is the
+    /// immutable-rebuild pattern; <see cref="LogLine"/> is a record, so both are O(1) comparisons
+    /// rather than a walk of the list.
+    /// </remarks>
+    private bool IsContinuationOf(IReadOnlyList<LogLine> aLines)
+    {
+        if (objConsumed == 0)
+        {
+            return true;
+        }
+
+        if (ReferenceEquals(aLines, objSourceLines))
+        {
+            return aLines.Count >= objConsumed;
+        }
+
+        return aLines.Count >= objConsumed
+            && Equals(aLines[0], objFirstSourceLine)
+            && Equals(aLines[objConsumed - 1], objLastConsumedLine);
+    }
+
+    private void Append(LogLine aLine)
+    {
+        if (objChunks.Count == 0 || objChunks[^1].Lines.Count >= ChunkSize)
+        {
+            objChunks.Add(new LogChunkState { Id = objNextChunkId++, FirstId = objNextLineId });
+        }
+
+        var vTail = objChunks[^1];
+        vTail.Lines.Add(aLine);
+        vTail.Version++;
+        objNextLineId++;
+        objHeld++;
+
+        if (aLine.Kind == LogLineKind.Warning)
+        {
+            objWarningCount++;
+        }
+        else if (aLine.Kind == LogLineKind.Failure)
+        {
+            objFailureCount++;
+        }
+    }
+
+    private void TrimToMaxLines()
+    {
+        if (MaxLines is not int vMax || vMax < 1 || objHeld <= vMax)
+        {
+            return;
+        }
+
+        while (objHeld > vMax && objChunks.Count > 0)
+        {
+            var vHead = objChunks[0];
+            var vTake = Math.Min(vHead.Lines.Count, objHeld - vMax);
+            UncountKinds(vHead.Lines, vTake);
+            vHead.Lines.RemoveRange(0, vTake);
+            vHead.FirstId += vTake;
+            vHead.Version++;
+            objHeld -= vTake;
+            objDroppedCount += vTake;
+
+            if (vHead.Lines.Count == 0)
+            {
+                objChunks.RemoveAt(0);
+            }
+        }
+
+        objShouldRender = true;
+    }
+
+    private void UncountKinds(List<LogLine> aLines, int aCount)
+    {
+        for (var vIndex = 0; vIndex < aCount; vIndex++)
+        {
+            if (aLines[vIndex].Kind == LogLineKind.Warning)
+            {
+                objWarningCount--;
+            }
+            else if (aLines[vIndex].Kind == LogLineKind.Failure)
+            {
+                objFailureCount--;
+            }
+        }
+    }
+
+    private void ResetBuffer()
+    {
+        // Chunk and line ids stay monotonic across a reset so that a recycled key can never pair a
+        // new block with the component instance of an old one.
+        objChunks.Clear();
+        objConsumed = 0;
+        objHeld = 0;
+        objDroppedCount = 0;
+        objWarningCount = 0;
+        objFailureCount = 0;
+        objFirstSourceLine = null;
+        objLastConsumedLine = null;
+        objAnnouncement = null;
+    }
+
+    /// <summary>
+    /// Notes that output arrived and makes sure exactly one waiter is watching for it to stop.
+    /// </summary>
+    /// <remarks>
+    /// A stamp rather than a fresh <see cref="CancellationTokenSource"/> per line: a build writes
+    /// tens of thousands of lines and one cancellation plus one timer each would cost more than the
+    /// rendering this component exists to make cheap. One waiter re-checks the stamp every
+    /// <see cref="QuietMilliseconds"/> instead, so the whole log costs one timer per quiet period.
+    /// </remarks>
+    private void ScheduleAnnouncement()
+    {
+        objAppendStamp++;
+        if (objIsAnnouncePending)
+        {
+            return;
+        }
+
+        objIsAnnouncePending = true;
+        _ = AnnounceWhenQuietAsync();
+    }
+
+    private async Task AnnounceWhenQuietAsync()
+    {
+        try
+        {
+            var vToken = objLifetimeCts.Token;
+            var vSeen = objAppendStamp;
+            while (true)
+            {
+                await Task.Delay(QuietMilliseconds, vToken);
+                if (objAppendStamp == vSeen)
+                {
+                    break;
+                }
+
+                vSeen = objAppendStamp;
+            }
+
+            var vSummary = BuildSummary();
+            await InvokeAsync(() =>
+            {
+                if (objIsDisposed)
+                {
+                    return;
+                }
+
+                objAnnouncement = vSummary;
+                objShouldRender = true;
+                StateHasChanged();
+            });
+        }
+        catch (OperationCanceledException)
+        {
+            // The component went away while the log was quiet.
+        }
+        catch (ObjectDisposedException)
+        {
+            // The renderer went away while the log was quiet.
+        }
+        finally
+        {
+            objIsAnnouncePending = false;
+        }
+    }
+
+    private string BuildSummary()
+    {
+        var vLines = objHeld.ToString(CultureInfo.CurrentCulture);
+        var vWarnings = objWarningCount.ToString(CultureInfo.CurrentCulture);
+        var vFailures = objFailureCount.ToString(CultureInfo.CurrentCulture);
+        return vLines + (objHeld == 1 ? " line, " : " lines, ")
+            + vWarnings + (objWarningCount == 1 ? " warning, " : " warnings, ")
+            + vFailures + (objFailureCount == 1 ? " failure." : " failures.");
+    }
+
+    private static string DroppedTextFor(int aCount) =>
+        "… " + aCount.ToString(CultureInfo.CurrentCulture) + (aCount == 1 ? " earlier line dropped" : " earlier lines dropped");
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "w-full overflow-hidden rounded-md border border-border bg-background text-foreground",
+        Class
+    );
+
+    /// <summary>
+    /// One block of lines the panel holds, and the version that tells its
+    /// <see cref="LogViewChunk"/> whether it has to render again.
+    /// </summary>
+    private sealed class LogChunkState
+    {
+        /// <summary>Gets the block's identity, used as its render key. Never reused.</summary>
+        public int Id { get; init; }
+
+        /// <summary>Gets or sets the sequence number of the block's first line.</summary>
+        public long FirstId { get; set; }
+
+        /// <summary>Gets or sets a number bumped whenever the block's lines change.</summary>
+        public int Version { get; set; }
+
+        /// <summary>Gets the block's lines.</summary>
+        public List<LogLine> Lines { get; } = [];
+    }
+}

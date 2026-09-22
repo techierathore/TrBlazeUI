@@ -4,13 +4,26 @@
 
 @* Reorderable list. Order is changed with real buttons rather than drag-and-drop, so it works
    with a keyboard, a screen reader, a touch screen and a mouse without a pointer-events story -
-   and every move is announced. Drag is a convenience; buttons are the contract. *@
+   and every move is announced. Drag is a convenience; buttons are the contract.
 
-<ol class="@CssClass" @attributes="AdditionalAttributes">
+   Each row shows where it is (ShowPosition) and, with AllowRemove, how to take it out - the two
+   things a reorderable list is asked for straight after "move it" (REQ-UI-017). *@
+
+<ol class="@CssClass" data-slot="sortable-list" @attributes="AdditionalAttributes">
     @foreach (var (vItem, vIndex) in Items.Select((item, index) => (item, index)))
     {
         var vPosition = vIndex;
-        <li class="@ItemCssClass" @key="vItem">
+        <li class="@ItemCssClass" data-slot="sortable-list-item" @key="vItem">
+            @if (ShowPosition)
+            {
+                @* The <ol> already tells a screen reader this is item n of m, so repeating the
+                   number here would be heard twice. It is drawn for the eye only. *@
+                @* min-w rather than w, so a list past 99 rows widens the column instead of
+                   overflowing it. *@
+                <span class="min-w-5 shrink-0 text-right text-sm tabular-nums text-muted-foreground"
+                      data-slot="sortable-list-position"
+                      aria-hidden="true">@(vPosition + 1)</span>
+            }
             <div class="flex shrink-0 flex-col">
                 <Button Variant="ButtonVariant.Ghost"
                         Size="ButtonSize.IconSmall"
@@ -39,10 +52,21 @@
                     @DescribeItem(vItem)
                 }
             </div>
+            @if (AllowRemove)
+            {
+                <Button Variant="ButtonVariant.Ghost"
+                        Size="ButtonSize.IconSmall"
+                        Class="h-7 w-7 shrink-0"
+                        data-slot="sortable-list-remove"
+                        AriaLabel="@($"Remove {DescribeItem(vItem)}")"
+                        OnClick="@(() => RemoveAsync(vPosition))">
+                    <span aria-hidden="true">&#10005;</span>
+                </Button>
+            }
         </li>
     }
 </ol>
-<span class="sr-only" aria-live="polite">@objAnnouncement</span>
+<span class="sr-only" aria-live="polite" data-slot="sortable-list-status">@objAnnouncement</span>
 
 @code {
     private string? objAnnouncement;
@@ -56,6 +80,9 @@
     /// <summary>
     /// Gets or sets the callback raised with the reordered list. Use with <c>@bind-Items</c>.
     /// </summary>
+    /// <remarks>
+    /// Raised by a removal as well as by a move, so a bound list stays in step either way.
+    /// </remarks>
     [Parameter]
     public EventCallback<IList<TItem>> ItemsChanged { get; set; }
 
@@ -71,6 +98,39 @@
     /// </summary>
     [Parameter]
     public Func<TItem, string>? ItemLabel { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether each row shows its 1-based position. Default is true.
+    /// </summary>
+    /// <remarks>
+    /// A reorderable list whose rows do not say where they are makes the reader count, and makes
+    /// the announcement ("moved to position 3 of 7") unverifiable against the screen (REQ-UI-017).
+    /// The number is drawn <c>aria-hidden</c>, because the <c>&lt;ol&gt;</c> already carries the
+    /// position for assistive technology and would otherwise say it twice.
+    /// </remarks>
+    [Parameter]
+    public bool ShowPosition { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether each row carries a remove button. Default is false.
+    /// </summary>
+    /// <remarks>
+    /// Off by default because removal destroys data and no existing caller asked for it. The
+    /// button's accessible name has the same shape as the move buttons' — "Remove Theming" —
+    /// and the removal is announced through the same live region.
+    /// </remarks>
+    [Parameter]
+    public bool AllowRemove { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback raised with the item that was removed.
+    /// </summary>
+    /// <remarks>
+    /// Raised after <see cref="ItemsChanged"/>, so a handler that inspects the bound list sees it
+    /// already without the item. Ignored unless <see cref="AllowRemove"/> is true.
+    /// </remarks>
+    [Parameter]
+    public EventCallback<TItem> OnRemove { get; set; }
 
     /// <summary>
     /// Gets or sets additional CSS classes.
@@ -111,6 +171,36 @@
         if (ItemsChanged.HasDelegate)
         {
             await ItemsChanged.InvokeAsync(Items);
+        }
+    }
+
+    private async Task RemoveAsync(int aIndex)
+    {
+        if (aIndex < 0 || aIndex >= Items.Count)
+        {
+            return;
+        }
+
+        // The name is taken before the removal - afterwards the item is no longer in the list, and
+        // an ItemLabel that looks the item up by position would describe the wrong row.
+        var vItem = Items[aIndex];
+        var vName = DescribeItem(vItem);
+        Items.RemoveAt(aIndex);
+
+        objAnnouncement = Items.Count == 1
+            ? $"{vName} removed, 1 item left"
+            : $"{vName} removed, {Items.Count} items left";
+
+        // Items first, so a handler on OnRemove reading the bound list sees it already updated -
+        // the same order MoveAsync writes the list back in.
+        if (ItemsChanged.HasDelegate)
+        {
+            await ItemsChanged.InvokeAsync(Items);
+        }
+
+        if (OnRemove.HasDelegate)
+        {
+            await OnRemove.InvokeAsync(vItem);
         }
     }
 }
