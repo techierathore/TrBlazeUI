@@ -15,11 +15,12 @@ fixed in code; four needed no code, because the control already existed.
 
 Nothing is blocked. All ten were found while designing Chatur's screens on day one, against the 2.0.7 component reference; the mockups are drawn from controls that do exist, and each entry says what was used instead.
 
-> **Upstream reply 2026-09-22 — read it before acting on this file.** Four entries
-> (TR-001, TR-002, TR-005, TR-009) and most of a fifth (TR-008) report controls that
-> already exist. Two of them are unreleased and genuinely invisible on 2.0.7; three were
-> documented in the very copy of the reference this file cites. The other six entries are
-> built and waiting on the next release. Full answer in
+> **Upstream reply 2026-09-22 — read it before acting on this file. The action is: upgrade
+> to 2.0.9.** Four entries (TR-001, TR-002, TR-005, TR-009) and most of a fifth (TR-008)
+> report controls that already exist. Two of them shipped in **2.0.8, on 2026-09-20 — the
+> day before this batch was filed**; three were documented in the very copy of the
+> reference this file cites. The other six are in **2.0.9**, released 2026-09-22. Note the
+> feed: 2.0.7 onward are on GitHub Packages, not nuget.org. Full answer in
 > "[Replies from TrBlazeUI](#replies-from-trblazeui)" at the foot of this file.
 
 ## Entries
@@ -149,15 +150,36 @@ also used TR-001 to TR-004 for different things (those became `ScrollArea.StickT
 "Chatur batch 2" throughout. Please keep numbering upward from TR-010 next time, or the
 two records cannot be told apart.
 
-**Everything below is built and checked in a running browser, but not yet published.** It
-is in `CHANGELOG.md` under `[Unreleased]`, waiting on the release after 2.0.7.
+**Everything below is published. Upgrade to 2.0.9.**
+
+> **Correction, 2026-09-22, later the same day.** The first version of this reply said the
+> tree control and the difference viewer were built but "not yet published", and that
+> everything else was waiting on a release. That was wrong, and the repository's own
+> `CHANGELOG.md` is why: three versions had been tagged and published while the changelog
+> still filed their contents under `[Unreleased]`, so this side could not see its own
+> release state either. The real position:
+>
+> | Version | Released | What it gave you |
+> |---|---|---|
+> | **2.0.9** | 2026-09-22 | the six entries below that needed code |
+> | **2.0.8** | 2026-09-20 | the tree control and the difference viewer — **the day before you filed this batch** |
+> | **2.0.7** | 2026-09-15 | the version you are on |
+>
+> So TR-001 and TR-002 were never waiting on us. They were published before your report
+> was written, and the answer there was always *upgrade*, not *wait*. We are sorry for the
+> wasted effort, and we have added a version table to the top of the reference so the next
+> person can check this in one look.
+>
+> **A feed warning while you are upgrading:** 2.0.7, 2.0.8 and 2.0.9 are on **GitHub
+> Packages**, not nuget.org, which still stops at 2.0.6. If the upgrade cannot find 2.0.9,
+> that is the reason.
 
 #### The four that need no code from us
 
 | Entry | What is actually there |
 |---|---|
-| **TR-001** tree control | `TreeView` + `TreeItem` **already exist** — expand/collapse, `@bind-SelectedValue`, the full WAI-ARIA tree keyboard, an `Icon` and `Trailing` slot per row, and children loaded on demand. They shipped for **your previous batch**. Live at `/components/tree-view`. |
-| **TR-002** difference viewer | `DiffView` + `TextDiff` **already exist** — side by side or inline, line numbers, added/removed tinting, folded unchanged stretches. Also from your previous batch. Live at `/components/diff-view`. |
+| **TR-001** tree control | `TreeView` + `TreeItem` **already exist** — expand/collapse, `@bind-SelectedValue`, the full WAI-ARIA tree keyboard, an `Icon` and `Trailing` slot per row, and children loaded on demand. They shipped for **your previous batch**, and were **published in 2.0.8 on 2026-09-20**. Live at `/components/tree-view`. |
+| **TR-002** difference viewer | `DiffView` + `TextDiff` **already exist** — side by side or inline, line numbers, added/removed tinting, folded unchanged stretches. Also from your previous batch, and also **published in 2.0.8 on 2026-09-20**. Live at `/components/diff-view`. |
 | **TR-005** small switch for a cell | `Size="SwitchSize.Small"` already exists **and is documented in the copy you read**, at line 775. Measured: the three switch heights are **20 / 24 / 28 px** and a DataTable body cell is **53 px**, so the small one does not stretch a row. |
 | **TR-009** list whose order the user sets | `SortableList` is **already button-driven**. The reference you read describes it at line 1818, verbatim, as *"Reorderable list driven by real buttons rather than drag-and-drop"* — the entry says it "reorders by dragging". Measured live: 3 move-up and 3 move-down buttons, the first up disabled, and move-down reordering correctly. |
 
@@ -167,12 +189,18 @@ lines above the `SelectedItems` row you found, with a worked `@bind-SelectedItem
 at line 2230. Measured live: 5 per-row checkboxes and a working count. **One part of your
 entry was a genuine defect and we have fixed it** — see below.
 
-**Why this happened, and what we changed because of it.** TR-001 and TR-002 are our fault
-in a way worth explaining: the copy at `.trblazeui/TrBlazeUI-AI-Reference.md` in your
-repository is deployed by the **installed NuGet package** and only changes when you upgrade
-it. Yours is the 2.0.7 copy, and `TreeView`, `DiffView`, `StickToEnd` and `ToggleGroup` are
-all unreleased, so they are genuinely invisible to you. That is a release problem, not a
-documentation one, and the answer is the next publish.
+**Why this happened, and what we changed because of it.** TR-001 and TR-002 are our fault,
+though not in the way we first said. The copy at `.trblazeui/TrBlazeUI-AI-Reference.md` in
+your repository is deployed by the **installed NuGet package** and only changes when you
+upgrade it. Yours is the 2.0.7 copy, so `TreeView`, `DiffView`, `StickToEnd` and
+`ToggleGroup` are invisible to you — but they were **published in 2.0.8 on 2026-09-20**,
+the day before you filed. They were an upgrade away the whole time, and we did not say so,
+because our own changelog had them filed as unpublished. Both ends were reading a stale
+record.
+
+So the reference now carries a **version table** at the top saying which version added
+which control, and the changelog now names each release instead of collecting everything
+under "unreleased".
 
 TR-005, TR-008 and TR-009 are different: those answers were in the copy you had, and you
 did not find them. That is still our problem — a reference nobody can search is a reference
@@ -219,10 +247,18 @@ highlighter is bundled** — pass your own markup through `Html`, the same barga
 
 #### What we need from you
 
-When the next release is out, upgrade and re-check the six built entries against your own
-screens — particularly `LogView` on the Process run screen and `NavList` on the roles tab,
-since those are the two where your real usage will be heavier than our demo. Tell us what
-does not fit. The four we pushed back on need nothing from you except a look at the new
-index at the top of the reference.
+**Upgrade to 2.0.9 — it is already out.** From GitHub Packages
+(`https://nuget.pkg.github.com/techierathore/index.json`); nuget.org still stops at 2.0.6,
+so that feed will not find it.
+
+Then re-check the six built entries against your own screens — particularly `LogView` on
+the Process run screen and `NavList` on the roles tab, since those are the two where your
+real usage will be heavier than our demo. Tell us what does not fit.
+
+The four we pushed back on need nothing from you except the upgrade and a look at the two
+new tables at the top of the reference: **"Which control do I use for…"**, which maps a
+problem on a screen to the control that solves it, and **"Which version added what"**,
+which tells you in one look whether a control you cannot find is missing or just newer
+than your package.
 
 ---

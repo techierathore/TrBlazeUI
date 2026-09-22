@@ -77,7 +77,7 @@ Written by the status gate after every build, verify and handoff; not by hand.
 | Screen | Requirements | Verified | Open | Status |
 |---|---|---|---|---|
 | UI / Pages | 19 | 19 | 0 | Done |
-| Functional requirements | 10 | 10 | 0 | Done |
+| Functional requirements | 10 | 9 | 1 | Partial |
 | Non-functional | 5 | 5 | 0 | Done |
 | Component demos | 2 | 2 | 0 | Done |
 | Editor | 1 | 1 | 0 | Done |

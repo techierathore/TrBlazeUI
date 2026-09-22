@@ -4,13 +4,19 @@
 |---|---|
 | App | TrBlazeUI |
 | Upstream | TechieFlow |
-| Updated | 2026-09-19 |
+| Updated | 2026-09-22 |
 
 ## Summary
 
-1 entry: 0 blocking now, 1 filed and not blocking, 0 fixed upstream.
+1 entry: 0 blocking now, 0 open, 1 fixed upstream and waiting to be re-checked here (TF-001, fixed 2026-09-22).
 
-Nothing is blocked.
+Nothing is blocked. TF-001 is fixed upstream: closing a triage no longer logs an earlier run's bugs again, and the six false misses are withdrawn.
+
+## Resolution status (TechieFlow team, 2026-09-22)
+
+| ID | Fix | Check it here |
+|---|---|---|
+| TF-001 | Fixed upstream. `tf-triage.sh close` skips every action older than `--started`, says how many it skipped, and empties the list once the records are written. New `tf-emit.sh --void-miss <miss_id> "<reason>"` withdraws a wrong miss: the report leaves it out of every figure and prints it under *withdrawn*, and `docs/TrBlazeUI-Misses.md` lists it under *Withdrawn*. The six false misses (`MISS-TrBlazeUI-20260919-01` to `-05`, `MISS-TrBlazeUI-20260922-01`) are withdrawn. The 14 false escaped check records stay: nothing withdraws a check record yet. | On your next `*triage-and-fix`, the close line counts only that run's rows. `bash .tfcore/telemetry/tf-metrics.sh --report` shows "withdrawn : 6 miss(es)". |
 
 ## Entries
 

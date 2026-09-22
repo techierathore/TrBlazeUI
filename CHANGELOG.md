@@ -11,16 +11,35 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
-Closes TfLens TR-039 and TR-040 (`docs/TfLens-TrBlazeUI-Feedback.md`), both filed against 2.0.6;
-Chatur's first batch, TR-001 to TR-004 (`docs/Chatur-TrBlazeUI-Feedback.md`), filed against 2.0.7;
-and Chatur's **second** batch of ten, filed 2026-09-21, also against 2.0.7. That second batch
-renumbered from TR-001, so its ids collide with the first batch's; it is referred to here as
-"Chatur batch 2" throughout.
+Nothing yet.
 
-Five of batch 2's ten entries reported controls that already exist. Four of those five — a tree,
+---
+
+## [2.0.9] — 2026-09-22
+
+> Published from the release tag `v2.0.9` to **GitHub Packages**
+> (`https://nuget.pkg.github.com/techierathore/index.json`). **Not on nuget.org**, which is still
+> at 2.0.6 — see the note under [2.0.7].
+>
+> **Three releases went out without a changelog entry.** 2.0.7, 2.0.8 and this one were tagged and
+> published while everything below sat under `[Unreleased]`, so between 2026-09-15 and today this
+> file said work was unpublished when it had already shipped. The sections below were reconstructed
+> on 2026-09-22 by reading each tag's own source tree, which is the only record that could not
+> drift: component-folder counts of **79** at `v2.0.7`, **81** at `v2.0.8` and **85** at `v2.0.9`,
+> and the presence of each named type at each tag. Dates are the GitHub release timestamps.
+>
+> The cost of this is not bookkeeping: a consumer on 2.0.7 was told by their own reference that a
+> control did not exist, while it had been published two days earlier. **Write the section when the
+> tag is cut.**
+
+Closes Chatur's **second** batch of ten findings (`docs/Chatur-TrBlazeUI-Feedback.md`), filed
+2026-09-21 against 2.0.7. That batch renumbered from TR-001, so its ids collide with the first
+batch's; it is called "Chatur batch 2" throughout.
+
+Five of batch 2's ten entries reported controls that already existed. Four of those five — a tree,
 a difference viewer, a small switch for a table cell, and an ordered list with move-up and
-move-down buttons — needed no code at all; they needed the reference to be findable. See
-"Documentation" below.
+move-down buttons — needed no code at all; two had shipped in 2.0.8 and two had been documented all
+along. They needed the reference to be findable. See "Documentation" below.
 
 ### ⚠ Behaviour changes to review before upgrading
 
@@ -118,6 +137,23 @@ the prose had said 79) and now carries the four new namespaces, at 85. A consume
 must drop those four lines: a `@using` for a namespace the installed package lacks is CS0246, a
 hard error, not the silent RZ10012 a missing one gives.
 
+---
+
+## [2.0.8] — 2026-09-20
+
+> Published from the release tag `v2.0.8` to **GitHub Packages**. Not on nuget.org.
+> 81 component folders at this tag, up from 79 at 2.0.7: `TreeView` and `DiffView` are the two.
+>
+> **This is the release Chatur needed and did not have.** They filed their second batch on
+> 2026-09-21 against 2.0.7, reporting that no tree control and no difference viewer existed — both
+> had been published here the day before. The action on those two findings was always *upgrade*,
+> never *wait*.
+
+Closes Chatur's **first** batch, TR-001 to TR-004 (`docs/Chatur-TrBlazeUI-Feedback.md`), filed
+against 2.0.7.
+
+### ⚠ Behaviour changes to review before upgrading
+
 - **Side borders and border styles now survive `Class` merging.** `cn()` used to read `border-l`,
   `border-b`, `border-s` (and the other sides) and `border-dashed`/`border-solid`/… as border
   *colours*, so a later colour class deleted them. `Timeline`'s vertical line (`border-s`) and
@@ -146,6 +182,20 @@ hard error, not the silent RZ10012 a missing one gives.
   joined control for a view switch that keeps exactly one choice. A single-choice group is now a
   `radiogroup` of `radio` items with one Tab stop and arrow-key movement; a multiple-choice group
   keeps `aria-pressed`. The AI reference now documents `ToggleGroup`, which it never listed.
+
+---
+
+## [2.0.7] — 2026-09-15
+
+> Published from the release tag `v2.0.7` to **GitHub Packages**. 79 component folders.
+>
+> **Not on nuget.org, and neither is anything after it.** nuget.org carries 2.0.0, 2.0.3 and 2.0.6
+> only, so a consumer on that feed cannot reach 2.0.7, 2.0.8 or 2.0.9 at all. REQ-FN-004's test
+> checks the latest release tag against nuget.org and fails for exactly this reason. Either publish
+> the three to nuget.org or say in `README.md` that GitHub Packages is the supported feed — right
+> now the repository implies one and ships to the other.
+
+Closes TfLens TR-039 and TR-040 (`docs/TfLens-TrBlazeUI-Feedback.md`), both filed against 2.0.6.
 
 ### Fixed
 
