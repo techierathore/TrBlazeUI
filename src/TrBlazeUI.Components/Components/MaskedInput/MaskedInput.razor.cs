@@ -403,6 +403,10 @@ public partial class MaskedInput : ComponentBase, IAsyncDisposable
             {
                 // Expected during circuit disconnect
             }
+            catch (TaskCanceledException)
+            {
+                // The page went away before it answered; the module died with it (REQ-UI-028).
+            }
         }
     }
 

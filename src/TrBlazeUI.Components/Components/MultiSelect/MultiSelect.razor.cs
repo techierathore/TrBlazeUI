@@ -617,7 +617,19 @@ public partial class MultiSelect<TItem> : ComponentBase, IAsyncDisposable
 
         if (objMultiSelectModule != null)
         {
-            await objMultiSelectModule.DisposeAsync();
+            try
+            {
+                await objMultiSelectModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Expected during circuit disconnect.
+            }
+            catch (TaskCanceledException)
+            {
+                // The page went away before it answered; the module died with it (REQ-UI-028).
+            }
+
             objMultiSelectModule = null;
         }
 

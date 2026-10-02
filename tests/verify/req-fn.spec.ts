@@ -148,7 +148,7 @@ test.describe('Functional requirements', () => {
     expect(log!, 'no undocumented-member warnings in the build').not.toMatch(/CS1591/);
   });
 
-  test('REQ-FN-004 the publish workflow resolves the version from the tag and guards the push', async () => {
+  test('REQ-FN-004 a published release puts all five packages on GitHub Packages at the tag version', async () => {
     const publish = read('.github/workflows/publish-nuget.yml');
     const build = read('.github/workflows/build.yml');
     expect(build.length, 'build.yml is present').toBeGreaterThan(0);
@@ -177,10 +177,32 @@ test.describe('Functional requirements', () => {
       expect(out.trim(), `${f} parses`).toBe('ok');
     }
 
-    // The closing condition itself: the owner's non-dry-run publish is observable from outside,
-    // on nuget.org. The latest published GitHub release names the tag; all five packages must be
-    // listed at that tag's version, and each must have been packed from the commit that tag
-    // points at - so a live version that came from somewhere else cannot pass.
+    // The release workflow: GitHub Packages is the source every application of the owner's uses,
+    // so this is the workflow the row is about. A published release must build all five packages
+    // at the tag's version and push them there.
+    const ghp = read('.github/workflows/publish-github-packages.yml');
+    expect(ghp, 'it runs when a release is published').toMatch(/release:\s*\n\s*types:\s*\[published\]/);
+    expect(ghp, 'it pushes to GitHub Packages').toMatch(/nuget\.pkg\.github\.com\/techierathore\/index\.json/);
+    expect(ghp, 'the version comes from the release tag').toMatch(/github\.event\.release\.tag_name/);
+    expect(ghp, 'the tag parses through the shared rule').toMatch(/ConvertTo-PackageVersion/);
+    expect((ghp.match(/-p:Version=/g) || []).length, 'the version reaches both build and pack').toBeGreaterThanOrEqual(2);
+    for (const name of ['TrBlazeUI.Primitives', 'TrBlazeUI.Components', 'TrBlazeUI.Icons.Lucide',
+                        'TrBlazeUI.Icons.Heroicons', 'TrBlazeUI.Icons.Feather']) {
+      expect(ghp, `${name} is packed`).toContain(`src/${name}/${name}.csproj`);
+    }
+    const ghpYaml = execFileSync('python3', ['-c',
+      'import sys,yaml;yaml.safe_load(open(sys.argv[1]));print("ok")',
+      path.join(REPO, '.github/workflows/publish-github-packages.yml')], { encoding: 'utf8' });
+    expect(ghpYaml.trim(), 'publish-github-packages.yml parses').toBe('ok');
+
+    // The closing condition, observable from outside without a sign-in: the newest published
+    // release has a run of that workflow, started by the release, at the tag's own commit, that
+    // finished green. GitHub Packages itself cannot be read without a token, and the run is the
+    // thing that puts the packages there.
+    //
+    // nuget.org is deliberately NOT checked. It serves external users, and which versions go
+    // there, and when, is the owner's decision (owner, 2026-09-22 and again 2026-10-02). This
+    // test demanded the newest tag on nuget.org until 2026-10-02 and held the row open for it.
     const json = async (url: string) => {
       const res = await fetch(url, { headers: { 'User-Agent': 'trblazeui-verify' } });
       expect(res.ok, `${url} answers`).toBe(true);
@@ -193,21 +215,12 @@ test.describe('Functional requirements', () => {
     expect(version, `release tag ${tag} carries a version`).toMatch(/^\d+\.\d+\.\d+/);
     const tagCommit: string = (await json(`https://api.github.com/repos/techierathore/TrBlazeUI/commits/${tag}`)).sha;
 
-    const packages = ['TrBlazeUI.Primitives', 'TrBlazeUI.Components', 'TrBlazeUI.Icons.Lucide',
-                      'TrBlazeUI.Icons.Heroicons', 'TrBlazeUI.Icons.Feather'];
-    for (const name of packages) {
-      const id = name.toLowerCase();
-      const index = await json(`https://api.nuget.org/v3-flatcontainer/${id}/index.json`);
-      expect(index.versions, `${name} ${version} is on nuget.org`).toContain(version);
-
-      const leaf = await json(`https://api.nuget.org/v3/registration5-semver1/${id}/${version}.json`);
-      expect(leaf.listed, `${name} ${version} is listed`).not.toBe(false);
-
-      const nuspecRes = await fetch(`https://api.nuget.org/v3-flatcontainer/${id}/${version}/${id}.nuspec`);
-      const nuspec = await nuspecRes.text();
-      expect(nuspec, `${name} ${version} nuspec carries that version`).toContain(`<version>${version}</version>`);
-      expect(nuspec, `${name} ${version} was packed from the ${tag} commit`).toContain(`commit="${tagCommit}"`);
-    }
+    const runs = await json('https://api.github.com/repos/techierathore/TrBlazeUI/actions/workflows/publish-github-packages.yml/runs?event=release&per_page=20');
+    const mine = (runs.workflow_runs as Array<{ head_branch: string; head_sha: string; status: string; conclusion: string }>)
+      .filter(r => r.head_branch === tag);
+    expect(mine.length, `a release run of the publish workflow exists for ${tag}`).toBeGreaterThan(0);
+    expect(mine[0].head_sha, `the ${tag} run built the commit the tag points at`).toBe(tagCommit);
+    expect(`${mine[0].status}/${mine[0].conclusion}`, `the ${tag} publish to GitHub Packages finished green`).toBe('completed/success');
   });
 
   test('REQ-FN-005 one shared version from the tag, with the package metadata declared', () => {

@@ -144,6 +144,9 @@ async function toggleGroup(page, w) {
   console.log(`\nREQ-UI-027 — ToggleGroup OnVariant @${w}`);
   await page.goto(`${BASE}/components/toggle-group`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1800);
+  // The items fade between colours. A reading taken part-way through a fade is neither the old
+  // colour nor the new one, so the colours are read with the fades switched off.
+  await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; }' });
 
   const measure = () => page.evaluate(() => {
     const probe = document.createElement('div');

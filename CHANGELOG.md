@@ -11,9 +11,38 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
+Built and verified on 2026-10-02, after 2.1.0 was cut. No behaviour changes and no new API.
+
+### Fixed
+
+- **No control reports an unhandled error when its page stops answering during dispose.** The
+  defect fixed on `ToggleGroup` in 2.1.0 (Chatur TR-013) was one instance of a pattern: a control's
+  `DisposeAsync` calls the browser, the page has closed or reloaded, the call is never answered,
+  the server cancels it after its one-minute limit, and the `TaskCanceledException` escapes as
+  "Unhandled exception rendering component". Every demo page was driven into that state: 17
+  controls threw before the fix and none after. Fixed in `AnchorNav`, `CodeBlock`, `CodeEditor`,
+  `ContextMenuContent`, `FileUpload`, `MarkdownEditor`, `MaskedInput`, `MenubarContent`,
+  `MultiSelect`, `NavList`, `NavigationMenuContent`, `ResponsiveNavProvider`, `RichTextEditor`,
+  `ScrollArea`, `SidebarProvider`, `TreeView`, the chart module wrapper, and in the primitives
+  `DialogContent`, `DropdownMenuContent`, `PopoverContent`, `SelectContent`, `SheetContent`,
+  `PortalHost`, `FocusManager` and `PositioningService`. `ContextMenuContent`, `MenubarContent`,
+  `MultiSelect` and `NavigationMenuContent` had no guard at all around their module dispose and
+  now also swallow `JSDisconnectedException`.
+- **Known and not fixable here:** the framework's own `Virtualize`, which `CommandVirtualizedGroup`
+  renders, has the same defect in its own `DisposeAsync`. The library cannot catch an exception
+  thrown inside a framework component's dispose.
+
+---
+
+## [2.1.0] — 2026-10-02
+
+> Published from the release tag `v2.1.0` to **GitHub Packages**
+> (`https://nuget.pkg.github.com/techierathore/index.json`) and to **nuget.org**. Confirmed against
+> the published `TrBlazeUI.Components` 2.1.0 package: it carries `RowAttributes`,
+> `ToggleOnVariant` and the rebuilt stylesheet.
+
 Closes Chatur's third batch (`docs/Chatur-TrBlazeUI-Feedback.md`, TR-011 to TR-013, filed
-2026-09-30 and 2026-10-01 against 2.0.9). Built and verified on 2026-10-01; **not in a published
-version yet**. Move this section under the version heading when the tag is cut.
+2026-09-30 and 2026-10-01 against 2.0.9).
 
 No behaviour changes: every existing `DataTable` and `ToggleGroup` renders as before.
 
@@ -528,7 +557,10 @@ existing trigger would be a silent breaking change — and the row recipe is now
 
 ---
 
-## [2.1.0] — never published under this number; shipped in 2.0.3 (2026-08-25)
+## [2.1.0 working label, 2026-08] — never published under this number; shipped in 2.0.3 (2026-08-25)
+
+> Not the 2.1.0 released on 2026-10-02, which is at the top of this file. This section kept the
+> number its work carried in the repository at the time.
 
 Consumer-feedback release closing the TechieBlog findings recorded in
 `docs/TechieBlog-TrBlazeUI-Feedback.md` (TR-001 … TR-065).

@@ -60,5 +60,9 @@ internal sealed class DisconnectSafeJSObjectReference : IJSObjectReference
         {
             // The circuit closed first; the browser released the module with it.
         }
+        catch (TaskCanceledException)
+        {
+            // The page went away before it answered; the module died with it (REQ-UI-028).
+        }
     }
 }

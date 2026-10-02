@@ -314,6 +314,10 @@
             {
                 // Circuit already gone.
             }
+            catch (TaskCanceledException)
+            {
+                // The page went away before it answered; the module died with it (REQ-UI-028).
+            }
 
             objPortalModule = null;
         }
@@ -327,6 +331,10 @@
             catch (JSDisconnectedException)
             {
                 // Circuit already gone.
+            }
+            catch (TaskCanceledException)
+            {
+                // The page went away before it answered; the module died with it (REQ-UI-028).
             }
 
             objClickOutsideModule = null;
