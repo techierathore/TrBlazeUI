@@ -11,7 +11,36 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
-Nothing yet.
+Closes Chatur's third batch (`docs/Chatur-TrBlazeUI-Feedback.md`, TR-011 to TR-013, filed
+2026-09-30 and 2026-10-01 against 2.0.9). Built and verified on 2026-10-01; **not in a published
+version yet**. Move this section under the version heading when the tag is cut.
+
+No behaviour changes: every existing `DataTable` and `ToggleGroup` renders as before.
+
+### Added — Chatur batch 3
+
+- **`DataTable.RowAttributes`, `HeaderRowAttributes` and `SelectAllAttributes` (TR-011)**: HTML
+  attributes for each body row (a function of the row's item), for the header row, and for the
+  choose-all control that `SelectionMode="Multiple"` draws. Attributes on the grid itself land on
+  its root and a column renders no element, so until now a row could not carry a `data-testid`.
+  `SelectAllAttributes` lands on whichever control the user operates — the checkbox on a one-page
+  grid, the menu button on a paged one. A `class` entry is added to the part's own classes. The
+  choose-all control's wrapper also carries a fixed `data-slot="datatable-select-all"`.
+- **`ToggleGroup.OnVariant` (TR-012)**: the chosen item's look — `Accent` (the default, and the
+  look it always had), `Card` or `Primary` (new enum `ToggleOnVariant`). The chosen colour was
+  fixed to `bg-accent`, and an on-state class a caller passed, such as `data-[state=on]:bg-card`,
+  was not in the shipped stylesheet. `trblazeui.css` was rebuilt and now carries the four new
+  classes (1,014,498 → 1,014,828 bytes).
+
+### Fixed — Chatur batch 3
+
+- **`ToggleGroup` let "A task was canceled" escape from `DisposeAsync` (TR-013)**: when a page
+  closed or reloaded between the group's two dispose calls to the browser, the second was never
+  answered, the server cancelled it after its one-minute limit, and the `TaskCanceledException`
+  was reported as "Unhandled exception rendering component" and then "Unhandled exception in
+  circuit". Only `JSDisconnectedException` was caught. Both are now swallowed, in `DisposeAsync`
+  and around the first-render import. Reproduced before the fix (44 log entries in one run) and
+  measured after it (0).
 
 ---
 

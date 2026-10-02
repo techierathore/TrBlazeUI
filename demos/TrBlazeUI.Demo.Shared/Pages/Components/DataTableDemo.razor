@@ -135,6 +135,54 @@
         </div>
     </div>
 
+    <!-- Attributes on the rows, the header row and the choose-all control -->
+    <div class="space-y-4 rounded-lg border border-alert-success bg-alert-success-bg p-6" data-testid="req-ui-026">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold text-alert-success-foreground">Naming a row, the header row and the choose-all control</h2>
+            <p class="text-sm text-alert-success-foreground">
+                Attributes passed to the grid land on its root, and a column renders no element of its
+                own, so a row, the header row and the choose-all control could not carry a test hook.
+                <code>RowAttributes</code> takes a function of the row's item,
+                <code>HeaderRowAttributes</code> and <code>SelectAllAttributes</code> take a set of
+                attributes. A <code>class</code> entry is added to the part's own classes. The
+                choose-all control also has a fixed hook that needs no parameter: its wrapper always
+                carries <code>data-slot="datatable-select-all"</code>.
+            </p>
+        </div>
+        <div class="space-y-2">
+            <p class="text-sm font-medium text-alert-success-foreground">More than one page: the choose-all control is a menu button</p>
+            <DataTable TData="Person"
+                       Data="@people"
+                       SelectionMode="DataTableSelectionMode.Multiple"
+                       InitialPageSize="5"
+                       RowAttributes="PersonRowHook"
+                       HeaderRowAttributes="PagedHeadHook"
+                       SelectAllAttributes="PagedChooseAllHook"
+                       data-testid="req-ui-026-paged">
+                <Columns>
+                    <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" Sortable />
+                    <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Role)" Header="Role" />
+                </Columns>
+            </DataTable>
+        </div>
+        <div class="space-y-2">
+            <p class="text-sm font-medium text-alert-success-foreground">One page: the choose-all control is a plain checkbox</p>
+            <DataTable TData="ModerationRow"
+                       Data="@objModeration"
+                       SelectionMode="DataTableSelectionMode.Multiple"
+                       ShowPagination="false"
+                       RowAttributes="@(r => new Dictionary<string, object> { ["data-testid"] = $"comment-row-{r.Author}" })"
+                       HeaderRowAttributes="SingleHeadHook"
+                       SelectAllAttributes="SingleChooseAllHook"
+                       data-testid="req-ui-026-single">
+                <Columns>
+                    <DataTableColumn TData="ModerationRow" TValue="string" Property="@(r => r.Author)" Header="Author" />
+                    <DataTableColumn TData="ModerationRow" TValue="string" Property="@(r => r.Post)" Header="Post" />
+                </Columns>
+            </DataTable>
+        </div>
+    </div>
+
     <!-- Custom Cell Templates -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -596,6 +644,27 @@
     private DataTable<Person>? objSelectionGrid;
 
     private IReadOnlyCollection<Person> objCountedSelection = Array.Empty<Person>();
+
+    // Names for the parts of a grid that attributes on the grid itself never reach (REQ-UI-026).
+    private static readonly IReadOnlyDictionary<string, object> PagedHeadHook =
+        new Dictionary<string, object> { ["data-testid"] = "people-head" };
+
+    private static readonly IReadOnlyDictionary<string, object> PagedChooseAllHook =
+        new Dictionary<string, object> { ["data-testid"] = "people-choose-all" };
+
+    private static readonly IReadOnlyDictionary<string, object> SingleHeadHook =
+        new Dictionary<string, object> { ["data-testid"] = "comments-head", ["class"] = "bg-muted" };
+
+    private static readonly IReadOnlyDictionary<string, object> SingleChooseAllHook =
+        new Dictionary<string, object> { ["data-testid"] = "comments-choose-all" };
+
+    // The class entry is added to the row's own classes, not swapped for them.
+    private static IReadOnlyDictionary<string, object> PersonRowHook(Person aPerson) =>
+        new Dictionary<string, object>
+        {
+            ["data-testid"] = $"person-row-{aPerson.Id}",
+            ["class"] = "font-medium",
+        };
 
     private readonly List<ModerationRow> objModeration =
     [

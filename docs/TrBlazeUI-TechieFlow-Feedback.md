@@ -4,13 +4,13 @@
 |---|---|
 | App | TrBlazeUI |
 | Upstream | TechieFlow |
-| Updated | 2026-09-22 |
+| Updated | 2026-10-01 |
 
 ## Summary
 
-1 entry: 0 blocking now, 0 open, 1 fixed upstream and waiting to be re-checked here (TF-001, fixed 2026-09-22).
+2 entries: 0 blocking now, 1 open (TF-002, minor), 1 closed.
 
-Nothing is blocked. TF-001 is fixed upstream: closing a triage no longer logs an earlier run's bugs again, and the six false misses are withdrawn.
+Nothing is blocked. TF-001 was re-checked on 2026-10-01 and is closed. TF-002 is new: a command that runs another command inside it has its own findings relabelled as old.
 
 ## Resolution status (TechieFlow team, 2026-09-22)
 
@@ -21,6 +21,8 @@ Nothing is blocked. TF-001 is fixed upstream: closing a triage no longer logs an
 ## Entries
 
 ### TF-001 — Closing a triage records last week's bugs again under today's run
+
+> ✅ **Closed 2026-10-01** — re-checked here: On the 2026-10-01 triage-and-fix run, tf-triage.sh close printed '3 row(s) logged, 3 gate record(s) (escaped), 3 miss(es)' for the 3 rows that run logged (REQ-UI-021, REQ-UI-026, REQ-UI-027); nothing from an earlier run was replayed. tf-metrics.sh --report printed 'withdrawn : 6 miss(es)' naming the six false misses.
 
 - **Severity:** major
 - **Blocks:** no — 14 phantom escaped checks and 6 phantom misses in the metrics so far.
@@ -37,3 +39,20 @@ Nothing is blocked. TF-001 is fixed upstream: closing a triage no longer logs an
 - **Still happening 2026-09-22.** That run logged 8 rows; `close` reported 9. The ninth, REQ-UI-021, was created on 2026-09-19 and never touched: one `escaped` record plus `MISS-TrBlazeUI-20260922-01`, which has **no `miss-fix`** — nothing to fix — so it stays open for good.
 - **Workaround:** none on the stream; nothing withdraws a record. Trimming the list by hand is why one leaked this time rather than thirteen. It shrinks the next run's blast radius, it fixes nothing.
 - **Suggested fix:** in `close`, skip actions whose `ts` precedes `--started`, and empty the list afterwards. **And add a withdrawal record:** six open misses record work that was never open and will depress the resolved-miss rate on every future report. A `miss-void`, shaped like the existing `run-void`, would let a report exclude them.
+
+### TF-002 — A command that chains another one has its own document findings relabelled as old
+
+- **Severity:** minor
+- **Blocks:** no — the findings are still printed; only their label is wrong, and the run carried on.
+- **Repro:**
+  ```
+  bash .tfcore/utils/tf-phase.sh start triage-and-fix TrBlazeUI   # "baseline written … (106 old finding(s))"
+  bash .tfcore/utils/tf-triage.sh TrBlazeUI new "…" "…"            # twice: two new rows
+  bash .tfcore/utils/tf-phase.sh start verify-phase TrBlazeUI     # "baseline written … (114 old finding(s))"
+  bash .tfcore/utils/tf-doc-check.sh docs/TrBlazeUI-Checklist.md  # the two new rows' findings print as OLD
+  ```
+- **Expected:** findings this run created stay `FAIL` until the run ends, whatever commands it runs inside itself.
+- **Actual:** `*triage-and-fix` tells its fix step to start `verify-phase` with its own step 0, and its metrics step to start `metrics-report`. Each start writes a new baseline, so the findings the triage had just created (the old count rose from 106 to 114; on REQ-UI-026 and REQ-UI-027 they were an acceptance line too long, no BRD item named and no mockup link) became "from before this command" and stopped blocking.
+- **Encountered in:** `*triage-and-fix TrBlazeUI`, 2026-10-01, at the status gate.
+- **Workaround:** read the `OLD` lines for the rows this run added and fix them by hand, which is what was done here.
+- **Suggested fix:** when a phase marker already exists for a running command, a chained start keeps the outer command's baseline instead of writing a new one.

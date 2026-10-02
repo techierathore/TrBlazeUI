@@ -3,9 +3,9 @@
 | | |
 |---|---|
 | App | TrBlazeUI |
-| Count | 49 logged: 13 open, 30 fixed, 0 will not fix, 6 withdrawn |
+| Count | 52 logged: 13 open, 33 fixed, 0 will not fix, 6 withdrawn |
 | Source | `docs/metrics/misses.jsonl`, one row per miss record. Rewritten by `tf-misses-md.sh` on every new record. Never edit it: a wrong row is corrected by a new record. |
-| Updated | 2026-09-22 |
+| Updated | 2026-10-01 |
 
 **Whose gap** answers the four questions of the miss protocol: **the app's spec** did not say it, so the checklist line is fixed; **the framework never said it**, so one requirement line and a check are added; **the check was too weak** (a review, or a script that did not fire), so the check is fixed; **said and ignored**, so the rule becomes a hook or is deleted. **not sorted** means the record predates the sort or nobody has answered yet; `bash .tfcore/utils/tf-emit.sh --amend <miss> sort <spec|unsaid|weak-check|ignored>` completes it.
 
@@ -27,10 +27,13 @@
 | MISS-TrBlazeUI-20260831-11 (REQ-FN-004) | 2026-08-31 by owner | not sorted | no sentence recorded (wrong-behaviour, config, why: insufficient-verify-method) |
 | MISS-TrBlazeUI-20260831-07 (REQ-FN-004) | 2026-08-31 by owner | not sorted | no sentence recorded (wrong-behaviour, config, why: insufficient-verify-method) |
 
-## Fixed (30)
+## Fixed (33)
 
 | Miss | Found | Closed | Whose gap | What went wrong |
 |---|---|---|---|---|
+| MISS-TrBlazeUI-20261001-03 (REQ-UI-021) | 2026-10-01 by owner | 2026-10-01 by fix-issues | the check was too weak | Chatur TR-013: closing or reloading a Blazor Server page that holds a ToggleGroup logs 'Unhandled exception rendering component: A task was canceled' at ToggleGroup.DisposeAsync, then 'Unhandled exception in circuit'. Reproduced: 44 times in one run when the page stops answering during the dispose ( |
+| MISS-TrBlazeUI-20261001-02 (REQ-UI-027) | 2026-10-01 by owner | 2026-10-01 by fix-issues | the app's spec | ToggleGroup chosen item takes another look through OnVariant (Chatur TR-012) |
+| MISS-TrBlazeUI-20261001-01 (REQ-UI-026) | 2026-10-01 by owner | 2026-10-01 by fix-issues | the app's spec | DataTable rows, header row and choose-all control take attributes (Chatur TR-011) |
 | MISS-TrBlazeUI-20260922-08 (REQ-FN-006) | 2026-09-22 by owner | 2026-09-22 by fix-issues | the check was too weak | Chatur batch 2 read the deployed reference .trblazeui/TrBlazeUI-AI-Reference.md, which is still the 2.0.7 copy, and five of their ten entries follow from what that copy says. It has 0 mentions of TreeView, DiffView, StickToEnd and ToggleGroup - all four shipped in [Unreleased] for the previous Chatu |
 | MISS-TrBlazeUI-20260922-07 (REQ-UI-017) | 2026-09-22 by owner | 2026-09-22 by fix-issues | the check was too weak | Chatur TR-009 residual: SortableList shows no position number per row and offers no remove. Measured live on /components/sortable-list: 3 items, 3 move-up and 3 move-down buttons, first move-up disabled, move-down reorders 'Part one' to 'Part two' - so the buttons the entry asks for already exist an |
 | MISS-TrBlazeUI-20260922-06 (REQ-UI-006) | 2026-09-22 by owner | 2026-09-22 by fix-issues | the check was too weak | Chatur TR-004: a step cannot carry its own state. StepperItem takes only Title/Description and TimelineItem only a Current bool, so both work every step's state out from its position: a chain that paused in the middle, or a step that succeeded on a second try, cannot be drawn. Measured on source: St |

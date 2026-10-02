@@ -4,14 +4,15 @@
 |---|---|
 | App | Chatur |
 | Upstream | TrBlazeUI |
-| Updated | 2026-09-21 |
+| Updated | 2026-10-01 |
 
 ## Summary
 
-10 entries: 0 blocking now, 0 filed and not blocking, 10 fixed upstream.
+13 entries: 0 blocking, 0 open, 3 fixed upstream (TR-011, TR-012, TR-013), 10 closed.
 
-All ten were answered on 2026-09-22 and none has been re-checked in Chatur yet. Six were
-fixed in code; four needed no code, because the control already existed.
+All ten were answered on 2026-09-22 and all ten have now been re-checked in Chatur against
+2.0.9. Six were fixed in code; four needed no code, because the control already existed. Each
+entry below carries the control that now does the job and the Chatur requirement that uses it.
 
 Nothing is blocked. All ten were found while designing Chatur's screens on day one, against the 2.0.7 component reference; the mockups are drawn from controls that do exist, and each entry says what was used instead.
 
@@ -27,6 +28,7 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 
 ### TR-001 — There is no tree control for files and folders
 
+- **Closed 2026-09-22** — re-checked against TrBlazeUI 2.0.9 on GitHub Packages. `TreeView` + `TreeItem` in 2.0.9 take a nested list with expand, collapse, a bound selection and the arrow keys. Chatur's files panel (BRD-80) drops its hand-built indentation and uses it.
 - **Severity:** major
 - **Blocks:** no — the Editor mockup draws the tree with nested Collapsible and SidebarMenu items, and the work carried on
 - **Repro:** Look for a tree in `.trblazeui/TrBlazeUI-AI-Reference.md` 2.0.7: sections 3 to 8 hold no control that shows a nested, expandable list of items with icons and a selected row.
@@ -38,6 +40,7 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 
 ### TR-002 — There is no side-by-side difference viewer
 
+- **Closed 2026-09-22** — re-checked against TrBlazeUI 2.0.9 on GitHub Packages. `DiffView` (and `TextDiff` for the lines in code) in 2.0.9 take a before and an after, side by side or inline, with line numbers. The change waiting in the conversation (BRD-64) and the Repository page (BRD-86) both use it.
 - **Severity:** major
 - **Blocks:** no — the Changes and Source control mockups put two `CodeBlock` panels in a two-column grid and colour the changed lines by hand
 - **Repro:** Look for a difference or comparison control in the 2.0.7 reference: section 8 has `CodeBlock` and `Prose`, and neither compares two texts.
@@ -49,6 +52,7 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 
 ### TR-003 — CodeBlock cannot be edited
 
+- **Closed 2026-09-22** — re-checked against TrBlazeUI 2.0.9 on GitHub Packages. `CodeEditor` in 2.0.9 is an editable code area with a gutter and Tab inserting an indent, and `EditorTabs` is the open-file strip with a close button and an unsaved mark per tab. Chatur's file view (BRD-81 to BRD-83) uses both, and `ReadOnly` gives us the rule that a file with a change waiting on it cannot be typed into.
 - **Severity:** minor
 - **Blocks:** no — the Editor mockup draws the editing area as a `Textarea` in a monospace font, which is what Chatur's quick edits need
 - **Repro:** `CodeBlock` in section 8 of the 2.0.7 reference renders text for reading; it takes no value binding and no change event.
@@ -60,6 +64,7 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 
 ### TR-004 — A step cannot carry its own state in Stepper or Timeline
 
+- **Closed 2026-09-22** — re-checked against TrBlazeUI 2.0.9 on GitHub Packages. `StepperItem.Status` in 2.0.9 carries done, running, waiting, failed and pending per step, with a vertical orientation and a template for trailing content. Process run (BRD-101) and the end-to-end chain (BRD-118 to BRD-125) use it, including the step that finished only after a retry.
 - **Severity:** major
 - **Blocks:** no — the run and process screens draw their step lists by hand, and the work carried on
 - **Repro:** `Stepper` in section 8 of the 2.0.7 reference takes `Current="2"` and `StepperItem Title/Description`; `Timeline` takes `Current="true"` per item. Both work out every other step's state from its position.
@@ -71,6 +76,7 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 
 ### TR-005 — There is no small switch for a table cell
 
+- **Closed 2026-09-22** — re-checked against TrBlazeUI 2.0.9 on GitHub Packages. `Switch Size="SwitchSize.Small"` inside a `DataTableColumn` `CellTemplate` was already there — it is in the reference this file cited. The features on Licence (BRD-144), the actions on Integrations (BRD-152) and the rights on the Agents page use it.
 - **Severity:** minor
 - **Blocks:** no — the Licence and Integrations mockups use a hand-reset button with the `.toggle` classes
 - **Repro:** `Switch` in section 5 of the 2.0.7 reference is a form control sized and laid out for a form row, with its label beside it.
@@ -82,6 +88,7 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 
 ### TR-006 — There is nothing to show that an answer is still arriving
 
+- **Closed 2026-09-22** — re-checked against TrBlazeUI 2.0.9 on GitHub Packages. `Typing` in 2.0.9 sits inside a message while its text grows, and `Progress Indeterminate` covers the bar case. The reply still arriving (BRD-47) uses it.
 - **Severity:** minor
 - **Blocks:** no — the Chat mockup draws three dots by hand, and the work carried on
 - **Repro:** In the 2.0.7 reference, `Skeleton` is a still placeholder for content that has not loaded and `Progress` needs a number. Neither says "this is being written now".
@@ -93,6 +100,7 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 
 ### TR-007 — There is no control for the output of a command
 
+- **Closed 2026-09-22** — re-checked against TrBlazeUI 2.0.9 on GitHub Packages. `LogView` in 2.0.9 takes lines as they arrive, marks each ordinary, success, warning or failure, holds its height and follows the newest line until the reader scrolls up. The output strip (BRD-23) and Process run (BRD-101) use it.
 - **Severity:** major
 - **Blocks:** no — Run and Process run use a hand-built panel, and the work carried on
 - **Repro:** The 2.0.7 reference has `CodeBlock` for a block of code and `Prose` for rendered HTML. Neither takes lines as they arrive, colours a line by what it is, or holds a height and follows the newest line.
@@ -104,6 +112,7 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 
 ### TR-008 — DataTable cannot let the user choose rows
 
+- **Closed 2026-09-22** — re-checked against TrBlazeUI 2.0.9 on GitHub Packages. `DataTable SelectionMode="DataTableSelectionMode.Multiple"` with `@bind-SelectedItems` gives the choosing column, the choose-all and the count. Choosing which files to check in (BRD-87) uses it.
 - **Severity:** major
 - **Blocks:** no — the Source control mockup puts a plain checkbox in the first cell, and the work carried on
 - **Repro:** `DataTable` in section 6 of the 2.0.7 reference renders rows from a list. It documents `@bind-SelectedItems` in the binding table, but no column, no header control and no way to turn choosing on.
@@ -111,10 +120,11 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 - **Actual:** The box, its label for a screen reader, the choose-all, the count and the enabling of the submit button are all left to the application, so every table that needs choosing writes them again.
 - **Encountered in:** BRD-87, checking in the chosen files on Source control
 - **Workaround:** A plain checkbox in the first cell, with the count written by hand.
-- **Suggested fix:** `SelectionMode` on `DataTable` with a real choosing column, plus a documented `SelectedCount`. While that is open: a one-line command sitting in a table cell has no copy affordance either — `CodeBlock` has one, but a cell is not a code block.
+- **Suggested fix:** `SelectionMode` on `DataTable` with a real choosing column, plus a documented `SelectedCount`.
 
 ### TR-009 — There is no list whose order the user sets
 
+- **Closed 2026-09-22** — re-checked against TrBlazeUI 2.0.9 on GitHub Packages. `SortableList` was already there, with real move-up and move-down buttons rather than dragging. The three fallback chains on Routing (BRD-40) use it.
 - **Severity:** minor
 - **Blocks:** no — the routing tab builds its chain from cards and buttons, and the work carried on
 - **Repro:** The 2.0.7 reference has `SortableList` in section 8, which reorders by dragging. There is no list that also offers move-up and move-down buttons, or that owns its items' positions.
@@ -126,6 +136,7 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 
 ### TR-010 — A list cannot drive a detail pane
 
+- **Closed 2026-09-22** — re-checked against TrBlazeUI 2.0.9 on GitHub Packages. `NavList<TItem>` in 2.0.9 is a list of multi-line rows that drives a detail pane, with an item template and a bound selection. The agents list beside its editor (BRD-53 and BRD-56) uses it, and the same control in a grid answers the theme cards on Appearance (BRD-156).
 - **Severity:** major
 - **Blocks:** no — the roles tab hand-builds its left-hand list, and the work carried on
 - **Repro:** `DataTable` renders rows but they cannot act as navigation that chooses what the rest of the screen shows; `Tabs` carries a label per item and no more.
@@ -135,9 +146,135 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 - **Workaround:** Hand-built anchors with an inline layout and a chosen class.
 - **Suggested fix:** A `ListDetail` or a `NavList<TItem>` with an item template and `@bind-Selected`. This is the commonest shape in the whole product and it has no control.
 
+### TR-011 — DataTable rows, its header row and its choose-all cell cannot carry an attribute
+
+- **Status:** open, filed 2026-09-30
+- **Severity:** minor
+- **Blocks:** no — Chatur puts the test hook on a cell's own content instead, and the work carried on. Only the verifier's check that every mockup control is on the page cannot find these four hooks.
+- **Repro:** TrBlazeUI 2.0.9 reference §6 "DataTable" and the "Every public component accepts arbitrary HTML attributes" note: attributes passed to `DataTable` land on the table, `DataTableColumn` renders none, and there is no parameter for a row, the `<thead>` row, or the choose-all cell that `SelectionMode="Multiple"` draws.
+- **Expected:** A way to name those parts, e.g. `RowAttributes="Func<TData, IReadOnlyDictionary<string, object>>"` (so each row can carry `data-testid="change-row-{path}"`), `HeaderRowAttributes`, and a `SelectAllAttributes` (or a fixed, documented `data-testid` on the choose-all box).
+- **Actual:** Chatur's mockups anchor `changes-head`, `choose-all`, `history-head` and `process-branches-head` on the Repository screen, and `provider-{name}` / `agent-tier-{role}` on a row; none can be put where the mockup puts it.
+- **Encountered in:** REQ-UI-042, REQ-UI-043, REQ-UI-028 and the Repository history and process-branch cards (BRD-86 to BRD-90)
+- **Workaround:** the hook sits on a wrapper inside a cell (`agent-tier-{role}` on the tier cell); the header and choose-all hooks are not placed.
+- **Suggested fix:** `RowAttributes`, `HeaderRowAttributes` and `SelectAllAttributes` parameters on `DataTable`.
+
+### TR-012 — ToggleGroup's chosen item cannot take another colour
+
+- **Status:** open, filed 2026-10-01
+- **Severity:** minor
+- **Blocks:** no — the mode toggle works; only its chosen colour differs from the mockup.
+- **Repro:** TrBlazeUI 2.0.9 `ToggleGroup`: the chosen item is fixed to `bg-accent`, and `data-[state=on]:bg-card` (or any on-state class) is not in the shipped CSS.
+- **Expected:** a parameter for the chosen item's look, e.g. `OnVariant` (`Accent`, `Card`, `Primary`), or the on-state classes shipped.
+- **Actual:** with a theme whose `--accent` is a soft tint, the chosen "Ask first" reads as a tinted pill where the mockup draws a plain card segment.
+- **Encountered in:** REQ-UI-024 (Workbench mode toggle), and the Sign in "remember this device" toggle
+- **Workaround:** none; the colour stays the library's.
+- **Suggested fix:** an `OnVariant` parameter on `ToggleGroup`.
+
+### TR-013 — ToggleGroup's DisposeAsync lets a "task was canceled" error escape
+
+- **Status:** open, filed 2026-10-01
+- **Severity:** minor
+- **Blocks:** no — seen when a page closes or reloads, when the connection is ending anyway; no lost work traced to it.
+- **Repro:** TrBlazeUI 2.0.9, Blazor Server: close or reload a page holding a `ToggleGroup`. The log shows "Unhandled exception rendering component: A task was canceled" at `ToggleGroup\`1.DisposeAsync()` → `JSObjectReference.DisposeAsync()`, then "Unhandled exception in circuit". 18 times in one verification run of Chatur.
+- **Expected:** a component's `DisposeAsync` swallows `JSDisconnectedException` and `TaskCanceledException` from its own JS module dispose, as the Blazor guidance asks.
+- **Actual:** the exception escapes and is reported as unhandled for the circuit.
+- **Encountered in:** REQ-UI-024 (Workbench mode toggle), the Sign in "remember this device" toggle
+- **Workaround:** none.
+- **Suggested fix:** wrap the module dispose in `try { … } catch (JSDisconnectedException) { } catch (TaskCanceledException) { }`.
+
 ## Replies from TrBlazeUI
 
 <!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
+
+### 2026-10-01 — TR-011, TR-012 and TR-013 are fixed; they arrive with the next release after 2.0.9
+
+All three are fixed in the library and tested there. **They are not in a published version
+yet.** 2.0.9 does not have them; the release after it will. Until that release is out there is
+nothing for you to re-check, and your workarounds stay as they are.
+
+| Entry | State | What you get |
+|---|---|---|
+| **TR-011** attributes on rows, the header row and the choose-all control | fixed | `DataTable` gains the three parameters you asked for: `RowAttributes` (a function of the row's item), `HeaderRowAttributes` and `SelectAllAttributes`. |
+| **TR-012** the chosen item's colour | fixed | `ToggleGroup` gains `OnVariant`: `ToggleOnVariant.Accent` (the default, and the look it has today), `Card` or `Primary`. The classes behind `Card` and `Primary` are now in the shipped stylesheet. |
+| **TR-013** "A task was canceled" from `ToggleGroup.DisposeAsync` | fixed | `ToggleGroup` now swallows `TaskCanceledException` as well as `JSDisconnectedException`, in `DisposeAsync` and around its first-render script import. |
+
+#### TR-011 — how to use it
+
+```razor
+<DataTable TData="ChangedFile" Data="@objFiles"
+           SelectionMode="DataTableSelectionMode.Multiple"
+           RowAttributes="@(f => new Dictionary<string, object> { ["data-testid"] = $"change-row-{f.Path}" })"
+           HeaderRowAttributes="ChangesHead"
+           SelectAllAttributes="ChooseAll">
+    …
+</DataTable>
+
+@code {
+    private static readonly IReadOnlyDictionary<string, object> ChangesHead =
+        new Dictionary<string, object> { ["data-testid"] = "changes-head" };
+
+    private static readonly IReadOnlyDictionary<string, object> ChooseAll =
+        new Dictionary<string, object> { ["data-testid"] = "choose-all" };
+}
+```
+
+Four things worth knowing before you move your hooks:
+
+1. **`SelectAllAttributes` lands on the control the user operates, and that control changes
+   shape.** When every row fits on one page it is a checkbox (`role="checkbox"`). When the grid
+   is paged it is a menu button holding a picture of a checkbox. Your `choose-all` hook finds
+   the right one either way, but a test that expects `role="checkbox"` on it will only be right
+   for a one-page grid.
+2. **There is also a fixed hook that needs no parameter.** The choose-all control's wrapper
+   always carries `data-slot="datatable-select-all"`. You asked for either the parameter or a
+   fixed hook; you have both.
+3. **A `class` entry is added to the part's own classes**, not swapped for them.
+4. **The three are read when the grid paints.** The grid does not repaint while its `Data`
+   reference is unchanged, so if what `RowAttributes` returns changes for rows already on
+   screen, call `Refresh()` on the grid.
+
+`DataTableColumn` still renders no element, so `provider-{name}` and `agent-tier-{role}` go on
+the row through `RowAttributes`, not on a column.
+
+#### TR-012 — how to use it
+
+```razor
+<ToggleGroup TValue="string" @bind-Value="objMode" Joined="true" AllowDeselect="false"
+             OnVariant="ToggleOnVariant.Card" Class="bg-muted" AriaLabel="Mode">
+    <ToggleGroupItem TValue="string" Value="@("ask")">Ask first</ToggleGroupItem>
+    <ToggleGroupItem TValue="string" Value="@("auto")">Automatic</ToggleGroupItem>
+</ToggleGroup>
+```
+
+`Card` paints the chosen item with `--card` and `--card-foreground`; `Primary` with `--primary`
+and `--primary-foreground`. One thing to check against your mockup: **on a page whose background
+is the same colour as its cards, a `Card` segment looks the same chosen or not.** The example
+puts the group on `bg-muted` for that reason. If your mockup draws the track differently, tell
+us what it draws.
+
+`OnVariant` sits on the group and applies to all of its items. A class of your own such as
+`data-[state=on]:bg-card` still does nothing — only the three looks are in the stylesheet.
+
+#### TR-013 — what we found
+
+We reproduced it. A `ToggleGroup` makes two calls to the browser when it is disposed. If the
+page closes or reloads between them, the second call is never answered, the server gives up on
+it after one minute, and that cancellation was escaping. Before the fix, one run here logged the
+error 44 times; after it, none, with the page made to stop answering at exactly that point.
+
+The same catch is missing from the dispose of some other controls in the library. You reported
+`ToggleGroup` only and that is what this fix covers. **If your log shows the same "A task was
+canceled" error naming another control after you upgrade, file it with the control's name** —
+it will be the same small fix.
+
+#### What we need from you
+
+Nothing until the next release is out. When it is: upgrade, move the four hooks onto
+`HeaderRowAttributes`, `SelectAllAttributes` and `RowAttributes`, set `OnVariant` on the mode
+toggle and the "remember this device" toggle, run your verification again, and check the log for
+the `ToggleGroup` error. Then close each entry here or tell us what does not fit.
+
+---
 
 ### 2026-09-22 — all ten answered; six needed code, four did not
 

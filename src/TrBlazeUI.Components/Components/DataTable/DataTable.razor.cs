@@ -333,6 +333,64 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     /// <summary>
+    /// Gets or sets a function returning the HTML attributes for one body row, given its item.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Attributes passed to the grid itself land on its root container, and a column renders no
+    /// element of its own, so until this parameter there was no way to name a row — a test hook
+    /// such as <c>data-testid="change-row-{path}"</c> had to sit on a wrapper inside a cell
+    /// (Chatur TR-011). The function is called once per rendered row and its result is splatted
+    /// onto that row's <c>tr</c>.
+    /// </para>
+    /// <para>
+    /// A <c>class</c> entry is merged with the row's own classes rather than replacing them. The
+    /// row's <c>role</c>, <c>aria-selected</c> and <c>tabindex</c> belong to the grid; an entry of
+    /// the same name replaces the grid's value, so leave those out. Return null for a row that
+    /// needs nothing. The function is read when the grid paints, so call <see cref="Refresh"/>
+    /// after changing what it returns for rows already on screen.
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// &lt;DataTable TData="ChangedFile" Data="@objFiles"
+    ///            RowAttributes="@(f => new Dictionary&lt;string, object&gt; { ["data-testid"] = $"change-row-{f.Path}" })" /&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public Func<TData, IReadOnlyDictionary<string, object>?>? RowAttributes { get; set; }
+
+    /// <summary>
+    /// Gets or sets the HTML attributes for the header row (the <c>tr</c> inside <c>thead</c>).
+    /// </summary>
+    /// <remarks>
+    /// For naming the header row, for example <c>data-testid="changes-head"</c> (Chatur TR-011).
+    /// A <c>class</c> entry is merged with the row's own classes. Ignored when
+    /// <see cref="ShowHeader"/> is false, because no header row is rendered.
+    /// </remarks>
+    [Parameter]
+    public IReadOnlyDictionary<string, object>? HeaderRowAttributes { get; set; }
+
+    /// <summary>
+    /// Gets or sets the HTML attributes for the choose-all control that
+    /// <see cref="DataTableSelectionMode.Multiple"/> draws in the header.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// They land on the control the user operates: the checkbox when every row fits on one page,
+    /// or the menu button that replaces it when the grid is paged. Either way one
+    /// <c>data-testid="choose-all"</c> finds it (Chatur TR-011). A <c>class</c> entry is merged.
+    /// The control's accessible name and its <c>data-slot</c> stay the grid's own.
+    /// </para>
+    /// <para>
+    /// Without this parameter the control is still reachable through a fixed hook: its wrapper
+    /// always carries <c>data-slot="datatable-select-all"</c>.
+    /// </para>
+    /// </remarks>
+    [Parameter]
+    public IReadOnlyDictionary<string, object>? SelectAllAttributes { get; set; }
+
+    /// <summary>
     /// Gets or sets the ARIA label for the table.
     /// </summary>
     [Parameter]
@@ -437,6 +495,39 @@ public partial class DataTable<TData> : ComponentBase where TData : class
     private string BodyCellCssClass => Density == DataTableDensity.Compact
         ? "px-2.5 py-2 align-middle"
         : "p-4 align-middle";
+
+    /// <summary>
+    /// Separates a caller's attribute set for a row or the choose-all control into the classes to
+    /// merge and the attributes to splat.
+    /// </summary>
+    /// <remarks>
+    /// A <c>class</c> entry cannot be splatted as it stands: the parts it lands on take their
+    /// classes through a <c>Class</c> parameter, which Blazor matches case-insensitively, so the
+    /// entry would replace the grid's own classes instead of adding to them (Chatur TR-011).
+    /// </remarks>
+    private static (string? CssClass, IReadOnlyDictionary<string, object>? Attributes) SplitPartAttributes(
+        IReadOnlyDictionary<string, object>? aAttributes)
+    {
+        if (aAttributes is null || aAttributes.Count == 0)
+        {
+            return (null, null);
+        }
+
+        string? vCssClass = null;
+        var vRest = new Dictionary<string, object>(aAttributes.Count);
+        foreach (var vPair in aAttributes)
+        {
+            if (string.Equals(vPair.Key, "class", StringComparison.OrdinalIgnoreCase))
+            {
+                vCssClass = vPair.Value as string;
+                continue;
+            }
+
+            vRest[vPair.Key] = vPair.Value;
+        }
+
+        return (vCssClass, vRest);
+    }
 
     /// <summary>
     /// Performs one-time initialization of the table state, seeding the pagination page size and

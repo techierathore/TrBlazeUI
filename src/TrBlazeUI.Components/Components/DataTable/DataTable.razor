@@ -64,12 +64,17 @@
                        cascaded DataTableColumn children, so column metadata is untouched (TR-012). *@
                     @if (ShowHeader)
                     {
+                    var vHeaderRow = SplitPartAttributes(HeaderRowAttributes);
+                    var vSelectAll = SplitPartAttributes(SelectAllAttributes);
                     <TableHeader>
-                        <TableRow TData="TData" Class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                        <TableRow TData="TData" Class="@ClassNames.cn("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", vHeaderRow.CssClass)" @attributes="vHeaderRow.Attributes">
                             @if (SelectionMode == DataTableSelectionMode.Multiple)
                             {
                                 <TableHeaderCell TData="TData" Class="@ClassNames.cn(HeaderCellCssClass, "w-12")" role="columnheader">
-                                    <div @onclick:stopPropagation="true">
+                                    @* The wrapper carries a fixed data-slot in both shapes below, so the
+                                       choose-all control can be found without SelectAllAttributes; the
+                                       caller's own attributes go on the control itself (Chatur TR-011). *@
+                                    <div @onclick:stopPropagation="true" data-slot="datatable-select-all">
                                         @if (ShouldShowSelectAllPrompt())
                                         {
                                             @* The checkbox here is a picture of the state, not a
@@ -83,7 +88,11 @@
                                                that checkbox - none, some or all - or the state is
                                                available only by opening the menu (REQ-UI-005). *@
                                             <DropdownMenu @bind-Open="objSelectAllDropdownOpen">
-                                                <DropdownMenuTrigger Class="inline-flex items-center justify-center p-0 bg-transparent border-0 hover:bg-transparent focus:outline-none"
+                                                @* The caller's attributes are splatted first, so the
+                                                   grid's own data-slot and state-carrying name,
+                                                   written after them, cannot be replaced. *@
+                                                <DropdownMenuTrigger @attributes="vSelectAll.Attributes"
+                                                                     Class="@ClassNames.cn("inline-flex items-center justify-center p-0 bg-transparent border-0 hover:bg-transparent focus:outline-none", vSelectAll.CssClass)"
                                                                      data-slot="datatable-select-all-trigger"
                                                                      aria-label="@SelectAllTriggerLabel">
                                                     <Checkbox Checked="@IsAllSelected()"
@@ -110,9 +119,11 @@
                                         }
                                         else
                                         {
-                                            <Checkbox Checked="@IsAllSelected()"
+                                            <Checkbox @attributes="vSelectAll.Attributes"
+                                                      Checked="@IsAllSelected()"
                                                       CheckedChanged="@(async (bool isChecked) => await HandleSelectAllChanged(isChecked))"
                                                       Indeterminate="@IsSomeSelected()"
+                                                      Class="@vSelectAll.CssClass"
                                                       AriaLabel="Select all rows" />
                                         }
                                     </div>
@@ -164,7 +175,8 @@
                         @foreach (var item in objProcessedData)
                         {
                             var isSelected = objTableState.Selection.IsSelected(item);
-                            <TableRow TData="TData" Item="@item" Class="@ClassNames.cn("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", isSelected ? "bg-muted" : "")">
+                            var vRow = SplitPartAttributes(RowAttributes?.Invoke(item));
+                            <TableRow TData="TData" Item="@item" Class="@ClassNames.cn("border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted", isSelected ? "bg-muted" : "", vRow.CssClass)" @attributes="vRow.Attributes">
                                 @if (SelectionMode == DataTableSelectionMode.Multiple)
                                 {
                                     <TableCell Class="@ClassNames.cn(BodyCellCssClass, "w-12")" role="gridcell">

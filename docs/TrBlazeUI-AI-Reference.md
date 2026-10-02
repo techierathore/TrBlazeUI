@@ -22,6 +22,8 @@ problem is in this table, the control exists — do not hand-build it.
 | Show the output of a running command — lines marked ordinary, warning or failure | `LogView` | §2.0.9 |
 | Show that an answer is still being written — inside the message, while its text grows | `Typing` (or `Progress Indeterminate="true"` for a bar) | §2.0.9 |
 | A list of multi-line rows that drives a detail pane beside it | `NavList<TItem>` | §2.0.9 |
+| Put a test hook (`data-testid`) on a table row, the table's header row or its choose-all box | `DataTable` `RowAttributes`, `HeaderRowAttributes`, `SelectAllAttributes` (after 2.0.9) | §6 |
+| A segmented switch whose chosen segment is a plain card, or the primary colour, instead of the accent tint | `ToggleGroup` `OnVariant` (after 2.0.9) | §5 |
 
 ---
 
@@ -67,7 +69,10 @@ These rules are non-negotiable. Violating them produces broken or inconsistent U
   (`Dialog`, `Sheet`, `Popover`, `HoverCard`, `DropdownMenu`, `ContextMenu`, `Drawer`,
   `TooltipProvider`, `ResponsiveNavProvider`, `PortalHost`) and the configuration-only
   `DataTableColumn`. Put the hook on the part that renders the visible element
-  (`DialogContent`, `SheetContent`, …). `BreadcrumbList` is a special case: it has no element
+  (`DialogContent`, `SheetContent`, …). For a `DataTable`, whose own attributes land on its root
+  container, the row, the header row and the choose-all control take theirs through
+  `RowAttributes`, `HeaderRowAttributes` and `SelectAllAttributes` (§6, after 2.0.9).
+  `BreadcrumbList` is a special case: it has no element
   either, but it forwards its attributes onto the `<ol>` that `Breadcrumb` renders.
 
 - **Tailwind utilities work in application markup.** `trblazeui.css` ships the standard Tailwind
@@ -1499,13 +1504,36 @@ group) or `Multiple` (`@bind-Values`, a `List<TValue>`). For a view switch in a 
 | DefaultValue | TValue? | null | Initial value when you leave the group unbound |
 | Joined | bool | false | One control with a shared border, for a view switch in a toolbar |
 | AllowDeselect | bool | true | `false` keeps exactly one item chosen |
-| Variant | ToggleVariant | Default | `Default` or `Outline` |
+| Variant | ToggleVariant | Default | `Default` or `Outline` — styles every item, chosen or not |
+| OnVariant | ToggleOnVariant | Accent | **After 2.0.9.** The chosen item's look: `Accent` (the look it always had), `Card` (the card colour — a plain card segment) or `Primary` (the primary colour) |
 | Size | ToggleSize | Default | `Small`, `Default`, `Large` |
 | Disabled | bool | false | Disables the whole group |
 | AriaLabel | string? | null | Name for the group |
 | Class | string? | null | Additional CSS classes |
 
 **ToggleGroupItem<TValue>** takes `TValue`, `Value`, `Disabled`, `Class` and its content.
+
+**The chosen item's colour — use `OnVariant`, not an on-state class of your own.** A class such
+as `data-[state=on]:bg-card` passed through `Class` does nothing unless that exact class is in the
+shipped stylesheet, and only the three looks below are. For a segmented switch whose chosen
+segment is a plain card, give the group a muted track and set `OnVariant`:
+
+```razor
+<ToggleGroup TValue="string" @bind-Value="mode" Joined="true" AllowDeselect="false"
+             OnVariant="ToggleOnVariant.Card" Class="bg-muted" AriaLabel="Mode">
+    <ToggleGroupItem TValue="string" Value="@("ask")">Ask first</ToggleGroupItem>
+    <ToggleGroupItem TValue="string" Value="@("auto")">Automatic</ToggleGroupItem>
+</ToggleGroup>
+```
+
+| `OnVariant` | Chosen item's background | Chosen item's text |
+|---|---|---|
+| `Accent` (default) | `--accent` | `--accent-foreground` |
+| `Card` | `--card` | `--card-foreground` |
+| `Primary` | `--primary` | `--primary-foreground` |
+
+`Card` on a page whose background is the same colour as its cards shows no difference between
+chosen and not chosen, which is why the example puts the group on `bg-muted`.
 
 - String values need `Value="@("board")"` — the plain `Value="board"` form cannot infer `TValue`.
 - One Tab stop (the chosen item); the arrow keys move between items. Single choice renders
@@ -1612,7 +1640,50 @@ three-line box turns the end caps into deep arcs that cut into the first and las
 | PageSizes | int[] | [5,10,20,50,100] | Page size options |
 | SelectedItems | IReadOnlyCollection<TData> | [] | Two-way: `@bind-SelectedItems` — the rows the user has chosen. `SelectedItems.Count` is the count to put on a button or a banner |
 | MinWidth | string? | null | CSS length, e.g. `"720px"`. Set it on wide tables: the grid's wrapper scrolls horizontally, but a `w-full` table with no minimum just shrinks and the right-hand columns are squeezed away with no scrollbar. |
+| RowAttributes | Func<TData, IReadOnlyDictionary<string, object>?>? | null | **After 2.0.9.** HTML attributes for each body row, from the row's item — for example a `data-testid` per row. See "Naming a row, the header row and the choose-all control" below |
+| HeaderRowAttributes | IReadOnlyDictionary<string, object>? | null | **After 2.0.9.** HTML attributes for the header row (the `<tr>` in `<thead>`) |
+| SelectAllAttributes | IReadOnlyDictionary<string, object>? | null | **After 2.0.9.** HTML attributes for the choose-all control that `SelectionMode="Multiple"` draws |
 | Class | string? | null | Additional CSS classes |
+
+#### Naming a row, the header row and the choose-all control — test hooks on the parts of a grid
+
+Attributes written on `<DataTable>` itself (`data-testid`, `id`) land on the grid's root container,
+and `DataTableColumn` renders no element. To name a row, the header row or the choose-all control —
+which a test, a mockup anchor or a script needs — use these three parameters (added after 2.0.9):
+
+```razor
+<DataTable TData="ChangedFile" Data="@objFiles"
+           SelectionMode="DataTableSelectionMode.Multiple"
+           RowAttributes="@(f => new Dictionary<string, object> { ["data-testid"] = $"change-row-{f.Path}" })"
+           HeaderRowAttributes="ChangesHead"
+           SelectAllAttributes="ChooseAll">
+    <Columns>
+        <DataTableColumn TData="ChangedFile" TValue="string" Property="@(f => f.Path)" Header="File" />
+    </Columns>
+</DataTable>
+
+@code {
+    private static readonly IReadOnlyDictionary<string, object> ChangesHead =
+        new Dictionary<string, object> { ["data-testid"] = "changes-head" };
+
+    private static readonly IReadOnlyDictionary<string, object> ChooseAll =
+        new Dictionary<string, object> { ["data-testid"] = "choose-all" };
+}
+```
+
+- `RowAttributes` is a function of the row's item, called once for each row on the page being
+  shown. Return `null` for a row that needs nothing.
+- `SelectAllAttributes` lands on the control the user operates: the checkbox when every row fits
+  on one page, or the menu button that takes its place when the grid is paged. One
+  `data-testid="choose-all"` finds it either way. Without the parameter, the control is still
+  reachable through a fixed hook — its wrapper always carries `data-slot="datatable-select-all"`.
+- A `class` entry is **added** to the part's own classes; it does not replace them.
+- The row's `role`, `aria-selected` and `tabindex` are the grid's. An entry of the same name
+  replaces the grid's value, so leave those out. The choose-all control's accessible name and
+  `data-slot` cannot be replaced.
+- `HeaderRowAttributes` does nothing with `ShowHeader="false"`, because no header row is drawn.
+- The three are read when the grid paints. The grid skips repainting while its `Data` reference is
+  unchanged, so after changing what they return for rows already on screen, call `Refresh()`.
 
 #### Letting the user choose rows — `SelectionMode` + `@bind-SelectedItems`
 
@@ -3616,13 +3687,16 @@ source* — see the next heading — and only rarely *wait for it to be built*.
 
 | Version | Released | Component namespaces | What it added |
 |---|---|---|---|
+| **After 2.0.9** | not yet published | 85 | `DataTable.RowAttributes`/`HeaderRowAttributes`/`SelectAllAttributes`; `ToggleGroup.OnVariant`; `ToggleGroup` no longer reports an unhandled error when its page closes |
 | **2.0.9** | 2026-09-22 | 85 | `CodeEditor` + `EditorTabs`, `LogView`, `NavList`, `Typing`; `Progress.Indeterminate`; `StepStatus` on `StepperItem`/`TimelineItem`; `SortableList.ShowPosition`/`AllowRemove`; `DataTable.SelectedCount` |
 | **2.0.8** | 2026-09-20 | 81 | `TreeView` + `TreeItem`, `DiffView` + `TextDiff`, `ScrollArea.StickToEnd`, `ToggleGroup.Joined`/`AllowDeselect`/`AriaLabel` |
 | **2.0.7** | 2026-09-15 | 79 | `InputGroupInput.DebounceMilliseconds`; the chart teardown fix |
 | **2.0.6** | 2026-09-13 | 79 | newest version currently on nuget.org |
 
-Everything in this document describes **2.0.9**. Each control's own section has its full parameter
-table; the version table above only says when it arrived. `CHANGELOG.md` has the detail per release.
+Everything in this document describes **2.0.9**, except the parameters marked "After 2.0.9", which
+are built and tested but not in a published version yet — they arrive with the next release. Each
+control's own section has its full parameter table; the version table above only says when it
+arrived. `CHANGELOG.md` has the detail per release.
 
 ### Which package source to use — there are two, and they carry different versions
 
