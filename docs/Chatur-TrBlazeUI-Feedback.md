@@ -186,11 +186,12 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 
 <!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
 
-### 2026-10-01 — TR-011, TR-012 and TR-013 are fixed; they arrive with the next release after 2.0.9
+### 2026-10-02 — TR-011, TR-012 and TR-013 are fixed in 2.1.0, which is out
 
-All three are fixed in the library and tested there. **They are not in a published version
-yet.** 2.0.9 does not have them; the release after it will. Until that release is out there is
-nothing for you to re-check, and your workarounds stay as they are.
+All three are fixed in the library and tested there. **They are in 2.1.0, released 2026-10-02
+on GitHub Packages** (`https://nuget.pkg.github.com/techierathore/index.json`), which is the
+source Chatur uses. Upgrade to 2.1.0 and re-check them. (This reply was first written on
+2026-10-01, before the release, and said the fixes were not published yet. They are now.)
 
 | Entry | State | What you get |
 |---|---|---|
@@ -262,17 +263,20 @@ page closes or reloads between them, the second call is never answered, the serv
 it after one minute, and that cancellation was escaping. Before the fix, one run here logged the
 error 44 times; after it, none, with the page made to stop answering at exactly that point.
 
-The same catch is missing from the dispose of some other controls in the library. You reported
-`ToggleGroup` only and that is what this fix covers. **If your log shows the same "A task was
-canceled" error naming another control after you upgrade, file it with the control's name** —
-it will be the same small fix.
+**2.1.0 fixes `ToggleGroup` only.** The same catch was missing from the dispose of 17 other
+controls, among them `NavList`, `TreeView`, `ScrollArea`, `CodeEditor`, `Select` and the sidebar,
+all of which Chatur uses. Those were fixed on 2026-10-02, after 2.1.0 was cut, and arrive with
+the release after it. So on 2.1.0 your log may still show "A task was canceled" naming one of
+those controls. That is known and already fixed in source; you do not need to file it. One case
+cannot be fixed in this library: the framework's own `Virtualize`, which
+`CommandVirtualizedGroup` renders, throws the same error from its own dispose.
 
 #### What we need from you
 
-Nothing until the next release is out. When it is: upgrade, move the four hooks onto
-`HeaderRowAttributes`, `SelectAllAttributes` and `RowAttributes`, set `OnVariant` on the mode
-toggle and the "remember this device" toggle, run your verification again, and check the log for
-the `ToggleGroup` error. Then close each entry here or tell us what does not fit.
+Upgrade to 2.1.0 from GitHub Packages. Move the four hooks onto `HeaderRowAttributes`,
+`SelectAllAttributes` and `RowAttributes`, set `OnVariant` on the mode toggle and the "remember
+this device" toggle, run your verification again, and check the log for the error naming
+`ToggleGroup`. Then close each entry here or tell us what does not fit.
 
 ---
 

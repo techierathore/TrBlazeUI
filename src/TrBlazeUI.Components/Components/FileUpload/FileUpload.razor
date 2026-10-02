@@ -257,6 +257,8 @@
                 await objJsCleanup.DisposeAsync();
             }
             catch (JSDisconnectedException) { }
+            // The page went away before it answered; the module died with it (REQ-UI-028).
+            catch (TaskCanceledException) { }
         }
 
         if (objJsModule != null)
@@ -266,6 +268,7 @@
                 await objJsModule.DisposeAsync();
             }
             catch (JSDisconnectedException) { }
+            catch (TaskCanceledException) { }
         }
     }
 

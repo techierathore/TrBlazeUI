@@ -608,6 +608,10 @@
             {
                 // Circuit disconnected, safe to ignore
             }
+            catch (TaskCanceledException)
+            {
+                // The page went away before it answered; the module died with it.
+            }
         }
     }
 }

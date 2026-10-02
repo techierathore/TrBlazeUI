@@ -4,19 +4,20 @@
 |---|---|
 | App | TrBlazeUI |
 | Upstream | TechieFlow |
-| Updated | 2026-10-01 |
+| Updated | 2026-10-02 |
 
 ## Summary
 
-2 entries: 0 blocking now, 1 open (TF-002, minor), 1 closed.
+2 entries: 0 blocking now, 0 open, 1 fixed upstream and waiting to be re-checked here (TF-002, fixed 2026-10-02), 1 closed.
 
-Nothing is blocked. TF-001 was re-checked on 2026-10-01 and is closed. TF-002 is new: a command that runs another command inside it has its own findings relabelled as old.
+Nothing is blocked. TF-001 was re-checked on 2026-10-01 and is closed. TF-002 is fixed upstream. It could not be re-checked on the 2026-10-02 run: the fixed script arrived at 07:30, ten minutes after that run's verify step had already started, so the next run that chains a verify is the first that can show it.
 
 ## Resolution status (TechieFlow team, 2026-09-22)
 
 | ID | Fix | Check it here |
 |---|---|---|
 | TF-001 | Fixed upstream. `tf-triage.sh close` skips every action older than `--started`, says how many it skipped, and empties the list once the records are written. New `tf-emit.sh --void-miss <miss_id> "<reason>"` withdraws a wrong miss: the report leaves it out of every figure and prints it under *withdrawn*, and `docs/TrBlazeUI-Misses.md` lists it under *Withdrawn*. The six false misses (`MISS-TrBlazeUI-20260919-01` to `-05`, `MISS-TrBlazeUI-20260922-01`) are withdrawn. The 14 false escaped check records stay: nothing withdraws a check record yet. | On your next `*triage-and-fix`, the close line counts only that run's rows. `bash .tfcore/telemetry/tf-metrics.sh --report` shows "withdrawn : 6 miss(es)". |
+| TF-002 | Fixed upstream (2026-10-02). `tf-phase.sh start verify-phase` or `start metrics-report` no longer writes a new document baseline when the marker shows it is running inside `build-phase`, `fix-issues` or `triage-and-fix`. It keeps the outer command's baseline and prints "runs inside triage-and-fix — keeping its document baseline". Findings the triage creates now stay `FAIL` until the run ends. Side effect: a standalone verify started right after a fix also keeps the fix's baseline, which can only make the gate stricter. | On your next `*triage-and-fix`, the verify's step 0 prints "verify-phase runs inside triage-and-fix — keeping its document baseline" and no second "baseline written" line. `tf-doc-check.sh docs/TrBlazeUI-Checklist.md` prints the new rows' findings as `FAIL`, not `OLD`. |
 
 ## Entries
 

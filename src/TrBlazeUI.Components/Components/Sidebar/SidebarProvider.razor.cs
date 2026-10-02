@@ -142,6 +142,10 @@ public partial class SidebarProvider
             {
                 // Circuit disconnected, ignore
             }
+            catch (TaskCanceledException)
+            {
+                // The page went away before it answered; the module died with it (REQ-UI-028).
+            }
         }
 
         objDotNetRef?.Dispose();

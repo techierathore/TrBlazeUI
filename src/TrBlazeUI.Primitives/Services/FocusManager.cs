@@ -86,6 +86,10 @@ public class FocusManager : IFocusManager, IAsyncDisposable
             {
                 // Circuit already torn down - the module died with it (TfLens TR-036).
             }
+            catch (TaskCanceledException)
+            {
+                // The page went away before it answered; the module died with it (REQ-UI-028).
+            }
         }
     }
 

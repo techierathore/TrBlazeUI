@@ -413,6 +413,10 @@
         {
             // Circuit already torn down - the modules died with it.
         }
+        catch (TaskCanceledException)
+        {
+            // The page went away before it answered; the modules died with it (REQ-UI-028).
+        }
 
         objDotNetRef?.Dispose();
 
