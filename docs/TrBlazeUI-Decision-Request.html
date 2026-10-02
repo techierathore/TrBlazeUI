@@ -106,14 +106,15 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout no-toc">
   <main>
     <h1>TrBlazeUI — decisions I need from you</h1>
-    <div class="subtitle">Rendered 2026-09-13 &middot; source <code>TrBlazeUI-Decision-Request.md</code></div>
+    <div class="subtitle">Rendered 2026-09-22 &middot; source <code>TrBlazeUI-Decision-Request.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
       <ol>
         <li><a href="#what-happened">What happened</a></li>
         <li><a href="#what-i-need-you-to-decide">What I need you to decide</a></li>
-        <li class="h3"><a href="#which-version-number-the-next-release-carries">1. Which version number the next release carries</a></li>
+        <li class="h3"><a href="#were-2-0-7-2-0-8-and-2-0-9-meant-for-external-users-too">1. Were 2.0.7, 2.0.8 and 2.0.9 meant for external users too?</a></li>
+        <li class="h3"><a href="#whether-a-release-without-a-changelog-entry-should-be-blocked">2. Whether a release without a changelog entry should be blocked</a></li>
         <li><a href="#what-i-do-when-you-answer">What I do when you answer</a></li>
         <li><a href="#copy-this-back-to-me">Copy this back to me</a></li>
       </ol>
@@ -122,63 +123,76 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <thead><tr><th></th><th></th></tr></thead>
 <tbody>
 <tr><td>App</td><td>TrBlazeUI</td></tr>
-<tr><td>Written</td><td>2026-09-12</td></tr>
-<tr><td>Waiting on</td><td>Nothing. Answered 2026-09-13.</td></tr>
+<tr><td>Written</td><td>2026-09-22</td></tr>
+<tr><td>Waiting on</td><td>Whether the last three releases were meant for external users too.</td></tr>
 </tbody>
 </table>
 <h2 id="what-happened">What happened<a class="anchor-link" href="#what-happened">#</a></h2>
-<p><strong>Answered 2026-09-13: released as 2.0.6</strong>, live on nuget.org. The original request is kept below.</p>
+<p><strong>Answered 2026-09-22: both sources are real, for different audiences.</strong> GitHub Packages is the
+source for this organisation's own applications; nuget.org is the source for external users. The
+AI reference now carries that, with the sign-in steps for the internal source. The README was
+left alone, as asked. The original request is kept below.</p>
+<p>One thing from it still stands and is <strong>not</strong> covered by the answer: nuget.org is at 2.0.6, so
+external users cannot reach 2.0.7, 2.0.8 or 2.0.9. Whether those three were meant for external
+users is a separate question, asked at the foot of this file.</p>
 <hr>
-<p>You asked why I suggested <code>v2.1.1</code> for the next release. I should not have suggested
-any number. The changelog says the release number is yours to assign when you cut the
-release, and says in as many words not to write one into it speculatively. I guessed
-from the <code>2.1.0</code> sitting in <code>Directory.Build.props</code>, which is only the number local
-builds use when nobody passes one in. That was my mistake, not a decision the project
-had already taken.</p>
-<p>Here is what is actually true today. All five packages on nuget.org are live at
-<strong>2.0.0</strong> and <strong>2.0.3</strong> — I checked the public index for each one. <code>2.1.0</code> was never
-published anywhere public; the changelog has a <code>2.1.0</code> section and it is still headed
-"unreleased". So the tag you cut, <code>2.0.5</code>, was not a step backwards at all: it is the
-next patch number after what is live. My earlier warning that it was "below 2.1.0"
-was misleading and I withdraw it.</p>
-<p>The open question is not which number comes next in sequence. It is that the work
-waiting to be released changes how existing code behaves: <code>Badge</code> now renders a
-<code>&lt;span&gt;</code> instead of a <code>&lt;div&gt;</code>, a long <code>Badge</code> label no longer wraps, <code>DataTable</code> with
-pagination switched off renders every row instead of five, and <code>AlertDialog</code> now
-closes on Escape. Each can change a page someone already built against 2.0.3.</p>
+<p>You published 2.0.9 today. It went to <strong>GitHub Packages</strong>. So did 2.0.8 and 2.0.7.</p>
+<p><strong>nuget.org has not had a new version since 2.0.6 on 2026-09-13.</strong> I checked the public index
+for all five packages: every one stops at 2.0.6.</p>
+<p>The project also said one thing and did the other. The requirement on the checklist is named
+"GitHub Packages CI/CD", but the check that proves it reads <strong>nuget.org</strong>, and there are two
+publish workflows, one per shop. That check has failed since 2026-09-15 for a true reason.</p>
+<p>One thing already cost a consumer real work. Three releases went out with no changelog entry,
+so everything in them sat under "unreleased" and the repository called shipped work
+unpublished. The Chatur team read that and reported two controls as missing that had been
+published the day before they wrote.</p>
 <h2 id="what-i-need-you-to-decide">What I need you to decide<a class="anchor-link" href="#what-i-need-you-to-decide">#</a></h2>
-<h3 id="which-version-number-the-next-release-carries">1. Which version number the next release carries<a class="anchor-link" href="#which-version-number-the-next-release-carries">#</a></h3>
-<p>The packages are at 2.0.3 in public. The unreleased work includes changes that alter
-how existing code behaves, which is what version numbers exist to signal. The number
-you pick is the whole signal — it decides whether someone upgrading gets a surprise.</p>
+<h3 id="were-2-0-7-2-0-8-and-2-0-9-meant-for-external-users-too">1. Were 2.0.7, 2.0.8 and 2.0.9 meant for external users too?<a class="anchor-link" href="#were-2-0-7-2-0-8-and-2-0-9-meant-for-external-users-too">#</a></h3>
+<p>Your answer settles which source each audience uses, but not this. nuget.org is at <strong>2.0.6</strong>, so
+an external user cannot reach any of the last three releases — including every control built for
+the two consumer reports.</p>
+<p>I need this because the check behind the release requirement currently demands that the newest
+release tag be on nuget.org. Under your answer that is only true for versions meant for external
+users, and I do not know which those are, so I cannot make the check honest without guessing. That
+requirement is marked as needing a re-check until then.</p>
 <table>
 <thead><tr><th>Option</th><th>What happens</th><th>What it costs</th></tr></thead>
 <tbody>
-<tr><td><strong>A — 3.0.0</strong></td><td>Says plainly that behaviour changed and code may need attention. Anyone on 2.x stays there until they choose to move, and reads the notes when they do.</td><td>A major number sets an expectation about how much changed. The list is real but it is eight or so items, not a rewrite.</td></tr>
-<tr><td><strong>B — 2.1.0</strong></td><td>Uses the number the changelog already has a section for, so the section and the release match. Signals new features, not breakage.</td><td>Understates it. Someone upgrading a minor version does not expect a <code>&lt;div&gt;</code> to become a <code>&lt;span&gt;</code>, and a stylesheet or test keyed on <code>div</code> stops matching with no warning.</td></tr>
-<tr><td><strong>C — 2.0.5</strong></td><td>The number you already tagged. Smallest possible step from 2.0.3.</td><td>Understates it most. A patch release is understood as safe to take without reading anything, and this one is not.</td></tr>
+<tr><td><strong>A — internal-only</strong></td><td>The last three stay off nuget.org. I change the check to prove the public source's newest version came from its own tag, and to stop demanding the newest tag be there.</td><td>External users stay on 2.0.6 until you choose to publish one.</td></tr>
+<tr><td><strong>B — public too</strong></td><td>I walk the publish of 2.0.7, 2.0.8 and 2.0.9 to nuget.org and confirm all five packages at each. The check then passes unchanged.</td><td>One publish run. Public versions cannot be withdrawn afterwards, only hidden.</td></tr>
 </tbody>
 </table>
-<p><strong>My recommendation: A — 3.0.0.</strong> The behaviour changes are the kind that break a
-working page silently rather than loudly, and a major number is the only one that
-tells someone to read the notes before upgrading.</p>
+<p><strong>My recommendation: B</strong> — the controls in those three releases are the ones two consumer teams
+asked for, and nothing in them is specific to this organisation.</p>
+<h3 id="whether-a-release-without-a-changelog-entry-should-be-blocked">2. Whether a release without a changelog entry should be blocked<a class="anchor-link" href="#whether-a-release-without-a-changelog-entry-should-be-blocked">#</a></h3>
+<p>Three releases went out unrecorded because nothing stopped them, and an outside team paid for it.
+The habit is the real fix — write the section when you cut the tag — but it can be enforced.</p>
+<table>
+<thead><tr><th>Option</th><th>What happens</th><th>What it costs</th></tr></thead>
+<tbody>
+<tr><td><strong>Yes</strong></td><td>A release whose version has no changelog section fails the build.</td><td>A few minutes to add; an occasional blocked release when you are in a hurry.</td></tr>
+<tr><td><strong>No</strong></td><td>It stays a habit.</td><td>It already failed once, at a consumer's expense.</td></tr>
+</tbody>
+</table>
+<p><strong>My recommendation: yes</strong> — this one went unnoticed for a week and was found by an outside team,
+not by us.</p>
 <h2 id="what-i-do-when-you-answer">What I do when you answer<a class="anchor-link" href="#what-i-do-when-you-answer">#</a></h2>
 <ol>
-<li>Correct the changelog: the <code>2.0.0</code> and <code>2.1.0</code> sections are both headed "unreleased" although 2.0.0 and 2.0.3 are live, and the unreleased work gets the number you choose. Around ten minutes.
+<li>For B: walk the three publishes and confirm all five packages at each version. For A: change the check to match, so it passes for a true reason instead of being ignored.
 </li>
-<li>Set the fallback number in <code>Directory.Build.props</code> to match, so a local build and a release agree.
+<li>Either way, correct the release requirement's wording, which names one source and tests the other.
 </li>
-<li>Tell you the exact tag to cut and the two steps to run the publish, then watch the run and confirm all five packages are live on nuget.org at that version.
-</li>
-<li>Close the last open row on the checklist, which only a real publish can close.
+<li>For yes on the second: add the changelog check and prove it against 2.0.9.
 </li>
 </ol>
-<p>I do not need an answer to delete the old tag — the commands for that are in my
-message and are yours to run either way.</p>
 <h2 id="copy-this-back-to-me">Copy this back to me<a class="anchor-link" href="#copy-this-back-to-me">#</a></h2>
-<pre><code>TrBlazeUI: decision 1 — cut the next release as 3.0.0. Update the changelog and the fallback version to match, then tell me the tag to cut.</code></pre>
-<pre><code>TrBlazeUI: decision 1 — cut the next release as 2.1.0. Update the changelog and the fallback version to match, then tell me the tag to cut.</code></pre>
-<pre><code>TrBlazeUI: decision 1 — cut the next release as 2.0.5. Update the changelog and the fallback version to match, then tell me the tag to cut.</code></pre>
+<pre><code>TrBlazeUI: those three were internal-only. Change the release check to match and re-verify that requirement.</code></pre>
+<pre><code>TrBlazeUI: publish 2.0.7, 2.0.8 and 2.0.9 to nuget.org as well, then re-verify the release requirement.</code></pre>
+<pre><code>TrBlazeUI: also block a release whose version has no changelog entry, and prove the check against 2.0.9.</code></pre>
+<hr>
+<p><em>Answered 2026-09-13 — the next release number.</em> I had suggested <code>v2.1.1</code>, guessing from the
+<code>2.1.0</code> in <code>Directory.Build.props</code>, which is only the number local builds use when nobody
+passes one in. That was my mistake. Released as 2.0.6.</p>
   </main>
 </div>
 

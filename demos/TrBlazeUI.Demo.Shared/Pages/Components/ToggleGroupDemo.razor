@@ -225,6 +225,47 @@
         <p class="text-sm text-muted-foreground" data-testid="view-selected">View: @objView · Layout: @objDiffMode</p>
     </div>
 
+    <!-- The chosen item's look -->
+    <div class="space-y-4" data-testid="on-variant-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">The Chosen Item's Look</h2>
+            <p class="text-sm text-muted-foreground">
+                <code class="bg-muted px-1 py-0.5 rounded">OnVariant</code> sets how the chosen item is painted:
+                <code class="bg-muted px-1 py-0.5 rounded">Accent</code> (the default),
+                <code class="bg-muted px-1 py-0.5 rounded">Card</code> for a plain card segment on a muted track, or
+                <code class="bg-muted px-1 py-0.5 rounded">Primary</code> for the strongest look.
+            </p>
+        </div>
+        <div class="flex flex-wrap items-start gap-8">
+            <div>
+                <p class="text-sm mb-2">Accent (default):</p>
+                <ToggleGroup TValue="string" @bind-Value="objModeAccent" Joined="true" AllowDeselect="false"
+                             Size="ToggleSize.Small" AriaLabel="Mode, accent look" data-testid="on-accent">
+                    <ToggleGroupItem TValue="string" Value="@("ask")">Ask first</ToggleGroupItem>
+                    <ToggleGroupItem TValue="string" Value="@("auto")">Automatic</ToggleGroupItem>
+                </ToggleGroup>
+            </div>
+            <div>
+                <p class="text-sm mb-2">Card, on a muted track:</p>
+                <ToggleGroup TValue="string" @bind-Value="objModeCard" Joined="true" AllowDeselect="false"
+                             OnVariant="ToggleOnVariant.Card" Class="bg-muted"
+                             Size="ToggleSize.Small" AriaLabel="Mode, card look" data-testid="on-card">
+                    <ToggleGroupItem TValue="string" Value="@("ask")">Ask first</ToggleGroupItem>
+                    <ToggleGroupItem TValue="string" Value="@("auto")">Automatic</ToggleGroupItem>
+                </ToggleGroup>
+            </div>
+            <div>
+                <p class="text-sm mb-2">Primary:</p>
+                <ToggleGroup TValue="string" @bind-Value="objModePrimary" Joined="true" AllowDeselect="false"
+                             OnVariant="ToggleOnVariant.Primary"
+                             Size="ToggleSize.Small" AriaLabel="Mode, primary look" data-testid="on-primary">
+                    <ToggleGroupItem TValue="string" Value="@("ask")">Ask first</ToggleGroupItem>
+                    <ToggleGroupItem TValue="string" Value="@("auto")">Automatic</ToggleGroupItem>
+                </ToggleGroup>
+            </div>
+        </div>
+    </div>
+
     <!-- API Reference -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -242,6 +283,7 @@
                     <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the entire group</p>
                     <p><strong>Joined:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Draws the items as one joined control</p>
                     <p><strong>AllowDeselect:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Single choice: pressing the chosen item clears it (default true)</p>
+                    <p><strong>OnVariant:</strong> <code class="bg-muted px-1 py-0.5 rounded">ToggleOnVariant</code> - The chosen item's look: Accent (default), Card or Primary</p>
                     <p><strong>AriaLabel:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Accessible name of the group</p>
                 </div>
             </div>
@@ -262,4 +304,7 @@
     private List<string>? objFormatting = new() { "bold" };
     private string? objView = "board";
     private string? objDiffMode = "side";
+    private string? objModeAccent = "ask";
+    private string? objModeCard = "ask";
+    private string? objModePrimary = "ask";
 }

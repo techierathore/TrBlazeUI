@@ -36,6 +36,7 @@
     private bool IsJoined => Context?.Joined == true;
     private ToggleVariant Variant => Context?.Variant ?? ToggleVariant.Default;
     private ToggleSize Size => Context?.Size ?? ToggleSize.Default;
+    private ToggleOnVariant OnVariant => Context?.OnVariant ?? ToggleOnVariant.Accent;
 
     /// <inheritdoc />
     protected override void OnInitialized() => Context?.Register(this);
@@ -58,6 +59,16 @@
         _ => "bg-transparent"
     };
 
+    // The chosen look. Each class is written out whole because the shipped stylesheet is built by
+    // scanning this file for class names: a name assembled at run time would never be generated,
+    // which is how a caller's own data-[state=on]:bg-card came to do nothing (Chatur TR-012).
+    private string OnClasses => OnVariant switch
+    {
+        ToggleOnVariant.Card => "data-[state=on]:bg-card data-[state=on]:text-card-foreground",
+        ToggleOnVariant.Primary => "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground",
+        _ => "data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
+    };
+
     private string SizeClasses => Size switch
     {
         ToggleSize.Small => "h-9 px-2.5",
@@ -77,7 +88,7 @@
         "hover:bg-muted hover:text-muted-foreground",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         "disabled:pointer-events-none disabled:opacity-50",
-        "data-[state=on]:bg-accent data-[state=on]:text-accent-foreground",
+        OnClasses,
         VariantClasses,
         SizeClasses,
         JoinedClasses,

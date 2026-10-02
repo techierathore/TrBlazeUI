@@ -18,10 +18,12 @@ problem is in this table, the control exists — do not hand-build it.
 | Let the user set the order of a list — move up and move down | `SortableList` (real buttons; there is no dragging) | §8 |
 | A switch inside a table cell — on and off per row, at the height of the row | `Switch Size="SwitchSize.Small"` inside a `DataTableColumn` `CellTemplate` | §5 |
 | Follow a growing log or chat — keep the newest line in view, stop when the reader scrolls up | `ScrollArea StickToEnd="true"` | §3 |
-| Edit a source file — line numbers, and Tab inserting an indent instead of moving focus | `CodeEditor` (and `EditorTabs` for the open-file strip) | §Added |
-| Show the output of a running command — lines marked ordinary, warning or failure | `LogView` | §Added |
-| Show that an answer is still being written — inside the message, while its text grows | `Typing` (or `Progress Indeterminate="true"` for a bar) | §Added |
-| A list of multi-line rows that drives a detail pane beside it | `NavList<TItem>` | §Added |
+| Edit a source file — line numbers, and Tab inserting an indent instead of moving focus | `CodeEditor` (and `EditorTabs` for the open-file strip) | §2.0.9 |
+| Show the output of a running command — lines marked ordinary, warning or failure | `LogView` | §2.0.9 |
+| Show that an answer is still being written — inside the message, while its text grows | `Typing` (or `Progress Indeterminate="true"` for a bar) | §2.0.9 |
+| A list of multi-line rows that drives a detail pane beside it | `NavList<TItem>` | §2.0.9 |
+| Put a test hook (`data-testid`) on a table row, the table's header row or its choose-all box | `DataTable` `RowAttributes`, `HeaderRowAttributes`, `SelectAllAttributes` (after 2.0.9) | §6 |
+| A segmented switch whose chosen segment is a plain card, or the primary colour, instead of the accent tint | `ToggleGroup` `OnVariant` (after 2.0.9) | §5 |
 
 ---
 
@@ -67,7 +69,10 @@ These rules are non-negotiable. Violating them produces broken or inconsistent U
   (`Dialog`, `Sheet`, `Popover`, `HoverCard`, `DropdownMenu`, `ContextMenu`, `Drawer`,
   `TooltipProvider`, `ResponsiveNavProvider`, `PortalHost`) and the configuration-only
   `DataTableColumn`. Put the hook on the part that renders the visible element
-  (`DialogContent`, `SheetContent`, …). `BreadcrumbList` is a special case: it has no element
+  (`DialogContent`, `SheetContent`, …). For a `DataTable`, whose own attributes land on its root
+  container, the row, the header row and the choose-all control take theirs through
+  `RowAttributes`, `HeaderRowAttributes` and `SelectAllAttributes` (§6, after 2.0.9).
+  `BreadcrumbList` is a special case: it has no element
   either, but it forwards its attributes onto the `<ol>` that `Breadcrumb` renders.
 
 - **Tailwind utilities work in application markup.** `trblazeui.css` ships the standard Tailwind
@@ -191,7 +196,7 @@ builder.Services.AddScoped<ToastService>();  // Required for Toast notifications
 
 > **Namespace rules — read before you copy this block.**
 > - `PortalHost` lives in `TrBlazeUI.Primitives.Services`, **not** in `TrBlazeUI.Primitives`. So do
->   the positioning enums `PopoverSide` / `PopoverAlign` / `PositioningStrategy` that
+>   the positioning types `PopoverSide` / `PopoverAlign` / `PositioningStrategy`, each a fixed list of values, that
 >   `DropdownMenuContent.Align`, `TooltipContent.Side` and friends take. That sub-namespace is in
 >   the block below; without it `<PortalHost />` and `Align="PopoverAlign.Start"` do not compile.
 > - `SheetSide` lives in `TrBlazeUI.Primitives.Sheet`. **Do not import that namespace** — it ships a
@@ -214,15 +219,15 @@ builder.Services.AddScoped<ToastService>();  // Required for Toast notifications
 >   grid use `DataTable` (§6) and import nothing extra.
 > - `@using ApexCharts` is required by the chart family (see §8) — the charts are a
 >   Blazor-ApexCharts wrapper and the series types come from that package.
-> - The block below lists **every one of the 85 `TrBlazeUI.Components.*` component namespaces
->   in the next release's assembly** — one per component folder, including `TreeView`, `DiffView`
->   and the four added since 2.0.7 (`CodeEditor`, `LogView`, `NavList`, `Typing`). Copy it
->   whole. A partial copy is the single most common cause of a silently broken page — see the
->   RZ10012 note under the block.
-> - **If you are on 2.0.7 or earlier, drop those last four lines.** A missing `@using` gives a
->   silent RZ10012 warning, but a `@using` for a namespace your installed package does not have is
->   CS0246 — a hard compile error. This document ships with the package, so if you are reading it
->   from your own `.trblazeui/` folder it already matches your version and you can copy it whole.
+> - The block below lists **every one of the 85 `TrBlazeUI.Components.*` component namespaces in
+>   the 2.0.9 assembly** — one per component folder. Copy it whole. A partial copy is the single
+>   most common cause of a silently broken page — see the RZ10012 note under the block.
+> - **On an older version, drop the lines your package does not have.** A missing `@using` gives a
+>   silent RZ10012 warning, but a `@using` for a namespace your installed package lacks is CS0246 —
+>   a hard compile error. This document ships with the package, so if you are reading it from your
+>   own `.trblazeui/` folder it already matches your version and you can copy it whole. Counts by
+>   version: **2.0.7 → 79**, **2.0.8 → 81** (adds `TreeView`, `DiffView`), **2.0.9 → 85** (adds
+>   `CodeEditor`, `LogView`, `NavList`, `Typing`).
 
 ```razor
 @using TrBlazeUI.Components
@@ -1442,7 +1447,7 @@ background image, so it looks the same in every browser. Nothing is needed from 
 | Value / ValueChanged | double | 0 | Current rating (two-way: `@bind-Value`) |
 | Max | int | 5 | Number of icons |
 | AllowHalf / AllowClear | bool | false / true | Half steps; clicking the current value clears it |
-| ReadOnly | bool | false | Renders as a **value**, not a control: `role="img"` + `aria-label`, no radio semantics, no tab stop |
+| ReadOnly | bool | false | Renders as a **value**, not a control: `role="img"` + `aria-label`, with no radio meaning and no tab stop |
 | Disabled | bool | false | `aria-disabled` on the group, options disabled |
 | Focusable | bool | true | Set `false` to keep a purely decorative rating out of the tab order |
 | Icon / IconTemplate | RatingIcon / RenderFragment | Star | Icon shape or a custom template |
@@ -1499,13 +1504,36 @@ group) or `Multiple` (`@bind-Values`, a `List<TValue>`). For a view switch in a 
 | DefaultValue | TValue? | null | Initial value when you leave the group unbound |
 | Joined | bool | false | One control with a shared border, for a view switch in a toolbar |
 | AllowDeselect | bool | true | `false` keeps exactly one item chosen |
-| Variant | ToggleVariant | Default | `Default` or `Outline` |
+| Variant | ToggleVariant | Default | `Default` or `Outline` — styles every item, chosen or not |
+| OnVariant | ToggleOnVariant | Accent | **After 2.0.9.** The chosen item's look: `Accent` (the look it always had), `Card` (the card colour — a plain card segment) or `Primary` (the primary colour) |
 | Size | ToggleSize | Default | `Small`, `Default`, `Large` |
 | Disabled | bool | false | Disables the whole group |
 | AriaLabel | string? | null | Name for the group |
 | Class | string? | null | Additional CSS classes |
 
 **ToggleGroupItem<TValue>** takes `TValue`, `Value`, `Disabled`, `Class` and its content.
+
+**The chosen item's colour — use `OnVariant`, not an on-state class of your own.** A class such
+as `data-[state=on]:bg-card` passed through `Class` does nothing unless that exact class is in the
+shipped stylesheet, and only the three looks below are. For a segmented switch whose chosen
+segment is a plain card, give the group a muted track and set `OnVariant`:
+
+```razor
+<ToggleGroup TValue="string" @bind-Value="mode" Joined="true" AllowDeselect="false"
+             OnVariant="ToggleOnVariant.Card" Class="bg-muted" AriaLabel="Mode">
+    <ToggleGroupItem TValue="string" Value="@("ask")">Ask first</ToggleGroupItem>
+    <ToggleGroupItem TValue="string" Value="@("auto")">Automatic</ToggleGroupItem>
+</ToggleGroup>
+```
+
+| `OnVariant` | Chosen item's background | Chosen item's text |
+|---|---|---|
+| `Accent` (default) | `--accent` | `--accent-foreground` |
+| `Card` | `--card` | `--card-foreground` |
+| `Primary` | `--primary` | `--primary-foreground` |
+
+`Card` on a page whose background is the same colour as its cards shows no difference between
+chosen and not chosen, which is why the example puts the group on `bg-muted`.
 
 - String values need `Value="@("board")"` — the plain `Value="board"` form cannot infer `TValue`.
 - One Tab stop (the chosen item); the arrow keys move between items. Single choice renders
@@ -1612,7 +1640,50 @@ three-line box turns the end caps into deep arcs that cut into the first and las
 | PageSizes | int[] | [5,10,20,50,100] | Page size options |
 | SelectedItems | IReadOnlyCollection<TData> | [] | Two-way: `@bind-SelectedItems` — the rows the user has chosen. `SelectedItems.Count` is the count to put on a button or a banner |
 | MinWidth | string? | null | CSS length, e.g. `"720px"`. Set it on wide tables: the grid's wrapper scrolls horizontally, but a `w-full` table with no minimum just shrinks and the right-hand columns are squeezed away with no scrollbar. |
+| RowAttributes | Func<TData, IReadOnlyDictionary<string, object>?>? | null | **After 2.0.9.** HTML attributes for each body row, from the row's item — for example a `data-testid` per row. See "Naming a row, the header row and the choose-all control" below |
+| HeaderRowAttributes | IReadOnlyDictionary<string, object>? | null | **After 2.0.9.** HTML attributes for the header row (the `<tr>` in `<thead>`) |
+| SelectAllAttributes | IReadOnlyDictionary<string, object>? | null | **After 2.0.9.** HTML attributes for the choose-all control that `SelectionMode="Multiple"` draws |
 | Class | string? | null | Additional CSS classes |
+
+#### Naming a row, the header row and the choose-all control — test hooks on the parts of a grid
+
+Attributes written on `<DataTable>` itself (`data-testid`, `id`) land on the grid's root container,
+and `DataTableColumn` renders no element. To name a row, the header row or the choose-all control —
+which a test, a mockup anchor or a script needs — use these three parameters (added after 2.0.9):
+
+```razor
+<DataTable TData="ChangedFile" Data="@objFiles"
+           SelectionMode="DataTableSelectionMode.Multiple"
+           RowAttributes="@(f => new Dictionary<string, object> { ["data-testid"] = $"change-row-{f.Path}" })"
+           HeaderRowAttributes="ChangesHead"
+           SelectAllAttributes="ChooseAll">
+    <Columns>
+        <DataTableColumn TData="ChangedFile" TValue="string" Property="@(f => f.Path)" Header="File" />
+    </Columns>
+</DataTable>
+
+@code {
+    private static readonly IReadOnlyDictionary<string, object> ChangesHead =
+        new Dictionary<string, object> { ["data-testid"] = "changes-head" };
+
+    private static readonly IReadOnlyDictionary<string, object> ChooseAll =
+        new Dictionary<string, object> { ["data-testid"] = "choose-all" };
+}
+```
+
+- `RowAttributes` is a function of the row's item, called once for each row on the page being
+  shown. Return `null` for a row that needs nothing.
+- `SelectAllAttributes` lands on the control the user operates: the checkbox when every row fits
+  on one page, or the menu button that takes its place when the grid is paged. One
+  `data-testid="choose-all"` finds it either way. Without the parameter, the control is still
+  reachable through a fixed hook — its wrapper always carries `data-slot="datatable-select-all"`.
+- A `class` entry is **added** to the part's own classes; it does not replace them.
+- The row's `role`, `aria-selected` and `tabindex` are the grid's. An entry of the same name
+  replaces the grid's value, so leave those out. The choose-all control's accessible name and
+  `data-slot` cannot be replaced.
+- `HeaderRowAttributes` does nothing with `ShowHeader="false"`, because no header row is drawn.
+- The three are read when the grid paints. The grid skips repainting while its `Data` reference is
+  unchanged, so after changing what they return for rows already on screen, call `Refresh()`.
 
 #### Letting the user choose rows — `SelectionMode` + `@bind-SelectedItems`
 
@@ -3601,40 +3672,69 @@ Common icon names: `home`, `house`, `settings`, `user`, `search`, `mail`, `bell`
 
 ---
 
-## Added after 2.0.7, not yet published
+## Which version added what — read this before reporting a control as missing
 
-**Read this before reporting a control as missing.** The copy of this document at
-`.trblazeui/TrBlazeUI-AI-Reference.md` inside a consumer's repository is deployed by the installed
-NuGet package. It changes only when that package is upgraded. So the copy you are reading there is
-your installed version's reference, not the latest one — a control added since your version will be
-absent from it, and absent from your `bin` folder, even though it exists. The current copy lives in
-the library repository at `docs/TrBlazeUI-AI-Reference.md`; check it, and the `[Unreleased]` section
-of `CHANGELOG.md`, before concluding that something does not exist.
+**The copy of this document in your own repository is your installed version's reference, not the
+latest one.** `.trblazeui/TrBlazeUI-AI-Reference.md` is deployed by the installed NuGet package and
+changes only when you upgrade it. A control added after your version is absent from that copy *and*
+absent from your `bin` folder, even though it exists and is published. Before concluding that
+something does not exist, check your installed version against the table below.
 
-### Already documented above, shipping in the next release
+**This has already cost a consumer real work.** A team on 2.0.7 filed a report saying no tree
+control and no difference viewer existed. Both had been published in 2.0.8 the day before. The
+answer to "the control I need is missing" is usually *upgrade*, sometimes *use the right package
+source* — see the next heading — and only rarely *wait for it to be built*.
 
-These are described in full, with parameter tables and examples, in the sections named. They are
-merged and documented but not yet in a published package, so a consumer on 2.0.7 will not see them
-until the next release.
+| Version | Released | Component namespaces | What it added |
+|---|---|---|---|
+| **After 2.0.9** | not yet published | 85 | `DataTable.RowAttributes`/`HeaderRowAttributes`/`SelectAllAttributes`; `ToggleGroup.OnVariant`; `ToggleGroup` no longer reports an unhandled error when its page closes |
+| **2.0.9** | 2026-09-22 | 85 | `CodeEditor` + `EditorTabs`, `LogView`, `NavList`, `Typing`; `Progress.Indeterminate`; `StepStatus` on `StepperItem`/`TimelineItem`; `SortableList.ShowPosition`/`AllowRemove`; `DataTable.SelectedCount` |
+| **2.0.8** | 2026-09-20 | 81 | `TreeView` + `TreeItem`, `DiffView` + `TextDiff`, `ScrollArea.StickToEnd`, `ToggleGroup.Joined`/`AllowDeselect`/`AriaLabel` |
+| **2.0.7** | 2026-09-15 | 79 | `InputGroupInput.DebounceMilliseconds`; the chart teardown fix |
+| **2.0.6** | 2026-09-13 | 79 | newest version currently on nuget.org |
 
-| Control | Section |
-|---|---|
-| `TreeView`, `TreeItem` — a tree of files and folders | §3 |
-| `DiffView`, `TextDiff` — compare two texts side by side or inline | §8 |
-| `ScrollArea.StickToEnd` — follow a growing log or chat | §3 |
-| `ToggleGroup.Joined` / `AllowDeselect` / `AriaLabel` — a joined view switch | §5 |
+Everything in this document describes **2.0.9**, except the parameters marked "After 2.0.9", which
+are built and tested but not in a published version yet — they arrive with the next release. Each
+control's own section has its full parameter table; the version table above only says when it
+arrived. `CHANGELOG.md` has the detail per release.
 
-### Added in this release — built and checked, not yet published
+### Which package source to use — there are two, and they carry different versions
 
-These are built, and their behaviour is checked in a running browser
-(`tests/verify/ui-chatur-2.spec.js`). A consumer on 2.0.7 will not see any of them until the next
-release. Full parameter tables follow in the sections named above.
+TrBlazeUI is published to two sources, and **which one you should use depends on who you are**.
+They do not carry the same versions, so this is the first thing to check when a control you can
+see documented here is missing from your `bin` folder.
 
-Each of them brings a new `TrBlazeUI.Components.*` namespace, and all four are now **in** the
-`_Imports.razor` block in §1, which lists 85 namespaces. If you are still on 2.0.7 or earlier,
-drop those four lines when you copy the block: a `@using` for a namespace your installed package
-does not contain is a compile error (CS0246), not the silent RZ10012 warning a *missing* `@using`
-gives.
+| You are | Your source | What it carries |
+|---|---|---|
+| **An internal application** — one of this organisation's own projects, such as Chatur, TfLens or TrStudio | **GitHub Packages** — `https://nuget.pkg.github.com/techierathore/index.json` | Every release, as soon as it is cut. Currently **2.0.9**. |
+| **An external user** — any project outside this organisation | **nuget.org** — the ordinary public source | The versions published for public use. Currently **2.0.6**. |
+
+**If you are an internal application, use GitHub Packages.** It needs authentication even though
+the library is Apache 2.0, because that is how GitHub Packages works. Add the source once:
+
+```bash
+dotnet nuget add source https://nuget.pkg.github.com/techierathore/index.json \
+  --name TrBlazeUI \
+  --username YOUR_GITHUB_USERNAME \
+  --password YOUR_GITHUB_PAT \
+  --store-password-in-clear-text
+```
+
+The token needs the `read:packages` scope and nothing more. In CI, the workflow adds this source
+with the sign-in token the build system supplies — see `nuget.config` at the repository root.
+
+**If you are an external user, use nuget.org** and expect it to lag the internal source. A control
+in the version table above that is newer than the newest version on nuget.org is not yet available
+to you, and no amount of restoring will find it.
+
+**So when an upgrade cannot find the version you want, check your source before anything else.**
+Being on the wrong one looks exactly like a control that does not exist, and it costs more time
+than any real defect.
+
+### The controls added in 2.0.9
+
+Full parameter tables. The controls added in 2.0.8 — `TreeView`, `DiffView`,
+`ScrollArea.StickToEnd`, `ToggleGroup` — are documented in their own sections (§3, §8, §3, §5).
 
 #### CodeEditor — edit a source file
 

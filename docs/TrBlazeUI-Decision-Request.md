@@ -3,77 +3,93 @@
 | | |
 |---|---|
 | App | TrBlazeUI |
-| Written | 2026-09-12 |
-| Waiting on | Nothing. Answered 2026-09-13. |
+| Written | 2026-09-22 |
+| Waiting on | Whether the last three releases were meant for external users too. |
 
 ## What happened
 
-**Answered 2026-09-13: released as 2.0.6**, live on nuget.org. The original request is kept below.
+**Answered 2026-09-22: both sources are real, for different audiences.** GitHub Packages is the
+source for this organisation's own applications; nuget.org is the source for external users. The
+AI reference now carries that, with the sign-in steps for the internal source. The README was
+left alone, as asked. The original request is kept below.
+
+One thing from it still stands and is **not** covered by the answer: nuget.org is at 2.0.6, so
+external users cannot reach 2.0.7, 2.0.8 or 2.0.9. Whether those three were meant for external
+users is a separate question, asked at the foot of this file.
 
 ---
 
-You asked why I suggested `v2.1.1` for the next release. I should not have suggested
-any number. The changelog says the release number is yours to assign when you cut the
-release, and says in as many words not to write one into it speculatively. I guessed
-from the `2.1.0` sitting in `Directory.Build.props`, which is only the number local
-builds use when nobody passes one in. That was my mistake, not a decision the project
-had already taken.
+You published 2.0.9 today. It went to **GitHub Packages**. So did 2.0.8 and 2.0.7.
 
-Here is what is actually true today. All five packages on nuget.org are live at
-**2.0.0** and **2.0.3** — I checked the public index for each one. `2.1.0` was never
-published anywhere public; the changelog has a `2.1.0` section and it is still headed
-"unreleased". So the tag you cut, `2.0.5`, was not a step backwards at all: it is the
-next patch number after what is live. My earlier warning that it was "below 2.1.0"
-was misleading and I withdraw it.
+**nuget.org has not had a new version since 2.0.6 on 2026-09-13.** I checked the public index
+for all five packages: every one stops at 2.0.6.
 
-The open question is not which number comes next in sequence. It is that the work
-waiting to be released changes how existing code behaves: `Badge` now renders a
-`<span>` instead of a `<div>`, a long `Badge` label no longer wraps, `DataTable` with
-pagination switched off renders every row instead of five, and `AlertDialog` now
-closes on Escape. Each can change a page someone already built against 2.0.3.
+The project also said one thing and did the other. The requirement on the checklist is named
+"GitHub Packages CI/CD", but the check that proves it reads **nuget.org**, and there are two
+publish workflows, one per shop. That check has failed since 2026-09-15 for a true reason.
+
+One thing already cost a consumer real work. Three releases went out with no changelog entry,
+so everything in them sat under "unreleased" and the repository called shipped work
+unpublished. The Chatur team read that and reported two controls as missing that had been
+published the day before they wrote.
 
 ## What I need you to decide
 
-### 1. Which version number the next release carries
+### 1. Were 2.0.7, 2.0.8 and 2.0.9 meant for external users too?
 
-The packages are at 2.0.3 in public. The unreleased work includes changes that alter
-how existing code behaves, which is what version numbers exist to signal. The number
-you pick is the whole signal — it decides whether someone upgrading gets a surprise.
+Your answer settles which source each audience uses, but not this. nuget.org is at **2.0.6**, so
+an external user cannot reach any of the last three releases — including every control built for
+the two consumer reports.
+
+I need this because the check behind the release requirement currently demands that the newest
+release tag be on nuget.org. Under your answer that is only true for versions meant for external
+users, and I do not know which those are, so I cannot make the check honest without guessing. That
+requirement is marked as needing a re-check until then.
 
 | Option | What happens | What it costs |
 |---|---|---|
-| **A — 3.0.0** | Says plainly that behaviour changed and code may need attention. Anyone on 2.x stays there until they choose to move, and reads the notes when they do. | A major number sets an expectation about how much changed. The list is real but it is eight or so items, not a rewrite. |
-| **B — 2.1.0** | Uses the number the changelog already has a section for, so the section and the release match. Signals new features, not breakage. | Understates it. Someone upgrading a minor version does not expect a `<div>` to become a `<span>`, and a stylesheet or test keyed on `div` stops matching with no warning. |
-| **C — 2.0.5** | The number you already tagged. Smallest possible step from 2.0.3. | Understates it most. A patch release is understood as safe to take without reading anything, and this one is not. |
+| **A — internal-only** | The last three stay off nuget.org. I change the check to prove the public source's newest version came from its own tag, and to stop demanding the newest tag be there. | External users stay on 2.0.6 until you choose to publish one. |
+| **B — public too** | I walk the publish of 2.0.7, 2.0.8 and 2.0.9 to nuget.org and confirm all five packages at each. The check then passes unchanged. | One publish run. Public versions cannot be withdrawn afterwards, only hidden. |
 
-**My recommendation: A — 3.0.0.** The behaviour changes are the kind that break a
-working page silently rather than loudly, and a major number is the only one that
-tells someone to read the notes before upgrading.
+**My recommendation: B** — the controls in those three releases are the ones two consumer teams
+asked for, and nothing in them is specific to this organisation.
+
+### 2. Whether a release without a changelog entry should be blocked
+
+Three releases went out unrecorded because nothing stopped them, and an outside team paid for it.
+The habit is the real fix — write the section when you cut the tag — but it can be enforced.
+
+| Option | What happens | What it costs |
+|---|---|---|
+| **Yes** | A release whose version has no changelog section fails the build. | A few minutes to add; an occasional blocked release when you are in a hurry. |
+| **No** | It stays a habit. | It already failed once, at a consumer's expense. |
+
+**My recommendation: yes** — this one went unnoticed for a week and was found by an outside team,
+not by us.
 
 ## What I do when you answer
 
-1. Correct the changelog: the `2.0.0` and `2.1.0` sections are both headed
-   "unreleased" although 2.0.0 and 2.0.3 are live, and the unreleased work gets the
-   number you choose. Around ten minutes.
-2. Set the fallback number in `Directory.Build.props` to match, so a local build and a
-   release agree.
-3. Tell you the exact tag to cut and the two steps to run the publish, then watch the
-   run and confirm all five packages are live on nuget.org at that version.
-4. Close the last open row on the checklist, which only a real publish can close.
-
-I do not need an answer to delete the old tag — the commands for that are in my
-message and are yours to run either way.
+1. For B: walk the three publishes and confirm all five packages at each version.
+   For A: change the check to match, so it passes for a true reason instead of being ignored.
+2. Either way, correct the release requirement's wording, which names one source and tests the other.
+3. For yes on the second: add the changelog check and prove it against 2.0.9.
 
 ## Copy this back to me
 
 ```
-TrBlazeUI: decision 1 — cut the next release as 3.0.0. Update the changelog and the fallback version to match, then tell me the tag to cut.
+TrBlazeUI: those three were internal-only. Change the release check to match and re-verify that requirement.
 ```
 
 ```
-TrBlazeUI: decision 1 — cut the next release as 2.1.0. Update the changelog and the fallback version to match, then tell me the tag to cut.
+TrBlazeUI: publish 2.0.7, 2.0.8 and 2.0.9 to nuget.org as well, then re-verify the release requirement.
 ```
 
 ```
-TrBlazeUI: decision 1 — cut the next release as 2.0.5. Update the changelog and the fallback version to match, then tell me the tag to cut.
+TrBlazeUI: also block a release whose version has no changelog entry, and prove the check against 2.0.9.
 ```
+
+---
+
+*Answered 2026-09-13 — the next release number.* I had suggested `v2.1.1`, guessing from the
+`2.1.0` in `Directory.Build.props`, which is only the number local builds use when nobody
+passes one in. That was my mistake. Released as 2.0.6.

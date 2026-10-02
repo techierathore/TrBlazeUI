@@ -11,16 +11,64 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
-Closes TfLens TR-039 and TR-040 (`docs/TfLens-TrBlazeUI-Feedback.md`), both filed against 2.0.6;
-Chatur's first batch, TR-001 to TR-004 (`docs/Chatur-TrBlazeUI-Feedback.md`), filed against 2.0.7;
-and Chatur's **second** batch of ten, filed 2026-09-21, also against 2.0.7. That second batch
-renumbered from TR-001, so its ids collide with the first batch's; it is referred to here as
-"Chatur batch 2" throughout.
+Closes Chatur's third batch (`docs/Chatur-TrBlazeUI-Feedback.md`, TR-011 to TR-013, filed
+2026-09-30 and 2026-10-01 against 2.0.9). Built and verified on 2026-10-01; **not in a published
+version yet**. Move this section under the version heading when the tag is cut.
 
-Five of batch 2's ten entries reported controls that already exist. Four of those five — a tree,
+No behaviour changes: every existing `DataTable` and `ToggleGroup` renders as before.
+
+### Added — Chatur batch 3
+
+- **`DataTable.RowAttributes`, `HeaderRowAttributes` and `SelectAllAttributes` (TR-011)**: HTML
+  attributes for each body row (a function of the row's item), for the header row, and for the
+  choose-all control that `SelectionMode="Multiple"` draws. Attributes on the grid itself land on
+  its root and a column renders no element, so until now a row could not carry a `data-testid`.
+  `SelectAllAttributes` lands on whichever control the user operates — the checkbox on a one-page
+  grid, the menu button on a paged one. A `class` entry is added to the part's own classes. The
+  choose-all control's wrapper also carries a fixed `data-slot="datatable-select-all"`.
+- **`ToggleGroup.OnVariant` (TR-012)**: the chosen item's look — `Accent` (the default, and the
+  look it always had), `Card` or `Primary` (new enum `ToggleOnVariant`). The chosen colour was
+  fixed to `bg-accent`, and an on-state class a caller passed, such as `data-[state=on]:bg-card`,
+  was not in the shipped stylesheet. `trblazeui.css` was rebuilt and now carries the four new
+  classes (1,014,498 → 1,014,828 bytes).
+
+### Fixed — Chatur batch 3
+
+- **`ToggleGroup` let "A task was canceled" escape from `DisposeAsync` (TR-013)**: when a page
+  closed or reloaded between the group's two dispose calls to the browser, the second was never
+  answered, the server cancelled it after its one-minute limit, and the `TaskCanceledException`
+  was reported as "Unhandled exception rendering component" and then "Unhandled exception in
+  circuit". Only `JSDisconnectedException` was caught. Both are now swallowed, in `DisposeAsync`
+  and around the first-render import. Reproduced before the fix (44 log entries in one run) and
+  measured after it (0).
+
+---
+
+## [2.0.9] — 2026-09-22
+
+> Published from the release tag `v2.0.9` to **GitHub Packages**
+> (`https://nuget.pkg.github.com/techierathore/index.json`). **Not on nuget.org**, which is still
+> at 2.0.6 — see the note under [2.0.7].
+>
+> **Three releases went out without a changelog entry.** 2.0.7, 2.0.8 and this one were tagged and
+> published while everything below sat under `[Unreleased]`, so between 2026-09-15 and today this
+> file said work was unpublished when it had already shipped. The sections below were reconstructed
+> on 2026-09-22 by reading each tag's own source tree, which is the only record that could not
+> drift: component-folder counts of **79** at `v2.0.7`, **81** at `v2.0.8` and **85** at `v2.0.9`,
+> and the presence of each named type at each tag. Dates are the GitHub release timestamps.
+>
+> The cost of this is not bookkeeping: a consumer on 2.0.7 was told by their own reference that a
+> control did not exist, while it had been published two days earlier. **Write the section when the
+> tag is cut.**
+
+Closes Chatur's **second** batch of ten findings (`docs/Chatur-TrBlazeUI-Feedback.md`), filed
+2026-09-21 against 2.0.7. That batch renumbered from TR-001, so its ids collide with the first
+batch's; it is called "Chatur batch 2" throughout.
+
+Five of batch 2's ten entries reported controls that already existed. Four of those five — a tree,
 a difference viewer, a small switch for a table cell, and an ordered list with move-up and
-move-down buttons — needed no code at all; they needed the reference to be findable. See
-"Documentation" below.
+move-down buttons — needed no code at all; two had shipped in 2.0.8 and two had been documented all
+along. They needed the reference to be findable. See "Documentation" below.
 
 ### ⚠ Behaviour changes to review before upgrading
 
@@ -118,6 +166,23 @@ the prose had said 79) and now carries the four new namespaces, at 85. A consume
 must drop those four lines: a `@using` for a namespace the installed package lacks is CS0246, a
 hard error, not the silent RZ10012 a missing one gives.
 
+---
+
+## [2.0.8] — 2026-09-20
+
+> Published from the release tag `v2.0.8` to **GitHub Packages**. Not on nuget.org.
+> 81 component folders at this tag, up from 79 at 2.0.7: `TreeView` and `DiffView` are the two.
+>
+> **This is the release Chatur needed and did not have.** They filed their second batch on
+> 2026-09-21 against 2.0.7, reporting that no tree control and no difference viewer existed — both
+> had been published here the day before. The action on those two findings was always *upgrade*,
+> never *wait*.
+
+Closes Chatur's **first** batch, TR-001 to TR-004 (`docs/Chatur-TrBlazeUI-Feedback.md`), filed
+against 2.0.7.
+
+### ⚠ Behaviour changes to review before upgrading
+
 - **Side borders and border styles now survive `Class` merging.** `cn()` used to read `border-l`,
   `border-b`, `border-s` (and the other sides) and `border-dashed`/`border-solid`/… as border
   *colours*, so a later colour class deleted them. `Timeline`'s vertical line (`border-s`) and
@@ -146,6 +211,20 @@ hard error, not the silent RZ10012 a missing one gives.
   joined control for a view switch that keeps exactly one choice. A single-choice group is now a
   `radiogroup` of `radio` items with one Tab stop and arrow-key movement; a multiple-choice group
   keeps `aria-pressed`. The AI reference now documents `ToggleGroup`, which it never listed.
+
+---
+
+## [2.0.7] — 2026-09-15
+
+> Published from the release tag `v2.0.7` to **GitHub Packages**. 79 component folders.
+>
+> **Not on nuget.org, and neither is anything after it.** nuget.org carries 2.0.0, 2.0.3 and 2.0.6
+> only, so a consumer on that feed cannot reach 2.0.7, 2.0.8 or 2.0.9 at all. REQ-FN-004's test
+> checks the latest release tag against nuget.org and fails for exactly this reason. Either publish
+> the three to nuget.org or say in `README.md` that GitHub Packages is the supported feed — right
+> now the repository implies one and ships to the other.
+
+Closes TfLens TR-039 and TR-040 (`docs/TfLens-TrBlazeUI-Feedback.md`), both filed against 2.0.6.
 
 ### Fixed
 
