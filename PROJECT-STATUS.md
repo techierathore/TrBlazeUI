@@ -1,20 +1,19 @@
 ---
 project: TrBlazeUI
-last_updated: 2026-10-02
-current_phase: Handoff — 43 of 43 verified
+last_updated: 2026-10-03
+current_phase: Handoff — 44 of 44 verified
 last_verified_build: PASS
-last_verified_date: 2026-10-02
+last_verified_date: 2026-10-03
 ---
 
 # TrBlazeUI — Status
 
 ## Where I am
 
-2.1.0 is released on GitHub Packages and nuget.org and carries Chatur's TR-011, TR-012 and
-TR-013. Built since, and not in a release yet: 24 more dispose methods no longer report a
-cancelled-task error when their page stops answering. The release check now proves GitHub
-Packages publishing only; nuget.org is the owner's call and is not checked. All 43 rows are
-verified. Nothing is waiting on the owner.
+2.1.0 is the latest release. Built since, not released yet: the dispose sweep, and Chatur's
+TR-014 as REQ-UI-029, `Switch.Outlined`, which gives an off switch a muted track, a visible
+border and a grey thumb. All 44 rows are verified. Chatur's feedback file carries the reply
+for TR-014. Nothing is waiting on the owner.
 
 ## Next command to run
 
@@ -50,23 +49,24 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 | Date | Phase | Result | Status table |
 |---|---|---|---|
-| 2026-09-19 | triage-and-fix | 36/36 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-09-22 | triage-and-fix | 40/40 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-09-22 | amend-docs | 39/40 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-01 | triage-and-fix | 41/42 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-02 | build-phase | 43/43 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-10-03 | triage-and-fix | 44/44 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 
-- TechieFlow: 0 open · 1 fixed upstream, not yet re-checked (TF-002) · 1 closed — docs/TrBlazeUI-TechieFlow-Feedback.md
+- TechieFlow: 1 open (TF-003) · 1 fixed upstream, not yet re-checked (TF-002) · 1 closed — docs/TrBlazeUI-TechieFlow-Feedback.md
 
 ## Standards compliance
 
-- Last check 2026-10-02: 0 findings, see the checklist Remarks.
+- Last check 2026-10-03: 0 findings, see the checklist Remarks.
 
 ## Deferred / future
 
-- The dispose sweep ships with the release after 2.1.0.
+- TF-003: the checker wants a mockup link on every UI row.
+- The dispose sweep and `Switch.Outlined` ship with the release after 2.1.0.
 - The framework's own `Virtualize`, inside `CommandVirtualizedGroup`, still throws on dispose; not fixable in this library.
 - Tell TfLens 2.1.0 is out.
 - `tools/splat-audit` throws on the library assembly alone.

@@ -4,11 +4,11 @@
 |---|---|
 | App | TrBlazeUI |
 | Upstream | TechieFlow |
-| Updated | 2026-10-02 |
+| Updated | 2026-10-03 |
 
 ## Summary
 
-2 entries: 0 blocking now, 0 open, 1 fixed upstream and waiting to be re-checked here (TF-002, fixed 2026-10-02), 1 closed.
+3 entries: 0 blocking now, 1 open (TF-003, the document checker asks a library's UI rows for a mockup link), 1 fixed upstream and waiting to be re-checked here (TF-002, fixed 2026-10-02), 1 closed.
 
 Nothing is blocked. TF-001 was re-checked on 2026-10-01 and is closed. TF-002 is fixed upstream. It could not be re-checked on the 2026-10-02 run: the fixed script arrived at 07:30, ten minutes after that run's verify step had already started, so the next run that chains a verify is the first that can show it.
 
@@ -57,3 +57,19 @@ Nothing is blocked. TF-001 was re-checked on 2026-10-01 and is closed. TF-002 is
 - **Encountered in:** `*triage-and-fix TrBlazeUI`, 2026-10-01, at the status gate.
 - **Workaround:** read the `OLD` lines for the rows this run added and fix them by hand, which is what was done here.
 - **Suggested fix:** when a phase marker already exists for a running command, a chained start keeps the outer command's baseline instead of writing a new one.
+
+### TF-003 — The document checker asks a library's UI rows for a mockup link
+
+- **Severity:** minor
+- **Blocks:** no — the row is built and verified; the gate passed once the workaround below was in place.
+- **Repro:**
+  ```
+  bash .tfcore/utils/tf-triage.sh TrBlazeUI new "…" "When a consumer … on the Switch demo screen, then …" --prefix UI
+  bash .tfcore/utils/tf-doc-check.sh docs/TrBlazeUI-Checklist.md
+  → FAIL docs/TrBlazeUI-Checklist.md: REQ-UI-029 is a UI row without a mockup link
+  ```
+- **Expected:** a project whose `core-config.yaml` says `metrics.project_type: library` has no screens and no `docs/mockups/`, so a UI row is not asked for a mockup link (or the rule is a warning there). `tf-triage.sh new` already prints "a UI row needs a mockup link" for the same row.
+- **Actual:** `tf-doc-check.py` line ~1101 fails every `REQ-UI` detail entry without a link into `docs/mockups/`. In this repo that is every UI row: 27 of them sit in the `OLD` list for this reason alone, and each new one (REQ-UI-026, -027, -029) fails the gate. The checklist says why at line 72: "UI REQs map to component families, not mockups (this library predates the mockup flow)."
+- **Encountered in:** `*triage-and-fix TrBlazeUI` for Chatur TR-014, 2026-10-03, status gate step 3.
+- **Workaround:** for REQ-UI-029 the design really came from a consumer's mockup, so Chatur's `settings-agents.html` and `chatur.css` were copied unchanged into `docs/mockups/` and linked. A link outside the repo does not work: the checker keeps only the `mockups/…` tail and looks for it under `docs/`. Rows with no consumer mockup have no honest workaround.
+- **Suggested fix:** skip the mockup-link check (and the matching `tf-triage.sh new` note) when `project_type` is `library` or `docs`, the same way the verifier already skips mockup parity for a project with no mockups.

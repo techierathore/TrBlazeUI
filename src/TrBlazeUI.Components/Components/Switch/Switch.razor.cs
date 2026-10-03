@@ -110,6 +110,20 @@ public partial class Switch : ComponentBase
     public SwitchSize Size { get; set; } = SwitchSize.Medium;
 
     /// <summary>
+    /// Gets or sets whether the switch draws a visible border while it is off.
+    /// </summary>
+    /// <remarks>
+    /// When true, a switch that is off sits on the muted surface (<c>bg-muted</c>) with a border in
+    /// the theme's border colour (<c>border-border</c>) and a grey thumb (<c>bg-muted-foreground</c>);
+    /// when on it looks like any other switch, with a transparent border. The off track changes too
+    /// because themes commonly set <c>--input</c> equal to <c>--border</c>, so a rule on the default
+    /// <c>bg-input</c> track would not show. When false (the default) nothing changes. A consumer's <c>Class="border-input"</c>
+    /// cannot do this, because the base transparent border wins in the shipped stylesheet (TR-014).
+    /// </remarks>
+    [Parameter]
+    public bool Outlined { get; set; }
+
+    /// <summary>
     /// Gets or sets additional CSS classes to apply to the switch.
     /// </summary>
     /// <remarks>
@@ -187,7 +201,7 @@ public partial class Switch : ComponentBase
     /// </remarks>
     private string CssClass => ClassNames.cn(
         // Base switch styles (from shadcn/ui)
-        "peer inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent",
+        "peer inline-flex shrink-0 cursor-pointer items-center rounded-full border-2",
         "transition-colors focus-visible:outline-none focus-visible:ring-2",
         "focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         "disabled:cursor-not-allowed disabled:opacity-50",
@@ -199,8 +213,11 @@ public partial class Switch : ComponentBase
             SwitchSize.Large => "h-7 w-14",
             _ => "h-6 w-11"
         },
-        // Checked state styling
-        Checked ? "bg-primary" : "bg-input",
+        // Checked state styling; an Outlined switch that is off sits on the muted surface, because
+        // themes commonly set --input equal to --border and a rule on a bg-input track would not show (TR-014)
+        Checked ? "bg-primary" : Outlined ? "bg-muted" : "bg-input",
+        // Border colour: visible only when Outlined and off (TR-014); transparent otherwise
+        Outlined && !Checked ? "border-border" : "border-transparent",
         // Custom classes (if provided)
         Class
     );
@@ -231,7 +248,9 @@ public partial class Switch : ComponentBase
 
             return ClassNames.cn(
                 // Base thumb styles
-                "pointer-events-none block rounded-full bg-background shadow-lg ring-0 transition-transform",
+                "pointer-events-none block rounded-full shadow-lg ring-0 transition-transform",
+                // Thumb colour: an Outlined switch that is off greys its thumb so it reads on the muted track (TR-014)
+                Outlined && !Checked ? "bg-muted-foreground" : "bg-background",
                 // Size and translation
                 thumbSize,
                 translateX

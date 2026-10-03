@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Status</h1>
-    <div class="sub">Last rendered: 2026-10-02</div>
+    <div class="sub">Last rendered: 2026-10-03</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#where-i-am">Where I am</a></li>
@@ -121,7 +121,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Status</h1>
-    <div class="subtitle">Rendered 2026-10-02 &middot; source <code>PROJECT-STATUS.md</code></div>
+    <div class="subtitle">Rendered 2026-10-03 &middot; source <code>PROJECT-STATUS.md</code></div>
     <div class="cta-next" style="padding:20px; background:var(--cta-bg); border:2px solid var(--accent); border-radius:10px; margin:20px 0;">
       <div style="font-size:11px; color:var(--muted); letter-spacing:.5px;">NEXT COMMAND TO RUN</div>
       <div style="font-family:var(--mono); font-size:18px; margin-top:6px;">/TechieFlow:agents:flow-master *handoff-phase TrBlazeUI</div>
@@ -129,10 +129,10 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <table>
 <tbody>
 <tr><th>project</th><td>TrBlazeUI</td></tr>
-<tr><th>last_updated</th><td>2026-10-02</td></tr>
-<tr><th>current_phase</th><td>Handoff — 43 of 43 verified</td></tr>
+<tr><th>last_updated</th><td>2026-10-03</td></tr>
+<tr><th>current_phase</th><td>Handoff — 44 of 44 verified</td></tr>
 <tr><th>last_verified_build</th><td>PASS</td></tr>
-<tr><th>last_verified_date</th><td>2026-10-02</td></tr>
+<tr><th>last_verified_date</th><td>2026-10-03</td></tr>
 </tbody>
 </table>
     <div class="toc-inline">
@@ -149,11 +149,10 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
       </ol>
     </div>
 <h2 id="where-i-am">Where I am<a class="anchor-link" href="#where-i-am">#</a></h2>
-<p>2.1.0 is released on GitHub Packages and nuget.org and carries Chatur's TR-011, TR-012 and
-TR-013. Built since, and not in a release yet: 24 more dispose methods no longer report a
-cancelled-task error when their page stops answering. The release check now proves GitHub
-Packages publishing only; nuget.org is the owner's call and is not checked. All 43 rows are
-verified. Nothing is waiting on the owner.</p>
+<p>2.1.0 is the latest release. Built since, not released yet: the dispose sweep, and Chatur's
+TR-014 as REQ-UI-029, <code>Switch.Outlined</code>, which gives an off switch a muted track, a visible
+border and a grey thumb. All 44 rows are verified. Chatur's feedback file carries the reply
+for TR-014. Nothing is waiting on the owner.</p>
 <h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2>
 <p>Claude Code:</p>
 <pre><code>/TechieFlow:agents:flow-master *handoff-phase TrBlazeUI</code></pre>
@@ -185,26 +184,28 @@ verified. Nothing is waiting on the owner.</p>
 <table>
 <thead><tr><th>Date</th><th>Phase</th><th>Result</th><th>Status table</th></tr></thead>
 <tbody>
-<tr><td>2026-09-19</td><td>triage-and-fix</td><td>36/36 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-09-22</td><td>triage-and-fix</td><td>40/40 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-09-22</td><td>amend-docs</td><td>39/40 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-10-01</td><td>triage-and-fix</td><td>41/42 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-10-02</td><td>build-phase</td><td>43/43 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-10-03</td><td>triage-and-fix</td><td>44/44 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 </tbody>
 </table>
 <h2 id="library-feedback-summary">Library feedback summary<a class="anchor-link" href="#library-feedback-summary">#</a></h2>
 <ul>
-<li>TechieFlow: 0 open · 1 fixed upstream, not yet re-checked (TF-002) · 1 closed — docs/TrBlazeUI-TechieFlow-Feedback.md
+<li>TechieFlow: 1 open (TF-003) · 1 fixed upstream, not yet re-checked (TF-002) · 1 closed — docs/TrBlazeUI-TechieFlow-Feedback.md
 </li>
 </ul>
 <h2 id="standards-compliance">Standards compliance<a class="anchor-link" href="#standards-compliance">#</a></h2>
 <ul>
-<li>Last check 2026-10-02: 0 findings, see the checklist Remarks.
+<li>Last check 2026-10-03: 0 findings, see the checklist Remarks.
 </li>
 </ul>
 <h2 id="deferred-future">Deferred / future<a class="anchor-link" href="#deferred-future">#</a></h2>
 <ul>
-<li>The dispose sweep ships with the release after 2.1.0.
+<li>TF-003: the checker wants a mockup link on every UI row.
+</li>
+<li>The dispose sweep and <code>Switch.Outlined</code> ship with the release after 2.1.0.
 </li>
 <li>The framework's own <code>Virtualize</code>, inside <code>CommandVirtualizedGroup</code>, still throws on dispose; not fixable in this library.
 </li>

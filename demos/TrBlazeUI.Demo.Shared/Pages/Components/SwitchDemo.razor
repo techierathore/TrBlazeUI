@@ -243,6 +243,36 @@
         </div>
     </div>
 
+    <!-- Outlined -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Outlined</h2>
+            <p class="text-sm text-muted-foreground">
+                Set Outlined so a switch that is off shows a muted track, a border in the theme's border colour and a grey thumb, which stands out on a light background. When the switch is on it looks like any other switch.
+            </p>
+        </div>
+        <div class="space-y-3">
+            <div class="flex items-center space-x-2">
+                <Switch @bind-Checked="outlinedOff" Outlined="true" Id="outlined-off" data-testid="switch-outlined-off" />
+                <label for="outlined-off" class="text-sm font-medium leading-none">
+                    Outlined (starts off)
+                </label>
+            </div>
+            <div class="flex items-center space-x-2">
+                <Switch @bind-Checked="outlinedOn" Outlined="true" Id="outlined-on" data-testid="switch-outlined-on" />
+                <label for="outlined-on" class="text-sm font-medium leading-none">
+                    Outlined (starts on)
+                </label>
+            </div>
+            <div class="flex items-center space-x-2">
+                <Switch @bind-Checked="outlinedDefault" Id="outlined-default" data-testid="switch-default-off" />
+                <label for="outlined-default" class="text-sm font-medium leading-none">
+                    Not outlined (default, off)
+                </label>
+            </div>
+        </div>
+    </div>
+
     <!-- Custom Styling -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -338,6 +368,11 @@
     private bool cardNotifications = true;
     private bool cardMarketing = false;
     private bool cardSocial = true;
+
+    // Outlined (TR-014)
+    private bool outlinedOff = false;
+    private bool outlinedOn = true;
+    private bool outlinedDefault = false;
 
     // Custom styling
     private bool styled1 = false;
