@@ -61,6 +61,7 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-UI-026 | DataTable rows, header row and choose-all control take attributes (Chatur TR-011) | Verified | 100% | 2026-10-02 verify: PASS — test `Chatur batch 3 — consumer-feedback fixes (TR-011…TR-013) REQ` | [d](#d-req-ui-026) |
 | REQ-UI-027 | ToggleGroup chosen item takes another look through OnVariant (Chatur TR-012) | Verified | 100% | 2026-10-02 verify: PASS — test `Chatur batch 3 — consumer-feedback fixes (TR-011…TR-013) REQ` | [d](#d-req-ui-027) |
 | REQ-UI-028 | No control reports an unhandled error when its page stops answering during dispose | Verified | 100% | 2026-10-02 verify: PASS — test `REQ-UI-028 — dispose on a page that has stopped answering RE` | [d](#d-req-ui-028) |
+| REQ-UI-029 | Switch that is off can draw a visible border through Outlined (Chatur TR-014) | Verified | 100% | 2026-10-03 verify: PASS — test `REQ-UI-029 — Switch Outlined (Chatur TR-014) REQ-UI-029 an O` | [d](#d-req-ui-029) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -291,6 +292,10 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 
 - <a id="d-req-ui-028"></a> **REQ-UI-028** (extends BRD-53 Reliability) No control reports an unhandled error when its page stops answering during dispose
   - *Acceptance:* When a page holding a control with a script module stops answering during dispose on the component demo screens, then the server log holds no unhandled cancelled-task error.
+
+- <a id="d-req-ui-029"></a> **REQ-UI-029** (extends BRD-6 Switch) Switch that is off can draw a visible border through Outlined (Chatur TR-014)
+  - *Acceptance:* When a consumer sets Outlined on the Switch demo screen, then an off switch shows a visible border against its track, and a switch without it looks unchanged.
+  - *Mockup:* [mockups/settings-agents.html](mockups/settings-agents.html), the Rights switches (`.sw` in `mockups/chatur.css`); copied unchanged from Chatur's `docs/mockups/` on 2026-10-03 — the consumer's design, not a library screen.
 
 
 ## Editor

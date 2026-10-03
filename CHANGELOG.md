@@ -11,7 +11,19 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
-Built and verified on 2026-10-02, after 2.1.0 was cut. No behaviour changes and no new API.
+Built and verified on 2026-10-02, after 2.1.0 was cut. One new opt-in parameter (`Switch.Outlined`);
+no behaviour changes for code that does not set it.
+
+### Added — Chatur batch 4
+
+- **`Switch.Outlined` (TR-014)**: when true, an off switch sits on the muted surface (`bg-muted`)
+  with a border in the theme's border colour (`border-border`) and a grey thumb
+  (`bg-muted-foreground`); when on it looks like any other switch, with a transparent border. The
+  off track changes as well because themes commonly set `--input` equal to `--border`, so a rule on
+  the default `bg-input` track would not show. A caller's `Class="border-input"` could not help:
+  the switch's own `border-transparent` comes later in the shipped stylesheet and won. The border
+  width (`border-2`) is unchanged, so size and thumb travel are the same. A switch that does not
+  set `Outlined` renders the same classes as before.
 
 ### Fixed
 

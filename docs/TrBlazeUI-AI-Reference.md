@@ -24,6 +24,7 @@ problem is in this table, the control exists — do not hand-build it.
 | A list of multi-line rows that drives a detail pane beside it | `NavList<TItem>` | §2.0.9 |
 | Put a test hook (`data-testid`) on a table row, the table's header row or its choose-all box | `DataTable` `RowAttributes`, `HeaderRowAttributes`, `SelectAllAttributes` (2.1.0) | §6 |
 | A segmented switch whose chosen segment is a plain card, or the primary colour, instead of the accent tint | `ToggleGroup` `OnVariant` (2.1.0) | §5 |
+| An off switch that needs a visible border so it does not vanish on a light card | `Switch Outlined="true"` (unreleased, TR-014) | §5 |
 
 ---
 
@@ -1116,6 +1117,7 @@ Sub-components: `ButtonIcon`
 | Checked | bool | false | On/off state |
 | CheckedChanged | EventCallback<bool> | - | Two-way: @bind-Checked |
 | Size | SwitchSize | Medium | `Small` (20px tall), `Medium` (24px), `Large` (28px) |
+| Outlined | bool | false | While off: a muted track (`bg-muted`), a visible border in the theme's border colour and a grey thumb; while on: the normal look, border transparent — for an off switch on a light card. Use this, not `Class="border-input"` (the base transparent border wins in the shipped CSS) (unreleased, TR-014) |
 | Disabled | bool | false | Disabled state |
 | AriaLabel | string? | null | Name for a switch with no visible label — required in a table cell |
 | Id | string? | null | Element ID |
