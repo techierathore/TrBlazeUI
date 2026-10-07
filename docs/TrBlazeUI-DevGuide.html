@@ -115,7 +115,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#screen-map">3. Screen map</a></li>
         <li class="h3"><a href="#screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11">2.1.0 screens (added / changed by REQ-UI-017 — all runtime-verified 2026-08-11)</a></li>
         <li class="h3"><a href="#screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes-runtime-verified-2026-09-13">2.0.6 screens (changed by REQ-UI-019 and REQ-UI-020, the TfLens passes — runtime-verified 2026-09-13)</a></li>
-        <li class="h3"><a href="#to-2-2-0-screens-chatur-req-ui-021-req-ui-032-runtime-verified-2026-10-07">2.0.8 to 2.2.0 screens (Chatur — REQ-UI-021…REQ-UI-032 — runtime-verified 2026-10-07)</a></li>
+        <li class="h3"><a href="#chatur-screens-chatur-req-ui-021-req-ui-032-runtime-verified-2026-10-07">Chatur screens (Chatur — REQ-UI-021…REQ-UI-032 — runtime-verified 2026-10-07)</a></li>
         <li><a href="#library-lineage-how-a-styled-component-resolves">4. Library lineage — how a styled component resolves</a></li>
         <li><a href="#known-issues">5. Known issues</a></li>
         <li><a href="#runtime-screenshots">6. Runtime screenshots</a></li>
@@ -137,7 +137,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#screen-map">3. Screen map</a></li>
         <li class="h3"><a href="#screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11">2.1.0 screens (added / changed by REQ-UI-017 — all runtime-verified 2026-08-11)</a></li>
         <li class="h3"><a href="#screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes-runtime-verified-2026-09-13">2.0.6 screens (changed by REQ-UI-019 and REQ-UI-020, the TfLens passes — runtime-verified 2026-09-13)</a></li>
-        <li class="h3"><a href="#to-2-2-0-screens-chatur-req-ui-021-req-ui-032-runtime-verified-2026-10-07">2.0.8 to 2.2.0 screens (Chatur — REQ-UI-021…REQ-UI-032 — runtime-verified 2026-10-07)</a></li>
+        <li class="h3"><a href="#chatur-screens-chatur-req-ui-021-req-ui-032-runtime-verified-2026-10-07">Chatur screens (Chatur — REQ-UI-021…REQ-UI-032 — runtime-verified 2026-10-07)</a></li>
         <li><a href="#library-lineage-how-a-styled-component-resolves">4. Library lineage — how a styled component resolves</a></li>
         <li><a href="#known-issues">5. Known issues</a></li>
         <li><a href="#runtime-screenshots">6. Runtime screenshots</a></li>
@@ -146,8 +146,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li class="h3"><a href="#earlier-sampled-key-screens-2026-06-30-datatable-png-recaptured-2026-07-21">6.2 Earlier sampled key screens (2026-06-30; datatable.png recaptured 2026-07-21)</a></li>
       </ol>
     </div>
-<p><strong>Last updated:</strong> 2026-10-07 (handoff — as-built at 2.2.0)
-<strong>Verification status:</strong> ✅ <strong>RUNTIME-VERIFIED.</strong> On <strong>2026-10-07</strong> the anonymous demo visitor drove the 11 screens of the Chatur controls (§3, 2.0.8 to 2.2.0 screens) at 1366 and 390 wide: all render, 0 console errors, 0 sideways scroll. Before that, the visitor drove the 8 screens changed by the TfLens passes on <strong>2026-09-13</strong> at 1366 and 390 wide, plus the phone menu at 390: all render, 0 console errors, 0 sideways scroll (screenshots in §6.3). Acceptance suite 33/33; Release build <strong>0 warnings / 0 errors</strong>. Earlier screens were last runtime-verified on 2026-08-25.</p>
+<p><strong>Last updated:</strong> 2026-10-07 (handoff — as-built source)
+<strong>Verification status:</strong> ✅ <strong>RUNTIME-VERIFIED.</strong> On <strong>2026-10-07</strong> the anonymous demo visitor drove the 11 screens of the Chatur controls (§3, Chatur screens) at 1366 and 390 wide: all render, 0 console errors, 0 sideways scroll. Before that, the visitor drove the 8 screens changed by the TfLens passes on <strong>2026-09-13</strong> at 1366 and 390 wide, plus the phone menu at 390: all render, 0 console errors, 0 sideways scroll (screenshots in §6.3). Acceptance suite 33/33; Release build <strong>0 warnings / 0 errors</strong>. Earlier screens were last runtime-verified on 2026-08-25.</p>
 <blockquote>
 <p><strong>What this document is.</strong> The screen-by-screen, as-built map a developer uses to chase a bug or catch AI-hallucinated code. TrBlazeUI is a <strong>component library with a demo application</strong> and has <strong>no database, no API, no stored procedures, and no auth</strong> — so the usual <em>page → service → data-access → proc</em> lineage collapses to <strong>demo page → demo-shared composition → library component → primitive → JS interop / service</strong>. There is exactly one role: the <strong>anonymous demo visitor</strong>.</p>
 </blockquote>
@@ -293,13 +293,13 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td><code>SidebarProvider</code> width parameters</td><td><code>{unresolved — Width/MobileWidth/IconWidth not found under those names in SidebarProvider.razor.cs; the 288px phone menu is runtime-verified}</code></td><td>—</td><td>—</td></tr>
 </tbody>
 </table>
-<h3 id="to-2-2-0-screens-chatur-req-ui-021-req-ui-032-runtime-verified-2026-10-07"><a id="208-to-220-screens-chatur--req-ui-021req-ui-032--runtime-verified-2026-10-07"></a>2.0.8 to 2.2.0 screens (Chatur — REQ-UI-021…REQ-UI-032 — runtime-verified 2026-10-07)<a class="anchor-link" href="#to-2-2-0-screens-chatur-req-ui-021-req-ui-032-runtime-verified-2026-10-07">#</a></h3>
+<h3 id="chatur-screens-chatur-req-ui-021-req-ui-032-runtime-verified-2026-10-07"><a id="chatur-screens-chatur--req-ui-021req-ui-032--runtime-verified-2026-10-07"></a>Chatur screens (Chatur — REQ-UI-021…REQ-UI-032 — runtime-verified 2026-10-07)<a class="anchor-link" href="#chatur-screens-chatur-req-ui-021-req-ui-032-runtime-verified-2026-10-07">#</a></h3>
 <table>
 <thead><tr><th>Screen</th><th>Route</th><th>Demo page file</th><th>Library surface exercised</th><th>Seen 2026-10-07</th></tr></thead>
 <tbody>
-<tr><td>Code Editor</td><td><code>/components/code-editor</code></td><td><code>Pages/Components/CodeEditorDemo.razor</code></td><td><code>CodeEditor</code>, <code>EditorTabs</code> (<code>TabAttributes</code>, 2.2.0)</td><td>renders at 1366 and 390; tabs carry <code>tab-program-cs</code> etc.</td></tr>
-<tr><td>Stepper</td><td><code>/components/stepper</code></td><td><code>Pages/Components/StepperDemo.razor</code></td><td><code>StepperItem</code> (<code>Status</code>, <code>Trailing</code>, <code>Icon</code> 2.2.0)</td><td>renders at 1366 and 390</td></tr>
-<tr><td>Badge</td><td><code>/components/badge</code></td><td><code>Pages/Components/BadgeDemo.razor</code></td><td><code>Badge</code> (<code>Danger</code> 2.2.0) → <code>ClassNames.cn</code> → <code>TailwindMerge</code></td><td>renders at 1366 and 390</td></tr>
+<tr><td>Code Editor</td><td><code>/components/code-editor</code></td><td><code>Pages/Components/CodeEditorDemo.razor</code></td><td><code>CodeEditor</code>, <code>EditorTabs</code> (<code>TabAttributes</code>)</td><td>renders at 1366 and 390; tabs carry <code>tab-program-cs</code> etc.</td></tr>
+<tr><td>Stepper</td><td><code>/components/stepper</code></td><td><code>Pages/Components/StepperDemo.razor</code></td><td><code>StepperItem</code> (<code>Status</code>, <code>Trailing</code>, <code>Icon</code>)</td><td>renders at 1366 and 390</td></tr>
+<tr><td>Badge</td><td><code>/components/badge</code></td><td><code>Pages/Components/BadgeDemo.razor</code></td><td><code>Badge</code> (<code>Danger</code>) → <code>ClassNames.cn</code> → <code>TailwindMerge</code></td><td>renders at 1366 and 390</td></tr>
 <tr><td>Switch</td><td><code>/components/switch</code></td><td><code>Pages/Components/SwitchDemo.razor</code></td><td><code>Switch</code> (<code>Outlined</code>, 2.1.2)</td><td>renders at 1366 and 390</td></tr>
 <tr><td>Toggle Group</td><td><code>/components/toggle-group</code></td><td><code>Pages/Components/ToggleGroupDemo.razor</code></td><td><code>ToggleGroup</code> (<code>Joined</code> 2.0.8, <code>OnVariant</code> 2.1.0)</td><td>renders at 1366 and 390</td></tr>
 <tr><td>DataTable</td><td><code>/components/datatable</code></td><td><code>Pages/Components/DataTableDemo.razor</code></td><td><code>DataTable</code> (<code>RowAttributes</code>/<code>HeaderRowAttributes</code>/<code>SelectAllAttributes</code> 2.1.0, <code>SelectedCount</code> 2.0.9)</td><td>renders at 1366 and 390</td></tr>
@@ -312,7 +312,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </table>
 <p>Call chain (tab attributes): <code>EditorTabs.razor</code> <code>@foreach</code> over <code>Items</code> → <code>TabAttributes(vItem)</code> → <code>SplitTabAttributes</code> → <code>class</code> merged through <code>ClassNames.cn</code>, the rest splatted on the tab's <code>&lt;li&gt;</code>.</p>
 <p>Call chain (step icon): <code>StepperItem.razor</code> marker <code>&lt;span data-slot="stepper-item-marker"&gt;</code> → <code>Icon</code> when set, else <code>MarkerText</code> → <code>MarkerCssClass</code> adds <code>[&amp;_svg]:size-4</code>.</p>
-<p>Call chain (badge colour): <code>Badge.razor.cs</code> <code>CssClass</code> → <code>ClassNames.cn</code> → <code>TailwindMerge.Merge</code> → <code>ComputeBaseUtilityGroup</code> → <code>TextColorRegex</code> (hyphenated colours are one group as of 2.2.0).</p>
+<p>Call chain (badge colour): <code>Badge.razor.cs</code> <code>CssClass</code> → <code>ClassNames.cn</code> → <code>TailwindMerge.Merge</code> → <code>ComputeBaseUtilityGroup</code> → <code>TextColorRegex</code> (hyphenated colours are one group).</p>
 <p><strong>Where to break</strong></p>
 <table>
 <thead><tr><th>File:line</th><th>Function</th><th>Watch</th><th>It should hold</th></tr></thead>
@@ -353,7 +353,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <p>A reader chasing a bug starts at the demo page, drops into the styled component (<code>.razor</code> markup + <code>.razor.cs</code> logic), then into the primitive it composes (for behavior/ARIA), and finally into the relevant JS interop file or DI service. Symbols that don't resolve to a real file/component in <code>src/</code> are hallucinations — verify against the folders listed in <code>docs/TrBlazeUI-Architecture.md §4</code>.</p>
 <h2 id="known-issues"><a id="5-known-issues"></a>5. Known issues<a class="anchor-link" href="#known-issues">#</a></h2>
 <ul>
-<li><strong>✅ FIXED 2026-10-07, ships in 2.2.0 — Chatur TR-015…TR-017 (<code>REQ-UI-030</code>…<code>REQ-UI-032</code>).</strong> <code>EditorTabs.TabAttributes</code>, <code>StepperItem.Icon</code>, <code>BadgeVariant.Danger</code>, and <code>cn()</code> grouping hyphenated text colours. ⚠ Visible effect of the last: an Outline <code>Toggle</code>/<code>ToggleGroupItem</code> hovers with <code>--accent-foreground</code> text, and a <code>NavList</code> selected row uses <code>--accent-foreground</code>. Verified by <code>tests/verify/req-ui-030.spec.ts</code> 3/3 and a class diff over all 125 demo routes.
+<li><strong>✅ FIXED 2026-10-07, not yet released — Chatur TR-015…TR-017 (<code>REQ-UI-030</code>…<code>REQ-UI-032</code>).</strong> <code>EditorTabs.TabAttributes</code>, <code>StepperItem.Icon</code>, <code>BadgeVariant.Danger</code>, and <code>cn()</code> grouping hyphenated text colours. ⚠ Visible effect of the last: an Outline <code>Toggle</code>/<code>ToggleGroupItem</code> hovers with <code>--accent-foreground</code> text, and a <code>NavList</code> selected row uses <code>--accent-foreground</code>. Verified by <code>tests/verify/req-ui-030.spec.ts</code> 3/3 and a class diff over all 125 demo routes.
 </li>
 <li><strong>⚠ DevGuide 2026-09-13 — test page layout (<code>REQ-UI-020</code>):</strong> on <code>/verify-tflens-3</code>, <code>demos/TrBlazeUI.Demo.Shared/Pages/VerifyTfLens3.razor</code> (the TR-038 badge matrix), the default Secondary and Destructive badges hold their label on one line as designed and spill out of their 150px boxes over the Truncate column at 1280. Test page only; it ships in no package.
 </li>
@@ -478,7 +478,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <p><img src="screenshots/TrBlazeUI/badge.png" alt="Badge" style="max-width:100%">
 <img src="screenshots/TrBlazeUI/badge-mobile.png" alt="Badge at 390" style="max-width:100%"></p>
 <hr>
-<p>Last updated: 2026-10-07 (handoff, 2.2.0 as-built) · RUNTIME-VERIFIED — 11 Chatur-control screens on 2026-10-07 at 1366 and 390; 8 changed screens plus the phone menu on 2026-09-13 at 1366 and 390; the 2.1.0-era screens 25/25 on 2026-08-11; screenshots in docs/screenshots/TrBlazeUI/</p>
+<p>Last updated: 2026-10-07 (handoff, as-built source) · RUNTIME-VERIFIED — 11 Chatur-control screens on 2026-10-07 at 1366 and 390; 8 changed screens plus the phone menu on 2026-09-13 at 1366 and 390; the 2.1.0-era screens 25/25 on 2026-08-11; screenshots in docs/screenshots/TrBlazeUI/</p>
   </main>
 </div>
 

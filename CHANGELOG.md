@@ -11,16 +11,11 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
----
-
-## [2.2.0] — 2026-10-07
-
-> Prepared 2026-10-07; published when the owner cuts the GitHub Release with tag `v2.2.0`
-> (`RELEASE.md`). Until that release exists on GitHub Packages, 2.1.2 is the newest version there.
+Built and verified on 2026-10-07, after 2.1.2.
 
 Closes Chatur's fifth batch (`docs/Chatur-TrBlazeUI-Feedback.md`, TR-015 to TR-017, filed
-2026-10-06 against 2.1.2). A minor version, not a patch: three new parameters, and one change to how
-`cn()` merges classes that alters what two controls paint (below).
+2026-10-06 against 2.1.2). Three new parameters, and one change to how `cn()` merges classes that alters
+what two controls paint (below).
 
 ### Added — Chatur batch 5
 
