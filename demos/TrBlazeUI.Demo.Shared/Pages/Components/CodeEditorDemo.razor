@@ -29,6 +29,12 @@
                 <code class="bg-muted px-1 py-0.5 rounded">OnClose</code> - the page owns the list,
                 so a real editor would prompt before dropping unsaved work.
             </p>
+            <p class="text-sm text-muted-foreground">
+                Each tab carries its own <code class="bg-muted px-1 py-0.5 rounded">data-testid</code>
+                (<code class="bg-muted px-1 py-0.5 rounded">tab-program-cs</code> and so on) through
+                <code class="bg-muted px-1 py-0.5 rounded">TabAttributes</code>, a function of the
+                tab's item.
+            </p>
         </div>
 
         <div class="overflow-hidden rounded-md border">
@@ -36,6 +42,7 @@
                         ActiveId="@objActiveId"
                         ActiveIdChanged="HandleActiveChanged"
                         OnClose="HandleCloseAsync"
+                        TabAttributes="TabHooks"
                         AriaLabel="Open files"
                         data-testid="editor-tabs" />
             @if (objActiveId != null)
@@ -121,7 +128,8 @@
     <!-- Usage -->
     <div class="space-y-4">
         <h2 class="text-2xl font-semibold">Usage</h2>
-        <pre class="overflow-x-auto rounded-md border bg-muted/30 p-4 text-xs"><code>&lt;EditorTabs Items="@@openFiles" @@bind-ActiveId="activeId" OnClose="CloseAsync" /&gt;
+        <pre class="overflow-x-auto rounded-md border bg-muted/30 p-4 text-xs"><code>&lt;EditorTabs Items="@@openFiles" @@bind-ActiveId="activeId" OnClose="CloseAsync"
+            TabAttributes="@@(t =&gt; new Dictionary&lt;string, object&gt; { ["data-testid"] = $"tab-{t.Id}" })" /&gt;
 
 &lt;CodeEditor @@bind-Value="text"
             Language="csharp"
@@ -173,6 +181,7 @@
                 <p><strong>ActiveId / ActiveIdChanged:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - The active file's Id; bind it or let the strip keep it</p>
                 <p><strong>OnSelect:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback&lt;EditorTabItem&gt;</code> - A tab was clicked</p>
                 <p><strong>OnClose:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback&lt;EditorTabItem&gt;</code> - A close button was pressed; the caller removes the tab</p>
+                <p><strong>TabAttributes:</strong> <code class="bg-muted px-1 py-0.5 rounded">Func&lt;EditorTabItem, IReadOnlyDictionary&lt;string, object&gt;?&gt;?</code> - HTML attributes for each tab's <code class="bg-muted px-1 py-0.5 rounded">li</code>, such as its own data-testid; a class entry is merged with the tab's classes</p>
                 <p><strong>AriaLabel:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - Name of the strip (default "Open files")</p>
                 <p><strong>Class / additional attributes:</strong> Merged classes, and any HTML attribute forwarded to the root</p>
             </div>
@@ -256,6 +265,15 @@
 
     private string? ActiveLanguage =>
         objActiveId != null && objLanguages.TryGetValue(objActiveId, out var vLanguage) ? vLanguage : null;
+
+    // "Program.cs" -> data-testid="tab-program-cs"; the marker class shows a class entry is merged,
+    // not swapped for the tab's own classes.
+    private static IReadOnlyDictionary<string, object>? TabHooks(EditorTabItem aItem) =>
+        new Dictionary<string, object>
+        {
+            ["data-testid"] = "tab-" + aItem.Id.Replace('.', '-').ToLowerInvariant(),
+            ["class"] = "demo-tab-hooked"
+        };
 
     private void HandleActiveChanged(string? aId) => objActiveId = aId;
 

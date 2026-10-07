@@ -1,6 +1,6 @@
 # TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)
 
-> The single source for **how to test and run** this library. Every agent (flow-master self-smoke, the verifier) **and** the human UAT use the SAME walkthrough listed here. TrBlazeUI is a **component library with a demo application**. It has **no authentication and no user accounts**, so the test-user table below is N/A. Testing means walking the demo app's pages and exercising each component. Released version: **2.0.6** on nuget.org.
+> The single source for **how to test and run** this library. Every agent (flow-master self-smoke, the verifier) **and** the human UAT use the SAME walkthrough listed here. TrBlazeUI is a **component library with a demo application**. It has **no authentication and no user accounts**, so the test-user table below is N/A. Testing means walking the demo app's pages and exercising each component. This guide describes **2.2.0** (GitHub Packages, `https://nuget.pkg.github.com/techierathore/index.json`).
 
 ## Test users (canonical — use THESE for all smoke / verify / UAT)
 
@@ -95,6 +95,11 @@ The demo app exposes the whole library through a sidebar navigation. Walk these 
 - **Expected:** the Options chart has no grid and shows value labels; every short-form chart that asks for labels shows them; every Badge variant keeps its colour under `Wrap` and `Truncate`; the money column header aligns right; the card-header filter narrows the table; leaving the page logs no server error.
 - **Covers:** REQ-UI-020, REQ-UI-001
 
+### Components added for Chatur (`/components/code-editor`, `/components/stepper`, `/components/badge`, `/components/switch`, `/components/datatable`, `/components/toggle-group`, `/components/tree-view`, `/components/diff-view`, `/components/log-view`, `/components/nav-list`, `/components/typing`)
+- **Steps:** on Code Editor, type in the editor, press Tab, switch and close tabs; on Stepper, read the per-step states and the icon markers; on Badge, find Danger and the red "Blocked 3" label; on Switch, turn the Outlined switch on and off; on DataTable, choose rows; on Toggle Group, pick a Card and a Primary item; open Tree View, Diff View, Log View, Nav List and Typing.
+- **Expected:** Tab indents; each editor tab carries its own `data-testid` (`tab-program-cs`); a step with an icon shows the icon in its circle and keeps its status name; Danger is a tinted red pill; the off Outlined switch shows a border; rows, header row and choose-all carry their attributes; the chosen toggle item paints card or primary; every page renders with no console error.
+- **Covers:** REQ-UI-021…REQ-UI-032
+
 ### Render-mode parity
 - **Steps:** repeat a few of the above in Server (5183), WASM (5184) and Auto (5185).
 - **Expected:** identical component behaviour across all three hosts.
@@ -127,7 +132,7 @@ bash tests/package/codex-agent-deployment.sh
 
 ## Smoke checklist (quick capability pass)
 - [ ] Start the demo and open the home page — it is styled, with a sidebar
-- [ ] Open Button, Input and Select — they render and keep what you type or pick
+- [ ] Open Button, Input, Select and Code Editor — they keep what you type or pick, and Tab indents in the editor
 - [ ] Open a Dialog and change a control inside it — the dialog updates
 - [ ] Open an AlertDialog and press Escape — it closes
 - [ ] Open the DataTable demo — sort, page and select rows
@@ -138,6 +143,25 @@ bash tests/package/codex-agent-deployment.sh
 - [ ] Open the Badge demo — pills sit inside sentences and long labels wrap or truncate as asked
 
 ## Consumer integration notes
+
+### Added 2026-10-07 (Chatur batch 5 — REQ-UI-030…REQ-UI-032 — ships in 2.2.0)
+
+- **`EditorTabs.TabAttributes`** puts attributes, such as a `data-testid`, on each tab's `<li>`.
+- **`StepperItem.Icon`** draws an icon in the step's circle in place of its glyph.
+- **`BadgeVariant.Danger`** is the tinted red; `Destructive` stays the solid fill.
+- **⚠ A text colour in `Class` now replaces the component's own text colour.** Two controls change look: an Outline `Toggle`/`ToggleGroupItem` hovers with `--accent-foreground` text, and a `NavList` selected row uses `--accent-foreground`.
+
+### Added 2026-10-02 to 2026-10-03 (Chatur batches 3 and 4 — REQ-UI-026…REQ-UI-029 — 2.1.0 to 2.1.2)
+
+- **`DataTable.RowAttributes`, `HeaderRowAttributes`, `SelectAllAttributes`** (2.1.0).
+- **`ToggleGroup.OnVariant`** — `Accent`, `Card` or `Primary` (2.1.0).
+- **No control reports "A task was canceled" when its page closes** (2.1.0 for `ToggleGroup`, 2.1.1 for 17 more).
+- **`Switch.Outlined`** gives an off switch a visible border (2.1.2).
+
+### Added 2026-09-20 to 2026-09-22 (Chatur batches 1 and 2 — REQ-UI-021…REQ-UI-025 — 2.0.8 and 2.0.9)
+
+- **New components:** `TreeView`, `DiffView`/`TextDiff` (2.0.8); `CodeEditor`, `EditorTabs`, `LogView`, `NavList`, `Typing` (2.0.9).
+- **New parameters:** `ScrollArea.StickToEnd`, `ToggleGroup.Joined` (2.0.8); `StepperItem.Status`/`Trailing`, `Progress.Indeterminate`, `SortableList.ShowPosition`/`AllowRemove`, `DataTable.SelectedCount` (2.0.9).
 
 ### Added 2026-09-13 (TfLens passes — REQ-UI-019, REQ-UI-020 — shipped in 2.0.6)
 
@@ -187,4 +211,4 @@ bash tests/package/codex-agent-deployment.sh
 - **NativeSelect inside MAUI Blazor Hybrid overlays** — the native popup is clipped in WebView2. Use `<Select>` inside dialogs and sheets. `docs/OldDocs/TrBlazeUI-Issues-Report-1.md` #2.
 - **`HtmlSanitizer 9.1.949-beta` is a pre-release dependency**, taken for the AngleSharp CVE-2026-54570 fix. Revisit when 9.1.x is stable.
 - **REQ-UI-015's harness page `/verify-trstudio` is missing**, so its 14 checks cannot be re-run. Its verdict rests on the 2026-07-12 run.
-- **Consumer feedback fixed library-side, waiting for the consumer's own re-check:** TfLens TR-036/TR-037/TR-038 (fixed 2026-09-13, in 2.0.6); TrStudio TR-011 (fixed 2026-07-12); AstroLyfe TR-001…TR-012 and TechieRag TR-001…TR-004 (fixed under REQ-UI-014/015/016, their files carry no closing mark).
+- **Consumer feedback fixed library-side, waiting for the consumer's own re-check:** Chatur TR-015/TR-016/TR-017 (fixed 2026-10-07, in 2.2.0); TfLens TR-036/TR-037/TR-038 (fixed 2026-09-13, in 2.0.6); TrStudio TR-011 (fixed 2026-07-12); AstroLyfe TR-001…TR-012 and TechieRag TR-001…TR-004 (fixed under REQ-UI-014/015/016, their files carry no closing mark).

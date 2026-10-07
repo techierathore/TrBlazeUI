@@ -20,7 +20,7 @@
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">Variants</h2>
             <p class="text-sm text-muted-foreground">
-                Seven badge variants for different use cases.
+                Eight badge variants for different use cases.
             </p>
         </div>
         <div class="flex flex-wrap gap-4">
@@ -31,6 +31,7 @@
             <Badge Variant="BadgeVariant.Success">Success</Badge>
             <Badge Variant="BadgeVariant.Info">Info</Badge>
             <Badge Variant="BadgeVariant.Warning">Warning</Badge>
+            <Badge Variant="BadgeVariant.Danger">Danger</Badge>
         </div>
     </div>
 
@@ -61,6 +62,18 @@
                 <span class="text-sm">Broken:</span>
                 <Badge Variant="BadgeVariant.Destructive" data-testid="tr016-badge-destructive">Broken</Badge>
             </div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm">Failed, tinted:</span>
+                <Badge Variant="BadgeVariant.Danger" data-testid="badge-danger">Stopped</Badge>
+            </div>
+        </div>
+        <p class="text-sm text-muted-foreground">
+            <code>Danger</code> is the tinted red that sits beside Success, Info and Warning;
+            <code>Destructive</code> is the solid fill. A text colour passed in <code>Class</code>
+            replaces the variant's own, so a Secondary badge can carry a red label:
+        </p>
+        <div class="flex flex-wrap gap-4 items-center">
+            <Badge Variant="BadgeVariant.Secondary" Class="text-destructive" data-testid="badge-class-colour">Blocked 3</Badge>
         </div>
     </div>
 

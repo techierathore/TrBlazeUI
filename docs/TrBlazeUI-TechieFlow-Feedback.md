@@ -4,13 +4,15 @@
 |---|---|
 | App | TrBlazeUI |
 | Upstream | TechieFlow |
-| Updated | 2026-10-03 |
+| Updated | 2026-10-07 |
 
 ## Summary
 
-3 entries: 0 blocking now, 1 open (TF-003, the document checker asks a library's UI rows for a mockup link), 1 fixed upstream and waiting to be re-checked here (TF-002, fixed 2026-10-02), 1 closed.
+5 entries: 0 blockers, 2 majors (TF-001 closed, TF-005 open), 3 minors (TF-002 closed, TF-003 and TF-004 open), 0 nice-to-haves. 0 blocking now, 3 open (TF-003 the document checker asks a library's UI rows for a mockup link; TF-004 a triage-and-fix run cannot record itself; TF-005 a library's fix run ends before its shipped documents are updated), 0 fixed upstream and waiting, 2 closed.
 
-Nothing is blocked. TF-001 was re-checked on 2026-10-01 and is closed. TF-002 is fixed upstream. It could not be re-checked on the 2026-10-02 run: the fixed script arrived at 07:30, ten minutes after that run's verify step had already started, so the next run that chains a verify is the first that can show it.
+Last consolidated: 2026-10-07. Entries are sorted by severity.
+
+Nothing is blocked. TF-002 was re-checked on 2026-10-07 and is closed. TF-004 and TF-005 were found on the 2026-10-07 run for Chatur TR-015 to TR-017.
 
 ## Resolution status (TechieFlow team, 2026-09-22)
 
@@ -41,7 +43,21 @@ Nothing is blocked. TF-001 was re-checked on 2026-10-01 and is closed. TF-002 is
 - **Workaround:** none on the stream; nothing withdraws a record. Trimming the list by hand is why one leaked this time rather than thirteen. It shrinks the next run's blast radius, it fixes nothing.
 - **Suggested fix:** in `close`, skip actions whose `ts` precedes `--started`, and empty the list afterwards. **And add a withdrawal record:** six open misses record work that was never open and will depress the resolved-miss rate on every future report. A `miss-void`, shaped like the existing `run-void`, would let a report exclude them.
 
+### TF-005 — A library's fix run ends before the documents it ships are brought up to date
+
+- **Severity:** major
+- **Blocks:** no — the documents were updated afterwards, but only because the owner asked.
+- **Repro:** `*triage-and-fix TrBlazeUI` on a project with `metrics.project_type: library`. When every row is `Verified`, the status gate prints `*handoff-phase TrBlazeUI` as the next command, after the run has ended.
+- **Expected:** for a library, a fix is not finished until the documents that ship inside the package describe it: the AI agent reference (`docs/TrBlazeUI-AI-Reference.md`, packed into `TrBlazeUI.Components`), the usage guide and the developer guide. The handoff runs inside the fix run, before the owner commits and cuts the release, so that one package carries the code and its documents.
+- **Actual:** `triage-and-fix.md` and `fix-issues.md` stop at the status gate, and the gate offers `*handoff-phase` as a separate next step. On a library that order means one of two things: the owner releases a package whose guides do not yet describe the new features, or the owner rebuilds and republishes it after the handoff. The owner has had to rebuild a package for this reason.
+- **Encountered in:** `*triage-and-fix TrBlazeUI` for Chatur TR-015 to TR-017, 2026-10-07. The agent also wrote "run `*handoff-phase` after the release" in its closing message, which is the wrong order for a library.
+- **Workaround:** run `*handoff-phase` straight after the fix, before committing, and only then cut the release.
+- **Also:** `tf-devguide-list.sh TrBlazeUI --update` prints "NOTHING: no routed page found … outside samples and tests" for this library, because it reports the kind as `app` and skips the demo pages, so the DevGuide step of a handoff cannot list anything. `devguide.md` says a UI library's unit is the component; the list script does not read `project_type: library`. The DevGuide was updated by hand on 2026-10-07.
+- **Suggested fix:** when `project_type` is `library`, have `triage-and-fix.md` and `fix-issues.md` run the handoff steps (UsageGuide, DevGuide `--update`, the shipped agent reference, the feedback replies) before the status gate, and have the gate never print `*handoff-phase` as a step after a library's release.
+
 ### TF-002 — A command that chains another one has its own document findings relabelled as old
+
+> ✅ **Closed 2026-10-07** — re-checked here: On the 2026-10-07 triage-and-fix run, verify-phase was started inside it and the status gate's tf-doc-check.sh then printed the three rows that run added (REQ-UI-030..032) as 8 FAIL lines, not OLD, so they blocked until fixed.
 
 - **Severity:** minor
 - **Blocks:** no — the findings are still printed; only their label is wrong, and the run carried on.
@@ -73,3 +89,25 @@ Nothing is blocked. TF-001 was re-checked on 2026-10-01 and is closed. TF-002 is
 - **Encountered in:** `*triage-and-fix TrBlazeUI` for Chatur TR-014, 2026-10-03, status gate step 3.
 - **Workaround:** for REQ-UI-029 the design really came from a consumer's mockup, so Chatur's `settings-agents.html` and `chatur.css` were copied unchanged into `docs/mockups/` and linked. A link outside the repo does not work: the checker keeps only the `mockups/…` tail and looks for it under `docs/`. Rows with no consumer mockup have no honest workaround.
 - **Suggested fix:** skip the mockup-link check (and the matching `tf-triage.sh new` note) when `project_type` is `library` or `docs`, the same way the verifier already skips mockup parity for a project with no mockups.
+- **Still happening 2026-10-07.** REQ-UI-030, -031 and -032 failed the gate the same way. Chatur's `process-run.html` draws all three asks, so it was copied into `docs/mockups/` and linked.
+
+### TF-004 — A triage-and-fix run cannot write its own run record
+
+- **Severity:** minor
+- **Blocks:** no — the time was recorded, under the wrong command name, and was put right by hand.
+- **Repro:**
+  ```
+  bash .tfcore/utils/tf-phase.sh start triage-and-fix TrBlazeUI          # 2026-10-07T05:59:51Z
+  … triage, fix, chained verify-phase …
+  bash .tfcore/utils/tf-fix-close.sh TrBlazeUI --started 2026-10-07T05:59:51Z --build pass
+  → "fix-issues: recorded around 1 chained run(s) (verify-phase) in 2 segment(s)"
+  cat <<'JSON' | bash .tfcore/utils/tf-emit.sh runs                       # triage-and-fix.md step 5
+  {"kind":"run","cmd":"triage-and-fix","started":"2026-10-07T05:59:51Z", …}
+  JSON
+  → "tf-emit: REFUSED — this run … overlaps the verify-phase run …"
+  ```
+- **Expected:** the run is on the stream as `cmd: triage-and-fix`, so `tf-metrics.sh --phases` counts its time and tokens under that command.
+- **Actual:** `triage-and-fix.md` step 3 runs `tf-fix-close.sh`, which always writes the segments around the chained verify as `cmd: fix-issues`. Step 5 then asks for a `triage-and-fix` record over the same window, and the overlap rule (SCHEMA §2.7b) correctly refuses it. Every `*triage-and-fix` run is therefore counted as `*fix-issues`, and the record the task asks for can never be written.
+- **Encountered in:** `*triage-and-fix TrBlazeUI` for Chatur TR-015 to TR-017, 2026-10-07, status gate.
+- **Workaround:** both `fix-issues` segments (started 05:59:51Z and 06:32:45Z) were voided with `tf-emit.sh --void-run`, giving the reason, and re-emitted with the same windows as `cmd: triage-and-fix`. The miss-fix records still find their window, because it is keyed on `started`.
+- **Suggested fix:** give `tf-fix-close.sh` a `--cmd` (default `fix-issues`), as `tf-triage.sh close` already has, and have `triage-and-fix.md` step 3 pass `--cmd triage-and-fix`. Then drop the separate record from step 5, or let step 5 say the run record is the one step 3 wrote, as `fix-issues.md` step 6 does.

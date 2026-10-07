@@ -20,8 +20,10 @@
          never as part of ordinary feature or fix work: what actually ships is the release tag,
          which the publish workflows resolve and pass as -p:Version=. This value is the
          local-build base and the stem the CI pre-release feed suffixes (e.g. 2.1.1-ci.42).
+         2.2.0: EditorTabs.TabAttributes, StepperItem.Icon, BadgeVariant.Danger; cn() groups
+         hyphenated text colours (Chatur batch 5). See CHANGELOG.md.
          See RELEASE.md. -->
-    <Version>2.1.0</Version>
+    <Version>2.2.0</Version>
 
     <!-- SourceLink. The .NET 8+ SDK bundles Microsoft.SourceLink.GitHub, so no PackageReference
          is needed - only these switches. PublishRepositoryUrl keeps the repo URL in the built

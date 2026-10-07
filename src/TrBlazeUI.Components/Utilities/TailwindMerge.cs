@@ -171,7 +171,12 @@ public static class TailwindMerge
     private static readonly Regex SpacingRegex = new(@"^(p|px|py|pt|pr|pb|pl|m|mx|my|mt|mr|mb|ml)-(\d+\.?\d*|auto)$", RegexOptions.Compiled);
     private static readonly Regex SizingRegex = new(@"^(w|h|min-w|min-h|max-w|max-h)-(.+)$", RegexOptions.Compiled);
     private static readonly Regex GapRegex = new(@"^(gap|gap-x|gap-y)-(\d+\.?\d*)$", RegexOptions.Compiled);
-    private static readonly Regex TextColorRegex = new(@"^text-([a-z]+)(?:-(\d+))?$", RegexOptions.Compiled);
+    // Theme colours are hyphenated (text-secondary-foreground, text-alert-danger-foreground) and may
+    // carry an opacity (text-destructive/80). The old pattern took one word only, so those were
+    // never grouped and a caller's Class="text-destructive" could not replace a variant's
+    // text-secondary-foreground - both were emitted and the stylesheet order decided (Chatur
+    // TR-017). The non-colour text-* utilities are in TailwindGroups and are matched before this.
+    private static readonly Regex TextColorRegex = new(@"^text-([a-z]+(?:-[a-z]+)*)(?:-(\d+))?(?:/\d+)?$", RegexOptions.Compiled);
     private static readonly Regex BgColorRegex = new(@"^bg-([a-z]+)(?:-(\d+))?$", RegexOptions.Compiled);
     private static readonly Regex BorderColorRegex = new(@"^border-([a-z]+)(?:-(\d+))?$", RegexOptions.Compiled);
     private static readonly Regex BorderWidthRegex = new(@"^border(-\d+)?$", RegexOptions.Compiled);
@@ -419,6 +424,15 @@ public static class TailwindMerge
             return group;
         }
 
+        // A font size with a line height (text-sm/6) is still a font size, not a colour with an
+        // opacity - the text colour pattern below accepts a "/n" suffix.
+        var vSlash = className.IndexOf('/', StringComparison.Ordinal);
+        if (vSlash > 0 && TailwindGroups.TryGetValue(className[..vSlash], out var vSizeGroup)
+            && vSizeGroup == "font-size")
+        {
+            return vSizeGroup;
+        }
+
         // Check spacing utilities (padding, margin) - use Match directly to avoid double evaluation
         var spacingMatch = SpacingRegex.Match(className);
         if (spacingMatch.Success)
@@ -443,8 +457,9 @@ public static class TailwindMerge
             return TailwindGroups.TryGetValue(prefix, out var gapGroup) ? gapGroup : null;
         }
 
-        // Check text colors
-        if (TextColorRegex.IsMatch(className))
+        // Check text colors. text-shadow-* is the one hyphenated non-colour text utility the
+        // broadened pattern would otherwise take.
+        if (TextColorRegex.IsMatch(className) && !className.StartsWith("text-shadow", StringComparison.Ordinal))
         {
             return "text-color";
         }

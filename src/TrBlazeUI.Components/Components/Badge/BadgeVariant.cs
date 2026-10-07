@@ -61,5 +61,16 @@ public enum BadgeVariant
     /// matching <see cref="TrBlazeUI.Components.Alert.AlertVariant.Warning"/>. Prefer this over
     /// <see cref="Destructive"/>, which reads as a failure.
     /// </summary>
-    Warning
+    Warning,
+
+    /// <summary>
+    /// Soft red badge style for a failed or stopped status.
+    /// Uses the --alert-danger-bg tint with --alert-danger-foreground text and an
+    /// --alert-danger border,
+    /// matching <see cref="TrBlazeUI.Components.Alert.AlertVariant.Danger"/> and completing the
+    /// tinted status set beside <see cref="Success"/>, <see cref="Info"/> and <see cref="Warning"/>.
+    /// <see cref="Destructive"/> is the solid red fill; use this where the other statuses on the
+    /// screen are tinted pills, so a failure does not outweigh them (Chatur TR-017).
+    /// </summary>
+    Danger
 }

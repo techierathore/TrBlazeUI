@@ -11,8 +11,57 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
-Built and verified on 2026-10-02, after 2.1.0 was cut. One new opt-in parameter (`Switch.Outlined`);
-no behaviour changes for code that does not set it.
+---
+
+## [2.2.0] — 2026-10-07
+
+> Prepared 2026-10-07; published when the owner cuts the GitHub Release with tag `v2.2.0`
+> (`RELEASE.md`). Until that release exists on GitHub Packages, 2.1.2 is the newest version there.
+
+Closes Chatur's fifth batch (`docs/Chatur-TrBlazeUI-Feedback.md`, TR-015 to TR-017, filed
+2026-10-06 against 2.1.2). A minor version, not a patch: three new parameters, and one change to how
+`cn()` merges classes that alters what two controls paint (below).
+
+### Added — Chatur batch 5
+
+- **`EditorTabs.TabAttributes` (TR-015)**: a function of each tab's `EditorTabItem` returning HTML
+  attributes for that tab's `<li>` (`data-slot="editor-tab"`), so each open-file tab can carry its
+  own `data-testid`. Attributes on the strip land on its root, so until now a tab could not be
+  named. A `class` entry is merged with the tab's classes. This was blocking for Chatur: the
+  verifier's screen check needs the mockups' `tab-*` anchors on 22 phase-2 rows.
+- **`StepperItem.Icon` (TR-016)**: a `RenderFragment` drawn inside the step's marker in place of the
+  glyph or number — a vector tick, spinner or pause. The marker keeps its circle, its status colour
+  and its accessible name (`role="img"`, named for the status); an `svg` inside it is sized to 1rem.
+  A step without `Icon` is unchanged.
+- **`BadgeVariant.Danger` (TR-017)**: the tinted red — `border-alert-danger/30 bg-alert-danger-bg
+  text-alert-danger-foreground` — built exactly like `Success`, `Info` and `Warning` and matching
+  `AlertVariant.Danger`. `Destructive` stays the solid fill.
+
+### Changed
+
+- **`cn()` groups hyphenated text colours (TR-017).** The text-colour rule matched one-word colours
+  only (`text-destructive`), so `text-secondary-foreground`, `text-alert-danger-foreground` and
+  `text-destructive/80` were never seen as colours: a caller's `Class="text-destructive"` on a
+  `Secondary` badge emitted both colours and the variant's won on stylesheet order. Now the later
+  colour replaces the earlier, as tailwind-merge does. `text-sm/6` (a size with a line height) and
+  `text-shadow-*` are not colours and are not grouped with them.
+- **Two controls paint differently because of it** — in both, the result is what the control's own
+  classes always asked for. Found by diffing every element's classes on all 125 demo routes before
+  and after the change; nothing else differed.
+  - `Toggle` and `ToggleGroupItem`, `Outline` variant, hovered: the label was
+    `--muted-foreground` on the `--accent` background; it is now `--accent-foreground`, the pair the
+    theme defines for that surface.
+  - `NavList`, the selected row: the label inherited its parent's colour on the `--accent`
+    background; it is now `--accent-foreground`.
+
+---
+
+## [2.1.2] — 2026-10-03 (and [2.1.1] — 2026-10-02)
+
+> Published to GitHub Packages; this section was left under `[Unreleased]` when they were cut, and
+> was moved here on 2026-10-07. Checked against the packages in the local NuGet cache:
+> `Switch.Outlined` is in 2.1.2 and not in 2.1.1. The dispose fixes below were made on 2026-10-02,
+> the day 2.1.1 was published.
 
 ### Added — Chatur batch 4
 

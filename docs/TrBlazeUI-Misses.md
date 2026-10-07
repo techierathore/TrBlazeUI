@@ -3,9 +3,9 @@
 | | |
 |---|---|
 | App | TrBlazeUI |
-| Count | 55 logged: 10 open, 39 fixed, 0 will not fix, 6 withdrawn |
+| Count | 58 logged: 10 open, 42 fixed, 0 will not fix, 6 withdrawn |
 | Source | `docs/metrics/misses.jsonl`, one row per miss record. Rewritten by `tf-misses-md.sh` on every new record. Never edit it: a wrong row is corrected by a new record. |
-| Updated | 2026-10-03 |
+| Updated | 2026-10-07 |
 
 **Whose gap** answers the four questions of the miss protocol: **the app's spec** did not say it, so the checklist line is fixed; **the framework never said it**, so one requirement line and a check are added; **the check was too weak** (a review, or a script that did not fire), so the check is fixed; **said and ignored**, so the rule becomes a hook or is deleted. **not sorted** means the record predates the sort or nobody has answered yet; `bash .tfcore/utils/tf-emit.sh --amend <miss> sort <spec|unsaid|weak-check|ignored>` completes it.
 
@@ -24,10 +24,13 @@
 | MISS-TrBlazeUI-20260912-09 (REQ-UI-008) | 2026-09-12 by owner | the check was too weak | TfLens TR-028 (High, reproduced live on /charts/bar @1280): BarChart exposes no axis, grid or data-label control and no route to ApexChartOptions, so a chart cannot be made to match an approved design. Measured: 32 .apexcharts-gridline and 30 .apexcharts-yaxis-label rendered with no parameter to tur |
 | MISS-TrBlazeUI-20260912-08 (REQ-UI-020) | 2026-09-12 by owner | the app's spec | TfLens post-2.1.0 consumer-feedback fixes (TR-028…TR-035) |
 
-## Fixed (39)
+## Fixed (42)
 
 | Miss | Found | Closed | Whose gap | What went wrong |
 |---|---|---|---|---|
+| MISS-TrBlazeUI-20261007-03 (REQ-UI-032) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | Badge has a soft red Danger variant, and a text colour in Class replaces the variant's (Chatur TR-017) |
+| MISS-TrBlazeUI-20261007-02 (REQ-UI-031) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | A Stepper step can show an icon in its marker through Icon (Chatur TR-016) |
+| MISS-TrBlazeUI-20261007-01 (REQ-UI-030) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | Each tab in EditorTabs can carry its own attributes through TabAttributes (Chatur TR-015) |
 | MISS-TrBlazeUI-20261003-01 (REQ-UI-029) | 2026-10-03 by owner | 2026-10-03 by fix-issues | the app's spec | Switch that is off can draw a visible border through Outlined (Chatur TR-014) |
 | MISS-TrBlazeUI-20261002-02 (REQ-UI-028) | 2026-10-02 by owner | 2026-10-02 by build-phase | the check was too weak | No control reports an unhandled error when its page stops answering during dispose |
 | MISS-TrBlazeUI-20261002-01 (REQ-FN-004) | 2026-10-02 by owner | 2026-10-02 by build-phase | said and ignored | The owner had already said GitHub Packages is for all his own applications and nuget.org is for external users, and that what he publishes to nuget.org and when is his decision; the agent still asked which versions were meant for external users and held REQ-FN-004 open on a test that demands the new |

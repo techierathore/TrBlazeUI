@@ -1,31 +1,32 @@
 ---
 project: TrBlazeUI
-last_updated: 2026-10-03
-current_phase: Handoff — 44 of 44 verified
+last_updated: 2026-10-07
+current_phase: UAT — handoff done, 47 of 47 verified
 last_verified_build: PASS
-last_verified_date: 2026-10-03
+last_verified_date: 2026-10-07
 ---
 
 # TrBlazeUI — Status
 
 ## Where I am
 
-2.1.0 is the latest release. Built since, not released yet: the dispose sweep, and Chatur's
-TR-014 as REQ-UI-029, `Switch.Outlined`, which gives an off switch a muted track, a visible
-border and a grey thumb. All 44 rows are verified. Chatur's feedback file carries the reply
-for TR-014. Nothing is waiting on the owner.
+2.2.0 is ready to release: code, CHANGELOG, agent reference, Usage Guide and DevGuide all describe
+it. It adds Chatur's TR-015 to TR-017 (REQ-UI-030 to 032): `EditorTabs.TabAttributes`,
+`StepperItem.Icon`, `BadgeVariant.Danger`, and `cn()` grouping hyphenated text colours. All 47
+rows are verified. 2.1.2 is the latest published version. Chatur's feedback file has the reply in
+both repositories.
 
 ## Next command to run
 
 Claude Code:
 ```
-/TechieFlow:agents:flow-master *handoff-phase TrBlazeUI
+(owner) set current_phase to Released after UAT — no agent command
 ```
 OpenCode:
 ```
-/flow-master *handoff-phase TrBlazeUI
+(owner) set current_phase to Released after UAT — no agent command
 ```
-Why: every row in this phase's scope is terminal and handoff has not run yet.
+Why: every row in this phase's scope is terminal and handoff has run; waiting on the owner.
 
 ## Open requirements
 
@@ -41,7 +42,7 @@ Why: every row in this phase's scope is terminal and handoff has not run yet.
 
 ## Known blockers
 
-- None
+- 2.2.0 is not on the feed until the owner commits and cuts the GitHub Release `v2.2.0`; agents cannot run git. Chatur's TR-015 waits on it.
 
 ## Verification log
 
@@ -49,15 +50,15 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 | Date | Phase | Result | Status table |
 |---|---|---|---|
-| 2026-09-22 | triage-and-fix | 40/40 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
-| 2026-09-22 | amend-docs | 39/40 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-01 | triage-and-fix | 41/42 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-02 | build-phase | 43/43 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-03 | triage-and-fix | 44/44 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-10-07 | triage-and-fix | 47/47 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-10-07 | handoff-phase | 47/47 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 
-- TechieFlow: 1 open (TF-003) · 1 fixed upstream, not yet re-checked (TF-002) · 1 closed — docs/TrBlazeUI-TechieFlow-Feedback.md
+- TechieFlow: 3 open · 2 closed — docs/TrBlazeUI-TechieFlow-Feedback.md
 
 ## Standards compliance
 
@@ -65,10 +66,8 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 ## Deferred / future
 
-- TF-003: the checker wants a mockup link on every UI row.
-- The dispose sweep and `Switch.Outlined` ship with the release after 2.1.0.
+- REQ-UI-030 to 032 name BRD-15 and BRD-28; `*amend-docs` can give them BRD items of their own.
 - The framework's own `Virtualize`, inside `CommandVirtualizedGroup`, still throws on dispose; not fixable in this library.
-- Tell TfLens 2.1.0 is out.
 - `tools/splat-audit` throws on the library assembly alone.
 - Report `ApexChart.Dispose` upstream.
 - Delete the stray `c2.0.5` tag (owner).

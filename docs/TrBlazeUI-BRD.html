@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Business Requirements</h1>
-    <div class="sub">Last rendered: 2026-10-03</div>
+    <div class="sub">Last rendered: 2026-10-07</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#table-of-contents">Table of Contents</a></li>
@@ -143,7 +143,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Business Requirements</h1>
-    <div class="subtitle">Rendered 2026-10-03 &middot; source <code>TrBlazeUI-BRD.md</code></div>
+    <div class="subtitle">Rendered 2026-10-07 &middot; source <code>TrBlazeUI-BRD.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -243,11 +243,11 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <li><a href="#glossary">Glossary</a>
 </li>
 </ol>
-<h2 id="executive-summary">1. Executive summary<a class="anchor-link" href="#executive-summary">#</a></h2>
+<h2 id="executive-summary"><a id="1-executive-summary"></a>1. Executive summary<a class="anchor-link" href="#executive-summary">#</a></h2>
 <p><strong>TrBlazeUI</strong> is a comprehensive, production-ready <strong>Blazor UI component library</strong> for .NET 10 that brings the shadcn/ui design system to Blazor. It is a renamed fork of the open-source <em>Blazor Blueprint</em> project (Apache 2.0), restructured into a layered architecture: <strong>16 headless, accessible primitives</strong> at the base and <strong>~69 pre-styled components</strong> on top, complemented by <strong>three icon packages</strong> (Lucide, Heroicons, Feather; 3,200+ icons total). It ships pre-built Tailwind CSS so consumers need no Node.js or Tailwind toolchain ("zero configuration"), is 100% compatible with shadcn/ui and tweakcn themes, and works identically across all three Blazor hosting models — Server, WebAssembly, and Auto.</p>
 <p>The product solves a real gap: Blazor developers have lacked a modern, system-first UI library equivalent to React's shadcn/ui. TrBlazeUI fills it with WCAG 2.1 AA-accessible components, built-in light/dark theming via CSS variables, and a familiar React-inspired API (<code>@bind-Value</code>, <code>AsChild</code>, composition over inheritance). The library is distributed as NuGet packages via GitHub Packages and is consumed by real downstream applications (e.g. an AppStudio IDE and a TechieRag web sample), whose feedback has driven hardening fixes.</p>
 <p>This document captures, for the product owner, what TrBlazeUI delivers today (the bulk of which is <strong>built and shipping</strong> following a .NET 8→10 modernization pass) and the small set of open enhancements. Because the codebase is brownfield, §4 is the first thing to read: it states feature-by-feature what is Done versus pending.</p>
-<h2 id="business-objectives">2. Business objectives<a class="anchor-link" href="#business-objectives">#</a></h2>
+<h2 id="business-objectives"><a id="2-business-objectives"></a>2. Business objectives<a class="anchor-link" href="#business-objectives">#</a></h2>
 <ul>
 <li>Provide Blazor developers a <strong>drop-in, shadcn/ui-equivalent component library</strong> so they don't design accessible UI components from scratch.
 </li>
@@ -262,7 +262,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <li>Maintain a <strong>clean, modern, standards-compliant codebase</strong> (.NET 10, C# 14, strict warnings-as-errors, mandatory XML docs) suitable for long-term maintenance and confident downstream consumption.
 </li>
 </ul>
-<h2 id="scope">3. Scope<a class="anchor-link" href="#scope">#</a></h2>
+<h2 id="scope"><a id="3-scope"></a>3. Scope<a class="anchor-link" href="#scope">#</a></h2>
 <p><strong>In scope:</strong></p>
 <ul>
 <li>Headless primitive components (behavior + accessibility, unstyled).
@@ -295,23 +295,23 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <li>Publishing to nuget.org (currently GitHub Packages under <code>techierathore</code>).
 </li>
 </ul>
-<h2 id="development-status">4. Development status<a class="anchor-link" href="#development-status">#</a></h2>
+<h2 id="development-status"><a id="4-development-status"></a>4. Development status<a class="anchor-link" href="#development-status">#</a></h2>
 <p>Written by the status gate after every build, verify and handoff; not by hand.</p>
-<p><strong>Snapshot as of 2026-10-03.</strong> Live per-requirement status: <code>PROJECT-STATUS.md</code> and the Requirements Status table in <code>docs/TrBlazeUI-Checklist.md</code>.</p>
+<p><strong>Snapshot as of 2026-10-07.</strong> Live per-requirement status: <code>PROJECT-STATUS.md</code> and the Requirements Status table in <code>docs/TrBlazeUI-Checklist.md</code>.</p>
 <table>
 <thead><tr><th>Screen</th><th>Requirements</th><th>Verified</th><th>Open</th><th>Status</th></tr></thead>
 <tbody>
 <tr><td>UI / Pages</td><td>19</td><td>19</td><td>0</td><td>Done</td></tr>
 <tr><td>Functional requirements</td><td>10</td><td>10</td><td>0</td><td>Done</td></tr>
 <tr><td>Non-functional</td><td>5</td><td>5</td><td>0</td><td>Done</td></tr>
-<tr><td>Component demos</td><td>6</td><td>6</td><td>0</td><td>Done</td></tr>
+<tr><td>Component demos</td><td>9</td><td>9</td><td>0</td><td>Done</td></tr>
 <tr><td>Editor</td><td>1</td><td>1</td><td>0</td><td>Done</td></tr>
 <tr><td>Chat</td><td>1</td><td>1</td><td>0</td><td>Done</td></tr>
 <tr><td>Run</td><td>1</td><td>1</td><td>0</td><td>Done</td></tr>
 <tr><td>Roles</td><td>1</td><td>1</td><td>0</td><td>Done</td></tr>
 </tbody>
 </table>
-<h2 id="stakeholders-users">5. Stakeholders / users<a class="anchor-link" href="#stakeholders-users">#</a></h2>
+<h2 id="stakeholders-users"><a id="5-stakeholders--users"></a>5. Stakeholders / users<a class="anchor-link" href="#stakeholders-users">#</a></h2>
 <p>TrBlazeUI has no end-user accounts — its "users" are <strong>developers</strong> who consume the library, plus the maintainers. There is no authentication or role system anywhere in the product.</p>
 <table>
 <thead><tr><th>Role</th><th>Needs</th></tr></thead>
@@ -324,7 +324,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </tbody>
 </table>
 <p><strong>Persona detail — Consuming developer onboarding path:</strong> (1) create a GitHub PAT with <code>read:packages</code>; (2) add the <code>techierathore</code> GitHub Packages NuGet source; (3) <code>dotnet add package TrBlazeUI.Components</code> (+ optional Primitives/Icons); (4) add <code>@using</code> lines to <code>_Imports.razor</code>; (5) add <code>&lt;PortalHost /&gt;</code> to the root layout; (6) link <code>theme.css</code> then <code>trblazeui.css</code> in <code>App.razor</code>; (7) register services (<code>AddTrBlazeUIPrimitives()</code>, <code>AddScoped&lt;ToastService&gt;()</code>); (8) start composing components.</p>
-<h2 id="context-diagram">6. Context diagram<a class="anchor-link" href="#context-diagram">#</a></h2>
+<h2 id="context-diagram"><a id="6-context-diagram"></a>6. Context diagram<a class="anchor-link" href="#context-diagram">#</a></h2>
 <div class="diagram">
   <div class="dt">
     <button data-zout title="Zoom out">&minus;</button>
@@ -346,7 +346,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   Repo --&gt; CI["GitHub Actions"]
   CI --&gt; GHP</pre>
 </div>
-<h2 id="user-journey-primary-use-case">7. User journey — primary use case<a class="anchor-link" href="#user-journey-primary-use-case">#</a></h2>
+<h2 id="user-journey-primary-use-case"><a id="7-user-journey--primary-use-case"></a>7. User journey — primary use case<a class="anchor-link" href="#user-journey-primary-use-case">#</a></h2>
 <p>The primary journey is a developer adding TrBlazeUI to an existing Blazor app and rendering a themed, accessible component.</p>
 <div class="diagram">
   <div class="dt">
@@ -369,7 +369,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   App-&gt;&gt;UI: "render with consumer theme variables"
   UI--&gt;&gt;D: "accessible, themed, dark-mode-ready UI"</pre>
 </div>
-<h2 id="component-sketch">8. Component sketch<a class="anchor-link" href="#component-sketch">#</a></h2>
+<h2 id="component-sketch"><a id="8-component-sketch"></a>8. Component sketch<a class="anchor-link" href="#component-sketch">#</a></h2>
 <div class="diagram">
   <div class="dt">
     <button data-zout title="Zoom out">&minus;</button>
@@ -389,7 +389,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   Comp --&gt; Markdig["Markdig + HtmlSanitizer"]
   Prim --&gt; JS["JS interop (portal, focus, positioning, keyboard)"]</pre>
 </div>
-<h2 id="feature-catalog">9. Feature catalog<a class="anchor-link" href="#feature-catalog">#</a></h2>
+<h2 id="feature-catalog"><a id="9-feature-catalog"></a>9. Feature catalog<a class="anchor-link" href="#feature-catalog">#</a></h2>
 <h3 id="f-prim-headless-primitives">F-PRIM: Headless primitives<a class="anchor-link" href="#f-prim-headless-primitives">#</a></h3>
 <p><strong>Personas:</strong> Consuming developer (custom-UI builders) · <strong>Phase:</strong> Pre-existing (Done)</p>
 <p>Sixteen headless, unstyled primitive components provide behavior, keyboard navigation, and ARIA semantics with no styling, so developers can build fully custom-styled UIs while inheriting accessibility. They are also the foundation the styled Components layer composes. Backing them are shared services (Portal, Positioning, Focus, Keyboard, Dropdown manager) registered by <code>AddTrBlazeUIPrimitives()</code>.</p>
@@ -436,7 +436,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   C --&gt;|"yes"| D["Submit + Toast success"]
   C --&gt;|"no"| E["Field shows validation message"]</pre>
 </div>
-<h3 id="f-layout-layout-navigation-components">F-LAYOUT: Layout &amp; navigation components<a class="anchor-link" href="#f-layout-layout-navigation-components">#</a></h3>
+<h3 id="f-layout-layout-navigation-components"><a id="f-layout-layout--navigation-components"></a>F-LAYOUT: Layout &amp; navigation components<a class="anchor-link" href="#f-layout-layout-navigation-components">#</a></h3>
 <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
 <p>Structural and navigation components for app shells: a feature-rich <strong>Sidebar</strong> (22 sub-components; collapsible icon mode, floating/inset variants, mobile sheet integration, Ctrl/Cmd+B toggle, cookie/localStorage persistence), plus Card, AspectRatio, Resizable, ScrollArea, Separator, Accordion, Collapsible, Item, and navigation (Breadcrumb, NavigationMenu, Menubar, Pagination, ResponsiveNav, Tabs).</p>
 <table>
@@ -448,7 +448,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </tbody>
 </table>
 <p><strong>Requirements:</strong> BRD-13 … BRD-18 (see §10)</p>
-<h3 id="f-overlay-overlay-feedback-components">F-OVERLAY: Overlay &amp; feedback components<a class="anchor-link" href="#f-overlay-overlay-feedback-components">#</a></h3>
+<h3 id="f-overlay-overlay-feedback-components"><a id="f-overlay-overlay--feedback-components"></a>F-OVERLAY: Overlay &amp; feedback components<a class="anchor-link" href="#f-overlay-overlay-feedback-components">#</a></h3>
 <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
 <p>Floating/overlay components rendered through the <strong>portal</strong> system (Dialog, AlertDialog, Sheet, Drawer, Popover, HoverCard, Tooltip, DropdownMenu, ContextMenu, Menubar, Command) plus Alert and Toast feedback. The portal was hardened with reactive refresh so internal state changes re-render correctly (consumer-reported blocker, fixed).</p>
 <table>
@@ -481,7 +481,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   U-&gt;&gt;P: "interact (toggle/select)"
   P--&gt;&gt;U: "RefreshPortal re-renders content"</pre>
 </div>
-<h3 id="f-data-data-content-components">F-DATA: Data &amp; content components<a class="anchor-link" href="#f-data-data-content-components">#</a></h3>
+<h3 id="f-data-data-content-components"><a id="f-data-data--content-components"></a>F-DATA: Data &amp; content components<a class="anchor-link" href="#f-data-data-content-components">#</a></h3>
 <p><strong>Personas:</strong> Consuming developer · <strong>Phase:</strong> Pre-existing (Done)</p>
 <p>Powerful data and rich-content editors: <strong>DataTable</strong> (sorting, filtering, pagination, selection, toolbar, column config), <strong>MarkdownEditor</strong> (Markdig-powered, toolbar + live preview), and <strong>RichTextEditor</strong> (Quill.js WYSIWYG with HtmlSanitizer-guarded HTML output).</p>
 <table>
@@ -530,7 +530,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </tbody>
 </table>
 <p><strong>Requirements:</strong> BRD-33, BRD-34 (see §10)</p>
-<h3 id="f-theme-theming-dark-mode">F-THEME: Theming &amp; dark mode<a class="anchor-link" href="#f-theme-theming-dark-mode">#</a></h3>
+<h3 id="f-theme-theming-dark-mode"><a id="f-theme-theming--dark-mode"></a>F-THEME: Theming &amp; dark mode<a class="anchor-link" href="#f-theme-theming-dark-mode">#</a></h3>
 <p><strong>Personas:</strong> Consuming developer, theme author · <strong>Phase:</strong> Pre-existing (Done)</p>
 <p>100% shadcn/ui + tweakcn theme compatibility via CSS custom properties in OKLCH color space. Consumers drop variables into <code>theme.css</code> (loaded before <code>trblazeui.css</code>); dark mode toggles by adding/removing <code>.dark</code> on <code>&lt;html&gt;</code>. Pre-built CSS means no Tailwind setup.</p>
 <p><strong>Requirements:</strong> BRD-35, BRD-36, BRD-37 (see §10)</p>
@@ -542,7 +542,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <p><strong>Personas:</strong> Maintainer, evaluating developer · <strong>Phase:</strong> Pre-existing (Done)</p>
 <p>A shared demo RCL (90+ pages) hosted in three render modes (Server 5183/7172, WASM 5184/7173, Auto 5185/7174) demonstrating every component, primitive, chart, and icon set, plus architecture and getting-started pages and a horizontal/vertical layout toggle. Run via <code>./scripts/run-demo.sh</code> or <code>dotnet run</code>.</p>
 <p><strong>Requirements:</strong> BRD-40, BRD-41 (see §10)</p>
-<h3 id="f-dist-packaging-distribution">F-DIST: Packaging &amp; distribution<a class="anchor-link" href="#f-dist-packaging-distribution">#</a></h3>
+<h3 id="f-dist-packaging-distribution"><a id="f-dist-packaging--distribution"></a>F-DIST: Packaging &amp; distribution<a class="anchor-link" href="#f-dist-packaging-distribution">#</a></h3>
 <p><strong>Personas:</strong> Maintainer · <strong>Phase:</strong> Pre-existing (Done)</p>
 <p>Five NuGet packages sharing a single version number taken from the release tag, published to GitHub Packages (<code>techierathore</code>) by GitHub Actions (<code>publish-github-packages.yml</code>; <code>build.yml</code> validates PRs) and to NuGet.org by the manually dispatched <code>publish-nuget.yml</code>. The publish workflows resolve the version from the release tag and pass it as <code>-p:Version=</code> to both <code>dotnet build</code> and <code>dotnet pack</code>; <code>Directory.Build.props</code> holds only the local-build base. <code>Directory.Build.props</code> centralizes metadata, Apache-2.0 license, repo URLs, and strict build settings. NOTICE preserves original attribution.</p>
 <p><strong>Requirements:</strong> BRD-42, BRD-43, BRD-44 (see §10)</p>
@@ -550,7 +550,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <p><strong>Personas:</strong> AI coding agent + their developer · <strong>Phase:</strong> Pre-existing (Done)</p>
 <p>Claude Code (<code>/trblazeui</code>) and OpenCode agent skills (distributable copies in <code>docs/skills/</code>) turn an AI assistant into a TrBlazeUI-aware .NET/Blazor developer (integrate, generate page/form/dashboard/component/service, setup-theme, list-components), backed by the <code>TrBlazeUI-AI-Reference.md</code> component reference.</p>
 <p><strong>Requirements:</strong> BRD-45, BRD-46, BRD-47 (see §10)</p>
-<h2 id="functional-requirements-brd-ledger">10. Functional requirements (BRD ledger)<a class="anchor-link" href="#functional-requirements-brd-ledger">#</a></h2>
+<h2 id="functional-requirements-brd-ledger"><a id="10-functional-requirements-brd-ledger"></a>10. Functional requirements (BRD ledger)<a class="anchor-link" href="#functional-requirements-brd-ledger">#</a></h2>
 <ul>
 <li><strong>BRD-1</strong> — A developer can install and register the headless primitives via <code>AddTrBlazeUIPrimitives()</code>. <em>(F-PRIM)</em> &lt;!-- from: TrBlazeUI-Doc.md --&gt;
 </li>
@@ -647,7 +647,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <li><strong>BRD-47</strong> — The AI agent draws on <code>TrBlazeUI-AI-Reference.md</code> for component parameters and patterns. <em>(F-AI)</em>
 </li>
 </ul>
-<h2 id="non-functional-requirements">11. Non-functional requirements<a class="anchor-link" href="#non-functional-requirements">#</a></h2>
+<h2 id="non-functional-requirements"><a id="11-non-functional-requirements"></a>11. Non-functional requirements<a class="anchor-link" href="#non-functional-requirements">#</a></h2>
 <ul>
 <li><strong>BRD-48</strong> — Performance: pre-built minified CSS (~906 KB / ~97 KB gzipped as of 2.1.0, which ships the full Tailwind utility scale so consumer markup can be styled with utility classes); components render identically across Server/WASM/Auto with no per-component JS bundle bloat.
 </li>
@@ -672,7 +672,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>Theme compatibility</td><td>shadcn/ui + tweakcn, light + dark</td></tr>
 </tbody>
 </table>
-<h2 id="constraints-assumptions">12. Constraints &amp; assumptions<a class="anchor-link" href="#constraints-assumptions">#</a></h2>
+<h2 id="constraints-assumptions"><a id="12-constraints--assumptions"></a>12. Constraints &amp; assumptions<a class="anchor-link" href="#constraints-assumptions">#</a></h2>
 <ul>
 <li>Apache 2.0 license; the NOTICE file (original <em>Blazor Blueprint</em> attribution) MUST ship with any distribution.
 </li>
@@ -685,7 +685,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <li>The library has no backend/DB/auth; any such concern is the consumer's.
 </li>
 </ul>
-<h2 id="success-metrics">13. Success metrics<a class="anchor-link" href="#success-metrics">#</a></h2>
+<h2 id="success-metrics"><a id="13-success-metrics"></a>13. Success metrics<a class="anchor-link" href="#success-metrics">#</a></h2>
 <ul>
 <li>A new consumer can install and render a themed, accessible component in under ~10 minutes following the README.
 </li>
@@ -698,7 +698,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <li>Consumer-reported issues resolved and tracked (5/5 + 5/5 from the two reports already fixed).
 </li>
 </ul>
-<h2 id="risks">14. Risks<a class="anchor-link" href="#risks">#</a></h2>
+<h2 id="risks"><a id="14-risks"></a>14. Risks<a class="anchor-link" href="#risks">#</a></h2>
 <table>
 <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
 <tbody>
@@ -709,7 +709,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>GitHub Packages PAT friction for consumers</td><td>Medium</td><td>Low</td><td>Clear README setup + CI token guidance</td></tr>
 </tbody>
 </table>
-<h2 id="glossary">15. Glossary<a class="anchor-link" href="#glossary">#</a></h2>
+<h2 id="glossary"><a id="15-glossary"></a>15. Glossary<a class="anchor-link" href="#glossary">#</a></h2>
 <ul>
 <li><strong>TrBlazeUI</strong> — this Blazor component library (renamed fork of Blazor Blueprint).
 </li>

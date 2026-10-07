@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="sub">Last rendered: 2026-09-13</div>
+    <div class="sub">Last rendered: 2026-10-07</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#table-of-contents">Table of Contents</a></li>
@@ -115,6 +115,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#screen-map">3. Screen map</a></li>
         <li class="h3"><a href="#screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11">2.1.0 screens (added / changed by REQ-UI-017 — all runtime-verified 2026-08-11)</a></li>
         <li class="h3"><a href="#screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes-runtime-verified-2026-09-13">2.0.6 screens (changed by REQ-UI-019 and REQ-UI-020, the TfLens passes — runtime-verified 2026-09-13)</a></li>
+        <li class="h3"><a href="#to-2-2-0-screens-chatur-req-ui-021-req-ui-032-runtime-verified-2026-10-07">2.0.8 to 2.2.0 screens (Chatur — REQ-UI-021…REQ-UI-032 — runtime-verified 2026-10-07)</a></li>
         <li><a href="#library-lineage-how-a-styled-component-resolves">4. Library lineage — how a styled component resolves</a></li>
         <li><a href="#known-issues">5. Known issues</a></li>
         <li><a href="#runtime-screenshots">6. Runtime screenshots</a></li>
@@ -125,7 +126,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="subtitle">Rendered 2026-09-13 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
+    <div class="subtitle">Rendered 2026-10-07 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -136,6 +137,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#screen-map">3. Screen map</a></li>
         <li class="h3"><a href="#screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11">2.1.0 screens (added / changed by REQ-UI-017 — all runtime-verified 2026-08-11)</a></li>
         <li class="h3"><a href="#screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes-runtime-verified-2026-09-13">2.0.6 screens (changed by REQ-UI-019 and REQ-UI-020, the TfLens passes — runtime-verified 2026-09-13)</a></li>
+        <li class="h3"><a href="#to-2-2-0-screens-chatur-req-ui-021-req-ui-032-runtime-verified-2026-10-07">2.0.8 to 2.2.0 screens (Chatur — REQ-UI-021…REQ-UI-032 — runtime-verified 2026-10-07)</a></li>
         <li><a href="#library-lineage-how-a-styled-component-resolves">4. Library lineage — how a styled component resolves</a></li>
         <li><a href="#known-issues">5. Known issues</a></li>
         <li><a href="#runtime-screenshots">6. Runtime screenshots</a></li>
@@ -144,8 +146,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li class="h3"><a href="#earlier-sampled-key-screens-2026-06-30-datatable-png-recaptured-2026-07-21">6.2 Earlier sampled key screens (2026-06-30; datatable.png recaptured 2026-07-21)</a></li>
       </ol>
     </div>
-<p><strong>Last updated:</strong> 2026-09-13 (handoff — as-built at 2.0.6)
-<strong>Verification status:</strong> ✅ <strong>RUNTIME-VERIFIED.</strong> Anonymous demo visitor drove the 8 screens changed by the TfLens passes on <strong>2026-09-13</strong> at 1366 and 390 wide, plus the phone menu at 390: all render, 0 console errors, 0 sideways scroll (screenshots in §6.3). Acceptance suite 33/33; Release build <strong>0 warnings / 0 errors</strong>. Earlier screens were last runtime-verified on 2026-08-25.</p>
+<p><strong>Last updated:</strong> 2026-10-07 (handoff — as-built at 2.2.0)
+<strong>Verification status:</strong> ✅ <strong>RUNTIME-VERIFIED.</strong> On <strong>2026-10-07</strong> the anonymous demo visitor drove the 11 screens of the Chatur controls (§3, 2.0.8 to 2.2.0 screens) at 1366 and 390 wide: all render, 0 console errors, 0 sideways scroll. Before that, the visitor drove the 8 screens changed by the TfLens passes on <strong>2026-09-13</strong> at 1366 and 390 wide, plus the phone menu at 390: all render, 0 console errors, 0 sideways scroll (screenshots in §6.3). Acceptance suite 33/33; Release build <strong>0 warnings / 0 errors</strong>. Earlier screens were last runtime-verified on 2026-08-25.</p>
 <blockquote>
 <p><strong>What this document is.</strong> The screen-by-screen, as-built map a developer uses to chase a bug or catch AI-hallucinated code. TrBlazeUI is a <strong>component library with a demo application</strong> and has <strong>no database, no API, no stored procedures, and no auth</strong> — so the usual <em>page → service → data-access → proc</em> lineage collapses to <strong>demo page → demo-shared composition → library component → primitive → JS interop / service</strong>. There is exactly one role: the <strong>anonymous demo visitor</strong>.</p>
 </blockquote>
@@ -164,7 +166,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <li><a href="#runtime-screenshots">Runtime screenshots</a>
 </li>
 </ol>
-<h2 id="roles-navigation">1. Roles &amp; navigation<a class="anchor-link" href="#roles-navigation">#</a></h2>
+<h2 id="roles-navigation"><a id="1-roles--navigation"></a>1. Roles &amp; navigation<a class="anchor-link" href="#roles-navigation">#</a></h2>
 <ul>
 <li><strong>Role:</strong> Anonymous demo visitor (no login). One sidebar navigation drives the whole app.
 </li>
@@ -194,7 +196,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   Shell --&gt; Theme["/ (DynamicThemeDemo)"]
   Shell --&gt; New["/whats-new (2.1.0 release page)"]</pre>
 </div>
-<h2 id="app-shell-shared-services">2. App shell &amp; shared services<a class="anchor-link" href="#app-shell-shared-services">#</a></h2>
+<h2 id="app-shell-shared-services"><a id="2-app-shell--shared-services"></a>2. App shell &amp; shared services<a class="anchor-link" href="#app-shell-shared-services">#</a></h2>
 <table>
 <thead><tr><th>Element</th><th>File</th><th>Responsibility</th></tr></thead>
 <tbody>
@@ -209,7 +211,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </tbody>
 </table>
 <p>There is <strong>no data-access layer</strong>: demo data comes entirely from <code>MockDataService</code> held in memory. Any code path that appears to read a database, call an API, or invoke a stored proc would be hallucinated — there is none in this repo.</p>
-<h2 id="screen-map">3. Screen map<a class="anchor-link" href="#screen-map">#</a></h2>
+<h2 id="screen-map"><a id="3-screen-map"></a>3. Screen map<a class="anchor-link" href="#screen-map">#</a></h2>
 <p>Each demo page lives under <code>demos/TrBlazeUI.Demo.Shared/Pages/</code> and composes one library component family. The full set is large — <strong>117 <code>.razor</code> pages</strong> in total (83 component demos + 15 primitive demos + 6 chart demos + icons + 5 top-level pages + <code>/whats-new</code> + 3 <code>/verify-*</code> test harnesses); the table below maps the representative/structural screens. Every <code>/components/{x}</code> page follows the same lineage shape: <strong>demo page → <code>&lt;Library component&gt;</code> → primitive (if any) → JS interop / service</strong>.</p>
 <table>
 <thead><tr><th>Screen</th><th>Route</th><th>Demo page file</th><th>Library surface exercised</th><th>Lineage notes</th></tr></thead>
@@ -234,7 +236,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>Verify harnesses</td><td><code>/verify-techieblog</code>, <code>/verify-ui016</code>, <code>/verify-ui014</code></td><td><code>Pages/VerifyTechieBlog.razor</code>, <code>VerifyUi016.razor</code>, <code>VerifyUi014.razor</code></td><td>fixture pages driven by the matching <code>tests/verify/*.spec.js</code></td><td><strong>not consumer-facing</strong>; <code>/verify-techieblog</code> renders ✓ + looks-right ✓ (runtime-confirmed 2026-08-25, 76/76 checks).</td></tr>
 </tbody>
 </table>
-<h3 id="screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11">2.1.0 screens (added / changed by REQ-UI-017 — all runtime-verified 2026-08-11)<a class="anchor-link" href="#screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11">#</a></h3>
+<h3 id="screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11"><a id="210-screens-added--changed-by-req-ui-017--all-runtime-verified-2026-08-11"></a>2.1.0 screens (added / changed by REQ-UI-017 — all runtime-verified 2026-08-11)<a class="anchor-link" href="#screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11">#</a></h3>
 <table>
 <thead><tr><th>Screen</th><th>Route</th><th>Demo page file</th><th>Library surface exercised</th><th>Lineage notes</th></tr></thead>
 <tbody>
@@ -255,7 +257,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>Typography</td><td><code>/components/typography</code></td><td><code>Pages/Components/TypographyDemo.razor</code></td><td><code>Typography*</code></td><td>2.1.0: <code>Size</code> replaces baked-in size classes; <code>ClassNames.cn</code> is variant-aware</td></tr>
 </tbody>
 </table>
-<h3 id="screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes-runtime-verified-2026-09-13">2.0.6 screens (changed by REQ-UI-019 and REQ-UI-020, the TfLens passes — runtime-verified 2026-09-13)<a class="anchor-link" href="#screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes-runtime-verified-2026-09-13">#</a></h3>
+<h3 id="screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes-runtime-verified-2026-09-13"><a id="206-screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes--runtime-verified-2026-09-13"></a>2.0.6 screens (changed by REQ-UI-019 and REQ-UI-020, the TfLens passes — runtime-verified 2026-09-13)<a class="anchor-link" href="#screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes-runtime-verified-2026-09-13">#</a></h3>
 <table>
 <thead><tr><th>Screen</th><th>Route</th><th>Demo page file</th><th>Library surface exercised</th><th>Seen 2026-09-13</th></tr></thead>
 <tbody>
@@ -291,8 +293,45 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td><code>SidebarProvider</code> width parameters</td><td><code>{unresolved — Width/MobileWidth/IconWidth not found under those names in SidebarProvider.razor.cs; the 288px phone menu is runtime-verified}</code></td><td>—</td><td>—</td></tr>
 </tbody>
 </table>
+<h3 id="to-2-2-0-screens-chatur-req-ui-021-req-ui-032-runtime-verified-2026-10-07"><a id="208-to-220-screens-chatur--req-ui-021req-ui-032--runtime-verified-2026-10-07"></a>2.0.8 to 2.2.0 screens (Chatur — REQ-UI-021…REQ-UI-032 — runtime-verified 2026-10-07)<a class="anchor-link" href="#to-2-2-0-screens-chatur-req-ui-021-req-ui-032-runtime-verified-2026-10-07">#</a></h3>
+<table>
+<thead><tr><th>Screen</th><th>Route</th><th>Demo page file</th><th>Library surface exercised</th><th>Seen 2026-10-07</th></tr></thead>
+<tbody>
+<tr><td>Code Editor</td><td><code>/components/code-editor</code></td><td><code>Pages/Components/CodeEditorDemo.razor</code></td><td><code>CodeEditor</code>, <code>EditorTabs</code> (<code>TabAttributes</code>, 2.2.0)</td><td>renders at 1366 and 390; tabs carry <code>tab-program-cs</code> etc.</td></tr>
+<tr><td>Stepper</td><td><code>/components/stepper</code></td><td><code>Pages/Components/StepperDemo.razor</code></td><td><code>StepperItem</code> (<code>Status</code>, <code>Trailing</code>, <code>Icon</code> 2.2.0)</td><td>renders at 1366 and 390</td></tr>
+<tr><td>Badge</td><td><code>/components/badge</code></td><td><code>Pages/Components/BadgeDemo.razor</code></td><td><code>Badge</code> (<code>Danger</code> 2.2.0) → <code>ClassNames.cn</code> → <code>TailwindMerge</code></td><td>renders at 1366 and 390</td></tr>
+<tr><td>Switch</td><td><code>/components/switch</code></td><td><code>Pages/Components/SwitchDemo.razor</code></td><td><code>Switch</code> (<code>Outlined</code>, 2.1.2)</td><td>renders at 1366 and 390</td></tr>
+<tr><td>Toggle Group</td><td><code>/components/toggle-group</code></td><td><code>Pages/Components/ToggleGroupDemo.razor</code></td><td><code>ToggleGroup</code> (<code>Joined</code> 2.0.8, <code>OnVariant</code> 2.1.0)</td><td>renders at 1366 and 390</td></tr>
+<tr><td>DataTable</td><td><code>/components/datatable</code></td><td><code>Pages/Components/DataTableDemo.razor</code></td><td><code>DataTable</code> (<code>RowAttributes</code>/<code>HeaderRowAttributes</code>/<code>SelectAllAttributes</code> 2.1.0, <code>SelectedCount</code> 2.0.9)</td><td>renders at 1366 and 390</td></tr>
+<tr><td>Tree View</td><td><code>/components/tree-view</code></td><td><code>Pages/Components/TreeViewDemo.razor</code></td><td><code>TreeView</code>, <code>TreeItem</code> (2.0.8)</td><td>renders at 1366 and 390</td></tr>
+<tr><td>Diff View</td><td><code>/components/diff-view</code></td><td><code>Pages/Components/DiffViewDemo.razor</code></td><td><code>DiffView</code>, <code>TextDiff</code> (2.0.8)</td><td>renders at 1366 and 390</td></tr>
+<tr><td>Log View</td><td><code>/components/log-view</code></td><td><code>Pages/Components/LogViewDemo.razor</code></td><td><code>LogView</code> (2.0.9)</td><td>renders at 1366 and 390</td></tr>
+<tr><td>Nav List</td><td><code>/components/nav-list</code></td><td><code>Pages/Components/NavListDemo.razor</code></td><td><code>NavList&lt;TItem&gt;</code> (2.0.9)</td><td>renders at 1366 and 390</td></tr>
+<tr><td>Typing</td><td><code>/components/typing</code></td><td><code>Pages/Components/TypingDemo.razor</code></td><td><code>Typing</code> (2.0.9)</td><td>renders at 1366 and 390</td></tr>
+</tbody>
+</table>
+<p>Call chain (tab attributes): <code>EditorTabs.razor</code> <code>@foreach</code> over <code>Items</code> → <code>TabAttributes(vItem)</code> → <code>SplitTabAttributes</code> → <code>class</code> merged through <code>ClassNames.cn</code>, the rest splatted on the tab's <code>&lt;li&gt;</code>.</p>
+<p>Call chain (step icon): <code>StepperItem.razor</code> marker <code>&lt;span data-slot="stepper-item-marker"&gt;</code> → <code>Icon</code> when set, else <code>MarkerText</code> → <code>MarkerCssClass</code> adds <code>[&amp;_svg]:size-4</code>.</p>
+<p>Call chain (badge colour): <code>Badge.razor.cs</code> <code>CssClass</code> → <code>ClassNames.cn</code> → <code>TailwindMerge.Merge</code> → <code>ComputeBaseUtilityGroup</code> → <code>TextColorRegex</code> (hyphenated colours are one group as of 2.2.0).</p>
+<p><strong>Where to break</strong></p>
+<table>
+<thead><tr><th>File:line</th><th>Function</th><th>Watch</th><th>It should hold</th></tr></thead>
+<tbody>
+<tr><td><code>src/TrBlazeUI.Components/Components/CodeEditor/EditorTabs.razor:26</code></td><td>tab loop</td><td><code>vTab</code></td><td>the caller's attributes for this tab, with <code>class</code> split out</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/CodeEditor/EditorTabs.razor:195</code></td><td><code>SplitTabAttributes</code></td><td><code>vCssClass</code>, <code>vRest</code></td><td>the <code>class</code> entry alone, then every other entry</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/Stepper/StepperItem.razor:18</code></td><td>marker markup</td><td><code>Icon</code></td><td>non-null draws the icon and no glyph text</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/Stepper/StepperItem.razor:173</code></td><td><code>MarkerCssClass</code></td><td>the class string</td><td><code>[&amp;_svg]:size-4 [&amp;_svg]:shrink-0</code> only when <code>Icon</code> is set</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/Badge/Badge.razor.cs:165</code></td><td><code>CssClass</code> (Danger arm)</td><td>the variant classes</td><td><code>border-alert-danger/30 bg-alert-danger-bg text-alert-danger-foreground</code></td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Utilities/TailwindMerge.cs:462</code></td><td><code>ComputeBaseUtilityGroup</code></td><td>return value for <code>text-secondary-foreground</code></td><td><code>"text-color"</code>, so a later <code>text-destructive</code> replaces it</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Utilities/TailwindMerge.cs:429</code></td><td><code>ComputeBaseUtilityGroup</code></td><td>return value for <code>text-sm/6</code></td><td><code>"font-size"</code>, never <code>"text-color"</code></td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/Switch/Switch.razor.cs:124</code></td><td><code>Outlined</code> parameter</td><td><code>Outlined</code></td><td><code>true</code> gives an off switch a muted track and a border in <code>--border</code></td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/Toggle/ToggleGroup.razor:62</code></td><td><code>OnVariant</code> parameter</td><td><code>OnVariant</code></td><td><code>Accent</code> unless the caller chose <code>Card</code> or <code>Primary</code></td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/DataTable/DataTable.razor.cs:361</code></td><td><code>RowAttributes</code> parameter</td><td>the function's result per row</td><td>the row's own attributes, <code>class</code> merged</td></tr>
+</tbody>
+</table>
+<p>Screenshots: <code>screenshots/TrBlazeUI/code-editor.png</code>, <code>stepper.png</code>, <code>badge.png</code> and their <code>-mobile</code> versions (§6).</p>
 <p><em>(The remaining ~68 component demos and ~14 primitive demos follow the identical lineage shape; they are enumerated in the demo <code>Pages/Components/</code> and <code>Pages/Primitives/</code> folders and indexed in the BRD §9 feature catalog.)</em></p>
-<h2 id="library-lineage-how-a-styled-component-resolves">4. Library lineage — how a styled component resolves<a class="anchor-link" href="#library-lineage-how-a-styled-component-resolves">#</a></h2>
+<h2 id="library-lineage-how-a-styled-component-resolves"><a id="4-library-lineage--how-a-styled-component-resolves"></a>4. Library lineage — how a styled component resolves<a class="anchor-link" href="#library-lineage-how-a-styled-component-resolves">#</a></h2>
 <div class="diagram">
   <div class="dt">
     <button data-zout title="Zoom out">&minus;</button>
@@ -312,8 +351,10 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   Styled --&gt; ThirdParty["3rd-party (ApexCharts / Quill / Markdig+HtmlSanitizer)"]</pre>
 </div>
 <p>A reader chasing a bug starts at the demo page, drops into the styled component (<code>.razor</code> markup + <code>.razor.cs</code> logic), then into the primitive it composes (for behavior/ARIA), and finally into the relevant JS interop file or DI service. Symbols that don't resolve to a real file/component in <code>src/</code> are hallucinations — verify against the folders listed in <code>docs/TrBlazeUI-Architecture.md §4</code>.</p>
-<h2 id="known-issues">5. Known issues<a class="anchor-link" href="#known-issues">#</a></h2>
+<h2 id="known-issues"><a id="5-known-issues"></a>5. Known issues<a class="anchor-link" href="#known-issues">#</a></h2>
 <ul>
+<li><strong>✅ FIXED 2026-10-07, ships in 2.2.0 — Chatur TR-015…TR-017 (<code>REQ-UI-030</code>…<code>REQ-UI-032</code>).</strong> <code>EditorTabs.TabAttributes</code>, <code>StepperItem.Icon</code>, <code>BadgeVariant.Danger</code>, and <code>cn()</code> grouping hyphenated text colours. ⚠ Visible effect of the last: an Outline <code>Toggle</code>/<code>ToggleGroupItem</code> hovers with <code>--accent-foreground</code> text, and a <code>NavList</code> selected row uses <code>--accent-foreground</code>. Verified by <code>tests/verify/req-ui-030.spec.ts</code> 3/3 and a class diff over all 125 demo routes.
+</li>
 <li><strong>⚠ DevGuide 2026-09-13 — test page layout (<code>REQ-UI-020</code>):</strong> on <code>/verify-tflens-3</code>, <code>demos/TrBlazeUI.Demo.Shared/Pages/VerifyTfLens3.razor</code> (the TR-038 badge matrix), the default Secondary and Destructive badges hold their label on one line as designed and spill out of their 150px boxes over the Truncate column at 1280. Test page only; it ships in no package.
 </li>
 <li><strong>✅ FIXED 2026-09-12 and 2026-09-13, shipped in 2.0.6 — TfLens TR-028…TR-038 (<code>REQ-UI-020</code>, <code>REQ-UI-001</code>).</strong> Chart <code>Options</code>/<code>OptionsConfigurator</code>/<code>ChartContainer.Bare</code>; chart data labels in the short form; <code>Badge.As</code>/<code>Wrap</code>/<code>Truncate</code>; <code>DataTableColumn.Align</code>; the <code>url(</code> class guard; <code>DataTable</code> <code>SearchText</code>/<code>ShowColumnChooser</code>; the phone sidebar width; and the circuit-teardown exception in <code>SelectContent</code> and five sibling primitives. Verified by <code>ui-tflens-2.spec.js</code> 37/37, <code>ui-tflens-3.spec.js</code> 70/70 and <code>req-ui-020.spec.ts</code>.
@@ -369,66 +410,75 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <li>Status is reflected in <code>docs/TrBlazeUI-Checklist.md</code> (all REQs terminal). Screens are runtime-verified — the 2.1.0 set on 2026-08-11 (25/25), earlier key screens with screenshots in <code>docs/screenshots/TrBlazeUI/</code>; run <code>*devguide TrBlazeUI --update</code> for a fresh sweep after the next change.
 </li>
 </ul>
-<h2 id="runtime-screenshots">6. Runtime screenshots<a class="anchor-link" href="#runtime-screenshots">#</a></h2>
+<h2 id="runtime-screenshots"><a id="6-runtime-screenshots"></a>6. Runtime screenshots<a class="anchor-link" href="#runtime-screenshots">#</a></h2>
 <p>Captured from the booted Blazor Server demo via headless Chromium (Playwright). These prove the as-built screens render with real data and correct layout.</p>
-<h3 id="the-2-1-0-surface-captured-2026-08-11-at-handoff-1366-900">6.1 The 2.1.0 surface (captured 2026-08-11 at handoff, 1366×900)<a class="anchor-link" href="#the-2-1-0-surface-captured-2026-08-11-at-handoff-1366-900">#</a></h3>
-<h4 id="what-s-new-2-1-0-release-page-whats-new">What's new — 2.1.0 release page (<code>/whats-new</code>)<a class="anchor-link" href="#what-s-new-2-1-0-release-page-whats-new">#</a></h4>
+<h3 id="the-2-1-0-surface-captured-2026-08-11-at-handoff-1366-900"><a id="61-the-210-surface-captured-2026-08-11-at-handoff-1366900"></a>6.1 The 2.1.0 surface (captured 2026-08-11 at handoff, 1366×900)<a class="anchor-link" href="#the-2-1-0-surface-captured-2026-08-11-at-handoff-1366-900">#</a></h3>
+<h4 id="what-s-new-2-1-0-release-page-whats-new"><a id="whats-new--210-release-page-whats-new"></a>What's new — 2.1.0 release page (<code>/whats-new</code>)<a class="anchor-link" href="#what-s-new-2-1-0-release-page-whats-new">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/whats-new.png" alt="What's new" style="max-width:100%"></p>
-<h4 id="prose-components-prose">Prose (<code>/components/prose</code>)<a class="anchor-link" href="#prose-components-prose">#</a></h4>
+<h4 id="prose-components-prose"><a id="prose-componentsprose"></a>Prose (<code>/components/prose</code>)<a class="anchor-link" href="#prose-components-prose">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/prose.png" alt="Prose" style="max-width:100%"></p>
-<h4 id="stattile-statgroup-components-stat">StatTile / StatGroup (<code>/components/stat</code>)<a class="anchor-link" href="#stattile-statgroup-components-stat">#</a></h4>
+<h4 id="stattile-statgroup-components-stat"><a id="stattile--statgroup-componentsstat"></a>StatTile / StatGroup (<code>/components/stat</code>)<a class="anchor-link" href="#stattile-statgroup-components-stat">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/stat.png" alt="Stat" style="max-width:100%"></p>
-<h4 id="timeline-components-timeline">Timeline (<code>/components/timeline</code>)<a class="anchor-link" href="#timeline-components-timeline">#</a></h4>
+<h4 id="timeline-components-timeline"><a id="timeline-componentstimeline"></a>Timeline (<code>/components/timeline</code>)<a class="anchor-link" href="#timeline-components-timeline">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/timeline.png" alt="Timeline" style="max-width:100%"></p>
-<h4 id="stepper-components-stepper">Stepper (<code>/components/stepper</code>)<a class="anchor-link" href="#stepper-components-stepper">#</a></h4>
+<h4 id="stepper-components-stepper"><a id="stepper-componentsstepper"></a>Stepper (<code>/components/stepper</code>)<a class="anchor-link" href="#stepper-components-stepper">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/stepper.png" alt="Stepper" style="max-width:100%"></p>
-<h4 id="anchornav-components-anchor-nav">AnchorNav (<code>/components/anchor-nav</code>)<a class="anchor-link" href="#anchornav-components-anchor-nav">#</a></h4>
+<h4 id="anchornav-components-anchor-nav"><a id="anchornav-componentsanchor-nav"></a>AnchorNav (<code>/components/anchor-nav</code>)<a class="anchor-link" href="#anchornav-components-anchor-nav">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/anchor-nav.png" alt="AnchorNav" style="max-width:100%"></p>
-<h4 id="sortablelist-components-sortable-list">SortableList (<code>/components/sortable-list</code>)<a class="anchor-link" href="#sortablelist-components-sortable-list">#</a></h4>
+<h4 id="sortablelist-components-sortable-list"><a id="sortablelist-componentssortable-list"></a>SortableList (<code>/components/sortable-list</code>)<a class="anchor-link" href="#sortablelist-components-sortable-list">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/sortable-list.png" alt="SortableList" style="max-width:100%"></p>
-<h4 id="passwordstrength-components-password-strength">PasswordStrength (<code>/components/password-strength</code>)<a class="anchor-link" href="#passwordstrength-components-password-strength">#</a></h4>
+<h4 id="passwordstrength-components-password-strength"><a id="passwordstrength-componentspassword-strength"></a>PasswordStrength (<code>/components/password-strength</code>)<a class="anchor-link" href="#passwordstrength-components-password-strength">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/password-strength.png" alt="PasswordStrength" style="max-width:100%"></p>
-<h4 id="codeblock-components-code-block">CodeBlock (<code>/components/code-block</code>)<a class="anchor-link" href="#codeblock-components-code-block">#</a></h4>
+<h4 id="codeblock-components-code-block"><a id="codeblock-componentscode-block"></a>CodeBlock (<code>/components/code-block</code>)<a class="anchor-link" href="#codeblock-components-code-block">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/code-block.png" alt="CodeBlock" style="max-width:100%"></p>
-<h4 id="centeredpanel-components-centered-panel">CenteredPanel (<code>/components/centered-panel</code>)<a class="anchor-link" href="#centeredpanel-components-centered-panel">#</a></h4>
+<h4 id="centeredpanel-components-centered-panel"><a id="centeredpanel-componentscentered-panel"></a>CenteredPanel (<code>/components/centered-panel</code>)<a class="anchor-link" href="#centeredpanel-components-centered-panel">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/centered-panel.png" alt="CenteredPanel" style="max-width:100%"></p>
-<h3 id="the-2-0-6-changes-captured-2026-09-13-at-1366-900-and-390-844">6.3 The 2.0.6 changes (captured 2026-09-13 at 1366×900 and 390×844)<a class="anchor-link" href="#the-2-0-6-changes-captured-2026-09-13-at-1366-900-and-390-844">#</a></h3>
-<h4 id="bar-chart-charts-bar">Bar chart (<code>/charts/bar</code>)<a class="anchor-link" href="#bar-chart-charts-bar">#</a></h4>
+<h3 id="the-2-0-6-changes-captured-2026-09-13-at-1366-900-and-390-844"><a id="63-the-206-changes-captured-2026-09-13-at-1366900-and-390844"></a>6.3 The 2.0.6 changes (captured 2026-09-13 at 1366×900 and 390×844)<a class="anchor-link" href="#the-2-0-6-changes-captured-2026-09-13-at-1366-900-and-390-844">#</a></h3>
+<h4 id="bar-chart-charts-bar"><a id="bar-chart-chartsbar"></a>Bar chart (<code>/charts/bar</code>)<a class="anchor-link" href="#bar-chart-charts-bar">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/chart-bar-2-0-6.png" alt="Bar chart" style="max-width:100%">
 <img src="screenshots/TrBlazeUI/chart-bar-2-0-6-mobile.png" alt="Bar chart at 390" style="max-width:100%"></p>
-<h4 id="badge-components-badge">Badge (<code>/components/badge</code>)<a class="anchor-link" href="#badge-components-badge">#</a></h4>
+<h4 id="badge-components-badge"><a id="badge-componentsbadge"></a>Badge (<code>/components/badge</code>)<a class="anchor-link" href="#badge-components-badge">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/badge.png" alt="Badge" style="max-width:100%">
 <img src="screenshots/TrBlazeUI/badge-mobile.png" alt="Badge at 390" style="max-width:100%"></p>
-<h4 id="select-components-select">Select (<code>/components/select</code>)<a class="anchor-link" href="#select-components-select">#</a></h4>
+<h4 id="select-components-select"><a id="select-componentsselect"></a>Select (<code>/components/select</code>)<a class="anchor-link" href="#select-components-select">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/select.png" alt="Select" style="max-width:100%">
 <img src="screenshots/TrBlazeUI/select-mobile.png" alt="Select at 390" style="max-width:100%"></p>
-<h4 id="nativeselect-components-native-select">NativeSelect (<code>/components/native-select</code>)<a class="anchor-link" href="#nativeselect-components-native-select">#</a></h4>
+<h4 id="nativeselect-components-native-select"><a id="nativeselect-componentsnative-select"></a>NativeSelect (<code>/components/native-select</code>)<a class="anchor-link" href="#nativeselect-components-native-select">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/native-select.png" alt="NativeSelect" style="max-width:100%">
 <img src="screenshots/TrBlazeUI/native-select-mobile.png" alt="NativeSelect at 390" style="max-width:100%"></p>
-<h4 id="alertdialog-components-alert-dialog">AlertDialog (<code>/components/alert-dialog</code>)<a class="anchor-link" href="#alertdialog-components-alert-dialog">#</a></h4>
+<h4 id="alertdialog-components-alert-dialog"><a id="alertdialog-componentsalert-dialog"></a>AlertDialog (<code>/components/alert-dialog</code>)<a class="anchor-link" href="#alertdialog-components-alert-dialog">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/alert-dialog.png" alt="AlertDialog" style="max-width:100%">
 <img src="screenshots/TrBlazeUI/alert-dialog-mobile.png" alt="AlertDialog at 390" style="max-width:100%"></p>
-<h4 id="datatable-components-datatable">DataTable (<code>/components/datatable</code>)<a class="anchor-link" href="#datatable-components-datatable">#</a></h4>
+<h4 id="datatable-components-datatable"><a id="datatable-componentsdatatable"></a>DataTable (<code>/components/datatable</code>)<a class="anchor-link" href="#datatable-components-datatable">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/datatable-2-0-6.png" alt="DataTable" style="max-width:100%">
 <img src="screenshots/TrBlazeUI/datatable-2-0-6-mobile.png" alt="DataTable at 390" style="max-width:100%"></p>
-<h4 id="phone-menu-opened-at-390">Phone menu, opened (<code>/</code> at 390)<a class="anchor-link" href="#phone-menu-opened-at-390">#</a></h4>
+<h4 id="phone-menu-opened-at-390"><a id="phone-menu-opened--at-390"></a>Phone menu, opened (<code>/</code> at 390)<a class="anchor-link" href="#phone-menu-opened-at-390">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/sidebar-phone-menu-mobile.png" alt="Phone menu" style="max-width:100%"></p>
 <h4 id="tflens-test-pages-verify-tflens-2-verify-tflens-3">TfLens test pages (<code>/verify-tflens-2</code>, <code>/verify-tflens-3</code>)<a class="anchor-link" href="#tflens-test-pages-verify-tflens-2-verify-tflens-3">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/verify-tflens-2.png" alt="verify-tflens-2" style="max-width:100%">
 <img src="screenshots/TrBlazeUI/verify-tflens-3.png" alt="verify-tflens-3" style="max-width:100%"></p>
-<h3 id="earlier-sampled-key-screens-2026-06-30-datatable-png-recaptured-2026-07-21">6.2 Earlier sampled key screens (2026-06-30; <code>datatable.png</code> recaptured 2026-07-21)<a class="anchor-link" href="#earlier-sampled-key-screens-2026-06-30-datatable-png-recaptured-2026-07-21">#</a></h3>
-<h4 id="home">Home (<code>/</code>)<a class="anchor-link" href="#home">#</a></h4>
+<h3 id="earlier-sampled-key-screens-2026-06-30-datatable-png-recaptured-2026-07-21"><a id="62-earlier-sampled-key-screens-2026-06-30-datatablepng-recaptured-2026-07-21"></a>6.2 Earlier sampled key screens (2026-06-30; <code>datatable.png</code> recaptured 2026-07-21)<a class="anchor-link" href="#earlier-sampled-key-screens-2026-06-30-datatable-png-recaptured-2026-07-21">#</a></h3>
+<h4 id="home"><a id="home-"></a>Home (<code>/</code>)<a class="anchor-link" href="#home">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/home.png" alt="Home" style="max-width:100%"></p>
-<h4 id="datatable-components-datatable-2">DataTable (<code>/components/datatable</code>)<a class="anchor-link" href="#datatable-components-datatable-2">#</a></h4>
+<h4 id="datatable-components-datatable-2"><a id="datatable-componentsdatatable-1"></a>DataTable (<code>/components/datatable</code>)<a class="anchor-link" href="#datatable-components-datatable-2">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/datatable.png" alt="DataTable" style="max-width:100%"></p>
-<h4 id="bar-chart-charts-bar-2">Bar Chart (<code>/charts/bar</code>)<a class="anchor-link" href="#bar-chart-charts-bar-2">#</a></h4>
+<h4 id="bar-chart-charts-bar-2"><a id="bar-chart-chartsbar-1"></a>Bar Chart (<code>/charts/bar</code>)<a class="anchor-link" href="#bar-chart-charts-bar-2">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/chart-bar.png" alt="Bar Chart" style="max-width:100%"></p>
-<h4 id="toolbar-components-toolbar">Toolbar (<code>/components/toolbar</code>)<a class="anchor-link" href="#toolbar-components-toolbar">#</a></h4>
+<h4 id="toolbar-components-toolbar"><a id="toolbar-componentstoolbar"></a>Toolbar (<code>/components/toolbar</code>)<a class="anchor-link" href="#toolbar-components-toolbar">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/toolbar.png" alt="Toolbar" style="max-width:100%"></p>
 <h4 id="icons-icons">Icons (<code>/icons</code>)<a class="anchor-link" href="#icons-icons">#</a></h4>
 <p><img src="screenshots/TrBlazeUI/icons.png" alt="Icons" style="max-width:100%"></p>
+<h4 id="code-editor-components-code-editor-2026-10-07"><a id="code-editor-componentscode-editor--2026-10-07"></a>Code Editor (<code>/components/code-editor</code>) — 2026-10-07<a class="anchor-link" href="#code-editor-components-code-editor-2026-10-07">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/code-editor.png" alt="Code Editor" style="max-width:100%">
+<img src="screenshots/TrBlazeUI/code-editor-mobile.png" alt="Code Editor at 390" style="max-width:100%"></p>
+<h4 id="stepper-components-stepper-2026-10-07"><a id="stepper-componentsstepper--2026-10-07"></a>Stepper (<code>/components/stepper</code>) — 2026-10-07<a class="anchor-link" href="#stepper-components-stepper-2026-10-07">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/stepper.png" alt="Stepper" style="max-width:100%">
+<img src="screenshots/TrBlazeUI/stepper-mobile.png" alt="Stepper at 390" style="max-width:100%"></p>
+<h4 id="badge-components-badge-2026-10-07"><a id="badge-componentsbadge--2026-10-07"></a>Badge (<code>/components/badge</code>) — 2026-10-07<a class="anchor-link" href="#badge-components-badge-2026-10-07">#</a></h4>
+<p><img src="screenshots/TrBlazeUI/badge.png" alt="Badge" style="max-width:100%">
+<img src="screenshots/TrBlazeUI/badge-mobile.png" alt="Badge at 390" style="max-width:100%"></p>
 <hr>
-<p>Last updated: 2026-09-13 (handoff, 2.0.6 as-built) · RUNTIME-VERIFIED — 8 changed screens plus the phone menu on 2026-09-13 at 1366 and 390; the 2.1.0-era screens 25/25 on 2026-08-11; screenshots in docs/screenshots/TrBlazeUI/</p>
+<p>Last updated: 2026-10-07 (handoff, 2.2.0 as-built) · RUNTIME-VERIFIED — 11 Chatur-control screens on 2026-10-07 at 1366 and 390; 8 changed screens plus the phone menu on 2026-09-13 at 1366 and 390; the 2.1.0-era screens 25/25 on 2026-08-11; screenshots in docs/screenshots/TrBlazeUI/</p>
   </main>
 </div>
 

@@ -14,7 +14,15 @@
           data-slot="stepper-item-marker"
           role="@(Status.HasValue ? "img" : null)"
           aria-label="@(Status.HasValue ? StepStatusPresentation.Label(Status.Value) : null)"
-          aria-hidden="@(Status.HasValue ? null : "true")">@MarkerText</span>
+          data-icon="@(Icon != null ? "true" : null)"
+          aria-hidden="@(Status.HasValue ? null : "true")">@if (Icon != null)
+        {
+            @Icon
+        }
+        else
+        {
+            @MarkerText
+        }</span>
     <span class="min-w-0">
         <span class="block text-sm font-medium">@Title</span>
         @if (!string.IsNullOrWhiteSpace(Description))
@@ -88,6 +96,33 @@
     public RenderFragment? Trailing { get; set; }
 
     /// <summary>
+    /// Gets or sets an icon drawn inside the step's marker in place of its glyph or number.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// For a design that marks each step with a vector tick, spinner or pause rather than a text
+    /// glyph (Chatur TR-016). The icon replaces the glyph only; the marker keeps its circle, its
+    /// status colour and its accessible name. With <see cref="Status"/> set the marker is a
+    /// <c>role="img"</c> named for the status, so the icon is never the only signal and needs no
+    /// label of its own; without a status the marker stays hidden from assistive technology, as
+    /// the number it replaces was. An <c>svg</c> inside the marker is sized to 1rem.
+    /// </para>
+    /// <para>
+    /// Choose an icon that says the same thing as the status. A spinner on a done step draws two
+    /// different answers for one state.
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// &lt;StepperItem Title="Build" Status="StepStatus.Done"&gt;
+    ///     &lt;Icon&gt;&lt;LucideIcon Name="check" /&gt;&lt;/Icon&gt;
+    /// &lt;/StepperItem&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public RenderFragment? Icon { get; set; }
+
+    /// <summary>
     /// Gets or sets extra content rendered under the label.
     /// </summary>
     [Parameter]
@@ -135,6 +170,7 @@
 
     private string MarkerCssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
         "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-sm font-semibold",
+        Icon != null ? "[&_svg]:size-4 [&_svg]:shrink-0" : null,
         Status.HasValue
             ? StepStatusPresentation.MarkerColourClass(Status.Value)
             : objCurrentStep > objNumber
