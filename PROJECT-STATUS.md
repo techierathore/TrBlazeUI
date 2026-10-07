@@ -10,8 +10,8 @@ last_verified_date: 2026-10-07
 
 ## Where I am
 
-2.2.0 is ready to release: code, CHANGELOG, agent reference, Usage Guide and DevGuide all describe
-it. It adds Chatur's TR-015 to TR-017 (REQ-UI-030 to 032): `EditorTabs.TabAttributes`,
+The next release is ready: code, CHANGELOG `[Unreleased]`, agent reference, Usage Guide and
+DevGuide all describe it. It adds Chatur's TR-015 to TR-017 (REQ-UI-030 to 032): `EditorTabs.TabAttributes`,
 `StepperItem.Icon`, `BadgeVariant.Danger`, and `cn()` grouping hyphenated text colours. All 47
 rows are verified. 2.1.2 is the latest published version. Chatur's feedback file has the reply in
 both repositories.
@@ -42,7 +42,7 @@ Why: every row in this phase's scope is terminal and handoff has run; waiting on
 
 ## Known blockers
 
-- 2.2.0 is not on the feed until the owner commits and cuts the GitHub Release `v2.2.0`; agents cannot run git. Chatur's TR-015 waits on it.
+- The fixes are not on the feed until the owner commits and cuts the next GitHub Release; agents cannot run git. Chatur's TR-015 waits on it.
 
 ## Verification log
 

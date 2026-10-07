@@ -1,6 +1,6 @@
 # TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)
 
-> The single source for **how to test and run** this library. Every agent (flow-master self-smoke, the verifier) **and** the human UAT use the SAME walkthrough listed here. TrBlazeUI is a **component library with a demo application**. It has **no authentication and no user accounts**, so the test-user table below is N/A. Testing means walking the demo app's pages and exercising each component. This guide describes **2.2.0** (GitHub Packages, `https://nuget.pkg.github.com/techierathore/index.json`).
+> The single source for **how to test and run** this library. Every agent (flow-master self-smoke, the verifier) **and** the human UAT use the SAME walkthrough listed here. TrBlazeUI is a **component library with a demo application**. It has **no authentication and no user accounts**, so the test-user table below is N/A. Testing means walking the demo app's pages and exercising each component. Packages are on GitHub Packages (`https://nuget.pkg.github.com/techierathore/index.json`); `CHANGELOG.md` says which version carries what.
 
 ## Test users (canonical — use THESE for all smoke / verify / UAT)
 
@@ -144,7 +144,7 @@ bash tests/package/codex-agent-deployment.sh
 
 ## Consumer integration notes
 
-### Added 2026-10-07 (Chatur batch 5 — REQ-UI-030…REQ-UI-032 — ships in 2.2.0)
+### Added 2026-10-07 (Chatur batch 5 — REQ-UI-030…REQ-UI-032 — not yet released)
 
 - **`EditorTabs.TabAttributes`** puts attributes, such as a `data-testid`, on each tab's `<li>`.
 - **`StepperItem.Icon`** draws an icon in the step's circle in place of its glyph.
@@ -211,4 +211,4 @@ bash tests/package/codex-agent-deployment.sh
 - **NativeSelect inside MAUI Blazor Hybrid overlays** — the native popup is clipped in WebView2. Use `<Select>` inside dialogs and sheets. `docs/OldDocs/TrBlazeUI-Issues-Report-1.md` #2.
 - **`HtmlSanitizer 9.1.949-beta` is a pre-release dependency**, taken for the AngleSharp CVE-2026-54570 fix. Revisit when 9.1.x is stable.
 - **REQ-UI-015's harness page `/verify-trstudio` is missing**, so its 14 checks cannot be re-run. Its verdict rests on the 2026-07-12 run.
-- **Consumer feedback fixed library-side, waiting for the consumer's own re-check:** Chatur TR-015/TR-016/TR-017 (fixed 2026-10-07, in 2.2.0); TfLens TR-036/TR-037/TR-038 (fixed 2026-09-13, in 2.0.6); TrStudio TR-011 (fixed 2026-07-12); AstroLyfe TR-001…TR-012 and TechieRag TR-001…TR-004 (fixed under REQ-UI-014/015/016, their files carry no closing mark).
+- **Consumer feedback fixed library-side, waiting for the consumer's own re-check:** Chatur TR-015/TR-016/TR-017 (fixed 2026-10-07, not yet released); TfLens TR-036/TR-037/TR-038 (fixed 2026-09-13, in 2.0.6); TrStudio TR-011 (fixed 2026-07-12); AstroLyfe TR-001…TR-012 and TechieRag TR-001…TR-004 (fixed under REQ-UI-014/015/016, their files carry no closing mark).

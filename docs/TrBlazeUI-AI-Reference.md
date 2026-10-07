@@ -25,10 +25,10 @@ problem is in this table, the control exists — do not hand-build it.
 | Put a test hook (`data-testid`) on a table row, the table's header row or its choose-all box | `DataTable` `RowAttributes`, `HeaderRowAttributes`, `SelectAllAttributes` (2.1.0) | §6 |
 | A segmented switch whose chosen segment is a plain card, or the primary colour, instead of the accent tint | `ToggleGroup` `OnVariant` (2.1.0) | §5 |
 | An off switch that needs a visible border so it does not vanish on a light card | `Switch Outlined="true"` (2.1.2) | §5 |
-| Put a test hook (`data-testid`) on each tab of an open-file strip | `EditorTabs` `TabAttributes` (2.2.0) | §2.0.9 |
-| A vector tick, spinner or pause in a step's marker instead of the text glyph | `StepperItem` `Icon` (2.2.0) | §8 |
-| A failed or stopped status as a soft red pill beside Success, Info and Warning | `Badge Variant="BadgeVariant.Danger"` (2.2.0); `Destructive` is the solid fill | §6 |
-| Colour one badge's label without changing its variant | `Class="text-destructive"` (or any text colour) — replaces the variant's text colour as of 2.2.0 | §6 |
+| Put a test hook (`data-testid`) on each tab of an open-file strip | `EditorTabs` `TabAttributes` (after 2.1.2) | §2.0.9 |
+| A vector tick, spinner or pause in a step's marker instead of the text glyph | `StepperItem` `Icon` (after 2.1.2) | §8 |
+| A failed or stopped status as a soft red pill beside Success, Info and Warning | `Badge Variant="BadgeVariant.Danger"` (after 2.1.2); `Destructive` is the solid fill | §6 |
+| Colour one badge's label without changing its variant | `Class="text-destructive"` (or any text colour) — replaces the variant's text colour (after 2.1.2) | §6 |
 
 ---
 
@@ -1573,7 +1573,7 @@ Sub-components: `AvatarImage` (Source, Alt), `AvatarFallback`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| Variant | BadgeVariant | Default | Default, Secondary, Destructive, Outline, **Success**, **Info**, **Warning**, **Danger** (2.2.0) |
+| Variant | BadgeVariant | Default | Default, Secondary, Destructive, Outline, **Success**, **Info**, **Warning**, **Danger** (after 2.1.2) |
 | As | string | `"span"` | The element rendered — `"span"` or `"div"`; anything else falls back to `"span"` |
 | Wrap | bool | false | `true` lets a long label wrap inside a pill that grows with it (left-aligned, corner radius) |
 | Truncate | bool | false | `true` clips a long label with an ellipsis on one line. Wins over `Wrap` if both are set |
@@ -1593,11 +1593,11 @@ a badge and the alert that explains it: each one paints the tinted `--alert-*-bg
 | Success | `border-alert-success/30 bg-alert-success-bg text-alert-success-foreground hover:opacity-80` |
 | Info | `border-alert-info/30 bg-alert-info-bg text-alert-info-foreground hover:opacity-80` |
 | Warning | `border-alert-warning/30 bg-alert-warning-bg text-alert-warning-foreground hover:opacity-80` |
-| Danger | `border-alert-danger/30 bg-alert-danger-bg text-alert-danger-foreground hover:opacity-80` (2.2.0) |
+| Danger | `border-alert-danger/30 bg-alert-danger-bg text-alert-danger-foreground hover:opacity-80` (after 2.1.2) |
 
-Use `Warning` for "needs attention" status. For a failure, `Danger` (2.2.0) is the tinted red that matches the other three, and `Destructive` is the solid red fill.
+Use `Warning` for "needs attention" status. For a failure, `Danger` (after 2.1.2) is the tinted red that matches the other three, and `Destructive` is the solid red fill.
 
-**A text colour in `Class` replaces the variant's (2.2.0).** `<Badge Variant="BadgeVariant.Secondary" Class="text-destructive">` renders the secondary surface with a red label. Before 2.2.0 both text colours were emitted and the variant's won, because `cn()` only grouped one-word colours.
+**A text colour in `Class` replaces the variant's (after 2.1.2).** `<Badge Variant="BadgeVariant.Secondary" Class="text-destructive">` renders the secondary surface with a red label. In 2.1.2 and earlier, both text colours were emitted and the variant's won, because `cn()` only grouped one-word colours.
 
 ```razor
 <Badge>New</Badge>
@@ -2876,7 +2876,7 @@ it instead:
 |---|---|---|---|
 | `StepperItem.Status` | `StepStatus?` | `null` | `Pending`, `Running`, `Waiting`, `Done`, `Retried`, `Failed`. Leave it null to keep the position-derived behaviour. |
 | `StepperItem.Trailing` | `RenderFragment?` | `null` | Content at the step's trailing edge — a duration, a badge, a link. |
-| `StepperItem.Icon` | `RenderFragment?` | `null` | **2.2.0.** An icon drawn inside the marker in place of the glyph or number — `<Icon><LucideIcon Name="check" /></Icon>`. Sized to 1rem; the marker keeps its circle, status colour and accessible name. |
+| `StepperItem.Icon` | `RenderFragment?` | `null` | **After 2.1.2.** An icon drawn inside the marker in place of the glyph or number — `<Icon><LucideIcon Name="check" /></Icon>`. Sized to 1rem; the marker keeps its circle, status colour and accessible name. |
 | `Stepper.Orientation` | `StepperOrientation` | `Horizontal` | `Vertical` runs the steps top to bottom. |
 
 Each status has its own glyph **and** its own accessible name (`Done` is `✓` named "Done",
@@ -3697,7 +3697,7 @@ source* — see the next heading — and only rarely *wait for it to be built*.
 
 | Version | Released | Component namespaces | What it added |
 |---|---|---|---|
-| **2.2.0** | 2026-10-07 | 85 | `EditorTabs.TabAttributes`; `StepperItem.Icon`; `BadgeVariant.Danger`; `cn()` treats hyphenated text colours (`text-secondary-foreground`) as one group, so a `Class` text colour replaces a component's own |
+| **After 2.1.2** | — | 85 | `EditorTabs.TabAttributes`; `StepperItem.Icon`; `BadgeVariant.Danger`; `cn()` treats hyphenated text colours (`text-secondary-foreground`) as one group, so a `Class` text colour replaces a component's own |
 | **2.1.2** | 2026-10-03 | 85 | `Switch.Outlined` |
 | **2.1.1** | 2026-10-02 | 85 | No control reports an unhandled error when its page stops answering during dispose (17 more controls) |
 | **2.1.0** | 2026-10-02 | 85 | `DataTable.RowAttributes`/`HeaderRowAttributes`/`SelectAllAttributes`; `ToggleGroup.OnVariant`; `ToggleGroup` no longer reports an unhandled error when its page closes |
@@ -3706,7 +3706,7 @@ source* — see the next heading — and only rarely *wait for it to be built*.
 | **2.0.7** | 2026-09-15 | 79 | `InputGroupInput.DebounceMilliseconds`; the chart teardown fix |
 | **2.0.6** | 2026-09-13 | 79 | everything earlier; see `CHANGELOG.md` |
 
-Everything in this document describes **2.2.0**. Each control's own section has its full parameter
+Everything in this document describes the package it came with; a feature marked "after 2.1.2" arrived in the release that followed 2.1.2. Each control's own section has its full parameter
 table; the version table above only says when it arrived. `CHANGELOG.md` has the detail per
 release.
 
@@ -3800,7 +3800,7 @@ file usually needs a prompt first.
 | `ActiveId` / `ActiveIdChanged` | `string?` | `null` | Use `@bind-ActiveId`. |
 | `OnSelect` / `OnClose` | `EventCallback<EditorTabItem>` | — | |
 | `AriaLabel` | `string` | `"Open files"` | |
-| `TabAttributes` | `Func<EditorTabItem, IReadOnlyDictionary<string, object>?>?` | `null` | **2.2.0.** HTML attributes for each tab's `<li>` (`data-slot="editor-tab"`), from its item — e.g. `data-testid="tab-{Id}"`. A `class` entry is merged with the tab's classes; leave out `data-slot`, `data-tab-id`, `data-active` and `data-dirty`, which the strip owns |
+| `TabAttributes` | `Func<EditorTabItem, IReadOnlyDictionary<string, object>?>?` | `null` | **After 2.1.2.** HTML attributes for each tab's `<li>` (`data-slot="editor-tab"`), from its item — e.g. `data-testid="tab-{Id}"`. A `class` entry is merged with the tab's classes; leave out `data-slot`, `data-tab-id`, `data-active` and `data-dirty`, which the strip owns |
 | `Class` | `string?` | `null` | |
 
 #### LogView — the output of a running command

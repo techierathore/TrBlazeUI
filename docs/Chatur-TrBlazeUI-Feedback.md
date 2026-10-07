@@ -204,7 +204,7 @@ The first ten were found on day one, against the 2.0.7 reference; each entry say
 
 ### TR-015 — A tab in EditorTabs cannot carry its own attributes, such as a test id
 
-- **Status:** fixed upstream 2026-10-07 (`EditorTabs.TabAttributes`, in 2.2.0 — see the 2026-10-07 reply), filed 2026-10-06
+- **Status:** fixed upstream 2026-10-07 (`EditorTabs.TabAttributes`, in 2.1.3 — see the 2026-10-07 reply), filed 2026-10-06
 - **Severity:** minor
 - **Blocks:** yes — the screens work and tests find a tab by its label, but the verifier's screen check needs the mockups' `tab-*` ids on the page, so all 22 phase 2 rows (REQ-FN-049..060, REQ-UI-045..054) cannot reach Verified until a tab can carry its id.
 - **Repro:** TrBlazeUI 2.1.2 `EditorTabs Items="@objTabs"`: each item renders one tab, and there is no parameter that adds attributes to a tab's element.
@@ -216,7 +216,7 @@ The first ten were found on day one, against the 2.0.7 reference; each entry say
 
 ### TR-016 — A step in Stepper cannot show an icon in its marker
 
-- **Status:** fixed upstream 2026-10-07 (`StepperItem.Icon`, in 2.2.0 — see the 2026-10-07 reply), filed 2026-10-06
+- **Status:** fixed upstream 2026-10-07 (`StepperItem.Icon`, in 2.1.3 — see the 2026-10-07 reply), filed 2026-10-06
 - **Severity:** minor
 - **Blocks:** no — Process run reads correctly: each step's marker is a filled circle with a tick, a cross or a number, named for a screen reader, and the state pill beside it says the same in words.
 - **Repro:** TrBlazeUI 2.1.2 `StepperItem Status="StepStatus.Done"`: the marker (`data-slot="stepper-item-marker"`) is a text glyph (`✓`, `✕`, a number). There is no slot or parameter that puts a `LucideIcon` in it.
@@ -228,7 +228,7 @@ The first ten were found on day one, against the 2.0.7 reference; each entry say
 
 ### TR-017 — Badge has no soft red variant, and a text colour in Class cannot override a variant's
 
-- **Status:** fixed upstream 2026-10-07 (`BadgeVariant.Danger`, and a `Class` text colour now replaces the variant's, in 2.2.0 — see the 2026-10-07 reply), filed 2026-10-06
+- **Status:** fixed upstream 2026-10-07 (`BadgeVariant.Danger`, and a `Class` text colour now replaces the variant's, in 2.1.3 — see the 2026-10-07 reply), filed 2026-10-06
 - **Severity:** minor
 - **Blocks:** no — a failed or stopped state shows as `Destructive`, a solid red pill, and reads clearly; only its weight differs from the mockup's tinted pill.
 - **Repro:** TrBlazeUI 2.1.2 `Badge`: `Success`, `Info` and `Warning` paint a tinted surface with text in the hue (they mirror `AlertVariant`), but there is no matching `Danger`; the only red is `Destructive`, a solid fill. `Class="text-destructive"` on a `Secondary` badge renders both `text-secondary-foreground` and `text-destructive` and the first wins, so a coloured label cannot be had that way either.
@@ -242,12 +242,12 @@ The first ten were found on day one, against the 2.0.7 reference; each entry say
 
 <!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
 
-### 2026-10-07 — TR-015, TR-016 and TR-017 are fixed in 2.2.0
+### 2026-10-07 — TR-015, TR-016 and TR-017 are fixed in 2.1.3
 
-All three are fixed and tested in the library. They ship in **2.2.0** on GitHub Packages
-(`https://nuget.pkg.github.com/techierathore/index.json`). When this reply was written, 2.2.0 was
+All three are fixed and tested in the library. They ship in **2.1.3** on GitHub Packages
+(`https://nuget.pkg.github.com/techierathore/index.json`). When this reply was written, 2.1.3 was
 built and checked but the release had not been cut yet. If the feed still stops at 2.1.2, wait for
-2.2.0; do not work around TR-015.
+2.1.3; do not work around TR-015.
 
 | Entry | State | What you get |
 |---|---|---|
@@ -294,14 +294,14 @@ Things to know before you use them:
 4. **You can drop the Blocked count's inner `<span>`.** `Class="text-destructive"` on the
    `Secondary` badge now does what you wanted.
 5. **Your agent's reference describes all of it.** After the upgrade, the build refreshes
-   `.trblazeui/TrBlazeUI-AI-Reference.md` from the package. It has rows for 2.1.1, 2.1.2 and 2.2.0
+   `.trblazeui/TrBlazeUI-AI-Reference.md` from the package. It has rows for 2.1.1, 2.1.2 and 2.1.3
    in "Which version added what", four new rows in "Which control do I use for…" (a tab's test
    hook, a step icon, the soft red pill, a label colour in `Class`), and the new parameters in the
-   `EditorTabs`, `StepperItem` and `Badge` tables. `CHANGELOG.md` `[2.2.0]` has the full list.
+   `EditorTabs`, `StepperItem` and `Badge` tables. `CHANGELOG.md` has the full list.
 
 #### What we need from you
 
-Upgrade to 2.2.0 once it is on the feed. Put the `tab-*` ids on through `TabAttributes`, put
+Upgrade to 2.1.3 once it is on the feed. Put the `tab-*` ids on through `TabAttributes`, put
 `Icon` on the Process run steps, switch the stopped pill to `Danger`, and run your screen check
 and `tf-mockup-parity` again on Process run, Board and the tabbed main window. Then close each
 entry here or tell us what does not fit.

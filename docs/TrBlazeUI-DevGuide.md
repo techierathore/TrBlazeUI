@@ -1,7 +1,7 @@
 # TrBlazeUI — Developer Guide (as-built screen map)
 
-**Last updated:** 2026-10-07 (handoff — as-built at 2.2.0)
-**Verification status:** ✅ **RUNTIME-VERIFIED.** On **2026-10-07** the anonymous demo visitor drove the 11 screens of the Chatur controls (§3, 2.0.8 to 2.2.0 screens) at 1366 and 390 wide: all render, 0 console errors, 0 sideways scroll. Before that, the visitor drove the 8 screens changed by the TfLens passes on **2026-09-13** at 1366 and 390 wide, plus the phone menu at 390: all render, 0 console errors, 0 sideways scroll (screenshots in §6.3). Acceptance suite 33/33; Release build **0 warnings / 0 errors**. Earlier screens were last runtime-verified on 2026-08-25.
+**Last updated:** 2026-10-07 (handoff — as-built source)
+**Verification status:** ✅ **RUNTIME-VERIFIED.** On **2026-10-07** the anonymous demo visitor drove the 11 screens of the Chatur controls (§3, Chatur screens) at 1366 and 390 wide: all render, 0 console errors, 0 sideways scroll. Before that, the visitor drove the 8 screens changed by the TfLens passes on **2026-09-13** at 1366 and 390 wide, plus the phone menu at 390: all render, 0 console errors, 0 sideways scroll (screenshots in §6.3). Acceptance suite 33/33; Release build **0 warnings / 0 errors**. Earlier screens were last runtime-verified on 2026-08-25.
 
 > **What this document is.** The screen-by-screen, as-built map a developer uses to chase a bug or catch AI-hallucinated code. TrBlazeUI is a **component library with a demo application** and has **no database, no API, no stored procedures, and no auth** — so the usual *page → service → data-access → proc* lineage collapses to **demo page → demo-shared composition → library component → primitive → JS interop / service**. There is exactly one role: the **anonymous demo visitor**.
 
@@ -129,13 +129,13 @@ Call chain (badge classes): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → 
 | `DataTableColumn.Align` | `{unresolved — the parameter was not found under that name in DataTable/*.cs; the column behaviour itself is runtime-verified by req-ui-020.spec.ts TR-031}` | — | — |
 | `SidebarProvider` width parameters | `{unresolved — Width/MobileWidth/IconWidth not found under those names in SidebarProvider.razor.cs; the 288px phone menu is runtime-verified}` | — | — |
 
-### 2.0.8 to 2.2.0 screens (Chatur — REQ-UI-021…REQ-UI-032 — runtime-verified 2026-10-07)
+### Chatur screens (Chatur — REQ-UI-021…REQ-UI-032 — runtime-verified 2026-10-07)
 
 | Screen | Route | Demo page file | Library surface exercised | Seen 2026-10-07 |
 |--------|-------|----------------|---------------------------|-----------------|
-| Code Editor | `/components/code-editor` | `Pages/Components/CodeEditorDemo.razor` | `CodeEditor`, `EditorTabs` (`TabAttributes`, 2.2.0) | renders at 1366 and 390; tabs carry `tab-program-cs` etc. |
-| Stepper | `/components/stepper` | `Pages/Components/StepperDemo.razor` | `StepperItem` (`Status`, `Trailing`, `Icon` 2.2.0) | renders at 1366 and 390 |
-| Badge | `/components/badge` | `Pages/Components/BadgeDemo.razor` | `Badge` (`Danger` 2.2.0) → `ClassNames.cn` → `TailwindMerge` | renders at 1366 and 390 |
+| Code Editor | `/components/code-editor` | `Pages/Components/CodeEditorDemo.razor` | `CodeEditor`, `EditorTabs` (`TabAttributes`) | renders at 1366 and 390; tabs carry `tab-program-cs` etc. |
+| Stepper | `/components/stepper` | `Pages/Components/StepperDemo.razor` | `StepperItem` (`Status`, `Trailing`, `Icon`) | renders at 1366 and 390 |
+| Badge | `/components/badge` | `Pages/Components/BadgeDemo.razor` | `Badge` (`Danger`) → `ClassNames.cn` → `TailwindMerge` | renders at 1366 and 390 |
 | Switch | `/components/switch` | `Pages/Components/SwitchDemo.razor` | `Switch` (`Outlined`, 2.1.2) | renders at 1366 and 390 |
 | Toggle Group | `/components/toggle-group` | `Pages/Components/ToggleGroupDemo.razor` | `ToggleGroup` (`Joined` 2.0.8, `OnVariant` 2.1.0) | renders at 1366 and 390 |
 | DataTable | `/components/datatable` | `Pages/Components/DataTableDemo.razor` | `DataTable` (`RowAttributes`/`HeaderRowAttributes`/`SelectAllAttributes` 2.1.0, `SelectedCount` 2.0.9) | renders at 1366 and 390 |
@@ -149,7 +149,7 @@ Call chain (tab attributes): `EditorTabs.razor` `@foreach` over `Items` → `Tab
 
 Call chain (step icon): `StepperItem.razor` marker `<span data-slot="stepper-item-marker">` → `Icon` when set, else `MarkerText` → `MarkerCssClass` adds `[&_svg]:size-4`.
 
-Call chain (badge colour): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → `TailwindMerge.Merge` → `ComputeBaseUtilityGroup` → `TextColorRegex` (hyphenated colours are one group as of 2.2.0).
+Call chain (badge colour): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → `TailwindMerge.Merge` → `ComputeBaseUtilityGroup` → `TextColorRegex` (hyphenated colours are one group).
 
 **Where to break**
 
@@ -186,7 +186,7 @@ A reader chasing a bug starts at the demo page, drops into the styled component 
 
 ## 5. Known issues
 
-- **✅ FIXED 2026-10-07, ships in 2.2.0 — Chatur TR-015…TR-017 (`REQ-UI-030`…`REQ-UI-032`).** `EditorTabs.TabAttributes`, `StepperItem.Icon`, `BadgeVariant.Danger`, and `cn()` grouping hyphenated text colours. ⚠ Visible effect of the last: an Outline `Toggle`/`ToggleGroupItem` hovers with `--accent-foreground` text, and a `NavList` selected row uses `--accent-foreground`. Verified by `tests/verify/req-ui-030.spec.ts` 3/3 and a class diff over all 125 demo routes.
+- **✅ FIXED 2026-10-07, not yet released — Chatur TR-015…TR-017 (`REQ-UI-030`…`REQ-UI-032`).** `EditorTabs.TabAttributes`, `StepperItem.Icon`, `BadgeVariant.Danger`, and `cn()` grouping hyphenated text colours. ⚠ Visible effect of the last: an Outline `Toggle`/`ToggleGroupItem` hovers with `--accent-foreground` text, and a `NavList` selected row uses `--accent-foreground`. Verified by `tests/verify/req-ui-030.spec.ts` 3/3 and a class diff over all 125 demo routes.
 
 - **⚠ DevGuide 2026-09-13 — test page layout (`REQ-UI-020`):** on `/verify-tflens-3`, `demos/TrBlazeUI.Demo.Shared/Pages/VerifyTfLens3.razor` (the TR-038 badge matrix), the default Secondary and Destructive badges hold their label on one line as designed and spill out of their 150px boxes over the Truncate column at 1280. Test page only; it ships in no package.
 - **✅ FIXED 2026-09-12 and 2026-09-13, shipped in 2.0.6 — TfLens TR-028…TR-038 (`REQ-UI-020`, `REQ-UI-001`).** Chart `Options`/`OptionsConfigurator`/`ChartContainer.Bare`; chart data labels in the short form; `Badge.As`/`Wrap`/`Truncate`; `DataTableColumn.Align`; the `url(` class guard; `DataTable` `SearchText`/`ShowColumnChooser`; the phone sidebar width; and the circuit-teardown exception in `SelectContent` and five sibling primitives. Verified by `ui-tflens-2.spec.js` 37/37, `ui-tflens-3.spec.js` 70/70 and `req-ui-020.spec.ts`.
@@ -315,4 +315,4 @@ Captured from the booted Blazor Server demo via headless Chromium (Playwright). 
 ![Badge at 390](screenshots/TrBlazeUI/badge-mobile.png)
 
 ---
-Last updated: 2026-10-07 (handoff, 2.2.0 as-built) · RUNTIME-VERIFIED — 11 Chatur-control screens on 2026-10-07 at 1366 and 390; 8 changed screens plus the phone menu on 2026-09-13 at 1366 and 390; the 2.1.0-era screens 25/25 on 2026-08-11; screenshots in docs/screenshots/TrBlazeUI/
+Last updated: 2026-10-07 (handoff, as-built source) · RUNTIME-VERIFIED — 11 Chatur-control screens on 2026-10-07 at 1366 and 390; 8 changed screens plus the phone menu on 2026-09-13 at 1366 and 390; the 2.1.0-era screens 25/25 on 2026-08-11; screenshots in docs/screenshots/TrBlazeUI/
