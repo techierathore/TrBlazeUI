@@ -54,7 +54,7 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-NFR-005 | Clean Release build (0 warnings / 0 errors, warnings-as-errors) | Verified | 100% | 2026-10-02 verify: PASS — test `Non-functional requirements REQ-NFR-005 the Release build is` | [view](#d-req-nfr-005) |
 | REQ-UI-020 | TfLens post-2.1.0 consumer-feedback fixes (TR-028…TR-035) | Verified | 100% | 2026-10-02 verify: PASS — test `REQ-UI-020 — TfLens post-2.1.0 consumer-feedback fixes (TR-0` | [d](#d-req-ui-020) |
 | REQ-UI-021 | Chatur consumer-feedback fixes (TR-001…TR-004): ScrollArea StickToEnd, TreeView, DiffView, ToggleGroup | Verified | 100% | 2026-10-02 verify: PASS — test `REQ-UI-021 — Chatur consumer-feedback fixes (TR-001…TR-004) ` | [d](#d-req-ui-021) |
-| REQ-UI-022 | Editable code area and an open-file tab strip (CodeEditor, EditorTabs) | Verified | 100% | 2026-10-02 verify: PASS — test `Chatur batch 2 — consumer-feedback fixes REQ-UI-022 CodeEdit` | [d](#d-req-ui-022) |
+| REQ-UI-022 | Editable code area and an open-file tab strip (CodeEditor, EditorTabs) | Verified | 100% | 2026-10-07 verify: PASS — test `Chatur batch 2 — consumer-feedback fixes REQ-UI-022 CodeEdit` | [d](#d-req-ui-022) |
 | REQ-UI-023 | Inline indicator for work under way with no known end (Typing, Progress.Indeterminate) | Verified | 100% | 2026-10-02 verify: PASS — test `Chatur batch 2 — consumer-feedback fixes REQ-UI-023 Typing s` | [d](#d-req-ui-023) |
 | REQ-UI-024 | Panel for the output of a running command (LogView) | Verified | 100% | 2026-10-02 verify: PASS — test `Chatur batch 2 — consumer-feedback fixes REQ-UI-024 LogView ` | [d](#d-req-ui-024) |
 | REQ-UI-025 | List that drives a detail pane (NavList) | Verified | 100% | 2026-10-02 verify: PASS — test `Chatur batch 2 — consumer-feedback fixes REQ-UI-025 NavList ` | [d](#d-req-ui-025) |
@@ -65,6 +65,7 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-UI-030 | Each tab in EditorTabs can carry its own attributes through TabAttributes (Chatur TR-015) | Verified | 100% | 2026-10-07 verify: PASS — test `Chatur batch 5 — consumer-feedback fixes (TR-015…TR-017) REQ` | [d](#d-req-ui-030) |
 | REQ-UI-031 | A Stepper step can show an icon in its marker through Icon (Chatur TR-016) | Verified | 100% | 2026-10-07 verify: PASS — test `Chatur batch 5 — consumer-feedback fixes (TR-015…TR-017) REQ` | [d](#d-req-ui-031) |
 | REQ-UI-032 | Badge has a soft red Danger variant, and a text colour in Class replaces the variant's (Chatur TR-017) | Verified | 100% | 2026-10-07 verify: PASS — test `Chatur batch 5 — consumer-feedback fixes (TR-015…TR-017) REQ` | [d](#d-req-ui-032) |
+| REQ-UI-033 | EditorTabs close mark can be drawn by the consumer through CloseContent (Chatur TR-018) | Verified | 100% | 2026-10-07 verify: PASS — test `Chatur batch 6 — consumer-feedback fix (TR-018) REQ-UI-033 C` | [d](#d-req-ui-033) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -311,6 +312,10 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 - <a id="d-req-ui-032"></a> **REQ-UI-032** (extends BRD-28 Badge) Badge has a soft red Danger variant, and a text colour in Class replaces the variant's (Chatur TR-017)
   - *Acceptance:* When a consumer sets Variant Danger on the Badge demo screen, then the badge paints the danger tint, and a text colour in Class replaces the variant's.
   - *Mockup:* [mockups/process-run.html](mockups/process-run.html), the stopped state pill (`.pill.bad`); copied unchanged from Chatur's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-033"></a> **REQ-UI-033** (extends BRD-15 Tabs) EditorTabs close mark can be drawn by the consumer through CloseContent (Chatur TR-018)
+  - *Acceptance:* When a consumer passes CloseContent on the Code Editor demo screen, then each tab's close button draws that content in place of the svg and keeps its accessible name.
+  - *Mockup:* [mockups/process-run.html](mockups/process-run.html), the main-window tab anchor `tab-process-run` whose close mark is a text × (`.tab .x` in `mockups/chatur.css`); copied unchanged from Chatur's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
 
 
 ## Editor

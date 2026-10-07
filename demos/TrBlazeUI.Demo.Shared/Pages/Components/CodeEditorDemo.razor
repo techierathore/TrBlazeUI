@@ -80,6 +80,42 @@
         </div>
     </div>
 
+    <!-- Drawing the close mark yourself -->
+    <div class="space-y-4" data-testid="close-content-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Drawing the close mark yourself</h2>
+            <p class="text-sm text-muted-foreground">
+                A mockup that draws the close mark as a text × rather than an icon is matched with
+                <code class="bg-muted px-1 py-0.5 rounded">CloseContent</code>: what you put in it
+                replaces the built-in svg inside every tab's close button. The button's accessible
+                name ("Close Processes") is unchanged, so the content needs no label of its own.
+            </p>
+        </div>
+
+        <div class="overflow-hidden rounded-md border">
+            <EditorTabs Items="@WindowTabs"
+                        ActiveId="@objActiveWindowId"
+                        ActiveIdChanged="HandleActiveWindowChanged"
+                        OnClose="HandleWindowCloseAsync"
+                        TabAttributes="WindowTabHooks"
+                        AriaLabel="Open windows"
+                        data-testid="editor-tabs-text-close">
+                <CloseContent>×</CloseContent>
+            </EditorTabs>
+        </div>
+
+        <div class="grid gap-4 text-sm sm:grid-cols-2">
+            <div class="rounded-md border p-4">
+                <p class="text-muted-foreground">Active window</p>
+                <p class="font-mono" data-testid="text-close-active">@(objActiveWindowId ?? "none")</p>
+            </div>
+            <div class="rounded-md border p-4">
+                <p class="text-muted-foreground">Last closed</p>
+                <p class="font-mono" data-testid="text-close-last-closed">@(objLastClosedWindow ?? "none")</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Tab indentation -->
     <div class="space-y-4" data-testid="indent-section">
         <div class="space-y-2">
@@ -130,6 +166,11 @@
         <h2 class="text-2xl font-semibold">Usage</h2>
         <pre class="overflow-x-auto rounded-md border bg-muted/30 p-4 text-xs"><code>&lt;EditorTabs Items="@@openFiles" @@bind-ActiveId="activeId" OnClose="CloseAsync"
             TabAttributes="@@(t =&gt; new Dictionary&lt;string, object&gt; { ["data-testid"] = $"tab-{t.Id}" })" /&gt;
+
+@@* The close mark as a text glyph instead of the built-in svg icon *@@
+&lt;EditorTabs Items="@@openFiles" @@bind-ActiveId="activeId" OnClose="CloseAsync"&gt;
+    &lt;CloseContent&gt;×&lt;/CloseContent&gt;
+&lt;/EditorTabs&gt;
 
 &lt;CodeEditor @@bind-Value="text"
             Language="csharp"
@@ -182,6 +223,7 @@
                 <p><strong>OnSelect:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback&lt;EditorTabItem&gt;</code> - A tab was clicked</p>
                 <p><strong>OnClose:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback&lt;EditorTabItem&gt;</code> - A close button was pressed; the caller removes the tab</p>
                 <p><strong>TabAttributes:</strong> <code class="bg-muted px-1 py-0.5 rounded">Func&lt;EditorTabItem, IReadOnlyDictionary&lt;string, object&gt;?&gt;?</code> - HTML attributes for each tab's <code class="bg-muted px-1 py-0.5 rounded">li</code>, such as its own data-testid; a class entry is merged with the tab's classes</p>
+                <p><strong>CloseContent:</strong> <code class="bg-muted px-1 py-0.5 rounded">RenderFragment?</code> - Drawn inside every tab's close button in place of the built-in svg, such as a text ×; the button's accessible name is unchanged (default null keeps the svg)</p>
                 <p><strong>AriaLabel:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - Name of the strip (default "Open files")</p>
                 <p><strong>Class / additional attributes:</strong> Merged classes, and any HTML attribute forwarded to the root</p>
             </div>
@@ -247,6 +289,12 @@
 
     private string? objLastClosed;
 
+    private readonly List<string> objOpenWindowIds = ["Processes", "Board", "Process run"];
+
+    private string? objActiveWindowId = "Process run";
+
+    private string? objLastClosedWindow;
+
     private string? objSnippet =
         "{\n" +
         "  \"name\": \"trblazeui\",\n" +
@@ -275,7 +323,32 @@
             ["class"] = "demo-tab-hooked"
         };
 
+    private IReadOnlyList<EditorTabItem> WindowTabs =>
+        objOpenWindowIds.Select(vId => new EditorTabItem(vId, vId)).ToList();
+
+    // "Process run" -> data-testid="tab-text-process-run", the shape the mockup's main window uses.
+    private static IReadOnlyDictionary<string, object>? WindowTabHooks(EditorTabItem aItem) =>
+        new Dictionary<string, object>
+        {
+            ["data-testid"] = "tab-text-" + aItem.Id.Replace(' ', '-').ToLowerInvariant()
+        };
+
     private void HandleActiveChanged(string? aId) => objActiveId = aId;
+
+    private void HandleActiveWindowChanged(string? aId) => objActiveWindowId = aId;
+
+    private Task HandleWindowCloseAsync(EditorTabItem aItem)
+    {
+        objOpenWindowIds.Remove(aItem.Id);
+        objLastClosedWindow = aItem.Label;
+
+        if (string.Equals(objActiveWindowId, aItem.Id, StringComparison.Ordinal))
+        {
+            objActiveWindowId = objOpenWindowIds.Count > 0 ? objOpenWindowIds[0] : null;
+        }
+
+        return Task.CompletedTask;
+    }
 
     private void HandleTextChanged(string? aText)
     {

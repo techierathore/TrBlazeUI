@@ -133,7 +133,7 @@ Call chain (badge classes): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → 
 
 | Screen | Route | Demo page file | Library surface exercised | Seen 2026-10-07 |
 |--------|-------|----------------|---------------------------|-----------------|
-| Code Editor | `/components/code-editor` | `Pages/Components/CodeEditorDemo.razor` | `CodeEditor`, `EditorTabs` (`TabAttributes`) | renders at 1366 and 390; tabs carry `tab-program-cs` etc. |
+| Code Editor | `/components/code-editor` | `Pages/Components/CodeEditorDemo.razor` | `CodeEditor`, `EditorTabs` (`TabAttributes`, `CloseContent`) | renders at 1366 and 390; tabs carry `tab-program-cs` etc.; the second strip draws a text × close mark |
 | Stepper | `/components/stepper` | `Pages/Components/StepperDemo.razor` | `StepperItem` (`Status`, `Trailing`, `Icon`) | renders at 1366 and 390 |
 | Badge | `/components/badge` | `Pages/Components/BadgeDemo.razor` | `Badge` (`Danger`) → `ClassNames.cn` → `TailwindMerge` | renders at 1366 and 390 |
 | Switch | `/components/switch` | `Pages/Components/SwitchDemo.razor` | `Switch` (`Outlined`, 2.1.2) | renders at 1366 and 390 |
@@ -147,6 +147,8 @@ Call chain (badge classes): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → 
 
 Call chain (tab attributes): `EditorTabs.razor` `@foreach` over `Items` → `TabAttributes(vItem)` → `SplitTabAttributes` → `class` merged through `ClassNames.cn`, the rest splatted on the tab's `<li>`.
 
+Call chain (close mark): `EditorTabs.razor` close `<button data-slot="editor-tab-close">` → `CloseContent` when set, else the built-in 12px svg; the button's `aria-label`, classes and `@onclick` are outside the branch, so they never change.
+
 Call chain (step icon): `StepperItem.razor` marker `<span data-slot="stepper-item-marker">` → `Icon` when set, else `MarkerText` → `MarkerCssClass` adds `[&_svg]:size-4`.
 
 Call chain (badge colour): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → `TailwindMerge.Merge` → `ComputeBaseUtilityGroup` → `TextColorRegex` (hyphenated colours are one group).
@@ -156,7 +158,9 @@ Call chain (badge colour): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → `
 | File:line | Function | Watch | It should hold |
 |---|---|---|---|
 | `src/TrBlazeUI.Components/Components/CodeEditor/EditorTabs.razor:26` | tab loop | `vTab` | the caller's attributes for this tab, with `class` split out |
-| `src/TrBlazeUI.Components/Components/CodeEditor/EditorTabs.razor:195` | `SplitTabAttributes` | `vCssClass`, `vRest` | the `class` entry alone, then every other entry |
+| `src/TrBlazeUI.Components/Components/CodeEditor/EditorTabs.razor:231` | `SplitTabAttributes` | `vCssClass`, `vRest` | the `class` entry alone, then every other entry |
+| `src/TrBlazeUI.Components/Components/CodeEditor/EditorTabs.razor:54` | close button markup | `CloseContent` | non-null draws the caller's content and no svg; the `aria-label` beside it is unchanged either way |
+| `src/TrBlazeUI.Components/Components/CodeEditor/EditorTabs.razor:178` | `CloseContent` parameter | `CloseContent` | `null` unless the caller gave `<CloseContent>` |
 | `src/TrBlazeUI.Components/Components/Stepper/StepperItem.razor:18` | marker markup | `Icon` | non-null draws the icon and no glyph text |
 | `src/TrBlazeUI.Components/Components/Stepper/StepperItem.razor:173` | `MarkerCssClass` | the class string | `[&_svg]:size-4 [&_svg]:shrink-0` only when `Icon` is set |
 | `src/TrBlazeUI.Components/Components/Badge/Badge.razor.cs:165` | `CssClass` (Danger arm) | the variant classes | `border-alert-danger/30 bg-alert-danger-bg text-alert-danger-foreground` |
@@ -186,7 +190,8 @@ A reader chasing a bug starts at the demo page, drops into the styled component 
 
 ## 5. Known issues
 
-- **✅ FIXED 2026-10-07, not yet released — Chatur TR-015…TR-017 (`REQ-UI-030`…`REQ-UI-032`).** `EditorTabs.TabAttributes`, `StepperItem.Icon`, `BadgeVariant.Danger`, and `cn()` grouping hyphenated text colours. ⚠ Visible effect of the last: an Outline `Toggle`/`ToggleGroupItem` hovers with `--accent-foreground` text, and a `NavList` selected row uses `--accent-foreground`. Verified by `tests/verify/req-ui-030.spec.ts` 3/3 and a class diff over all 125 demo routes.
+- **✅ FIXED 2026-10-07, not yet released — Chatur TR-018 (`REQ-UI-033`).** `EditorTabs.CloseContent` draws the consumer's own close mark (a text `×`) in place of the svg; the button's `aria-label`, `data-slot` and click are unchanged. Verified by `tests/verify/req-ui-033.spec.ts`.
+- **✅ FIXED 2026-10-07, shipped in 2.1.3 — Chatur TR-015…TR-017 (`REQ-UI-030`…`REQ-UI-032`).** `EditorTabs.TabAttributes`, `StepperItem.Icon`, `BadgeVariant.Danger`, and `cn()` grouping hyphenated text colours. ⚠ Visible effect of the last: an Outline `Toggle`/`ToggleGroupItem` hovers with `--accent-foreground` text, and a `NavList` selected row uses `--accent-foreground`. Verified by `tests/verify/req-ui-030.spec.ts` 3/3 and a class diff over all 125 demo routes.
 
 - **⚠ DevGuide 2026-09-13 — test page layout (`REQ-UI-020`):** on `/verify-tflens-3`, `demos/TrBlazeUI.Demo.Shared/Pages/VerifyTfLens3.razor` (the TR-038 badge matrix), the default Secondary and Destructive badges hold their label on one line as designed and spill out of their 150px boxes over the Truncate column at 1280. Test page only; it ships in no package.
 - **✅ FIXED 2026-09-12 and 2026-09-13, shipped in 2.0.6 — TfLens TR-028…TR-038 (`REQ-UI-020`, `REQ-UI-001`).** Chart `Options`/`OptionsConfigurator`/`ChartContainer.Bare`; chart data labels in the short form; `Badge.As`/`Wrap`/`Truncate`; `DataTableColumn.Align`; the `url(` class guard; `DataTable` `SearchText`/`ShowColumnChooser`; the phone sidebar width; and the circuit-teardown exception in `SelectContent` and five sibling primitives. Verified by `ui-tflens-2.spec.js` 37/37, `ui-tflens-3.spec.js` 70/70 and `req-ui-020.spec.ts`.

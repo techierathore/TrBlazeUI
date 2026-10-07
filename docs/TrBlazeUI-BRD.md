@@ -79,7 +79,7 @@ Written by the status gate after every build, verify and handoff; not by hand.
 | UI / Pages | 19 | 19 | 0 | Done |
 | Functional requirements | 10 | 10 | 0 | Done |
 | Non-functional | 5 | 5 | 0 | Done |
-| Component demos | 9 | 9 | 0 | Done |
+| Component demos | 10 | 10 | 0 | Done |
 | Editor | 1 | 1 | 0 | Done |
 | Chat | 1 | 1 | 0 | Done |
 | Run | 1 | 1 | 0 | Done |

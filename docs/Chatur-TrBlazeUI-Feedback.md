@@ -4,11 +4,11 @@
 |---|---|
 | App | Chatur |
 | Upstream | TrBlazeUI |
-| Updated | 2026-10-06 |
+| Updated | 2026-10-07 |
 
 ## Summary
 
-17 entries: 1 blocking (TR-015 tab attributes, 22 phase 2 rows), 2 open and not blocking (TR-016 icon in a Stepper marker, TR-017 soft red Badge), 3 fixed upstream (TR-011, TR-012, TR-013), 11 closed.
+18 entries: 1 blocking (TR-018, fixed upstream, awaiting re-check; blocks 22 phase 2 rows until 2.1.4), 3 fixed upstream (TR-011 to TR-013), 14 closed (TR-015 to TR-017 on 2.1.3, 2026-10-07).
 
 All ten were answered on 2026-09-22 and all ten have now been re-checked in Chatur against
 2.0.9. Six were fixed in code; four needed no code, because the control already existed. Each
@@ -204,6 +204,8 @@ The first ten were found on day one, against the 2.0.7 reference; each entry say
 
 ### TR-015 — A tab in EditorTabs cannot carry its own attributes, such as a test id
 
+> ✅ **Closed 2026-10-07** — re-checked here: TrBlazeUI 2.1.3, `TabAttributes` on the main window's EditorTabs gives `tab-processes`, `tab-board`, `tab-process-run`, `tab-agent-workspace` and `tab-<file name without extension>`. `tf-verify-screens.sh` on the four phase 2 screens at 1280 and 390: render OK, visual OK, no missing `tab-*` anchor. workbench-files.spec.ts and all six phase 2 specs pass (48 of 48).
+
 - **Status:** fixed upstream 2026-10-07 (`EditorTabs.TabAttributes`, in 2.1.3 — see the 2026-10-07 reply), filed 2026-10-06
 - **Severity:** minor
 - **Blocks:** yes — the screens work and tests find a tab by its label, but the verifier's screen check needs the mockups' `tab-*` ids on the page, so all 22 phase 2 rows (REQ-FN-049..060, REQ-UI-045..054) cannot reach Verified until a tab can carry its id.
@@ -215,6 +217,8 @@ The first ten were found on day one, against the 2.0.7 reference; each entry say
 - **Suggested fix:** add `TabAttributes` (`Func<TItem, IReadOnlyDictionary<string, object>?>`) to `EditorTabs`, applied to each tab's root element.
 
 ### TR-016 — A step in Stepper cannot show an icon in its marker
+
+> ✅ **Closed 2026-10-07** — re-checked here: TrBlazeUI 2.1.3, each Process run step uses `StepperItem.Icon` (check, spinning loader-circle, pause, x, clock). Screenshots run-stopped-390.png and run-verdicts-1280.png show the vector marks in the circles; `tf-mockup-parity.sh` no longer reports "mockup carries an icon here" for `run-step-1` to `run-step-7`.
 
 - **Status:** fixed upstream 2026-10-07 (`StepperItem.Icon`, in 2.1.3 — see the 2026-10-07 reply), filed 2026-10-06
 - **Severity:** minor
@@ -228,6 +232,8 @@ The first ten were found on day one, against the 2.0.7 reference; each entry say
 
 ### TR-017 — Badge has no soft red variant, and a text colour in Class cannot override a variant's
 
+> ✅ **Closed 2026-10-07** — re-checked here: TrBlazeUI 2.1.3, the stopped state and a failed step use `BadgeVariant.Danger` (soft red pill in run-stopped-390.png); the Board's Blocked count is `Class="text-destructive"` on a Secondary badge with the inner span removed, and reads red. Note: Chatur's theme tint tokens (`--alert-*-bg` and `-foreground`) stay. With them removed, `tf-mockup-parity.sh` reports Success and Warning pills as neutral (count-verified, right-*, run-step-*), because the library's own tints are paler than the mockup's 16 to 18 percent hue.
+
 - **Status:** fixed upstream 2026-10-07 (`BadgeVariant.Danger`, and a `Class` text colour now replaces the variant's, in 2.1.3 — see the 2026-10-07 reply), filed 2026-10-06
 - **Severity:** minor
 - **Blocks:** no — a failed or stopped state shows as `Destructive`, a solid red pill, and reads clearly; only its weight differs from the mockup's tinted pill.
@@ -238,9 +244,66 @@ The first ten were found on day one, against the 2.0.7 reference; each entry say
 - **Workaround:** none for the pill; the Blocked count's label colour is set on an inner `<span>`, which is ordinary markup, not a replacement for a control.
 - **Suggested fix:** add `Danger` to `BadgeVariant` with `border-alert-danger/30 bg-alert-danger-bg text-alert-danger-foreground`, and let `cn()` treat `text-*` colour classes as one group so a `Class` colour replaces the variant's.
 
+### TR-018 — A tab's close button draws an svg icon where the mockup draws a × glyph
+
+- **Status:** fixed upstream 2026-10-07 (`EditorTabs.CloseContent`, in 2.1.4 — see the later 2026-10-07 reply), filed 2026-10-07
+- **Severity:** minor
+- **Blocks:** yes — the close button works and is named for a screen reader, but the mockup comparison fails on every tab, so none of the 22 phase 2 rows (REQ-FN-049..060, REQ-UI-045..054) can reach Verified while the tab's close mark differs from the mockups' ×.
+- **Repro:** TrBlazeUI 2.1.3 `EditorTabs` on the main window; `tf-mockup-parity.sh` for Processes, Process run, Board and Agent workspace.
+- **Expected:** the tab matches the mockups' `tab-*` anchors, which end in a text × (`Processes×`).
+- **Actual:** parity reports "app carries an icon the mockup does not" for `tab-processes`, `tab-process-run`, `tab-board` and `tab-agent-workspace` at 1280, because the close button holds an svg. This appeared only once TR-015 let the tabs carry their ids.
+- **Encountered in:** REQ-UI-045, REQ-UI-047, REQ-UI-049, REQ-UI-053
+- **Workaround:** none; the close button is the library's own. The mockups could instead draw the svg.
+- **Suggested fix:** add `EditorTabs.CloseContent` (`RenderFragment?`, default the current svg) so an app can draw the close mark as its mockup does, e.g. a text `×`.
+
 ## Replies from TrBlazeUI
 
 <!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
+
+### 2026-10-07, later the same day — TR-018 is fixed; it ships in 2.1.4
+
+Fixed and tested in the library on the day it was filed. It ships in **2.1.4** on GitHub Packages
+(`https://nuget.pkg.github.com/techierathore/index.json`). When this reply was written, the fix was
+built and verified but the release had not been cut yet. If the feed still stops at 2.1.3, wait for
+2.1.4; do not change the mockups to draw the svg.
+
+| Entry | State | What you get |
+|---|---|---|
+| **TR-018** a tab's close button draws an svg where the mockup draws × | fixed | `EditorTabs` gains `CloseContent`, a `RenderFragment`. What you put in it is drawn inside every tab's close button in place of the svg. Left out, the svg is drawn as before, so nothing you have changes until you opt in. |
+
+```razor
+<EditorTabs Items="@objTabs" @bind-ActiveId="objActiveTab"
+            TabAttributes="@(t => new Dictionary<string, object> { ["data-testid"] = $"tab-{t.Id}" })">
+    <CloseContent>×</CloseContent>
+</EditorTabs>
+```
+
+Things to know before you use it:
+
+1. **Only the button's content changes.** The close button keeps `data-slot="editor-tab-close"`, its
+   accessible name `aria-label="Close <label>"`, its hover and focus classes and its click. So put a
+   plain text `×` in `CloseContent`, as the mockup's `.tab .x` holds; do not give it a label of its
+   own and do not wrap it in a button. Your existing selector `[data-slot="editor-tab-close"]` still
+   finds it.
+2. **One mark for the whole strip.** `CloseContent` is drawn on every tab. There is no per-tab
+   version, because every mockup tab draws the same ×; tell us if a tab needs a different one.
+3. **The glyph takes the surrounding font size.** The svg was a fixed 12px; a text × is drawn at the
+   font size the strip inherits, inside the same 20px button. If it reads too large or too small
+   against the mockup, size it yourself: `<CloseContent><span class="text-xs">×</span></CloseContent>`.
+4. **Your agent's reference describes it.** After the upgrade, the build refreshes
+   `.trblazeui/TrBlazeUI-AI-Reference.md`: "Which version added what" has a 2.1.3 row for TR-015 to
+   TR-017 and an "After 2.1.3" row for this, "Which control do I use for…" has a row for the close
+   mark, and the `EditorTabs` table has the parameter. `CHANGELOG.md` has the full list.
+
+#### What we need from you
+
+Upgrade to 2.1.4 once it is on the feed, add `<CloseContent>×</CloseContent>` to the main window's
+`EditorTabs`, and run your screen check and `tf-mockup-parity` again on Processes, Process run, Board
+and Agent workspace at 1280 and 390. Then close this entry here
+(`bash .tfcore/utils/tf-feedback.sh Chatur --close TR-018 "<what you ran and what it showed>"`) or
+tell us what does not fit.
+
+---
 
 ### 2026-10-07 — TR-015, TR-016 and TR-017 are fixed in 2.1.3
 
