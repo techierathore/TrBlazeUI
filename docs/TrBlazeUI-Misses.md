@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | App | TrBlazeUI |
-| Count | 58 logged: 10 open, 42 fixed, 0 will not fix, 6 withdrawn |
+| Count | 60 logged: 10 open, 43 fixed, 0 will not fix, 7 withdrawn |
 | Source | `docs/metrics/misses.jsonl`, one row per miss record. Rewritten by `tf-misses-md.sh` on every new record. Never edit it: a wrong row is corrected by a new record. |
 | Updated | 2026-10-07 |
 
@@ -24,10 +24,11 @@
 | MISS-TrBlazeUI-20260912-09 (REQ-UI-008) | 2026-09-12 by owner | the check was too weak | TfLens TR-028 (High, reproduced live on /charts/bar @1280): BarChart exposes no axis, grid or data-label control and no route to ApexChartOptions, so a chart cannot be made to match an approved design. Measured: 32 .apexcharts-gridline and 30 .apexcharts-yaxis-label rendered with no parameter to tur |
 | MISS-TrBlazeUI-20260912-08 (REQ-UI-020) | 2026-09-12 by owner | the app's spec | TfLens post-2.1.0 consumer-feedback fixes (TR-028…TR-035) |
 
-## Fixed (42)
+## Fixed (43)
 
 | Miss | Found | Closed | Whose gap | What went wrong |
 |---|---|---|---|---|
+| MISS-TrBlazeUI-20261007-05 (REQ-UI-033) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | EditorTabs close mark can be drawn by the consumer through CloseContent (Chatur TR-018) |
 | MISS-TrBlazeUI-20261007-03 (REQ-UI-032) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | Badge has a soft red Danger variant, and a text colour in Class replaces the variant's (Chatur TR-017) |
 | MISS-TrBlazeUI-20261007-02 (REQ-UI-031) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | A Stepper step can show an icon in its marker through Icon (Chatur TR-016) |
 | MISS-TrBlazeUI-20261007-01 (REQ-UI-030) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | Each tab in EditorTabs can carry its own attributes through TabAttributes (Chatur TR-015) |
@@ -71,10 +72,11 @@
 | MISS-TrBlazeUI-20260831-02 (REQ-UI-004) | 2026-08-31 by library-feedback | 2026-08-31 by fix-issues | not sorted | no sentence recorded (partial-implementation, src, why: insufficient-verify-method) |
 | MISS-TrBlazeUI-20260831-01 (REQ-UI-001) | 2026-08-31 by library-feedback | 2026-08-31 by fix-issues | not sorted | no sentence recorded (wrong-behaviour, src, why: insufficient-verify-method) |
 
-## Withdrawn — logged in error (6)
+## Withdrawn — logged in error (7)
 
 | Miss | Found | Closed | Whose gap | What went wrong |
 |---|---|---|---|---|
+| MISS-TrBlazeUI-20261007-04 (REQ-FN-011) | 2026-10-07 by owner | 2026-10-07: logged under the FN prefix by mistake (a component parameter is a UI row); re-logged as REQ-UI-033 | the app's spec | EditorTabs close mark can be drawn by the consumer through CloseContent (Chatur TR-018) |
 | MISS-TrBlazeUI-20260922-01 (REQ-UI-021) | 2026-09-22 by owner | 2026-09-22: REQ-UI-021 logged again by triage close from the 2026-09-19 run's leftover actions; nothing was wrong with it (TF-001) | the app's spec | Chatur consumer-feedback fixes (TR-001…TR-004): ScrollArea StickToEnd, TreeView, DiffView, ToggleGroup |
 | MISS-TrBlazeUI-20260919-05 (REQ-UI-002) | 2026-09-19 by owner | 2026-09-22: logged again by triage close from an earlier run's leftover actions; the bug was already fixed (TF-001) | the check was too weak | TfLens TR-040: InputGroupInput has no DebounceMilliseconds, so a filter box drawn with a leading icon re-filters on every keystroke. Reproduced: the built XML documentation lists exactly the 15 members TfLens names and no debounce, while Input.DebounceMilliseconds exists. |
 | MISS-TrBlazeUI-20260919-04 (REQ-UI-008) | 2026-09-19 by owner | 2026-09-22: logged again by triage close from an earlier run's leftover actions; the bug was already fixed (TF-001) | the check was too weak | TfLens TR-039: leaving a page that holds a chart logs an unobserved JSDisconnectedException from ApexChart.Dispose (fire-and-forget JSObjectReference.DisposeAsync). Reproduced on the unchanged library: /charts/bar 5 charts -> 5 unobserved exceptions, /charts/pie 4 -> 4, /verify-tflens-3 5 -> 5, /com |

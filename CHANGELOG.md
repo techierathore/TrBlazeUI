@@ -11,7 +11,23 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
-Built and verified on 2026-10-07, after 2.1.2.
+Built and verified on 2026-10-07, after 2.1.3.
+
+Closes Chatur's sixth entry (`docs/Chatur-TrBlazeUI-Feedback.md`, TR-018, filed 2026-10-07 against
+2.1.3). One new parameter; nothing else changes.
+
+### Added — Chatur TR-018
+
+- **`EditorTabs.CloseContent` (TR-018)**: a `RenderFragment` drawn inside each tab's close button in
+  place of the built-in svg cross, so a strip can match a mockup that draws the close mark as a text
+  `×`. The button keeps its `aria-label` ("Close Program.cs"), its `data-slot="editor-tab-close"`,
+  its classes and its click, so the content needs no label of its own. The same content is drawn
+  on every tab. Left unset, the svg is drawn as before. This was blocking for Chatur: the mockup
+  comparison on 22 phase-2 rows reported "app carries an icon the mockup does not" on every tab.
+
+---
+
+## [2.1.3] — 2026-10-07
 
 Closes Chatur's fifth batch (`docs/Chatur-TrBlazeUI-Feedback.md`, TR-015 to TR-017, filed
 2026-10-06 against 2.1.2). Three new parameters, and one change to how `cn()` merges classes that alters

@@ -1,7 +1,7 @@
 ---
 project: TrBlazeUI
 last_updated: 2026-10-07
-current_phase: UAT — handoff done, 47 of 47 verified
+current_phase: UAT — handoff done, 48 of 48 verified
 last_verified_build: PASS
 last_verified_date: 2026-10-07
 ---
@@ -10,11 +10,10 @@ last_verified_date: 2026-10-07
 
 ## Where I am
 
-The next release is ready: code, CHANGELOG `[Unreleased]`, agent reference, Usage Guide and
-DevGuide all describe it. It adds Chatur's TR-015 to TR-017 (REQ-UI-030 to 032): `EditorTabs.TabAttributes`,
-`StepperItem.Icon`, `BadgeVariant.Danger`, and `cn()` grouping hyphenated text colours. All 47
-rows are verified. 2.1.2 is the latest published version. Chatur's feedback file has the reply in
-both repositories.
+2.1.3 is the latest published version; Chatur closed TR-015 to TR-017 on it. The next release is
+ready: `EditorTabs.CloseContent` (REQ-UI-033, Chatur TR-018) is built, verified, and described in
+CHANGELOG `[Unreleased]`, the agent reference, the Usage Guide and the DevGuide. Chatur's feedback
+file carries the reply in both repositories. All 48 rows are verified. Nothing is open.
 
 ## Next command to run
 
@@ -42,7 +41,7 @@ Why: every row in this phase's scope is terminal and handoff has run; waiting on
 
 ## Known blockers
 
-- The fixes are not on the feed until the owner commits and cuts the next GitHub Release; agents cannot run git. Chatur's TR-015 waits on it.
+- The TR-018 fix is not on the feed until the owner commits and cuts the next GitHub Release; agents cannot run git. Chatur's 22 phase-2 rows wait on it.
 
 ## Verification log
 
@@ -50,11 +49,11 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 | Date | Phase | Result | Status table |
 |---|---|---|---|
-| 2026-10-01 | triage-and-fix | 41/42 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-02 | build-phase | 43/43 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-03 | triage-and-fix | 44/44 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-07 | triage-and-fix | 47/47 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-07 | handoff-phase | 47/47 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-10-07 | triage-and-fix | 48/48 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 
@@ -66,7 +65,7 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 ## Deferred / future
 
-- REQ-UI-030 to 032 name BRD-15 and BRD-28; `*amend-docs` can give them BRD items of their own.
+- REQ-UI-030 to 033 name BRD-15 and BRD-28; `*amend-docs` can give them BRD items of their own.
 - The framework's own `Virtualize`, inside `CommandVirtualizedGroup`, still throws on dispose; not fixable in this library.
 - `tools/splat-audit` throws on the library assembly alone.
 - Report `ApexChart.Dispose` upstream.

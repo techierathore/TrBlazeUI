@@ -51,19 +51,26 @@
                         aria-label="@($"Close {vItem.Label}")"
                         class="mx-1 inline-flex size-5 shrink-0 items-center justify-center rounded-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         @onclick="() => CloseAsync(vItem)">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         width="12"
-                         height="12"
-                         viewBox="0 0 24 24"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-width="2.5"
-                         stroke-linecap="round"
-                         stroke-linejoin="round"
-                         aria-hidden="true">
-                        <path d="M18 6 6 18" />
-                        <path d="m6 6 12 12" />
-                    </svg>
+                    @if (CloseContent is not null)
+                    {
+                        @CloseContent
+                    }
+                    else
+                    {
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="12"
+                             height="12"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2.5"
+                             stroke-linecap="round"
+                             stroke-linejoin="round"
+                             aria-hidden="true">
+                            <path d="M18 6 6 18" />
+                            <path d="m6 6 12 12" />
+                        </svg>
+                    }
                 </button>
             </li>
         }
@@ -140,6 +147,35 @@
     /// </example>
     [Parameter]
     public Func<EditorTabItem, IReadOnlyDictionary<string, object>?>? TabAttributes { get; set; }
+
+    /// <summary>
+    /// Gets or sets the content drawn inside each tab's close button in place of the built-in
+    /// cross icon.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The close button draws a small svg cross. A design that draws the mark as a text glyph
+    /// instead cannot be matched that way, and the mockup comparison reports the icon the design
+    /// does not have (Chatur TR-018). This content replaces the svg inside the button
+    /// (<c>data-slot="editor-tab-close"</c>); the button itself, its classes and its click are
+    /// unchanged.
+    /// </para>
+    /// <para>
+    /// The button's <c>aria-label</c> ("Close {Label}") is the accessible name, so the content
+    /// needs no label of its own and may be a plain text glyph such as <c>×</c>. The same content
+    /// is drawn on every tab. <c>null</c>, the default, keeps the built-in svg, so an existing
+    /// strip is unchanged.
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// &lt;EditorTabs Items="@objTabs" @bind-ActiveId="objActiveTab"&gt;
+    ///     &lt;CloseContent&gt;×&lt;/CloseContent&gt;
+    /// &lt;/EditorTabs&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public RenderFragment? CloseContent { get; set; }
 
     /// <summary>
     /// Gets or sets the accessible name of the strip. Default is <c>"Open files"</c>.
