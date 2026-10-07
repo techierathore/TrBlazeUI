@@ -13,7 +13,7 @@ namespace TrBlazeUI.Components.Badge;
 /// </para>
 /// <para>
 /// Features:
-/// - 7 visual variants (Default, Secondary, Destructive, Outline, Success, Info, Warning)
+/// - 8 visual variants (Default, Secondary, Destructive, Outline, Success, Info, Warning, Danger)
 /// - Compact, inline-friendly design
 /// - Accessible with semantic HTML
 /// - RTL (Right-to-Left) support
@@ -162,6 +162,7 @@ public partial class Badge : ComponentBase
             BadgeVariant.Success => "border-alert-success/30 bg-alert-success-bg text-alert-success-foreground hover:opacity-80",
             BadgeVariant.Info => "border-alert-info/30 bg-alert-info-bg text-alert-info-foreground hover:opacity-80",
             BadgeVariant.Warning => "border-alert-warning/30 bg-alert-warning-bg text-alert-warning-foreground hover:opacity-80",
+            BadgeVariant.Danger => "border-alert-danger/30 bg-alert-danger-bg text-alert-danger-foreground hover:opacity-80",
             _ => "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
         },
         // Wrap / truncate treatment. Placed after rounded-full so that Wrap's own rounded-md wins

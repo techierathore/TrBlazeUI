@@ -4,17 +4,17 @@
 |---|---|
 | App | Chatur |
 | Upstream | TrBlazeUI |
-| Updated | 2026-10-01 |
+| Updated | 2026-10-06 |
 
 ## Summary
 
-13 entries: 0 blocking, 0 open, 3 fixed upstream (TR-011, TR-012, TR-013), 10 closed.
+17 entries: 1 blocking (TR-015 tab attributes, 22 phase 2 rows), 2 open and not blocking (TR-016 icon in a Stepper marker, TR-017 soft red Badge), 3 fixed upstream (TR-011, TR-012, TR-013), 11 closed.
 
 All ten were answered on 2026-09-22 and all ten have now been re-checked in Chatur against
 2.0.9. Six were fixed in code; four needed no code, because the control already existed. Each
 entry below carries the control that now does the job and the Chatur requirement that uses it.
 
-Nothing is blocked. All ten were found while designing Chatur's screens on day one, against the 2.0.7 component reference; the mockups are drawn from controls that do exist, and each entry says what was used instead.
+The first ten were found on day one, against the 2.0.7 reference; each entry says what was used instead.
 
 > **Upstream reply 2026-09-22 — read it before acting on this file. The action is: upgrade
 > to 2.0.9.** Four entries (TR-001, TR-002, TR-005, TR-009) and most of a fifth (TR-008)
@@ -148,6 +148,8 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 
 ### TR-011 — DataTable rows, its header row and its choose-all cell cannot carry an attribute
 
+> ✅ **Closed 2026-10-02** — re-checked here: Upgraded to TrBlazeUI 2.1.1 (GitHub Packages). Moved changes-head, history-head and process-branches-head to DataTable HeaderRowAttributes, choose-all to SelectAllAttributes, provider-{name} and agent-tier-{role} to RowAttributes; removed the tier-cell wrapper. Measured on the running app 2026-10-02: provider-opencode-go and agent-tier-analyst are <tr> rows; changes-head, history-head and process-branches-head are <tr> in <thead>; choose-all is the control itself (role=checkbox, one-page grid). All 96 acceptance tests pass.
+
 - **Status:** open, filed 2026-09-30
 - **Severity:** minor
 - **Blocks:** no — Chatur puts the test hook on a cell's own content instead, and the work carried on. Only the verifier's check that every mockup control is on the page cannot find these four hooks.
@@ -159,6 +161,8 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 - **Suggested fix:** `RowAttributes`, `HeaderRowAttributes` and `SelectAllAttributes` parameters on `DataTable`.
 
 ### TR-012 — ToggleGroup's chosen item cannot take another colour
+
+> ✅ **Closed 2026-10-02** — re-checked here: Set OnVariant=ToggleOnVariant.Card on the Workbench mode toggle and the Sign in remember toggle, both on a muted track (bg-muted). Measured 2026-10-02 on TrBlazeUI 2.1.1: chosen item background oklch(0.222 0.012 65) equals --card exactly on both; the track is oklch(0.262 0.015 65).
 
 - **Status:** open, filed 2026-10-01
 - **Severity:** minor
@@ -172,6 +176,8 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 
 ### TR-013 — ToggleGroup's DisposeAsync lets a "task was canceled" error escape
 
+> ✅ **Closed 2026-10-02** — re-checked here: Full verification on TrBlazeUI 2.1.1 (96 acceptance tests, every screen, live model) on 2026-10-02, then searched the server log app-5280.log: 0 'A task was canceled' rendering errors, 0 mentions of ToggleGroup, and none for any other control.
+
 - **Status:** open, filed 2026-10-01
 - **Severity:** minor
 - **Blocks:** no — seen when a page closes or reloads, when the connection is ending anyway; no lost work traced to it.
@@ -182,9 +188,145 @@ Nothing is blocked. All ten were found while designing Chatur's screens on day o
 - **Workaround:** none.
 - **Suggested fix:** wrap the module dispose in `try { … } catch (JSDisconnectedException) { } catch (TaskCanceledException) { }`.
 
+### TR-014 — A switch that is off cannot be given a visible border
+
+> ✅ **Closed 2026-10-03** — re-checked here: 2026-10-03: upgraded TrBlazeUI.Components and Icons.Lucide 2.1.1 -> 2.1.2 (newest on the GitHub Packages feed; no later release exists), set Outlined=true on the Rights switches in SettingsAgents.razor (no border class was present). tf-mockup-parity.sh --screen settings-agents=/settings/agents: PASS, 0 findings at 1280 and 390 (no border-width finding). The off switch measures 2px solid in --border on a muted track with a grey thumb.
+
+- **Status:** fixed upstream 2026-10-03 (`Switch.Outlined`, unreleased — see the 2026-10-03 reply), filed 2026-10-02
+- **Severity:** minor
+- **Blocks:** no — the Rights switches on Settings ▸ Agents work and read clearly; only the off-state outline differs from the mockup.
+- **Repro:** TrBlazeUI 2.1.1 `Switch`: the root carries `border-transparent`, and `border-input` / `border-border` come earlier in `trblazeui.css`, so a `Class="border border-input"` on the switch loses to it. Chatur has no Tailwind build, so a class the shipped CSS does not already order after `border-transparent` (or an `!` variant) cannot be added.
+- **Expected:** an off switch draws a visible rule in `--input`, as the mockup's `.sw` does (a solid 1px `var(--line)` border when off, transparent when on), or `Switch` takes a parameter/variant for it, e.g. `Outlined`.
+- **Actual:** the off switch has a 1px transparent border, so `tf-mockup-parity` reports "border style differs — mockup solid, app none" for `switch-changes-code`, `switch-runs-commands` and `switch-marks-verified` at both widths.
+- **Encountered in:** REQ-UI-026 (Settings ▸ Agents, Rights panel)
+- **Workaround:** none; a colour written into the component would break "a theme is a file of OKLCH values", and an inline style is not allowed.
+- **Suggested fix:** draw the off-state border with `border-input` on the switch root (`data-[state=unchecked]:border-input`) or add a `Variant`.
+
+### TR-015 — A tab in EditorTabs cannot carry its own attributes, such as a test id
+
+- **Status:** fixed upstream 2026-10-07 (`EditorTabs.TabAttributes`, in 2.2.0 — see the 2026-10-07 reply), filed 2026-10-06
+- **Severity:** minor
+- **Blocks:** yes — the screens work and tests find a tab by its label, but the verifier's screen check needs the mockups' `tab-*` ids on the page, so all 22 phase 2 rows (REQ-FN-049..060, REQ-UI-045..054) cannot reach Verified until a tab can carry its id.
+- **Repro:** TrBlazeUI 2.1.2 `EditorTabs Items="@objTabs"`: each item renders one tab, and there is no parameter that adds attributes to a tab's element.
+- **Expected:** a way to give each tab its own attributes from its item, like `DataTable.RowAttributes`, so a tab can carry `data-testid="tab-processes"` as Chatur's mockups draw.
+- **Actual:** the mockups' `tab-processes`, `tab-board`, `tab-process-run` and `tab-agent-workspace` anchors cannot exist on the page, so the screen check lists them as missing.
+- **Encountered in:** REQ-UI-045, REQ-UI-047, REQ-UI-049, REQ-UI-053 (phase 2 screens as tabs in the main window)
+- **Workaround:** none; tests locate a tab by its visible label.
+- **Suggested fix:** add `TabAttributes` (`Func<TItem, IReadOnlyDictionary<string, object>?>`) to `EditorTabs`, applied to each tab's root element.
+
+### TR-016 — A step in Stepper cannot show an icon in its marker
+
+- **Status:** fixed upstream 2026-10-07 (`StepperItem.Icon`, in 2.2.0 — see the 2026-10-07 reply), filed 2026-10-06
+- **Severity:** minor
+- **Blocks:** no — Process run reads correctly: each step's marker is a filled circle with a tick, a cross or a number, named for a screen reader, and the state pill beside it says the same in words.
+- **Repro:** TrBlazeUI 2.1.2 `StepperItem Status="StepStatus.Done"`: the marker (`data-slot="stepper-item-marker"`) is a text glyph (`✓`, `✕`, a number). There is no slot or parameter that puts a `LucideIcon` in it.
+- **Expected:** an `Icon` slot on `StepperItem` that replaces the glyph, so a step can carry the same vector tick, spinner or pause the mockup draws at the start of each row (`mockups/process-run.html`, `run-step-*`).
+- **Actual:** `tf-mockup-parity.sh` reports "mockup carries an icon here; the app does not" for `run-step-1` to `run-step-7` at both widths.
+- **Encountered in:** REQ-FN-052, REQ-UI-047 (Process run, the steps panel)
+- **Workaround:** none; an icon placed beside the marker would draw two marks for one state.
+- **Suggested fix:** add `Icon` (`RenderFragment?`) to `StepperItem`, drawn inside the marker in place of the glyph when given, with the marker's accessible name unchanged.
+
+### TR-017 — Badge has no soft red variant, and a text colour in Class cannot override a variant's
+
+- **Status:** fixed upstream 2026-10-07 (`BadgeVariant.Danger`, and a `Class` text colour now replaces the variant's, in 2.2.0 — see the 2026-10-07 reply), filed 2026-10-06
+- **Severity:** minor
+- **Blocks:** no — a failed or stopped state shows as `Destructive`, a solid red pill, and reads clearly; only its weight differs from the mockup's tinted pill.
+- **Repro:** TrBlazeUI 2.1.2 `Badge`: `Success`, `Info` and `Warning` paint a tinted surface with text in the hue (they mirror `AlertVariant`), but there is no matching `Danger`; the only red is `Destructive`, a solid fill. `Class="text-destructive"` on a `Secondary` badge renders both `text-secondary-foreground` and `text-destructive` and the first wins, so a coloured label cannot be had that way either.
+- **Expected:** `BadgeVariant.Danger` painting `--alert-danger-bg` with `--alert-danger-foreground`, the same as the other three, so the status vocabulary is complete (the mockups' `.pill.bad`).
+- **Actual:** the stopped state on Process run uses `Destructive`; the Blocked count on Board wraps its label in a coloured `<span>` inside a `Secondary` badge.
+- **Encountered in:** REQ-UI-047 (Process run state pill), REQ-UI-049 (Board status counts)
+- **Workaround:** none for the pill; the Blocked count's label colour is set on an inner `<span>`, which is ordinary markup, not a replacement for a control.
+- **Suggested fix:** add `Danger` to `BadgeVariant` with `border-alert-danger/30 bg-alert-danger-bg text-alert-danger-foreground`, and let `cn()` treat `text-*` colour classes as one group so a `Class` colour replaces the variant's.
+
 ## Replies from TrBlazeUI
 
 <!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
+
+### 2026-10-07 — TR-015, TR-016 and TR-017 are fixed in 2.2.0
+
+All three are fixed and tested in the library. They ship in **2.2.0** on GitHub Packages
+(`https://nuget.pkg.github.com/techierathore/index.json`). When this reply was written, 2.2.0 was
+built and checked but the release had not been cut yet. If the feed still stops at 2.1.2, wait for
+2.2.0; do not work around TR-015.
+
+| Entry | State | What you get |
+|---|---|---|
+| **TR-015** a tab cannot carry its own attributes | fixed | `EditorTabs` gains `TabAttributes`, a function of each tab's `EditorTabItem`. What it returns is put on that tab's `<li>`, the same way `DataTable.RowAttributes` works. |
+| **TR-016** no icon in a step's marker | fixed | `StepperItem` gains `Icon`. It is drawn inside the marker in place of the glyph or number. |
+| **TR-017** no soft red badge; a `Class` text colour loses | fixed, both halves | `BadgeVariant.Danger` paints `--alert-danger-bg` with `--alert-danger-foreground`, built the same way as `Success`, `Info` and `Warning`. A text colour in `Class` now replaces the variant's own. |
+
+```razor
+<EditorTabs Items="@objTabs" @bind-ActiveId="objActiveTab"
+            TabAttributes="@(t => new Dictionary<string, object> { ["data-testid"] = $"tab-{t.Id}" })" />
+
+<StepperItem Title="Build" Status="StepStatus.Running">
+    <Icon><LucideIcon Name="loader-circle" Class="animate-spin" /></Icon>
+</StepperItem>
+
+<Badge Variant="BadgeVariant.Danger">Stopped</Badge>
+<Badge Variant="BadgeVariant.Secondary" Class="text-destructive">Blocked 3</Badge>
+```
+
+Things to know before you use them:
+
+1. **TR-015: the hook is on the `<li>`, which holds two buttons.** `tab-processes` is the whole tab,
+   the label button and the close button together. A test that clicks the hook clicks the middle of
+   the tab, which is the label. To be exact, click
+   `[data-testid="tab-processes"] [data-slot="editor-tab-label"]`, or the close button with
+   `[data-slot="editor-tab-close"]`. A `class` entry is added to the tab's classes, not swapped for
+   them. Leave out `data-slot`, `data-tab-id`, `data-active` and `data-dirty`, because the strip
+   owns them. The function runs on every render, so a changed id shows straight away.
+2. **TR-016: the icon replaces the glyph and nothing else.** The marker keeps its circle, its status
+   colour and its accessible name (`role="img"`, named "Done", "Running" and so on), so do not give
+   the icon its own label. An `svg` inside the marker is sized to 1rem. Pick an icon that says the
+   same thing as the `Status`; a spinner on a done step shows two answers for one state.
+3. **TR-017: the `Class` fix is library-wide, and two controls look different because of it.** The
+   class merger only treated one-word colours (`text-destructive`) as colours, so
+   `text-secondary-foreground` was never replaced and the stylesheet order decided which colour
+   won. It now treats `text-secondary-foreground`, `text-alert-danger-foreground` and
+   `text-destructive/80` as colours too, so the later one wins. We compared every element's classes
+   on all 125 demo pages before and after the change, and two things changed: an `Outline`
+   `Toggle`/`ToggleGroupItem` now shows `--accent-foreground` text on hover instead of
+   `--muted-foreground`, and the **selected row of a `NavList`** now shows `--accent-foreground`
+   text instead of inheriting its parent's colour. Chatur uses `NavList` on the agents list and
+   the Appearance theme cards, so look at the selected row there after upgrading. If your mockup
+   draws that text in another colour, tell us.
+4. **You can drop the Blocked count's inner `<span>`.** `Class="text-destructive"` on the
+   `Secondary` badge now does what you wanted.
+5. **Your agent's reference describes all of it.** After the upgrade, the build refreshes
+   `.trblazeui/TrBlazeUI-AI-Reference.md` from the package. It has rows for 2.1.1, 2.1.2 and 2.2.0
+   in "Which version added what", four new rows in "Which control do I use for…" (a tab's test
+   hook, a step icon, the soft red pill, a label colour in `Class`), and the new parameters in the
+   `EditorTabs`, `StepperItem` and `Badge` tables. `CHANGELOG.md` `[2.2.0]` has the full list.
+
+#### What we need from you
+
+Upgrade to 2.2.0 once it is on the feed. Put the `tab-*` ids on through `TabAttributes`, put
+`Icon` on the Process run steps, switch the stopped pill to `Danger`, and run your screen check
+and `tf-mockup-parity` again on Process run, Board and the tabbed main window. Then close each
+entry here or tell us what does not fit.
+
+---
+
+### 2026-10-03 — TR-014 is fixed in the library; not released yet
+
+| Entry | State | What you get |
+|---|---|---|
+| **TR-014** an off switch cannot be given a visible border | fixed (unreleased; in the library's `[Unreleased]` changelog, ships in the next version after 2.1.0) | `Switch` gains `Outlined` (bool, default false). With it set, an off switch draws the mockup's `.sw` look: a `bg-muted` track (`--soft`), a solid border in `--border` (`--line`) and a `bg-muted-foreground` thumb (`--faint`). When on, it looks like any other switch and the border is transparent. A switch without `Outlined` is unchanged. |
+
+Why it also changes the track and the thumb, not only the border: every Chatur theme sets
+`--input` equal to `--border`, and the off track is `bg-input`, so a border in either colour on
+that track would be invisible. The library's test now checks that the off border colour differs
+from the track colour.
+
+```razor
+<Switch @bind-Checked="objCanChangeCode" Outlined="true" data-testid="switch-changes-code" />
+```
+
+Two things to know: the border is 2px (`border-2`, the switch's existing width, kept so its size
+and thumb travel do not move), while the mockup's `.sw` draws 1px; if `tf-mockup-parity` compares
+width as well as style it will report that. And drop `Class="border border-input"` from the three
+Rights switches: it never took effect and is no longer needed.
 
 ### 2026-10-02 — TR-011, TR-012 and TR-013 are fixed in 2.1.0, which is out
 

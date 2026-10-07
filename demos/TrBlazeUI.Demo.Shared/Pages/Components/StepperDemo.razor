@@ -103,6 +103,33 @@
         </div>
     </div>
 
+    <!-- Icon in the marker -->
+    <div class="space-y-4" data-testid="stepper-icon-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">An icon in the marker</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>Icon</code> draws a vector icon inside the marker in place of the text glyph —
+                a tick, a spinner, a pause. The circle, its status colour and its accessible name
+                stay as they were, so a screen reader still hears "Done" or "Running". The last step
+                has no <code>Icon</code> and keeps its glyph.
+            </p>
+        </div>
+        <div class="rounded-lg border p-6">
+            <Stepper Current="2" Orientation="StepperOrientation.Vertical" AriaLabel="Process run">
+                <StepperItem Title="Plan" Status="StepStatus.Done" data-testid="icon-step-done">
+                    <Icon><LucideIcon Name="check" /></Icon>
+                </StepperItem>
+                <StepperItem Title="Build" Status="StepStatus.Running" data-testid="icon-step-running">
+                    <Icon><LucideIcon Name="loader-circle" Class="animate-spin" /></Icon>
+                </StepperItem>
+                <StepperItem Title="Review" Status="StepStatus.Waiting" data-testid="icon-step-waiting">
+                    <Icon><LucideIcon Name="pause" /></Icon>
+                </StepperItem>
+                <StepperItem Title="Merge" Status="StepStatus.Failed" data-testid="icon-step-glyph" />
+            </Stepper>
+        </div>
+    </div>
+
     <!-- Series index -->
     <div class="space-y-4">
         <div class="space-y-2">

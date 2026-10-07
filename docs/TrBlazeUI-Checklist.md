@@ -62,6 +62,9 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-UI-027 | ToggleGroup chosen item takes another look through OnVariant (Chatur TR-012) | Verified | 100% | 2026-10-02 verify: PASS — test `Chatur batch 3 — consumer-feedback fixes (TR-011…TR-013) REQ` | [d](#d-req-ui-027) |
 | REQ-UI-028 | No control reports an unhandled error when its page stops answering during dispose | Verified | 100% | 2026-10-02 verify: PASS — test `REQ-UI-028 — dispose on a page that has stopped answering RE` | [d](#d-req-ui-028) |
 | REQ-UI-029 | Switch that is off can draw a visible border through Outlined (Chatur TR-014) | Verified | 100% | 2026-10-03 verify: PASS — test `REQ-UI-029 — Switch Outlined (Chatur TR-014) REQ-UI-029 an O` | [d](#d-req-ui-029) |
+| REQ-UI-030 | Each tab in EditorTabs can carry its own attributes through TabAttributes (Chatur TR-015) | Verified | 100% | 2026-10-07 verify: PASS — test `Chatur batch 5 — consumer-feedback fixes (TR-015…TR-017) REQ` | [d](#d-req-ui-030) |
+| REQ-UI-031 | A Stepper step can show an icon in its marker through Icon (Chatur TR-016) | Verified | 100% | 2026-10-07 verify: PASS — test `Chatur batch 5 — consumer-feedback fixes (TR-015…TR-017) REQ` | [d](#d-req-ui-031) |
+| REQ-UI-032 | Badge has a soft red Danger variant, and a text colour in Class replaces the variant's (Chatur TR-017) | Verified | 100% | 2026-10-07 verify: PASS — test `Chatur batch 5 — consumer-feedback fixes (TR-015…TR-017) REQ` | [d](#d-req-ui-032) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -296,6 +299,18 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 - <a id="d-req-ui-029"></a> **REQ-UI-029** (extends BRD-6 Switch) Switch that is off can draw a visible border through Outlined (Chatur TR-014)
   - *Acceptance:* When a consumer sets Outlined on the Switch demo screen, then an off switch shows a visible border against its track, and a switch without it looks unchanged.
   - *Mockup:* [mockups/settings-agents.html](mockups/settings-agents.html), the Rights switches (`.sw` in `mockups/chatur.css`); copied unchanged from Chatur's `docs/mockups/` on 2026-10-03 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-030"></a> **REQ-UI-030** (extends BRD-15 Tabs) Each tab in EditorTabs can carry its own attributes through TabAttributes (Chatur TR-015)
+  - *Acceptance:* When a consumer passes TabAttributes on the Code Editor demo screen, then each open-file tab carries its own attributes, such as a data-testid, and keeps its classes.
+  - *Mockup:* [mockups/process-run.html](mockups/process-run.html), the main-window tab anchor `tab-process-run`; copied unchanged from Chatur's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-031"></a> **REQ-UI-031** (extends BRD-15 navigation — Stepper) A Stepper step can show an icon in its marker through Icon (Chatur TR-016)
+  - *Acceptance:* When a consumer gives a StepperItem an Icon on the Stepper demo screen, then the marker draws that icon in place of the glyph and keeps its accessible name.
+  - *Mockup:* [mockups/process-run.html](mockups/process-run.html), the steps panel `run-step-1` to `run-step-7`; copied unchanged from Chatur's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-032"></a> **REQ-UI-032** (extends BRD-28 Badge) Badge has a soft red Danger variant, and a text colour in Class replaces the variant's (Chatur TR-017)
+  - *Acceptance:* When a consumer sets Variant Danger on the Badge demo screen, then the badge paints the danger tint, and a text colour in Class replaces the variant's.
+  - *Mockup:* [mockups/process-run.html](mockups/process-run.html), the stopped state pill (`.pill.bad`); copied unchanged from Chatur's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
 
 
 ## Editor

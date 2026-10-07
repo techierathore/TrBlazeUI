@@ -23,12 +23,14 @@
         @foreach (var vItem in Items)
         {
             var vIsActive = string.Equals(vItem.Id, CurrentActiveId, StringComparison.Ordinal);
+            var vTab = SplitTabAttributes(TabAttributes?.Invoke(vItem));
             <li @key="vItem.Id"
                 data-slot="editor-tab"
                 data-tab-id="@vItem.Id"
                 data-active="@(vIsActive ? "true" : "false")"
                 data-dirty="@(vItem.IsDirty ? "true" : "false")"
-                class="@(vIsActive ? ActiveTabClass : InactiveTabClass)">
+                class="@TrBlazeUI.Components.Utilities.ClassNames.cn(vIsActive ? ActiveTabClass : InactiveTabClass, vTab.CssClass)"
+                @attributes="vTab.Attributes">
                 <button type="button"
                         data-slot="editor-tab-label"
                         aria-current="@(vIsActive ? "true" : null)"
@@ -113,6 +115,33 @@
     public EventCallback<EditorTabItem> OnClose { get; set; }
 
     /// <summary>
+    /// Gets or sets a function that returns the HTML attributes for one tab, from its item.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Attributes passed to the strip itself land on its root, so until this parameter a tab could
+    /// not be named - a test hook such as <c>data-testid="tab-processes"</c> had nowhere to go
+    /// (Chatur TR-015). The function is called once per tab on every render and its result is
+    /// splatted onto that tab's <c>li</c> (<c>data-slot="editor-tab"</c>), the element that holds
+    /// both the label button and the close button.
+    /// </para>
+    /// <para>
+    /// A <c>class</c> entry is merged with the tab's own classes rather than replacing them. The
+    /// strip's own <c>data-slot</c>, <c>data-tab-id</c>, <c>data-active</c> and <c>data-dirty</c>
+    /// are what the strip's styling and tests read; an entry of the same name replaces the strip's
+    /// value, so leave those out. Return null for a tab that needs nothing.
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// &lt;EditorTabs Items="@objTabs"
+    ///             TabAttributes="@(t => new Dictionary&lt;string, object&gt; { ["data-testid"] = $"tab-{t.Id}" })" /&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public Func<EditorTabItem, IReadOnlyDictionary<string, object>?>? TabAttributes { get; set; }
+
+    /// <summary>
     /// Gets or sets the accessible name of the strip. Default is <c>"Open files"</c>.
     /// </summary>
     [Parameter]
@@ -160,4 +189,30 @@
     }
 
     private Task CloseAsync(EditorTabItem aItem) => OnClose.InvokeAsync(aItem);
+
+    // Pulls a "class" entry out so it can be merged through cn() instead of overwriting the tab's
+    // own classes; everything else is splatted as given.
+    private static (string? CssClass, IReadOnlyDictionary<string, object>? Attributes) SplitTabAttributes(
+        IReadOnlyDictionary<string, object>? aAttributes)
+    {
+        if (aAttributes is null || aAttributes.Count == 0)
+        {
+            return (null, null);
+        }
+
+        string? vCssClass = null;
+        var vRest = new Dictionary<string, object>(aAttributes.Count);
+        foreach (var vPair in aAttributes)
+        {
+            if (string.Equals(vPair.Key, "class", StringComparison.OrdinalIgnoreCase))
+            {
+                vCssClass = vPair.Value as string;
+                continue;
+            }
+
+            vRest[vPair.Key] = vPair.Value;
+        }
+
+        return (vCssClass, vRest);
+    }
 }

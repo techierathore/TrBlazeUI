@@ -24,7 +24,11 @@ problem is in this table, the control exists — do not hand-build it.
 | A list of multi-line rows that drives a detail pane beside it | `NavList<TItem>` | §2.0.9 |
 | Put a test hook (`data-testid`) on a table row, the table's header row or its choose-all box | `DataTable` `RowAttributes`, `HeaderRowAttributes`, `SelectAllAttributes` (2.1.0) | §6 |
 | A segmented switch whose chosen segment is a plain card, or the primary colour, instead of the accent tint | `ToggleGroup` `OnVariant` (2.1.0) | §5 |
-| An off switch that needs a visible border so it does not vanish on a light card | `Switch Outlined="true"` (unreleased, TR-014) | §5 |
+| An off switch that needs a visible border so it does not vanish on a light card | `Switch Outlined="true"` (2.1.2) | §5 |
+| Put a test hook (`data-testid`) on each tab of an open-file strip | `EditorTabs` `TabAttributes` (2.2.0) | §2.0.9 |
+| A vector tick, spinner or pause in a step's marker instead of the text glyph | `StepperItem` `Icon` (2.2.0) | §8 |
+| A failed or stopped status as a soft red pill beside Success, Info and Warning | `Badge Variant="BadgeVariant.Danger"` (2.2.0); `Destructive` is the solid fill | §6 |
+| Colour one badge's label without changing its variant | `Class="text-destructive"` (or any text colour) — replaces the variant's text colour as of 2.2.0 | §6 |
 
 ---
 
@@ -1117,7 +1121,7 @@ Sub-components: `ButtonIcon`
 | Checked | bool | false | On/off state |
 | CheckedChanged | EventCallback<bool> | - | Two-way: @bind-Checked |
 | Size | SwitchSize | Medium | `Small` (20px tall), `Medium` (24px), `Large` (28px) |
-| Outlined | bool | false | While off: a muted track (`bg-muted`), a visible border in the theme's border colour and a grey thumb; while on: the normal look, border transparent — for an off switch on a light card. Use this, not `Class="border-input"` (the base transparent border wins in the shipped CSS) (unreleased, TR-014) |
+| Outlined | bool | false | While off: a muted track (`bg-muted`), a visible border in the theme's border colour and a grey thumb; while on: the normal look, border transparent — for an off switch on a light card. Use this, not `Class="border-input"` (the base transparent border wins in the shipped CSS) (2.1.2, TR-014) |
 | Disabled | bool | false | Disabled state |
 | AriaLabel | string? | null | Name for a switch with no visible label — required in a table cell |
 | Id | string? | null | Element ID |
@@ -1569,7 +1573,7 @@ Sub-components: `AvatarImage` (Source, Alt), `AvatarFallback`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| Variant | BadgeVariant | Default | Default, Secondary, Destructive, Outline, **Success**, **Info**, **Warning** |
+| Variant | BadgeVariant | Default | Default, Secondary, Destructive, Outline, **Success**, **Info**, **Warning**, **Danger** (2.2.0) |
 | As | string | `"span"` | The element rendered — `"span"` or `"div"`; anything else falls back to `"span"` |
 | Wrap | bool | false | `true` lets a long label wrap inside a pill that grows with it (left-aligned, corner radius) |
 | Truncate | bool | false | `true` clips a long label with an ellipsis on one line. Wins over `Wrap` if both are set |
@@ -1589,8 +1593,11 @@ a badge and the alert that explains it: each one paints the tinted `--alert-*-bg
 | Success | `border-alert-success/30 bg-alert-success-bg text-alert-success-foreground hover:opacity-80` |
 | Info | `border-alert-info/30 bg-alert-info-bg text-alert-info-foreground hover:opacity-80` |
 | Warning | `border-alert-warning/30 bg-alert-warning-bg text-alert-warning-foreground hover:opacity-80` |
+| Danger | `border-alert-danger/30 bg-alert-danger-bg text-alert-danger-foreground hover:opacity-80` (2.2.0) |
 
-Use `Warning` for "needs attention" status; `Destructive` reads as a failure.
+Use `Warning` for "needs attention" status. For a failure, `Danger` (2.2.0) is the tinted red that matches the other three, and `Destructive` is the solid red fill.
+
+**A text colour in `Class` replaces the variant's (2.2.0).** `<Badge Variant="BadgeVariant.Secondary" Class="text-destructive">` renders the secondary surface with a red label. Before 2.2.0 both text colours were emitted and the variant's won, because `cn()` only grouped one-word colours.
 
 ```razor
 <Badge>New</Badge>
@@ -2869,6 +2876,7 @@ it instead:
 |---|---|---|---|
 | `StepperItem.Status` | `StepStatus?` | `null` | `Pending`, `Running`, `Waiting`, `Done`, `Retried`, `Failed`. Leave it null to keep the position-derived behaviour. |
 | `StepperItem.Trailing` | `RenderFragment?` | `null` | Content at the step's trailing edge — a duration, a badge, a link. |
+| `StepperItem.Icon` | `RenderFragment?` | `null` | **2.2.0.** An icon drawn inside the marker in place of the glyph or number — `<Icon><LucideIcon Name="check" /></Icon>`. Sized to 1rem; the marker keeps its circle, status colour and accessible name. |
 | `Stepper.Orientation` | `StepperOrientation` | `Horizontal` | `Vertical` runs the steps top to bottom. |
 
 Each status has its own glyph **and** its own accessible name (`Done` is `✓` named "Done",
@@ -3689,13 +3697,16 @@ source* — see the next heading — and only rarely *wait for it to be built*.
 
 | Version | Released | Component namespaces | What it added |
 |---|---|---|---|
+| **2.2.0** | 2026-10-07 | 85 | `EditorTabs.TabAttributes`; `StepperItem.Icon`; `BadgeVariant.Danger`; `cn()` treats hyphenated text colours (`text-secondary-foreground`) as one group, so a `Class` text colour replaces a component's own |
+| **2.1.2** | 2026-10-03 | 85 | `Switch.Outlined` |
+| **2.1.1** | 2026-10-02 | 85 | No control reports an unhandled error when its page stops answering during dispose (17 more controls) |
 | **2.1.0** | 2026-10-02 | 85 | `DataTable.RowAttributes`/`HeaderRowAttributes`/`SelectAllAttributes`; `ToggleGroup.OnVariant`; `ToggleGroup` no longer reports an unhandled error when its page closes |
 | **2.0.9** | 2026-09-22 | 85 | `CodeEditor` + `EditorTabs`, `LogView`, `NavList`, `Typing`; `Progress.Indeterminate`; `StepStatus` on `StepperItem`/`TimelineItem`; `SortableList.ShowPosition`/`AllowRemove`; `DataTable.SelectedCount` |
 | **2.0.8** | 2026-09-20 | 81 | `TreeView` + `TreeItem`, `DiffView` + `TextDiff`, `ScrollArea.StickToEnd`, `ToggleGroup.Joined`/`AllowDeselect`/`AriaLabel` |
 | **2.0.7** | 2026-09-15 | 79 | `InputGroupInput.DebounceMilliseconds`; the chart teardown fix |
 | **2.0.6** | 2026-09-13 | 79 | everything earlier; see `CHANGELOG.md` |
 
-Everything in this document describes **2.1.0**. Each control's own section has its full parameter
+Everything in this document describes **2.2.0**. Each control's own section has its full parameter
 table; the version table above only says when it arrived. `CHANGELOG.md` has the detail per
 release.
 
@@ -3779,7 +3790,8 @@ accessible name — so it is never colour alone.
 file usually needs a prompt first.
 
 ```razor
-<EditorTabs Items="@objOpenFiles" @bind-ActiveId="objActiveFile" OnClose="CloseFileAsync" />
+<EditorTabs Items="@objOpenFiles" @bind-ActiveId="objActiveFile" OnClose="CloseFileAsync"
+            TabAttributes="@(t => new Dictionary<string, object> { ["data-testid"] = $"tab-{t.Id}" })" />
 ```
 
 | Parameter | Type | Default | What it does |
@@ -3788,6 +3800,7 @@ file usually needs a prompt first.
 | `ActiveId` / `ActiveIdChanged` | `string?` | `null` | Use `@bind-ActiveId`. |
 | `OnSelect` / `OnClose` | `EventCallback<EditorTabItem>` | — | |
 | `AriaLabel` | `string` | `"Open files"` | |
+| `TabAttributes` | `Func<EditorTabItem, IReadOnlyDictionary<string, object>?>?` | `null` | **2.2.0.** HTML attributes for each tab's `<li>` (`data-slot="editor-tab"`), from its item — e.g. `data-testid="tab-{Id}"`. A `class` entry is merged with the tab's classes; leave out `data-slot`, `data-tab-id`, `data-active` and `data-dirty`, which the strip owns |
 | `Class` | `string?` | `null` | |
 
 #### LogView — the output of a running command
