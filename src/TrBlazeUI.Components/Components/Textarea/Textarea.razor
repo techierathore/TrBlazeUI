@@ -11,11 +11,12 @@
     disabled="@Disabled"
     required="@Required"
     maxlength="@MaxLength"
+    rows="@Rows"
     aria-label="@AriaLabel"
     aria-describedby="@AriaDescribedBy"
     aria-invalid="@(AriaInvalid?.ToString().ToLower())"
     data-slot="textarea-control"
-    @attributes="AdditionalAttributes"
+    @attributes="EffectiveAttributes"
     @onfocusin="HandleFocus"
     @onfocusout="HandleBlur"
     @oninput="HandleInput"></textarea>

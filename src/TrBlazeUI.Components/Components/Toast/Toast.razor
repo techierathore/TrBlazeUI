@@ -80,6 +80,10 @@
         {
             ToastVariant.Default => "border bg-background text-foreground",
             ToastVariant.Destructive => "destructive group border-destructive bg-destructive text-destructive-foreground",
+            // The same tints Alert and Badge use for these states (Sevak TR-023).
+            ToastVariant.Success => "border-alert-success/30 bg-alert-success-bg text-alert-success-foreground",
+            ToastVariant.Info => "border-alert-info/30 bg-alert-info-bg text-alert-info-foreground",
+            ToastVariant.Warning => "border-alert-warning/30 bg-alert-warning-bg text-alert-warning-foreground",
             _ => "border bg-background text-foreground"
         },
         Class

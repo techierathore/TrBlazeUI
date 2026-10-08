@@ -1,0 +1,29 @@
+@namespace TrBlazeUI.Components.Table
+@using TrBlazeUI.Components.Utilities
+
+<tfoot data-slot="table-footer" class="@CssClass" @attributes="AdditionalAttributes">
+    @ChildContent
+</tfoot>
+
+@code {
+    /// <summary>
+    /// Gets or sets the footer rows, typically a total.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes merged into the element's own.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered <c>tfoot</c> element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => ClassNames.cn("border-t bg-muted/50 font-medium", Class);
+}

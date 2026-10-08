@@ -1,0 +1,31 @@
+@namespace TrBlazeUI.Components.Table
+@using TrBlazeUI.Components.Utilities
+
+<th data-slot="table-head" class="@CssClass" @attributes="AdditionalAttributes">
+    @ChildContent
+</th>
+
+@code {
+    /// <summary>
+    /// Gets or sets the column heading.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes merged into the element's own.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered <c>th</c> element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => ClassNames.cn(
+        "h-12 px-4 text-left align-middle font-medium text-muted-foreground",
+        Class);
+}

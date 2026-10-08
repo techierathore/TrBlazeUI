@@ -262,8 +262,13 @@ public partial class Button : ComponentBase
         // Handle trigger context behavior (from AsChild pattern)
         if (TriggerContext != null)
         {
-            // For close buttons (no Toggle, only Close)
-            if (TriggerContext.Toggle == null && TriggerContext.Close != null)
+            // For close buttons (no Toggle, only Close). CloseAsync is preferred when the owner
+            // (DialogClose) also has a handler to await.
+            if (TriggerContext.Toggle == null && TriggerContext.CloseAsync != null)
+            {
+                await TriggerContext.CloseAsync();
+            }
+            else if (TriggerContext.Toggle == null && TriggerContext.Close != null)
             {
                 TriggerContext.Close?.Invoke();
             }

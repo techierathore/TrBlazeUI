@@ -66,6 +66,19 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-UI-031 | A Stepper step can show an icon in its marker through Icon (Chatur TR-016) | Verified | 100% | 2026-10-07 verify: PASS — test `Chatur batch 5 — consumer-feedback fixes (TR-015…TR-017) REQ` | [d](#d-req-ui-031) |
 | REQ-UI-032 | Badge has a soft red Danger variant, and a text colour in Class replaces the variant's (Chatur TR-017) | Verified | 100% | 2026-10-07 verify: PASS — test `Chatur batch 5 — consumer-feedback fixes (TR-015…TR-017) REQ` | [d](#d-req-ui-032) |
 | REQ-UI-033 | EditorTabs close mark can be drawn by the consumer through CloseContent (Chatur TR-018) | Verified | 100% | 2026-10-07 verify: PASS — test `Chatur batch 6 — consumer-feedback fix (TR-018) REQ-UI-033 C` | [d](#d-req-ui-033) |
+| REQ-UI-034 | AlertDialogAction and AlertDialogCancel take an OnClick that runs before the dialog closes (Sevak TR-044) | Verified | 100% | 2026-10-07 verify: PASS — test `Sevak — consumer-feedback fixes (TR-044, TR-043, TR-023) REQ` | [d](#d-req-ui-034) |
+| REQ-UI-035 | An empty toast viewport lets clicks through to the page beneath it (Sevak TR-043) | Verified | 100% | 2026-10-07 verify: PASS — test `Sevak — consumer-feedback fixes (TR-044, TR-043, TR-023) REQ` | [d](#d-req-ui-035) |
+| REQ-UI-036 | ToastVariant gains Success, Info and Warning with matching ToastService methods (Sevak TR-023) | Verified | 100% | 2026-10-07 verify: PASS — test `Sevak — consumer-feedback fixes (TR-044, TR-043, TR-023) REQ` | [d](#d-req-ui-036) |
+| REQ-UI-037 | NumericInput and Slider emit valid, invariant ARIA range attributes (Sevak TR-033, TR-034) | Verified | 100% | 2026-10-07 verify: PASS — test `Sevak feedback — builder B (TR-033, TR-034, TR-039, TR-026, ` | [d](#d-req-ui-037) |
+| REQ-UI-038 | NumberInput fails the build with a message naming NumericInput (Sevak TR-039) | Verified | 100% | 2026-10-07 verify: PASS — test `Sevak feedback — builder B (TR-033, TR-034, TR-039, TR-026, ` | [d](#d-req-ui-038) |
+| REQ-UI-039 | Textarea takes Rows and MaxRows and grows with its content up to the cap (Sevak TR-026) | Verified | 100% | 2026-10-07 verify: PASS — test `Sevak feedback — builder B (TR-033, TR-034, TR-039, TR-026, ` | [d](#d-req-ui-039) |
+| REQ-UI-040 | Table family for a plain markup table: Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption (Sevak TR-028) | Verified | 100% | 2026-10-07 verify: PASS — test `Sevak feedback — table family, heading levels, chart attribu` | [d](#d-req-ui-040) |
+| REQ-UI-041 | CardTitle and AlertTitle take an As heading level (Sevak TR-008) | Verified | 100% | 2026-10-07 verify: PASS — test `Sevak feedback — table family, heading levels, chart attribu` | [d](#d-req-ui-041) |
+| REQ-UI-042 | Select shows its placeholder when the bound value matches no item (Sevak TR-024) | Verified | 100% | 2026-10-07 verify: PASS — test `Sevak feedback — builder B (TR-033, TR-034, TR-039, TR-026, ` | [d](#d-req-ui-042) |
+| REQ-UI-043 | The six chart components take unmatched attributes like every other component (Sevak TR-044 census) | Verified | 100% | 2026-10-07 verify: PASS — test `Sevak feedback — table family, heading levels, chart attribu`; no code change: the charts already splat through `ChartBase`, the per-file census that logged this row missed the base class (Sevak's 136-component count was 1.0.7) [REQ-UI-043] | [d](#d-req-ui-043) |
+| REQ-FN-011 | HtmlSanitizer on a stable 9.1.x release with no vulnerable AngleSharp (Sevak TR-037) | Verified | 100% | 2026-10-07 verify: PASS — test `Functional requirements REQ-FN-011 HtmlSanitizer is a stable` | [d](#d-req-fn-011) |
+| REQ-UI-044 | A Select inside a Dialog never freezes the page: a portal or positioning failure is logged and the list falls back, never thrown into the circuit (Sevak TR-041) | Verified | 100% | 2026-10-08 verify: PASS — test `Sevak feedback — a Select inside a Dialog never freezes the ` | [d](#d-req-ui-044) |
+| REQ-UI-045 | Chat family: ChatThread, ChatMessage and ChatComposer for a message thread with a composer (Sevak TR-006) | Verified | 100% | 2026-10-08 verify: PASS — test `Sevak feedback — chat family (TR-006) REQ-UI-045 messages al` | [d](#d-req-ui-045) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -316,6 +329,57 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 - <a id="d-req-ui-033"></a> **REQ-UI-033** (extends BRD-15 Tabs) EditorTabs close mark can be drawn by the consumer through CloseContent (Chatur TR-018)
   - *Acceptance:* When a consumer passes CloseContent on the Code Editor demo screen, then each tab's close button draws that content in place of the svg and keeps its accessible name.
   - *Mockup:* [mockups/process-run.html](mockups/process-run.html), the main-window tab anchor `tab-process-run` whose close mark is a text × (`.tab .x` in `mockups/chatur.css`); copied unchanged from Chatur's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-034"></a> **REQ-UI-034** (extends BRD-19 Dialog, AlertDialog) AlertDialogAction and AlertDialogCancel take an OnClick that runs before the dialog closes (Sevak TR-044)
+  - *Acceptance:* When a consumer sets OnClick on AlertDialogAction on the Alert Dialog demo screen, then the handler runs and the dialog closes.
+  - *Mockup:* [mockups/sevak-backup.html](mockups/sevak-backup.html), the restore confirmation; copied unchanged from Sevak's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-035"></a> **REQ-UI-035** (extends BRD-24 Toasts) An empty toast viewport lets clicks through to the page beneath it (Sevak TR-043)
+  - *Acceptance:* When no toast is showing on the Toast demo screen, then a click at the bottom-right corner reaches the page, and a shown toast still takes its own clicks.
+  - *Mockup:* [mockups/sevak-tasks.html](mockups/sevak-tasks.html), the Add task dialog whose footer sits at the window's bottom edge; copied unchanged from Sevak's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-036"></a> **REQ-UI-036** (extends BRD-24 Toasts) ToastVariant gains Success, Info and Warning with matching ToastService methods (Sevak TR-023)
+  - *Acceptance:* When a consumer calls ToastService.Warning on the Toast demo screen, then a toast paints the warning tint, and Success and Info do the same with theirs.
+  - *Mockup:* [mockups/sevak-qdrant-admin.html](mockups/sevak-qdrant-admin.html), the caution notice for a plain TCP endpoint; copied unchanged from Sevak's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-037"></a> **REQ-UI-037** (extends BRD-9 NumericInput and BRD-10 Slider) NumericInput and Slider emit valid, invariant ARIA range attributes (Sevak TR-033, TR-034)
+  - *Acceptance:* When a NumericInput renders on its demo screen, then it carries role spinbutton with its range attributes, and its numbers and the Slider's use a dot decimal in every culture.
+  - *Mockup:* [mockups/sevak-admin-settings.html](mockups/sevak-admin-settings.html), the upload-size numeric field; copied unchanged from Sevak's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-038"></a> **REQ-UI-038** (extends BRD-9 NumericInput) NumberInput fails the build with a message naming NumericInput (Sevak TR-039)
+  - *Acceptance:* When a consumer writes NumberInput in a Razor file, then the build fails with an error naming NumericInput instead of rendering an invisible element.
+  - *Mockup:* [mockups/sevak-agents.html](mockups/sevak-agents.html), the step-budget numeric field; copied unchanged from Sevak's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-039"></a> **REQ-UI-039** (extends BRD-5 Textarea) Textarea takes Rows and MaxRows and grows with its content up to the cap (Sevak TR-026)
+  - *Acceptance:* When a consumer sets Rows and MaxRows on the Textarea demo screen, then the box starts at Rows lines, grows as text is typed, and scrolls once MaxRows is reached.
+  - *Mockup:* [mockups/sevak-workspace-chat.html](mockups/sevak-workspace-chat.html), the composer that grows to about twelve lines; copied unchanged from Sevak's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-040"></a> **REQ-UI-040** (extends BRD-25 DataTable) Table family for a plain markup table: Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption (Sevak TR-028)
+  - *Acceptance:* When a consumer composes the Table family on the Table demo screen, then a styled table renders from plain markup with no record type, toolbar or pager.
+  - *Mockup:* [mockups/sevak-connectors.html](mockups/sevak-connectors.html), the Jobs table; copied unchanged from Sevak's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-041"></a> **REQ-UI-041** (extends BRD-16 Card and BRD-24 Alert) CardTitle and AlertTitle take an As heading level (Sevak TR-008)
+  - *Acceptance:* When a consumer sets As on CardTitle or AlertTitle on their demo screens, then that heading element renders with the same classes, and the default is unchanged.
+  - *Mockup:* [mockups/sevak-admin-settings.html](mockups/sevak-admin-settings.html), the card and alert headings in one outline; copied unchanged from Sevak's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-042"></a> **REQ-UI-042** (extends BRD-7 Select) Select shows its placeholder when the bound value matches no item (Sevak TR-024)
+  - *Acceptance:* When a Select is bound to a value no item carries on the Select demo screen, then the trigger shows the placeholder instead of the raw value.
+  - *Mockup:* [mockups/sevak-qdrant-admin.html](mockups/sevak-qdrant-admin.html), the distance-metric picker; copied unchanged from Sevak's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-043"></a> **REQ-UI-043** (extends BRD-32 Charts) The six chart components take unmatched attributes like every other component (Sevak TR-044 census)
+  - *Acceptance:* When a consumer puts a data-testid on a chart on the Charts demo screens, then it lands on the chart's root element and the chart still draws.
+  - *Mockup:* [mockups/sevak-token-usage.html](mockups/sevak-token-usage.html), the usage charts; copied unchanged from Sevak's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-fn-011"></a> **REQ-FN-011** (extends BRD-27 sanitized rich text) HtmlSanitizer on a stable 9.1.x release with no vulnerable AngleSharp (Sevak TR-037)
+  - *Acceptance:* When the Components package is restored on the Rich Text Editor demo screen, then its HtmlSanitizer dependency is a stable 9.1.x release and no transitive package carries an open advisory.
+
+- <a id="d-req-ui-044"></a> **REQ-UI-044** (extends BRD-7 Select and BRD-23 reactive portal) A Select inside a Dialog never freezes the page: a portal or positioning failure is logged and the list falls back, never thrown into the circuit (Sevak TR-041)
+  - *Acceptance:* When the floating-position script fails for a Select inside a Dialog on the Dialog demo screen, then the page keeps answering clicks and no error banner shows.
+  - *Mockup:* [mockups/sevak-tasks.html](mockups/sevak-tasks.html), the Add task dialog with its pickers; copied unchanged from Sevak's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-045"></a> **REQ-UI-045** (extends BRD-28 display components and BRD-5 Textarea) Chat family: ChatThread, ChatMessage and ChatComposer for a message thread with a composer (Sevak TR-006)
+  - *Acceptance:* When a consumer composes the chat family on the Chat demo screen, then messages align by role, a streaming message shows Typing, and Enter sends while Shift+Enter adds a line.
+  - *Mockup:* [mockups/sevak-workspace-chat.html](mockups/sevak-workspace-chat.html), the message column and composer; copied unchanged from Sevak's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
 
 
 ## Editor

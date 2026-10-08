@@ -279,6 +279,30 @@
         </div>
     </div>
 
+    <!-- Heading level -->
+    <div class="space-y-4" data-testid="card-title-as-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Heading Level</h2>
+            <p class="text-sm text-muted-foreground">
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">CardTitle</code> renders an
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">h3</code> by default. Set
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">As</code> to another element so the page
+                keeps a correct heading outline; the classes stay the same.
+            </p>
+        </div>
+        <div class="grid gap-4" style="max-width: 400px;">
+            <Card>
+                <CardHeader>
+                    <CardTitle As="h2" data-testid="card-title-h2">Quarterly report</CardTitle>
+                    <CardDescription>This title is an h2, because it is the page's second-level heading.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p class="text-sm">Same look as every other card title, different outline level.</p>
+                </CardContent>
+            </Card>
+        </div>
+    </div>
+
     <!-- Accessibility Notes -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -320,6 +344,10 @@
         &lt;Button&gt;Action&lt;/Button&gt;
     &lt;/CardFooter&gt;
 &lt;/Card&gt;</code></pre>
+            </div>
+            <div class="rounded-lg border bg-card p-4">
+                <h3 class="text-sm font-medium mb-2">CardTitle</h3>
+                <p class="text-xs text-muted-foreground"><strong>As:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - the heading element to render (default <code class="bg-muted px-1 py-0.5 rounded">h3</code>); any element name, e.g. h2, h4, div. Classes and additional attributes are unchanged.</p>
             </div>
         </div>
     </div>

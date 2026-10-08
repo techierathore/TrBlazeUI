@@ -29,7 +29,13 @@ problem is in this table, the control exists — do not hand-build it.
 | A vector tick, spinner or pause in a step's marker instead of the text glyph | `StepperItem` `Icon` (2.1.3) | §8 |
 | A failed or stopped status as a soft red pill beside Success, Info and Warning | `Badge Variant="BadgeVariant.Danger"` (2.1.3); `Destructive` is the solid fill | §6 |
 | Colour one badge's label without changing its variant | `Class="text-destructive"` (or any text colour) — replaces the variant's text colour (2.1.3) | §6 |
-| Draw a tab's close mark as a text `×` (or anything else) instead of the built-in svg | `EditorTabs` `CloseContent` (after 2.1.3) | §2.0.9 |
+| Draw a tab's close mark as a text `×` (or anything else) instead of the built-in svg | `EditorTabs` `CloseContent` (2.1.4) | §2.0.9 |
+| A table that is just markup — no record type, toolbar or pager | `Table` + `TableHeader`/`TableBody`/`TableRow`/`TableHead`/`TableCell`/`TableCaption` (after 2.1.4) | §6 |
+| A warning, info or success toast, not only default and error | `ToastService.Warning` / `.Info` / `.Success`, `ToastVariant.Warning` / `Info` / `Success` (after 2.1.4) | §7 |
+| Run code when an alert dialog's confirm button is pressed | `AlertDialogAction OnClick` (and `AlertDialogCancel OnClick`) (after 2.1.4) | §7 |
+| A text box that grows with its content up to a cap, then scrolls | `Textarea Rows="3" MaxRows="12"` (after 2.1.4) | §5 |
+| A card or alert title at another heading level | `CardTitle As="h2"`, `AlertTitle As="h3"` (after 2.1.4) | §3, §7 |
+| A chat: a thread that follows new messages, bubbles by role with a streaming state, a composer where Enter sends | `ChatThread` + `ChatMessage` + `ChatComposer` (after 2.1.4) | §8 |
 
 ---
 
@@ -80,6 +86,14 @@ These rules are non-negotiable. Violating them produces broken or inconsistent U
   `RowAttributes`, `HeaderRowAttributes` and `SelectAllAttributes` (§6, added in 2.1.0).
   `BreadcrumbList` is a special case: it has no element
   either, but it forwards its attributes onto the `<ol>` that `Breadcrumb` renders.
+
+- **The parameter tables list what a component adds, not what every component has.** `Class`
+  (merged with the component's own classes) and `AdditionalAttributes` (the splat above) are on
+  every component and are not repeated in each table. Where a table names `AriaLabel`, the
+  component declares that parameter; where it does not, write the raw `aria-label="…"` attribute,
+  which the splat forwards — an `AriaLabel="…"` on a component without the parameter is splatted
+  verbatim as a meaningless `arialabel` attribute, with no warning (Sevak TR-038). The shipped
+  `TrBlazeUI.Components.xml` in the package is the complete list of parameters.
 
 - **Tailwind utilities work in application markup.** `trblazeui.css` ships the standard Tailwind
   scale (spacing, sizing, grid, flex, typography, colour tokens) with the `sm:`/`md:`/`lg:`/`xl:`/
@@ -242,10 +256,12 @@ builder.Services.AddScoped<ToastService>();  // Required for Toast notifications
 @using ApexCharts
 @using TrBlazeUI.Components.Button
 @using TrBlazeUI.Components.Card
+@using TrBlazeUI.Components.Chat
 @using TrBlazeUI.Components.Checkbox
 @using TrBlazeUI.Components.RadioGroup
 @using TrBlazeUI.Components.Select
 @using TrBlazeUI.Components.Switch
+@using TrBlazeUI.Components.Table
 @using TrBlazeUI.Components.Separator
 @using TrBlazeUI.Components.Badge
 @using TrBlazeUI.Components.Sidebar
@@ -387,6 +403,14 @@ silently at runtime; the compiler does not diagnose the missing namespace.
 <PortalHost />
 ```
 
+> **The layout that holds `PortalHost` and `ToastProvider` must render interactively.** Every
+> overlay (`Select` list, `Dialog`, `Sheet`, toasts, tooltips) renders into `PortalHost`. If
+> `App.razor` renders `<Routes />` statically and only the pages set `@rendermode`, the layout is
+> a static tree and nothing can render into it: no toast appears, a `Select` never opens and the
+> console shows `Floating element is not ready` or `Portal … render timeout` (Sevak TR-001). Use
+> global interactivity (`@rendermode="InteractiveServer"` on `<Routes />` and `<HeadOutlet />`),
+> or put the interactive render mode on the layout that contains `PortalHost`.
+
 ### CSS Imports (in order)
 
 ```html
@@ -394,6 +418,10 @@ silently at runtime; the compiler does not diagnose the missing namespace.
 <link rel="stylesheet" href="_content/TrBlazeUI.Components/trblazeui.css" />
 <link rel="stylesheet" href="styles/base.css" />
 ```
+
+Link the project's own scoped bundle (`<link href="{AssemblyName}.styles.css" />`) **only if the
+project has `.razor.css` files**; without them the bundle is never generated and the link 404s on
+every page (Sevak TR-002). The library needs no scoped bundle.
 
 ---
 
@@ -616,6 +644,10 @@ SidebarProvider
 | ChildContent | RenderFragment | - | Card content |
 
 Sub-components: `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`, `CardAction`
+
+`CardTitle As="h2"` (after 2.1.4) renders the title as that element — any element name, default `h3` —
+so the page keeps a correct heading outline; the classes do not change. `AlertTitle` has the same
+`As` (default `h5`). Sevak TR-008.
 
 ```razor
 <Card>
@@ -1073,10 +1105,13 @@ Sub-components: `ButtonIcon`
 | Required | bool | false | Required field |
 | AriaLabel | string? | null | Accessible name (see the note under `Input`) |
 | DebounceMilliseconds | int | 0 | Delay before `ValueChanged` fires |
+| Rows | int? | null | **After 2.1.4.** Starting height in lines (the `rows` attribute); the box still grows with its content |
+| MaxRows | int? | null | **After 2.1.4.** Cap in lines; past it the box scrolls. Growth relies on CSS `field-sizing: content` (Chromium 123+, Safari 18); a browser without it keeps the `Rows` height |
 | Class | string? | null | Additional CSS classes |
 
 ```razor
 <Textarea @bind-Value="description" Placeholder="Enter description" MaxLength="500" />
+<Textarea @bind-Value="objMessage" Rows="3" MaxRows="12" Placeholder="Type a message" />  @* a chat composer (Sevak TR-026) *@
 ```
 
 > **Blazor Server note.** `Input` and `Textarea` keep the DOM value and the server echo separate, so
@@ -1164,6 +1199,18 @@ or call `Refresh()` (see "Mutating a row in place" under `DataTable`).
 `Small` also suits a dense settings list or a toolbar; `Large` is for a single prominent switch.
 
 ### Select (Generic)
+
+> **Testing note.** Playwright's `getByRole('option', { name: 'OpenAI (Cloud)' })` matches on a
+> substring, so it also finds "Azure OpenAI (Cloud)". Pass `exact: true` in every option locator
+> (Sevak TR-012). This is Playwright's rule, not the component's.
+
+> **A Select inside a Dialog, Sheet or other portal (after 2.1.4).** The listbox renders inline
+> inside the dialog's layer and positions itself with `position: fixed`, so it stacks above the
+> overlay. If the Select's script cannot be fetched, or the positioning library fails, or the portal
+> host never reports the render, the component logs a warning to the server log and falls back
+> (list under its trigger, or rendered inline) — it never throws into the circuit, so the page keeps
+> answering (Sevak TR-041). A page that freezes with "An unhandled error has occurred" after a click
+> is therefore not this component; look for the exception in the server log.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -1346,6 +1393,10 @@ visible trigger button. `TimePicker` follows the same rule.
 <Slider @bind-Value="volume" Min="0" Max="100" Step="1" />
 ```
 
+`aria-valuemin` / `aria-valuemax` / `aria-valuenow` are written with a dot decimal in every culture
+(after 2.1.4; `Progress` since 2.0.9). A comma-decimal UI culture used to emit `0,5`, which is not a
+valid ARIA number (Sevak TR-033).
+
 ### RangeSlider
 
 ```razor
@@ -1354,9 +1405,19 @@ visible trigger button. `TimePicker` follows the same rule.
 
 ### NumericInput
 
+The component is `NumericInput<TValue>` in namespace `TrBlazeUI.Components.NumericInput`. There
+is **no `NumberInput`**: writing one compiles to an error that names `NumericInput` (after 2.1.4;
+before that it rendered an invisible unknown element — Sevak TR-039).
+
 ```razor
-<NumericInput @bind-Value="quantity" Min="0" Max="100" Step="1" />
+<NumericInput TValue="int" @bind-Value="quantity" Min="0" Max="100" Step="1" />
 ```
+
+The input is `role="spinbutton"` with `aria-valuemin` / `aria-valuemax` / `aria-valuenow`, whether or
+not `ShowButtons` is set, and the numbers use a dot decimal in every culture (after 2.1.4; Sevak
+TR-033, TR-034). Parameters: `Value`/`ValueChanged`, `Min`, `Max`, `Step`, `DecimalPlaces`,
+`AllowNegative`, `ShowButtons`, `Placeholder`, `Disabled`, `Required`, `Id`, `AriaLabel`,
+`AriaDescribedBy`, `AriaInvalid`, `Format`, `Class`, plus unmatched attributes on the container.
 
 ### CurrencyInput
 
@@ -1631,6 +1692,40 @@ overflows, which is visible. Say which behaviour you want:
 
 `Wrap` also drops the `rounded-full` pill radius to a corner radius, because a 999px radius on a
 three-line box turns the end caps into deep arcs that cut into the first and last lines.
+
+### Table — a plain markup table (after 2.1.4)
+
+For a fixed, already ordered list shown as a table — no record type, no toolbar, no pager. Reach
+for `DataTable` when the rows need sorting, filtering, paging or selection. `@using
+TrBlazeUI.Components.Table` in the page (not globally — the headless `TrBlazeUI.Primitives.Table`
+family under `DataTable` shares the names). Sevak TR-028.
+
+| Component | Renders | Notes |
+|---|---|---|
+| `Table` | `<div data-slot="table-container" class="relative w-full overflow-x-auto"><table data-slot="table">` | a wide table scrolls inside its container instead of widening the page |
+| `TableHeader` / `TableBody` / `TableFooter` | `thead` / `tbody` / `tfoot` | |
+| `TableRow` | `tr`, `Selected="true"` adds `data-state="selected"` and the muted background | |
+| `TableHead` / `TableCell` | `th` / `td` | |
+| `TableCaption` | `caption`, drawn below the rows | |
+
+Every part takes `Class` (merged) and unmatched attributes (`colspan`, `data-testid`, …).
+
+```razor
+<Table>
+    <TableCaption>A list of recent invoices.</TableCaption>
+    <TableHeader>
+        <TableRow><TableHead>Invoice</TableHead><TableHead Class="text-right">Amount</TableHead></TableRow>
+    </TableHeader>
+    <TableBody>
+        @foreach (var vRow in objRows)
+        {
+            <TableRow Selected="@(vRow.Id == objSelectedId)">
+                <TableCell>@vRow.Id</TableCell><TableCell Class="text-right">@vRow.Amount</TableCell>
+            </TableRow>
+        }
+    </TableBody>
+</Table>
+```
 
 ### DataTable (Generic) — rows, sorting, paging, and letting the user choose rows
 
@@ -2020,7 +2115,9 @@ supply both an `Icon` fragment and action content, name **both** fragments expli
 | Icon | RenderFragment? | null | Icon content |
 | Class | string? | null | Additional CSS classes |
 
-Sub-components: `AlertTitle`, `AlertDescription`, `AlertIcon`
+Sub-components: `AlertTitle`, `AlertDescription`, `AlertIcon`. `AlertTitle As="h3"` (after 2.1.4)
+renders the title as that element, default `h5`, same classes — for a correct heading outline
+(Sevak TR-008).
 
 ```razor
 <Alert Variant="AlertVariant.Default">
@@ -2099,11 +2196,22 @@ Sub-components: `AlertDialogTrigger`, `AlertDialogContent`, `AlertDialogHeader`,
         </AlertDialogHeader>
         <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction>Continue</AlertDialogAction>
+            <AlertDialogAction OnClick="DeleteAsync">Continue</AlertDialogAction>
         </AlertDialogFooter>
     </AlertDialogContent>
 </AlertDialog>
 ```
+
+#### AlertDialogAction and AlertDialogCancel (after 2.1.4)
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| OnClick | EventCallback<MouseEventArgs> | - | Runs when the button is pressed; the dialog closes as well. Before 2.1.5 the parts had no `OnClick`, so a handler had to go on a `Button` inside them (Sevak TR-044) |
+| PreventClose | bool | false | Keep the dialog open and only run `OnClick` — for a confirm that can fail |
+| AsChild | bool | true | The child `Button` is the rendered element |
+
+A controlled `<AlertDialog @bind-Open="objIsOpen">` opens from any button on the page, with no
+`AlertDialogTrigger` (Sevak TR-031, fixed before 2.1.4).
 
 #### AlertDialogContent
 
@@ -2337,10 +2445,18 @@ top-right close button stay pinned while long content moves under them.
     // .Show(description, title?, variant?, duration?)
     // .Success(description, title?)
     // .Error(description, title?)
+    // .Warning(description, title?)   after 2.1.4
+    // .Info(description, title?)      after 2.1.4
     // .Dismiss(id)
     // .DismissAll()
 }
 ```
+
+`ToastVariant`: `Default`, `Destructive`, and (after 2.1.4) `Success`, `Info`, `Warning` on the same
+`--alert-*` tokens as `AlertVariant` and `BadgeVariant`, so the three status families agree (Sevak
+TR-023). `Warning()` and `Info()` use their tints; `Success()` keeps the default look it always had,
+so pass `ToastVariant.Success` to `Show(...)` for the green tint. The empty toast viewport lets
+clicks through (`pointer-events: none`); each toast takes its own (after 2.1.4; Sevak TR-043).
 
 ### Toolbar
 
@@ -2749,6 +2865,35 @@ surface from whatever it is placed in:
         </ChartContainer>
     </CardContent>
 </Card>
+```
+
+### Chat — a message thread with a composer (after 2.1.4)
+
+`@using TrBlazeUI.Components.Chat`. Three parts; the message body is yours (plain text, or `Prose`
+for rendered markdown). Sevak TR-006.
+
+| Component | Parameters | What it does |
+|---|---|---|
+| `ChatThread` | `StickToEnd` (true), `Class` (give the height here, e.g. `h-96`), `ChildContent` | a `role="log" aria-live="polite"` list inside a `ScrollArea` that follows the newest message until the reader scrolls up |
+| `ChatMessage` | `Role` (`ChatRole.User` / `Assistant` / `System`, default Assistant), `Author`, `Streaming`, `ChildContent`, `Trace`, `Attachments`, `Footer`, `Avatar`, `Class` | one bubble: User right-aligned in the primary colour, Assistant left on the muted surface, System centred and small. `Streaming="true"` adds `Typing` under the body and `aria-busy="true"`. `Trace` is a monospace block above the body (a tool run), `Attachments` a chip row below it (citations), `Footer` a small last line (time, model). `Footer`, not `Meta`: Razor rejects `<Meta>` as a child tag because `meta` is an HTML void element |
+| `ChatComposer` | `Value`/`ValueChanged` (`@bind-Value`), `OnSend` (`EventCallback<string>`, trimmed text, never empty), `Placeholder`, `AriaLabel`, `SendLabel`, `Rows` (1), `MaxRows` (12), `Disabled`, `Sending`, `SubmitOnEnter` (true), `ClearOnSend` (true), `Actions`, `Class` | the text box with its send button; Enter sends and Shift+Enter adds a line (IME composition respected); `Actions` renders a row of controls above the box (a mode picker, a microphone button) |
+
+Named fragments (`Trace`, `Attachments`, `Footer`, `Avatar`, `Actions`) must be direct children of
+the component tag — Razor refuses an `@if` around them (RZ9996); pass a `RenderFragment` variable as
+an attribute when a slot is optional.
+
+```razor
+<ChatThread Class="h-96">
+    <ChatMessage Role="ChatRole.User">What liability caps did we agree with Acme?</ChatMessage>
+    <ChatMessage Author="agent" Attachments="@objCitations" Footer="@objStamp">
+        <Trace><div>→ rag_search("liability cap") · 4 chunks · 0.4s</div></Trace>
+        <ChildContent><Prose Html="@objAnswerHtml" /></ChildContent>
+    </ChatMessage>
+    <ChatMessage Author="agent" Streaming="true">Comparing the Acme cap with the standard template</ChatMessage>
+</ChatThread>
+<ChatComposer @bind-Value="objDraft" OnSend="SendAsync" Placeholder="Ask about these documents">
+    <Actions><NativeSelect @bind-Value="objMode">…</NativeSelect></Actions>
+</ChatComposer>
 ```
 
 ### Prose (rendered HTML you did not author)
@@ -3698,7 +3843,8 @@ source* — see the next heading — and only rarely *wait for it to be built*.
 
 | Version | Released | Component namespaces | What it added |
 |---|---|---|---|
-| **After 2.1.3** | — | 85 | `EditorTabs.CloseContent` — draw a tab's close mark yourself (a text `×`) in place of the svg |
+| **After 2.1.4** | — | 87 | `Chat` family (`ChatThread`, `ChatMessage`, `ChatComposer`); a `Select` inside a `Dialog` never freezes the page (script, positioning and portal failures fall back and log); `Table` family (plain markup table); `ToastVariant.Success`/`Info`/`Warning` + `ToastService.Warning`/`Info`; `AlertDialogAction`/`AlertDialogCancel` `OnClick`/`PreventClose`; `Textarea.Rows`/`MaxRows`; `CardTitle`/`AlertTitle` `As`; `NumericInput` always `role="spinbutton"`, invariant ARIA numbers on `NumericInput` and `Slider`; `NumberInput` is a compile error naming `NumericInput`; a `Select` bound to a value no item carries shows its placeholder; the empty toast viewport lets clicks through; `HtmlSanitizer` on a stable 9.1.x |
+| **2.1.4** | 2026-10-07 | 85 | `EditorTabs.CloseContent` — draw a tab's close mark yourself (a text `×`) in place of the svg |
 | **2.1.3** | 2026-10-07 | 85 | `EditorTabs.TabAttributes`; `StepperItem.Icon`; `BadgeVariant.Danger`; `cn()` treats hyphenated text colours (`text-secondary-foreground`) as one group, so a `Class` text colour replaces a component's own |
 | **2.1.2** | 2026-10-03 | 85 | `Switch.Outlined` |
 | **2.1.1** | 2026-10-02 | 85 | No control reports an unhandled error when its page stops answering during dispose (17 more controls) |
@@ -3708,7 +3854,7 @@ source* — see the next heading — and only rarely *wait for it to be built*.
 | **2.0.7** | 2026-09-15 | 79 | `InputGroupInput.DebounceMilliseconds`; the chart teardown fix |
 | **2.0.6** | 2026-09-13 | 79 | everything earlier; see `CHANGELOG.md` |
 
-Everything in this document describes the package it came with; a feature marked "after 2.1.3" arrives in the release that follows 2.1.3. Each control's own section has its full parameter
+Everything in this document describes the package it came with; a feature marked "after 2.1.4" arrives in the release that follows 2.1.4. Each control's own section has its full parameter
 table; the version table above only says when it arrived. `CHANGELOG.md` has the detail per
 release.
 

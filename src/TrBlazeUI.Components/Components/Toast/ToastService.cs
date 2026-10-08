@@ -47,7 +47,9 @@ public class ToastService
     }
 
     /// <summary>
-    /// Shows a success toast (default variant).
+    /// Shows a success toast. It keeps the <see cref="ToastVariant.Default"/> look it has always
+    /// had; pass <see cref="ToastVariant.Success"/> to <see cref="Show(string, string?, ToastVariant, int)"/>
+    /// for the tinted green surface.
     /// </summary>
     /// <param name="description">The message to display.</param>
     /// <param name="title">Optional title.</param>
@@ -61,6 +63,24 @@ public class ToastService
     /// <param name="title">Optional title.</param>
     public void Error(string description, string? title = null) =>
         Show(description, title, ToastVariant.Destructive);
+
+    /// <summary>
+    /// Shows a warning toast (<see cref="ToastVariant.Warning"/>): a caution about an operation
+    /// that succeeded, which neither <see cref="Success"/> nor <see cref="Error"/> conveys
+    /// (Sevak TR-023).
+    /// </summary>
+    /// <param name="description">The message to display.</param>
+    /// <param name="title">Optional title.</param>
+    public void Warning(string description, string? title = null) =>
+        Show(description, title, ToastVariant.Warning);
+
+    /// <summary>
+    /// Shows an informational toast (<see cref="ToastVariant.Info"/>).
+    /// </summary>
+    /// <param name="description">The message to display.</param>
+    /// <param name="title">Optional title.</param>
+    public void Info(string description, string? title = null) =>
+        Show(description, title, ToastVariant.Info);
 
     /// <summary>
     /// Dismisses a specific toast by ID.

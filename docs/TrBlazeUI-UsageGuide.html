@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)</h1>
-    <div class="sub">Last rendered: 2026-10-07</div>
+    <div class="sub">Last rendered: 2026-10-08</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#test-users-canonical-use-these-for-all-smoke-verify-uat">Test users (canonical — use THESE for all smoke / verify / UAT)</a></li>
@@ -134,7 +134,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
-        <li class="h3"><a href="#added-2026-10-07-chatur-tr-018-req-ui-033-not-yet-released">Added 2026-10-07 (Chatur TR-018 — REQ-UI-033 — not yet released)</a></li>
+        <li class="h3"><a href="#added-2026-10-07-sevak-feedback-req-ui-034-req-ui-043-req-fn-011-not-yet-released">Added 2026-10-07 (Sevak feedback — REQ-UI-034…REQ-UI-043, REQ-FN-011 — not yet released)</a></li>
+        <li class="h3"><a href="#added-2026-10-07-chatur-tr-018-req-ui-033-2-1-4">Added 2026-10-07 (Chatur TR-018 — REQ-UI-033 — 2.1.4)</a></li>
         <li class="h3"><a href="#added-2026-10-07-chatur-batch-5-req-ui-030-req-ui-032-2-1-3">Added 2026-10-07 (Chatur batch 5 — REQ-UI-030…REQ-UI-032 — 2.1.3)</a></li>
         <li class="h3"><a href="#added-2026-10-02-to-2026-10-03-chatur-batches-3-and-4-req-ui-026-req-ui-029-2-1-0-to-2-1-2">Added 2026-10-02 to 2026-10-03 (Chatur batches 3 and 4 — REQ-UI-026…REQ-UI-029 — 2.1.0 to 2.1.2)</a></li>
         <li class="h3"><a href="#added-2026-09-20-to-2026-09-22-chatur-batches-1-and-2-req-ui-021-req-ui-025-2-0-8-and-2-0-9">Added 2026-09-20 to 2026-09-22 (Chatur batches 1 and 2 — REQ-UI-021…REQ-UI-025 — 2.0.8 and 2.0.9)</a></li>
@@ -148,7 +149,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)</h1>
-    <div class="subtitle">Rendered 2026-10-07 &middot; source <code>TrBlazeUI-UsageGuide.md</code></div>
+    <div class="subtitle">Rendered 2026-10-08 &middot; source <code>TrBlazeUI-UsageGuide.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -178,7 +179,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
-        <li class="h3"><a href="#added-2026-10-07-chatur-tr-018-req-ui-033-not-yet-released">Added 2026-10-07 (Chatur TR-018 — REQ-UI-033 — not yet released)</a></li>
+        <li class="h3"><a href="#added-2026-10-07-sevak-feedback-req-ui-034-req-ui-043-req-fn-011-not-yet-released">Added 2026-10-07 (Sevak feedback — REQ-UI-034…REQ-UI-043, REQ-FN-011 — not yet released)</a></li>
+        <li class="h3"><a href="#added-2026-10-07-chatur-tr-018-req-ui-033-2-1-4">Added 2026-10-07 (Chatur TR-018 — REQ-UI-033 — 2.1.4)</a></li>
         <li class="h3"><a href="#added-2026-10-07-chatur-batch-5-req-ui-030-req-ui-032-2-1-3">Added 2026-10-07 (Chatur batch 5 — REQ-UI-030…REQ-UI-032 — 2.1.3)</a></li>
         <li class="h3"><a href="#added-2026-10-02-to-2026-10-03-chatur-batches-3-and-4-req-ui-026-req-ui-029-2-1-0-to-2-1-2">Added 2026-10-02 to 2026-10-03 (Chatur batches 3 and 4 — REQ-UI-026…REQ-UI-029 — 2.1.0 to 2.1.2)</a></li>
         <li class="h3"><a href="#added-2026-09-20-to-2026-09-22-chatur-batches-1-and-2-req-ui-021-req-ui-025-2-0-8-and-2-0-9">Added 2026-09-20 to 2026-09-22 (Chatur batches 1 and 2 — REQ-UI-021…REQ-UI-025 — 2.0.8 and 2.0.9)</a></li>
@@ -424,7 +426,28 @@ bash tests/package/codex-agent-deployment.sh</code></pre>
 </li>
 </ul>
 <h2 id="consumer-integration-notes">Consumer integration notes<a class="anchor-link" href="#consumer-integration-notes">#</a></h2>
-<h3 id="added-2026-10-07-chatur-tr-018-req-ui-033-not-yet-released"><a id="added-2026-10-07-chatur-tr-018--req-ui-033--not-yet-released"></a>Added 2026-10-07 (Chatur TR-018 — REQ-UI-033 — not yet released)<a class="anchor-link" href="#added-2026-10-07-chatur-tr-018-req-ui-033-not-yet-released">#</a></h3>
+<h3 id="added-2026-10-07-sevak-feedback-req-ui-034-req-ui-043-req-fn-011-not-yet-released"><a id="added-2026-10-07-sevak-feedback--req-ui-034req-ui-043-req-fn-011--not-yet-released"></a>Added 2026-10-07 (Sevak feedback — REQ-UI-034…REQ-UI-043, REQ-FN-011 — not yet released)<a class="anchor-link" href="#added-2026-10-07-sevak-feedback-req-ui-034-req-ui-043-req-fn-011-not-yet-released">#</a></h3>
+<ul>
+<li><strong><code>Table</code> family</strong> (<code>Table</code>, <code>TableHeader</code>, <code>TableBody</code>, <code>TableFooter</code>, <code>TableRow</code>, <code>TableHead</code>, <code>TableCell</code>, <code>TableCaption</code>) for a table that is just markup; import <code>TrBlazeUI.Components.Table</code> in the page, not globally.
+</li>
+<li><strong><code>ToastService.Warning</code> and <code>.Info</code></strong>, with <code>ToastVariant.Success</code>, <code>Info</code> and <code>Warning</code> on the alert tokens. The empty toast viewport no longer blocks clicks at the window's edge.
+</li>
+<li><strong><code>AlertDialogAction</code> and <code>AlertDialogCancel</code> take <code>OnClick</code></strong> (and <code>PreventClose</code> to keep the dialog open).
+</li>
+<li><strong><code>Textarea Rows</code> and <code>MaxRows</code></strong>: start height and a cap after which the box scrolls.
+</li>
+<li><strong><code>CardTitle As</code> and <code>AlertTitle As</code></strong>: pick the heading element for a correct outline.
+</li>
+<li><strong><code>NumericInput</code></strong> is always a spinbutton and, like <code>Slider</code>, writes its ARIA numbers with a dot decimal in every culture. Writing <code>NumberInput</code> is now a build error that names <code>NumericInput</code>.
+</li>
+<li><strong><code>Select</code></strong> shows its placeholder when the bound value matches no item, and a Select inside a Dialog can no longer freeze the page: a failed script, positioning or portal render is logged and falls back instead of killing the circuit.
+</li>
+<li><strong><code>ChatThread</code>, <code>ChatMessage</code>, <code>ChatComposer</code></strong>: a message thread that follows new messages, bubbles aligned by role with a streaming state, and a composer where Enter sends and Shift+Enter adds a line.
+</li>
+<li><strong><code>HtmlSanitizer</code></strong> moves to a stable 9.1.x release.
+</li>
+</ul>
+<h3 id="added-2026-10-07-chatur-tr-018-req-ui-033-2-1-4"><a id="added-2026-10-07-chatur-tr-018--req-ui-033--214"></a>Added 2026-10-07 (Chatur TR-018 — REQ-UI-033 — 2.1.4)<a class="anchor-link" href="#added-2026-10-07-chatur-tr-018-req-ui-033-2-1-4">#</a></h3>
 <ul>
 <li><strong><code>EditorTabs.CloseContent</code></strong> draws what you put in it inside every tab's close button instead of the built-in svg cross, for a design that draws the close mark as a text <code>×</code>. The button keeps its accessible name ("Close Program.cs"), so the content needs no label. Leave it out and the svg is drawn as before.
 </li>

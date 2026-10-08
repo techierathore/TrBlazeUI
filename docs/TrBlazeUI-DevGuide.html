@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="sub">Last rendered: 2026-10-07</div>
+    <div class="sub">Last rendered: 2026-10-08</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#table-of-contents">Table of Contents</a></li>
@@ -126,7 +126,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="subtitle">Rendered 2026-10-07 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
+    <div class="subtitle">Rendered 2026-10-08 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -298,6 +298,9 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <thead><tr><th>Screen</th><th>Route</th><th>Demo page file</th><th>Library surface exercised</th><th>Seen 2026-10-07</th></tr></thead>
 <tbody>
 <tr><td>Code Editor</td><td><code>/components/code-editor</code></td><td><code>Pages/Components/CodeEditorDemo.razor</code></td><td><code>CodeEditor</code>, <code>EditorTabs</code> (<code>TabAttributes</code>, <code>CloseContent</code>)</td><td>renders at 1366 and 390; tabs carry <code>tab-program-cs</code> etc.; the second strip draws a text × close mark</td></tr>
+<tr><td>Chat</td><td><code>/components/chat</code></td><td><code>Pages/Components/ChatDemo.razor</code></td><td><code>ChatThread</code> → <code>ScrollArea StickToEnd</code>; <code>ChatMessage</code> → <code>Typing</code>; <code>ChatComposer</code> → <code>Textarea</code> + <code>chat-composer.js</code></td><td>renders at 1280 and 390; Enter sends, Shift+Enter adds a line (req-ui-045.spec.ts)</td></tr>
+<tr><td>Dialog (Select inside)</td><td><code>/components/dialog</code></td><td><code>Pages/Components/DialogDemo.razor</code></td><td><code>SelectContent</code> → <code>FloatingPortal</code> (inline when nested) → <code>positioning.js</code>, <code>element-utils.js placeUnderAnchor</code></td><td>renders at 1280 and 390; with select.js blocked or computePosition failing the page keeps answering (req-ui-044.spec.ts)</td></tr>
+<tr><td>Table</td><td><code>/components/table</code></td><td><code>Pages/Components/TableDemo.razor</code></td><td><code>Table</code> family (<code>Components/Table/</code>)</td><td>renders at 1280 and 390; plain markup, no record type</td></tr>
 <tr><td>Stepper</td><td><code>/components/stepper</code></td><td><code>Pages/Components/StepperDemo.razor</code></td><td><code>StepperItem</code> (<code>Status</code>, <code>Trailing</code>, <code>Icon</code>)</td><td>renders at 1366 and 390</td></tr>
 <tr><td>Badge</td><td><code>/components/badge</code></td><td><code>Pages/Components/BadgeDemo.razor</code></td><td><code>Badge</code> (<code>Danger</code>) → <code>ClassNames.cn</code> → <code>TailwindMerge</code></td><td>renders at 1366 and 390</td></tr>
 <tr><td>Switch</td><td><code>/components/switch</code></td><td><code>Pages/Components/SwitchDemo.razor</code></td><td><code>Switch</code> (<code>Outlined</code>, 2.1.2)</td><td>renders at 1366 and 390</td></tr>
@@ -311,6 +314,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </tbody>
 </table>
 <p>Call chain (tab attributes): <code>EditorTabs.razor</code> <code>@foreach</code> over <code>Items</code> → <code>TabAttributes(vItem)</code> → <code>SplitTabAttributes</code> → <code>class</code> merged through <code>ClassNames.cn</code>, the rest splatted on the tab's <code>&lt;li&gt;</code>.</p>
+<p>Call chain (Select inside a Dialog, Sevak TR-041): <code>SelectContent.razor</code> (Primitives) <code>OnAfterRenderAsync</code> → <code>import select.js</code> inside try/catch → <code>FloatingPortal.razor</code> <code>OnAfterRenderAsync</code> → portal ready or timeout → timeout sets <code>objUseInlineFallback</code> + <code>objPendingInlineSetup</code>, re-renders inline → <code>SetupAsync</code> → <code>SetupPositioningAsync</code>; its catch → <code>PlaceUnderAnchorAsync</code> → <code>element-utils.js placeUnderAnchor</code>.</p>
 <p>Call chain (close mark): <code>EditorTabs.razor</code> close <code>&lt;button data-slot="editor-tab-close"&gt;</code> → <code>CloseContent</code> when set, else the built-in 12px svg; the button's <code>aria-label</code>, classes and <code>@onclick</code> are outside the branch, so they never change.</p>
 <p>Call chain (step icon): <code>StepperItem.razor</code> marker <code>&lt;span data-slot="stepper-item-marker"&gt;</code> → <code>Icon</code> when set, else <code>MarkerText</code> → <code>MarkerCssClass</code> adds <code>[&amp;_svg]:size-4</code>.</p>
 <p>Call chain (badge colour): <code>Badge.razor.cs</code> <code>CssClass</code> → <code>ClassNames.cn</code> → <code>TailwindMerge.Merge</code> → <code>ComputeBaseUtilityGroup</code> → <code>TextColorRegex</code> (hyphenated colours are one group).</p>
@@ -356,7 +360,11 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <p>A reader chasing a bug starts at the demo page, drops into the styled component (<code>.razor</code> markup + <code>.razor.cs</code> logic), then into the primitive it composes (for behavior/ARIA), and finally into the relevant JS interop file or DI service. Symbols that don't resolve to a real file/component in <code>src/</code> are hallucinations — verify against the folders listed in <code>docs/TrBlazeUI-Architecture.md §4</code>.</p>
 <h2 id="known-issues"><a id="5-known-issues"></a>5. Known issues<a class="anchor-link" href="#known-issues">#</a></h2>
 <ul>
-<li><strong>✅ FIXED 2026-10-07, not yet released — Chatur TR-018 (<code>REQ-UI-033</code>).</strong> <code>EditorTabs.CloseContent</code> draws the consumer's own close mark (a text <code>×</code>) in place of the svg; the button's <code>aria-label</code>, <code>data-slot</code> and click are unchanged. Verified by <code>tests/verify/req-ui-033.spec.ts</code>.
+<li><strong>✅ FIXED 2026-10-08, not yet released — Sevak TR-041 and TR-006 (<code>REQ-UI-044</code>, <code>REQ-UI-045</code>).</strong> A Select inside a Dialog can no longer freeze the page: <code>SelectContent</code> catches its script import, <code>FloatingPortal</code> places the content under its anchor when positioning fails and renders inline when the portal host times out (both failures injected by <code>tests/verify/req-ui-044.spec.ts</code>). New <code>Chat</code> family (<code>Components/Chat/</code>, <code>wwwroot/js/chat-composer.js</code>), verified by <code>req-ui-045.spec.ts</code>.
+</li>
+<li><strong>✅ FIXED 2026-10-07, not yet released — Sevak feedback (<code>REQ-UI-034</code>…<code>REQ-UI-043</code>, <code>REQ-FN-011</code>).</strong> <code>Table</code> family (<code>Components/Table/</code>), <code>ToastVariant</code> Success/Info/Warning + <code>ToastService.Warning</code>/<code>.Info</code>, <code>AlertDialogAction</code>/<code>AlertDialogCancel</code> <code>OnClick</code>/<code>PreventClose</code>, <code>Textarea.Rows</code>/<code>MaxRows</code>, <code>CardTitle</code>/<code>AlertTitle</code> <code>As</code> (now code components <code>CardTitle.cs</code>/<code>AlertTitle.cs</code>, since Razor cannot take an element name from a parameter), <code>NumericInput</code> always <code>role="spinbutton"</code> with invariant ARIA numbers (<code>Slider</code> too), the <code>NumberInput</code> obsolete shim, <code>SelectValue</code> placeholder when no item matches, <code>ToastProvider</code> viewport <code>pointer-events-none</code>, <code>HtmlSanitizer</code> stable 9.1.x. Verified by <code>tests/verify/req-ui-034.spec.ts</code>, <code>req-ui-037.spec.ts</code>, <code>req-ui-040.spec.ts</code> and <code>req-fn.spec.ts</code> (REQ-FN-011). Sevak filed against 1.0.7; 23 of its 34 entries were already fixed by 2.1.4 and are answered in <code>docs/Sevak-TrBlazeUI-Feedback.md</code>.
+</li>
+<li><strong>✅ FIXED 2026-10-07, shipped in 2.1.4 — Chatur TR-018 (<code>REQ-UI-033</code>).</strong> <code>EditorTabs.CloseContent</code> draws the consumer's own close mark (a text <code>×</code>) in place of the svg; the button's <code>aria-label</code>, <code>data-slot</code> and click are unchanged. Verified by <code>tests/verify/req-ui-033.spec.ts</code>.
 </li>
 <li><strong>✅ FIXED 2026-10-07, shipped in 2.1.3 — Chatur TR-015…TR-017 (<code>REQ-UI-030</code>…<code>REQ-UI-032</code>).</strong> <code>EditorTabs.TabAttributes</code>, <code>StepperItem.Icon</code>, <code>BadgeVariant.Danger</code>, and <code>cn()</code> grouping hyphenated text colours. ⚠ Visible effect of the last: an Outline <code>Toggle</code>/<code>ToggleGroupItem</code> hovers with <code>--accent-foreground</code> text, and a <code>NavList</code> selected row uses <code>--accent-foreground</code>. Verified by <code>tests/verify/req-ui-030.spec.ts</code> 3/3 and a class diff over all 125 demo routes.
 </li>

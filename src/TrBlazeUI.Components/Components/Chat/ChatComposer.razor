@@ -1,0 +1,57 @@
+@namespace TrBlazeUI.Components.Chat
+@using TrBlazeUI.Components.Textarea
+@using TrBlazeUI.Components.Button
+@using TrBlazeUI.Components.Spinner
+@implements IAsyncDisposable
+
+@* The box a message is written in: optional controls above (mode, model, microphone), a text area
+   that grows with its content up to MaxRows, and a send button. Enter sends and Shift+Enter adds
+   a line (chat-composer.js). Sevak TR-006. *@
+
+<div @ref="objRoot"
+     data-slot="chat-composer"
+     class="@CssClass"
+     @attributes="AdditionalAttributes">
+    @if (Actions is not null)
+    {
+        <div data-slot="chat-composer-actions" class="mb-2 flex flex-wrap items-center gap-2">@Actions</div>
+    }
+    <div class="flex items-end gap-2">
+        <Textarea Value="@Value"
+                  ValueChanged="HandleValueChanged"
+                  Rows="@Rows"
+                  MaxRows="@MaxRows"
+                  Placeholder="@Placeholder"
+                  Disabled="@Disabled"
+                  AriaLabel="@AriaLabel"
+                  Id="@objInputId"
+                  Class="min-h-0 flex-1 resize-none border-0 shadow-none focus-visible:ring-0" />
+        <Button Type="ButtonType.Button"
+                Size="ButtonSize.Icon"
+                Disabled="@(Disabled || Sending || string.IsNullOrWhiteSpace(Value))"
+                OnClick="HandleSendClickAsync"
+                aria-label="@SendLabel"
+                data-slot="chat-composer-send">
+            @if (Sending)
+            {
+                <Spinner Size="SpinnerSize.Small" AriaLabel="Sending" />
+            }
+            else
+            {
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="16"
+                     height="16"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round"
+                     aria-hidden="true">
+                    <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" />
+                    <path d="m21.854 2.147-10.94 10.939" />
+                </svg>
+            }
+        </Button>
+    </div>
+</div>

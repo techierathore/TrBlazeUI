@@ -11,7 +11,74 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
-Built and verified on 2026-10-07, after 2.1.3.
+Built and verified on 2026-10-07, after 2.1.4.
+
+Answers Sevak's feedback file (`docs/Sevak-TrBlazeUI-Feedback.md`, 34 entries filed against
+**1.0.7**). Most of it was already fixed between 1.0.7 and 2.1.4 and the answer there is *upgrade*;
+the entries below are the ones that still needed code on 2.1.4.
+
+### Added — Sevak
+
+- **`Chat` family (TR-006)**: `ChatThread` (a `role="log"` list that follows the newest message
+  through `ScrollArea StickToEnd`), `ChatMessage` (`Role` User, Assistant or System sets the
+  alignment and tint; `Author`, `Trace` for a tool-run block, `Attachments` for citation chips,
+  `Footer`, `Avatar`; `Streaming="true"` shows `Typing` and `aria-busy`) and `ChatComposer`
+  (`@bind-Value`, `OnSend`, `Rows`/`MaxRows`, `Actions` above the box, `Sending`; Enter sends and
+  Shift+Enter adds a line, IME composition respected, through `chat-composer.js`). The body is
+  yours: put `Prose` or your own markdown in `ChildContent`. Demo at `/components/chat`.
+- **`Table` family (TR-028)**: `Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`
+  (`Selected`), `TableHead`, `TableCell`, `TableCaption` in `TrBlazeUI.Components.Table` — a plain
+  markup table with the `DataTable` look, inside a `relative w-full overflow-x-auto` container, for
+  a fixed list that needs no record type, toolbar or pager. Every part takes `Class` and unmatched
+  attributes. Import the namespace in the page, not globally: the headless
+  `TrBlazeUI.Primitives.Table` family under `DataTable` shares the names.
+- **`ToastVariant.Success`, `Info`, `Warning` and `ToastService.Warning` / `.Info` (TR-023)**: the
+  toast family now agrees with `AlertVariant` and `BadgeVariant`, on the same `--alert-*` tokens.
+  `ToastService.Success()` keeps the default look it always had (recolouring it would change every
+  existing success toast); pass `ToastVariant.Success` to `Show(...)` for the tint.
+- **`AlertDialogAction.OnClick` and `AlertDialogCancel.OnClick`, with `PreventClose` (TR-044)**: a
+  handler on the confirm or cancel part itself; the dialog closes and the handler runs, or the
+  dialog stays open when `PreventClose` is set. Underneath, `DialogClose` in its `AsChild` form now
+  honours `PreventClose` and awaits `OnClick` like its rendered-button form, through a new
+  `TriggerContext.CloseAsync` that `Button` prefers over `Close` when present.
+- **`Textarea.Rows` and `MaxRows` (TR-026)**: a starting height in lines and a cap after which the
+  box scrolls; growth uses CSS `field-sizing: content`.
+- **`CardTitle.As` and `AlertTitle.As` (TR-008)**: the heading element to render (`h2`, `h4`,
+  `div`…), defaults `h3` and `h5` unchanged, so a page keeps a correct heading outline.
+- **`NumberInput` is a compile-time error (TR-039)**: an `[Obsolete(error: true)]` shim names
+  `NumericInput`, where the wrong guess used to compile and render an invisible element.
+
+### Fixed — Sevak
+
+- **A `Select` inside a `Dialog` can no longer freeze the page (TR-041).** Reproduced on 2.1.4 by
+  making the Select's script fail to load: the import ran outside any catch, the exception killed the
+  circuit, the error banner showed and the page stopped answering clicks — Sevak's symptom on the
+  Windows head. `SelectContent` now catches the import and ready-handler failures and logs a warning
+  (the listbox loses keyboard navigation and click-outside, the page loses nothing). Two more
+  fallbacks in `FloatingPortal`: when the positioning library fails, the content is placed directly
+  under its anchor instead of staying parked at -9999px; when the portal host never reports the
+  render (the "Portal … render timeout" message), the content renders inline at its declaration site
+  instead of staying hidden. Both injected failures are covered by `tests/verify/req-ui-044.spec.ts`.
+- **`NumericInput` is always `role="spinbutton"` (TR-034)**: it emitted `aria-valuemin/max/now` on a
+  plain text input unless `ShowButtons` was set — an invalid combination for assistive technology.
+- **`NumericInput` and `Slider` write ARIA numbers invariantly (TR-033)**: a comma-decimal culture
+  produced `aria-valuenow="0,5"`. `Progress` already did this (2.0.9).
+- **The empty toast viewport lets clicks through (TR-043)**: `ToastProvider`'s fixed container now
+  carries `pointer-events-none`; each toast keeps `pointer-events-auto`. A dialog footer in the
+  bottom-right corner of the window could not be clicked before.
+- **`Select` shows its placeholder when the bound value matches no item (TR-024)**: an `int` Select
+  bound to `0` with items 1–5 showed `0`; the raw value is now shown only before items register.
+- **`HtmlSanitizer` on a stable 9.1.x release (TR-037)**: the deliberate `9.1.949-beta` (the only line
+  then carrying the patched AngleSharp) is replaced by the stable release; no transitive advisory.
+
+### Not changed, by decision
+
+- **Charts already took unmatched attributes** through `ChartBase`; the TR-044 census against 1.0.7
+  (136 components without the splat) finds none on 2.1.4.
+
+---
+
+## [2.1.4] — 2026-10-07
 
 Closes Chatur's sixth entry (`docs/Chatur-TrBlazeUI-Feedback.md`, TR-018, filed 2026-10-07 against
 2.1.3). One new parameter; nothing else changes.

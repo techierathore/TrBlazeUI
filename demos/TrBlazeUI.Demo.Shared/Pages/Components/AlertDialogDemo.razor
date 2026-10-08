@@ -110,6 +110,47 @@
         </AlertDialog>
     </div>
 
+    <!-- Sevak TR-044: OnClick on the footer buttons -->
+    <div class="space-y-4" data-testid="alertdialog-onclick-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Running code before it closes</h2>
+            <p class="text-sm text-muted-foreground">
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">AlertDialogAction</code> and
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">AlertDialogCancel</code> take an
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">OnClick</code>: the dialog closes
+                and the handler runs, awaited. Set
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">PreventClose="true"</code> to keep the
+                dialog open and close it yourself, for a delete that may fail.
+            </p>
+        </div>
+        <div class="flex items-center gap-4">
+            <AlertDialog>
+                <AlertDialogTrigger>
+                    <Button data-testid="alertdialog-onclick-open" Variant="ButtonVariant.Outline">Delete with a handler</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent data-testid="alertdialog-onclick-content">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete this item?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Pressing Delete closes the dialog and runs the page's handler.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel OnClick="HandleCancelled">
+                            <Button data-testid="alertdialog-onclick-cancel" Variant="ButtonVariant.Outline">Keep it</Button>
+                        </AlertDialogCancel>
+                        <AlertDialogAction OnClick="HandleDeleted">
+                            <Button data-testid="alertdialog-onclick-action" Variant="ButtonVariant.Destructive">Delete</Button>
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <span class="text-sm text-muted-foreground">
+                Deleted <span data-testid="alertdialog-onclick-count">@objDeletedCount</span> · kept <span data-testid="alertdialog-onclick-cancel-count">@objKeptCount</span>
+            </span>
+        </div>
+    </div>
+
     <!-- TR-014: Escape cancels an alert dialog -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -239,10 +280,38 @@
                     Callback when the open state changes.
                 </p>
             </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">AlertDialogAction / AlertDialogCancel: OnClick</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">EventCallback&lt;MouseEventArgs&gt;</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    Runs when the button is pressed, after the dialog closes; awaited.
+                </p>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">AlertDialogAction / AlertDialogCancel: PreventClose</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">bool</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    When true the press does not close the dialog; only OnClick runs. Default: false.
+                </p>
+            </div>
         </div>
     </div>
 </div>
 
 @code {
     private bool objIsControlledOpen;
+
+    private int objDeletedCount;
+
+    private int objKeptCount;
+
+    private void HandleDeleted() => objDeletedCount++;
+
+    private void HandleCancelled() => objKeptCount++;
 }

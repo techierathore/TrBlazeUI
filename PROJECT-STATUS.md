@@ -1,19 +1,20 @@
 ---
 project: TrBlazeUI
-last_updated: 2026-10-07
-current_phase: UAT — handoff done, 48 of 48 verified
+last_updated: 2026-10-08
+current_phase: UAT — handoff done, 61 of 61 verified
 last_verified_build: PASS
-last_verified_date: 2026-10-07
+last_verified_date: 2026-10-08
 ---
 
 # TrBlazeUI — Status
 
 ## Where I am
 
-2.1.3 is the latest published version; Chatur closed TR-015 to TR-017 on it. The next release is
-ready: `EditorTabs.CloseContent` (REQ-UI-033, Chatur TR-018) is built, verified, and described in
-CHANGELOG `[Unreleased]`, the agent reference, the Usage Guide and the DevGuide. Chatur's feedback
-file carries the reply in both repositories. All 48 rows are verified. Nothing is open.
+2.1.4 is the latest published version. The next release is ready: all 34 of Sevak's entries are
+answered as fixed in both repositories. The twelve fixes 2.1.4 still needed (REQ-UI-034 to 045,
+REQ-FN-011) are built and verified: the Sevak batch from 2026-10-07, plus today's `Select` inside
+a `Dialog` never freezing the page and the new `Chat` family. CHANGELOG `[Unreleased]`, the agent
+reference, the Usage Guide and the DevGuide describe them. All 61 rows are verified.
 
 ## Next command to run
 
@@ -41,7 +42,7 @@ Why: every row in this phase's scope is terminal and handoff has run; waiting on
 
 ## Known blockers
 
-- The TR-018 fix is not on the feed until the owner commits and cuts the next GitHub Release; agents cannot run git. Chatur's 22 phase-2 rows wait on it.
+- The Sevak fixes are not on the feed until the owner commits and cuts the next GitHub Release; agents cannot run git. Sevak's upgrade waits on it.
 
 ## Verification log
 
@@ -49,11 +50,11 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 | Date | Phase | Result | Status table |
 |---|---|---|---|
-| 2026-10-02 | build-phase | 43/43 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
-| 2026-10-03 | triage-and-fix | 44/44 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-07 | triage-and-fix | 47/47 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-07 | handoff-phase | 47/47 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-07 | triage-and-fix | 48/48 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-10-07 | triage-and-fix | 59/59 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-10-08 | triage-and-fix | 61/61 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 
@@ -65,10 +66,11 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 ## Deferred / future
 
-- REQ-UI-030 to 033 name BRD-15 and BRD-28; `*amend-docs` can give them BRD items of their own.
-- The framework's own `Virtualize`, inside `CommandVirtualizedGroup`, still throws on dispose; not fixable in this library.
-- `tools/splat-audit` throws on the library assembly alone.
-- Report `ApexChart.Dispose` upstream.
+- REQ-UI-030 to 045 extend existing BRD items; `*amend-docs` can give them their own.
+- `ToastService.Success()` keeps the default look; tinting it is a later behaviour change.
+- The portal-timeout inline fallback is covered by code reading only; no test forces that path.
+- The framework's own `Virtualize` still throws on dispose; not fixable here.
+- `tools/splat-audit` throws on the library assembly alone; report `ApexChart.Dispose` upstream.
 - Delete the stray `c2.0.5` tag (owner).
 - Restore `/verify-trstudio` for REQ-UI-015.
 - Test with real assistive technology.
