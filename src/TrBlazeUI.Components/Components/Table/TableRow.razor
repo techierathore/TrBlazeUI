@@ -1,0 +1,41 @@
+@namespace TrBlazeUI.Components.Table
+@using TrBlazeUI.Components.Utilities
+
+<tr data-slot="table-row"
+    data-state="@(Selected ? "selected" : null)"
+    class="@CssClass"
+    @attributes="AdditionalAttributes">
+    @ChildContent
+</tr>
+
+@code {
+    /// <summary>
+    /// Gets or sets the cells of the row (<c>TableHead</c> in a header, <c>TableCell</c> elsewhere).
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the row is drawn as selected: it carries <c>data-state="selected"</c>
+    /// and takes the muted background.
+    /// </summary>
+    [Parameter]
+    public bool Selected { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes merged into the element's own.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered <c>tr</c> element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => ClassNames.cn(
+        "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+        Class);
+}

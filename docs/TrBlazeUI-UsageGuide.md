@@ -144,7 +144,19 @@ bash tests/package/codex-agent-deployment.sh
 
 ## Consumer integration notes
 
-### Added 2026-10-07 (Chatur TR-018 — REQ-UI-033 — not yet released)
+### Added 2026-10-07 (Sevak feedback — REQ-UI-034…REQ-UI-043, REQ-FN-011 — not yet released)
+
+- **`Table` family** (`Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`) for a table that is just markup; import `TrBlazeUI.Components.Table` in the page, not globally.
+- **`ToastService.Warning` and `.Info`**, with `ToastVariant.Success`, `Info` and `Warning` on the alert tokens. The empty toast viewport no longer blocks clicks at the window's edge.
+- **`AlertDialogAction` and `AlertDialogCancel` take `OnClick`** (and `PreventClose` to keep the dialog open).
+- **`Textarea Rows` and `MaxRows`**: start height and a cap after which the box scrolls.
+- **`CardTitle As` and `AlertTitle As`**: pick the heading element for a correct outline.
+- **`NumericInput`** is always a spinbutton and, like `Slider`, writes its ARIA numbers with a dot decimal in every culture. Writing `NumberInput` is now a build error that names `NumericInput`.
+- **`Select`** shows its placeholder when the bound value matches no item, and a Select inside a Dialog can no longer freeze the page: a failed script, positioning or portal render is logged and falls back instead of killing the circuit.
+- **`ChatThread`, `ChatMessage`, `ChatComposer`**: a message thread that follows new messages, bubbles aligned by role with a streaming state, and a composer where Enter sends and Shift+Enter adds a line.
+- **`HtmlSanitizer`** moves to a stable 9.1.x release.
+
+### Added 2026-10-07 (Chatur TR-018 — REQ-UI-033 — 2.1.4)
 
 - **`EditorTabs.CloseContent`** draws what you put in it inside every tab's close button instead of the built-in svg cross, for a design that draws the close mark as a text `×`. The button keeps its accessible name ("Close Program.cs"), so the content needs no label. Leave it out and the svg is drawn as before.
 

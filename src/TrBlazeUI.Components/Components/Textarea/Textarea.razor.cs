@@ -149,10 +149,97 @@ public partial class Textarea : ComponentBase, IDisposable
     public bool? AriaInvalid { get; set; }
 
     /// <summary>
+    /// Gets or sets the starting height of the box, in lines of text.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Rendered as the <c>rows</c> attribute and as a matching minimum height, so the box opens at
+    /// this many lines and grows from there as text is typed (the component sizes itself to its
+    /// content through CSS <c>field-sizing: content</c>, Chromium 123+ and Safari 18.x). In a browser
+    /// without that property the box stays at <c>Rows</c> lines and scrolls, as a plain textarea does.
+    /// </para>
+    /// <para>
+    /// Left unset, the box keeps its default minimum height of 4rem. Chat composers and comment boxes
+    /// that must start small and grow are the case this serves (Sevak TR-026).
+    /// </para>
+    /// </remarks>
+    [Parameter]
+    public int? Rows { get; set; }
+
+    /// <summary>
+    /// Gets or sets the height, in lines of text, past which the box stops growing and scrolls.
+    /// </summary>
+    /// <remarks>
+    /// Rendered as an inline <c>max-height</c> of that many lines plus the box's padding and border,
+    /// so the cap follows the text size the box actually renders at. Works with or without
+    /// <see cref="Rows"/>. Left unset, the box grows with its content without limit (Sevak TR-026).
+    /// </remarks>
+    [Parameter]
+    public int? MaxRows { get; set; }
+
+    /// <summary>
     /// Gets or sets additional HTML attributes to apply to the element.
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    // The box is border-box, so a height of N lines is N line-heights plus the vertical padding
+    // (py-2 = 1rem) plus the two 1px borders. `lh` is the element's own line-height, so the cap is
+    // right at every text size without measuring anything.
+    private static string LinesToHeight(int aLines) => $"calc({aLines}lh + 1rem + 2px)";
+
+    /// <summary>
+    /// Gets the inline style the sizing parameters need, merged with any style the caller passed.
+    /// </summary>
+    private string? InlineStyle
+    {
+        get
+        {
+            var vParts = new List<string>(3);
+
+            if (AdditionalAttributes is not null
+                && AdditionalAttributes.TryGetValue("style", out var vCallerStyle)
+                && vCallerStyle is string vCallerText
+                && !string.IsNullOrWhiteSpace(vCallerText))
+            {
+                vParts.Add(vCallerText.TrimEnd().TrimEnd(';'));
+            }
+
+            if (Rows is > 0)
+            {
+                vParts.Add($"min-height: {LinesToHeight(Rows.Value)}");
+            }
+
+            if (MaxRows is > 0)
+            {
+                vParts.Add($"max-height: {LinesToHeight(MaxRows.Value)}");
+            }
+
+            return vParts.Count == 0 ? null : string.Join("; ", vParts);
+        }
+    }
+
+    /// <summary>
+    /// Gets the caller's attributes with <c>style</c> replaced by the merged inline style, so a
+    /// caller's own style and the sizing parameters both land on the element.
+    /// </summary>
+    private IReadOnlyDictionary<string, object>? EffectiveAttributes
+    {
+        get
+        {
+            var vStyle = InlineStyle;
+            if (vStyle is null)
+            {
+                return AdditionalAttributes;
+            }
+
+            var vMerged = AdditionalAttributes is null
+                ? new Dictionary<string, object>(1)
+                : new Dictionary<string, object>(AdditionalAttributes);
+            vMerged["style"] = vStyle;
+            return vMerged;
+        }
+    }
 
     /// <summary>
     /// Gets the computed CSS classes for the textarea element.
@@ -170,8 +257,10 @@ public partial class Textarea : ComponentBase, IDisposable
     /// Uses the cn() utility for intelligent class merging and Tailwind conflict resolution.
     /// </remarks>
     private string CssClass => ClassNames.cn(
-        // Base textarea styles (from shadcn/ui v4)
-        "flex field-sizing-content min-h-16 w-full rounded-md border border-input",
+        // Base textarea styles (from shadcn/ui v4). With Rows set, the rows attribute and its inline
+        // min-height give the starting height, so the 4rem minimum must not win over them.
+        "flex field-sizing-content w-full rounded-md border border-input",
+        Rows is > 0 ? null : "min-h-16",
         "bg-transparent dark:bg-input/30 px-3 py-2 text-base shadow-xs",
         "placeholder:text-muted-foreground",
         // Focus states

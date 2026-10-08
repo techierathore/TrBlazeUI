@@ -1,0 +1,50 @@
+@namespace TrBlazeUI.Components.Chat
+@using TrBlazeUI.Components.ScrollArea
+
+@* The message list of a chat. A role="log" region: new messages are announced as they are added,
+   without the whole thread being re-read. The ScrollArea follows the newest message until the
+   reader scrolls up, and resumes when they come back to the end (StickToEnd). Sevak TR-006. *@
+
+<div data-slot="chat-thread"
+     role="log"
+     aria-live="polite"
+     aria-relevant="additions"
+     class="@CssClass"
+     @attributes="AdditionalAttributes">
+    <ScrollArea StickToEnd="@StickToEnd" Class="h-full">
+        <div data-slot="chat-thread-messages" class="flex flex-col gap-4 p-4">
+            @ChildContent
+        </div>
+    </ScrollArea>
+</div>
+
+@code {
+    /// <summary>
+    /// Gets or sets the messages, usually a list of <see cref="ChatMessage"/> items.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the thread keeps the newest message in view as messages arrive, pausing
+    /// while the reader scrolls up and resuming when they return to the end. Default true.
+    /// </summary>
+    [Parameter]
+    public bool StickToEnd { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets additional CSS classes merged into the root's own. Give the thread its height
+    /// here (for example <c>h-96</c>), or it grows with its messages and never scrolls.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn("relative", Class);
+}

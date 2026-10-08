@@ -3,10 +3,10 @@
 
 @*
     Alert Dialog Cancel - the cancel button.
-    Closes the dialog when clicked.
+    Closes the dialog when clicked, then runs OnClick.
 *@
 
-<DialogClose AsChild="@AsChild" @attributes="AdditionalAttributes">
+<DialogClose AsChild="@AsChild" OnClick="@OnClick" PreventClose="@PreventClose" @attributes="AdditionalAttributes">
     @ChildContent
 </DialogClose>
 
@@ -23,6 +23,23 @@
     /// </summary>
     [Parameter]
     public bool AsChild { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the handler run when cancel is pressed, after the dialog has closed
+    /// (or instead of closing it when <see cref="PreventClose"/> is true).
+    /// </summary>
+    /// <remarks>
+    /// Added with <c>AlertDialogAction.OnClick</c> (Sevak TR-044) so both footer buttons take a
+    /// handler the same way. The handler is awaited.
+    /// </remarks>
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether pressing cancel leaves the dialog open. Default is false.
+    /// </summary>
+    [Parameter]
+    public bool PreventClose { get; set; }
 
     /// <summary>
     /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)

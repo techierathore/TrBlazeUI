@@ -1,0 +1,135 @@
+@namespace TrBlazeUI.Components.Chat
+@using TrBlazeUI.Components.Typing
+
+@* One message in a ChatThread. The article is the flex item that takes the side (self-end for the
+   user, self-start for the assistant, self-center for the system); the bubble inside carries the
+   surface. An avatar, when given, sits beside the bubble on the outer side. A streaming message
+   says so twice: Typing's dots inside the bubble, and aria-busy on the article. Sevak TR-006. *@
+
+<article data-slot="chat-message"
+         data-role="@RoleName"
+         aria-label="@(Author ?? RoleName)"
+         aria-busy="@(Streaming ? "true" : null)"
+         class="@ArticleCssClass"
+         @attributes="AdditionalAttributes">
+    @if (Avatar is not null)
+    {
+        <div data-slot="chat-message-avatar" class="shrink-0">@Avatar</div>
+    }
+    <div data-slot="chat-message-bubble" class="@BubbleCssClass">
+        @if (Author is not null)
+        {
+            <div data-slot="chat-message-author" class="mb-1 text-xs font-medium opacity-80">@Author</div>
+        }
+        @if (Trace is not null)
+        {
+            <div data-slot="chat-message-trace" class="mb-2 rounded-md bg-background/60 p-2 font-mono text-xs">@Trace</div>
+        }
+        <div data-slot="chat-message-body" class="whitespace-pre-wrap break-words">@ChildContent</div>
+        @if (Streaming)
+        {
+            <Typing Size="TypingSize.Small" Label="Still writing the answer" Class="mt-1" />
+        }
+        @if (Attachments is not null)
+        {
+            <div data-slot="chat-message-attachments" class="mt-2 flex flex-wrap gap-1.5">@Attachments</div>
+        }
+        @if (Footer is not null)
+        {
+            <div data-slot="chat-message-footer" class="mt-1 text-xs opacity-70">@Footer</div>
+        }
+    </div>
+</article>
+
+@code {
+    /// <summary>
+    /// Gets or sets who wrote the message. Default <see cref="ChatRole.Assistant"/>.
+    /// </summary>
+    [Parameter]
+    public ChatRole Role { get; set; } = ChatRole.Assistant;
+
+    /// <summary>
+    /// Gets or sets the author line shown above the body (for example the agent's name). It is
+    /// also the message's accessible name; without it the role is used.
+    /// </summary>
+    [Parameter]
+    public string? Author { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the message is still being written. Shows <c>Typing</c> under the body
+    /// and marks the article <c>aria-busy</c>.
+    /// </summary>
+    [Parameter]
+    public bool Streaming { get; set; }
+
+    /// <summary>
+    /// Gets or sets the body of the message: plain text, or rendered markdown through <c>Prose</c>.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets a monospace block drawn above the body, for the tool calls an agent made.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Trace { get; set; }
+
+    /// <summary>
+    /// Gets or sets content drawn under the body, for citation chips or file attachments.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Attachments { get; set; }
+
+    /// <summary>
+    /// Gets or sets a small line under everything else, for a timestamp or a model name.
+    /// </summary>
+    /// <remarks>
+    /// Named <c>Footer</c>, not <c>Meta</c>: Razor refuses <c>&lt;Meta&gt;…&lt;/Meta&gt;</c> as a
+    /// child-content tag because <c>meta</c> is an HTML void element.
+    /// </remarks>
+    [Parameter]
+    public RenderFragment? Footer { get; set; }
+
+    /// <summary>
+    /// Gets or sets an avatar drawn beside the bubble, on the outer side of the message.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Avatar { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes merged into the article's own.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered root element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string RoleName => Role switch
+    {
+        ChatRole.User => "user",
+        ChatRole.System => "system",
+        _ => "assistant"
+    };
+
+    private string ArticleCssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        "flex max-w-prose items-end gap-2",
+        Role switch
+        {
+            ChatRole.User => "self-end flex-row-reverse",
+            ChatRole.System => "self-center",
+            _ => "self-start"
+        },
+        Class);
+
+    private string BubbleCssClass => Role switch
+    {
+        ChatRole.User => "rounded-2xl bg-primary px-4 py-2.5 text-sm text-primary-foreground",
+        ChatRole.System => "rounded-md px-3 py-1.5 text-xs text-muted-foreground",
+        _ => "rounded-2xl bg-muted px-4 py-2.5 text-sm text-foreground"
+    };
+}

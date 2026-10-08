@@ -134,6 +134,9 @@ Call chain (badge classes): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → 
 | Screen | Route | Demo page file | Library surface exercised | Seen 2026-10-07 |
 |--------|-------|----------------|---------------------------|-----------------|
 | Code Editor | `/components/code-editor` | `Pages/Components/CodeEditorDemo.razor` | `CodeEditor`, `EditorTabs` (`TabAttributes`, `CloseContent`) | renders at 1366 and 390; tabs carry `tab-program-cs` etc.; the second strip draws a text × close mark |
+| Chat | `/components/chat` | `Pages/Components/ChatDemo.razor` | `ChatThread` → `ScrollArea StickToEnd`; `ChatMessage` → `Typing`; `ChatComposer` → `Textarea` + `chat-composer.js` | renders at 1280 and 390; Enter sends, Shift+Enter adds a line (req-ui-045.spec.ts) |
+| Dialog (Select inside) | `/components/dialog` | `Pages/Components/DialogDemo.razor` | `SelectContent` → `FloatingPortal` (inline when nested) → `positioning.js`, `element-utils.js placeUnderAnchor` | renders at 1280 and 390; with select.js blocked or computePosition failing the page keeps answering (req-ui-044.spec.ts) |
+| Table | `/components/table` | `Pages/Components/TableDemo.razor` | `Table` family (`Components/Table/`) | renders at 1280 and 390; plain markup, no record type |
 | Stepper | `/components/stepper` | `Pages/Components/StepperDemo.razor` | `StepperItem` (`Status`, `Trailing`, `Icon`) | renders at 1366 and 390 |
 | Badge | `/components/badge` | `Pages/Components/BadgeDemo.razor` | `Badge` (`Danger`) → `ClassNames.cn` → `TailwindMerge` | renders at 1366 and 390 |
 | Switch | `/components/switch` | `Pages/Components/SwitchDemo.razor` | `Switch` (`Outlined`, 2.1.2) | renders at 1366 and 390 |
@@ -146,6 +149,8 @@ Call chain (badge classes): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → 
 | Typing | `/components/typing` | `Pages/Components/TypingDemo.razor` | `Typing` (2.0.9) | renders at 1366 and 390 |
 
 Call chain (tab attributes): `EditorTabs.razor` `@foreach` over `Items` → `TabAttributes(vItem)` → `SplitTabAttributes` → `class` merged through `ClassNames.cn`, the rest splatted on the tab's `<li>`.
+
+Call chain (Select inside a Dialog, Sevak TR-041): `SelectContent.razor` (Primitives) `OnAfterRenderAsync` → `import select.js` inside try/catch → `FloatingPortal.razor` `OnAfterRenderAsync` → portal ready or timeout → timeout sets `objUseInlineFallback` + `objPendingInlineSetup`, re-renders inline → `SetupAsync` → `SetupPositioningAsync`; its catch → `PlaceUnderAnchorAsync` → `element-utils.js placeUnderAnchor`.
 
 Call chain (close mark): `EditorTabs.razor` close `<button data-slot="editor-tab-close">` → `CloseContent` when set, else the built-in 12px svg; the button's `aria-label`, classes and `@onclick` are outside the branch, so they never change.
 
@@ -190,7 +195,9 @@ A reader chasing a bug starts at the demo page, drops into the styled component 
 
 ## 5. Known issues
 
-- **✅ FIXED 2026-10-07, not yet released — Chatur TR-018 (`REQ-UI-033`).** `EditorTabs.CloseContent` draws the consumer's own close mark (a text `×`) in place of the svg; the button's `aria-label`, `data-slot` and click are unchanged. Verified by `tests/verify/req-ui-033.spec.ts`.
+- **✅ FIXED 2026-10-08, not yet released — Sevak TR-041 and TR-006 (`REQ-UI-044`, `REQ-UI-045`).** A Select inside a Dialog can no longer freeze the page: `SelectContent` catches its script import, `FloatingPortal` places the content under its anchor when positioning fails and renders inline when the portal host times out (both failures injected by `tests/verify/req-ui-044.spec.ts`). New `Chat` family (`Components/Chat/`, `wwwroot/js/chat-composer.js`), verified by `req-ui-045.spec.ts`.
+- **✅ FIXED 2026-10-07, not yet released — Sevak feedback (`REQ-UI-034`…`REQ-UI-043`, `REQ-FN-011`).** `Table` family (`Components/Table/`), `ToastVariant` Success/Info/Warning + `ToastService.Warning`/`.Info`, `AlertDialogAction`/`AlertDialogCancel` `OnClick`/`PreventClose`, `Textarea.Rows`/`MaxRows`, `CardTitle`/`AlertTitle` `As` (now code components `CardTitle.cs`/`AlertTitle.cs`, since Razor cannot take an element name from a parameter), `NumericInput` always `role="spinbutton"` with invariant ARIA numbers (`Slider` too), the `NumberInput` obsolete shim, `SelectValue` placeholder when no item matches, `ToastProvider` viewport `pointer-events-none`, `HtmlSanitizer` stable 9.1.x. Verified by `tests/verify/req-ui-034.spec.ts`, `req-ui-037.spec.ts`, `req-ui-040.spec.ts` and `req-fn.spec.ts` (REQ-FN-011). Sevak filed against 1.0.7; 23 of its 34 entries were already fixed by 2.1.4 and are answered in `docs/Sevak-TrBlazeUI-Feedback.md`.
+- **✅ FIXED 2026-10-07, shipped in 2.1.4 — Chatur TR-018 (`REQ-UI-033`).** `EditorTabs.CloseContent` draws the consumer's own close mark (a text `×`) in place of the svg; the button's `aria-label`, `data-slot` and click are unchanged. Verified by `tests/verify/req-ui-033.spec.ts`.
 - **✅ FIXED 2026-10-07, shipped in 2.1.3 — Chatur TR-015…TR-017 (`REQ-UI-030`…`REQ-UI-032`).** `EditorTabs.TabAttributes`, `StepperItem.Icon`, `BadgeVariant.Danger`, and `cn()` grouping hyphenated text colours. ⚠ Visible effect of the last: an Outline `Toggle`/`ToggleGroupItem` hovers with `--accent-foreground` text, and a `NavList` selected row uses `--accent-foreground`. Verified by `tests/verify/req-ui-030.spec.ts` 3/3 and a class diff over all 125 demo routes.
 
 - **⚠ DevGuide 2026-09-13 — test page layout (`REQ-UI-020`):** on `/verify-tflens-3`, `demos/TrBlazeUI.Demo.Shared/Pages/VerifyTfLens3.razor` (the TR-038 badge matrix), the default Secondary and Destructive badges hold their label on one line as designed and spill out of their 150px boxes over the Truncate column at 1280. Test page only; it ships in no package.

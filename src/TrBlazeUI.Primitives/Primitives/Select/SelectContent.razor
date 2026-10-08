@@ -108,14 +108,35 @@ else
     {
         if (firstRender && objJsModule == null)
         {
-            objJsModule = await JS.InvokeAsync<IJSObjectReference>(
-                "import", "./_content/TrBlazeUI.Primitives/js/primitives/select.js");
-
-            // Inline nested portals can report ready before this component's first asynchronous
-            // module import completes. Finish keyboard/click-outside setup once the module exists.
-            if (objContext?.IsOpen == true)
+            // Sevak TR-041: this import and the ready handler ran outside any catch. When the script
+            // could not be fetched (a WebView2 host, a blocked static asset), the JSException left
+            // OnAfterRenderAsync unhandled, the circuit died and the page stopped answering clicks
+            // until the app restarted. A missing script costs the listbox its keyboard navigation
+            // and click-outside handling; it must never cost the page.
+            try
             {
-                await HandleFloatingReady();
+                objJsModule = await JS.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/TrBlazeUI.Primitives/js/primitives/select.js");
+
+                // Inline nested portals can report ready before this component's first asynchronous
+                // module import completes. Finish keyboard/click-outside setup once the module exists.
+                if (objContext?.IsOpen == true)
+                {
+                    await HandleFloatingReady();
+                }
+            }
+            catch (JSDisconnectedException)
+            {
+                // The circuit is going away; nothing to set up.
+            }
+            catch (TaskCanceledException)
+            {
+                // The page stopped answering during the import; nothing to set up.
+            }
+            catch (JSException ex)
+            {
+                Console.WriteLine(
+                    $"TrBlazeUI warning: Select could not load its script, so this listbox has no keyboard navigation or click-outside handling: {ex.Message}");
             }
         }
     }

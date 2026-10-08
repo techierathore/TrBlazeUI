@@ -1,0 +1,259 @@
+@page "/components/chat"
+@using TrBlazeUI.Components.Chat
+@using TrBlazeUI.Components.NativeSelect
+
+<PageTitle>Chat Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Chat Component</h1>
+        <p class="text-xl text-muted-foreground">
+            A message thread and a composer: messages aligned by who wrote them, a streaming
+            answer that shows it is still being written, and a box where Enter sends and
+            Shift+Enter adds a line.
+        </p>
+        <p class="text-sm text-muted-foreground">
+            Three parts. <code class="bg-muted px-1 py-0.5 rounded">ChatThread</code> is the
+            scrolling list that follows the newest message.
+            <code class="bg-muted px-1 py-0.5 rounded">ChatMessage</code> is one bubble with slots
+            for an author line, a tool trace, citation chips and a timestamp.
+            <code class="bg-muted px-1 py-0.5 rounded">ChatComposer</code> is the text box with its
+            send button and a row of controls above it. The body is yours: plain text here, or
+            rendered markdown through <code class="bg-muted px-1 py-0.5 rounded">Prose</code>.
+        </p>
+    </div>
+
+    <!-- A thread with a composer -->
+    <div class="space-y-4" data-testid="chat-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">A thread with a composer</h2>
+            <p class="text-sm text-muted-foreground">
+                Type a question and press Enter: your message joins the thread, the agent's reply
+                arrives as a streaming bubble and finishes a moment later. Shift+Enter adds a line
+                instead of sending.
+            </p>
+        </div>
+
+        <div class="overflow-hidden rounded-md border">
+            <ChatThread Class="h-96" data-testid="chat-demo-thread">
+                @foreach (var vMessage in objMessages)
+                {
+                    <ChatMessage @key="vMessage.Id"
+                                 Role="@vMessage.Role"
+                                 Author="@vMessage.Author"
+                                 Streaming="@vMessage.Streaming"
+                                 Trace="@(vMessage.Trace is null ? null : objTraceTemplate(vMessage))"
+                                 Attachments="@(vMessage.Citations is null ? null : objCitationsTemplate(vMessage))"
+                                 Footer="@(vMessage.Meta is null ? null : objFooterTemplate(vMessage))"
+                                 data-testid="@vMessage.TestId">
+                        @vMessage.Text
+                    </ChatMessage>
+                }
+            </ChatThread>
+            <div class="border-t p-2">
+                <ChatComposer @bind-Value="objDraft"
+                              OnSend="HandleSendAsync"
+                              Sending="@objSending"
+                              Placeholder="Ask about these documents"
+                              data-testid="chat-demo-composer">
+                    <Actions>
+                        <NativeSelect TValue="string" @bind-Value="objMode" Size="NativeSelectSize.Small" aria-label="Mode">
+                            <option value="rag">Retrieve, then answer with citations</option>
+                            <option value="query">Answer only from these documents</option>
+                            <option value="chat">Chat without retrieval</option>
+                        </NativeSelect>
+                        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.IconSmall" Disabled="true" aria-label="Dictate (not available)">
+                            <LucideIcon Name="mic" Size="16" />
+                        </Button>
+                    </Actions>
+                </ChatComposer>
+            </div>
+        </div>
+
+        <div class="grid gap-4 text-sm sm:grid-cols-3">
+            <div class="rounded-md border p-4">
+                <p class="text-muted-foreground">Messages</p>
+                <p class="font-mono" data-testid="chat-demo-count">@objMessages.Count</p>
+            </div>
+            <div class="rounded-md border p-4">
+                <p class="text-muted-foreground">Mode</p>
+                <p class="font-mono" data-testid="chat-demo-mode">@objMode</p>
+            </div>
+            <div class="rounded-md border p-4">
+                <p class="text-muted-foreground">Last sent</p>
+                <p class="font-mono truncate" data-testid="chat-demo-last-sent">@(objLastSent ?? "none")</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Usage -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Usage</h2>
+        <pre class="overflow-x-auto rounded-md border bg-muted/30 p-4 text-xs"><code>&lt;ChatThread Class="h-96"&gt;
+    &lt;ChatMessage Role="ChatRole.User"&gt;What liability caps did we agree with Acme?&lt;/ChatMessage&gt;
+    &lt;ChatMessage Author="agent" Streaming="@@isStreaming"&gt;
+        &lt;Trace&gt;&lt;div&gt;→ rag_search("liability cap") · 4 chunks&lt;/div&gt;&lt;/Trace&gt;
+        &lt;ChildContent&gt;@@answer&lt;/ChildContent&gt;
+        &lt;Attachments&gt;&lt;Badge Variant="BadgeVariant.Outline"&gt;MSA-Acme-2026.pdf · 0.87&lt;/Badge&gt;&lt;/Attachments&gt;
+        &lt;Footer&gt;12:04 · qwen2.5-14b&lt;/Footer&gt;
+    &lt;/ChatMessage&gt;
+&lt;/ChatThread&gt;
+
+&lt;ChatComposer @@bind-Value="draft" OnSend="SendAsync" Placeholder="Ask about these documents"&gt;
+    &lt;Actions&gt;
+        &lt;NativeSelect TValue="string" @@bind-Value="mode"&gt;…&lt;/NativeSelect&gt;
+    &lt;/Actions&gt;
+&lt;/ChatComposer&gt;
+
+@@code {
+    private string? draft;
+    private string mode = "rag";
+
+    private async Task SendAsync(string text)
+    {
+        // add the user's message, start the answer with Streaming="true", flip it when done
+    }
+}</code></pre>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">API Reference</h2>
+        <div class="border rounded-lg p-6 space-y-4 text-sm">
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">ChatThread</h3>
+                <p><strong>ChildContent:</strong> <code class="bg-muted px-1 py-0.5 rounded">RenderFragment?</code> - The messages</p>
+                <p><strong>StickToEnd:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Follow the newest message until the reader scrolls up (default true)</p>
+                <p><strong>Class / additional attributes:</strong> Merged classes (give the thread its height here), and any HTML attribute forwarded to the root, which is a <code class="bg-muted px-1 py-0.5 rounded">role="log"</code> region</p>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">ChatMessage</h3>
+                <p><strong>Role:</strong> <code class="bg-muted px-1 py-0.5 rounded">ChatRole</code> - User (right, primary), Assistant (left, muted; default) or System (centred, small)</p>
+                <p><strong>Author:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Author line above the body; also the message's accessible name</p>
+                <p><strong>Streaming:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Still being written: shows Typing and marks the message aria-busy</p>
+                <p><strong>ChildContent / Trace / Attachments / Footer / Avatar:</strong> <code class="bg-muted px-1 py-0.5 rounded">RenderFragment?</code> - The body; a monospace tool-trace block above it; chips or files below it; a small last line (a timestamp); an avatar beside the bubble. Named fragments must be direct children of the tag, so an optional one is passed as an attribute: <code class="bg-muted px-1 py-0.5 rounded">Footer="@@(stamp is null ? null : footerTemplate(stamp))"</code></p>
+                <p><strong>Class / additional attributes:</strong> Merged classes, and any HTML attribute forwarded to the article</p>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">ChatComposer</h3>
+                <p><strong>Value / ValueChanged:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - The text; use <code class="bg-muted px-1 py-0.5 rounded">@@bind-Value</code></p>
+                <p><strong>OnSend:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback&lt;string&gt;</code> - The trimmed text, on the button or on Enter; empty text is never sent</p>
+                <p><strong>Placeholder / AriaLabel / SendLabel:</strong> <code class="bg-muted px-1 py-0.5 rounded">string</code> - "Type a message", "Message", "Send"</p>
+                <p><strong>Rows / MaxRows:</strong> <code class="bg-muted px-1 py-0.5 rounded">int</code> - Start height and cap in lines (1 and 12)</p>
+                <p><strong>Disabled / Sending:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disabled stops both; Sending shows a spinner on the button and keeps the box usable</p>
+                <p><strong>SubmitOnEnter / ClearOnSend:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Enter sends, Shift+Enter adds a line (default true); the box is emptied after a send (default true)</p>
+                <p><strong>Actions:</strong> <code class="bg-muted px-1 py-0.5 rounded">RenderFragment?</code> - Controls above the box, such as a mode picker</p>
+                <p><strong>Class / additional attributes:</strong> Merged classes, and any HTML attribute forwarded to the root</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private sealed class DemoMessage
+    {
+        public required string Id { get; init; }
+        public ChatRole Role { get; init; }
+        public string? Author { get; init; }
+        public string Text { get; set; } = string.Empty;
+        public bool Streaming { get; set; }
+        public IReadOnlyList<string>? Trace { get; init; }
+        public IReadOnlyList<string>? Citations { get; init; }
+        public string? Meta { get; set; }
+        public string? TestId { get; init; }
+    }
+
+    private readonly List<DemoMessage> objMessages =
+    [
+        new()
+        {
+            Id = "m1",
+            Role = ChatRole.User,
+            Text = "What liability caps did we agree with Acme, and where?",
+            TestId = "chat-demo-msg-user"
+        },
+        new()
+        {
+            Id = "m2",
+            Role = ChatRole.Assistant,
+            Author = "agent",
+            Text = "The Acme cap is 12 months of fees, with IP and confidentiality carve-outs. It is in clause 9.2 of the MSA and repeated in the SOW.",
+            Trace = ["→ rag_search(\"liability cap\") · 4 chunks · 0.4s", "→ file_read(MSA-Acme-2026.pdf) · ok · 0.1s", "✔ answer composed"],
+            Citations = ["MSA-Acme-2026.pdf · 0.87", "SOW-Q3-2026.docx · 0.81"],
+            Meta = "12:04 · qwen2.5-14b",
+            TestId = "chat-demo-msg-assistant"
+        },
+        new()
+        {
+            Id = "m3",
+            Role = ChatRole.System,
+            Text = "Model changed to qwen2.5-14b.",
+            TestId = "chat-demo-msg-system"
+        },
+        new()
+        {
+            Id = "m4",
+            Role = ChatRole.Assistant,
+            Author = "agent",
+            Text = "Comparing the Acme cap with the standard template",
+            Streaming = true,
+            TestId = "chat-demo-msg-streaming"
+        }
+    ];
+
+    // Named fragments must be direct children of the component tag, so an optional slot is passed
+    // as an attribute from one of these templates (or null to leave it out).
+    private readonly RenderFragment<DemoMessage> objTraceTemplate = aMessage =>
+        @<text>
+            @foreach (var vLine in aMessage.Trace ?? [])
+            {
+                <div>@vLine</div>
+            }
+        </text>;
+
+    private readonly RenderFragment<DemoMessage> objCitationsTemplate = aMessage =>
+        @<text>
+            @foreach (var vCitation in aMessage.Citations ?? [])
+            {
+                <Badge Variant="BadgeVariant.Outline">@vCitation</Badge>
+            }
+        </text>;
+
+    private readonly RenderFragment<DemoMessage> objFooterTemplate = aMessage =>
+        @<text>@aMessage.Meta</text>;
+
+    private string? objDraft;
+
+    private string objMode = "rag";
+
+    private string? objLastSent;
+
+    private bool objSending;
+
+    private int objNextId = 5;
+
+    private async Task HandleSendAsync(string aText)
+    {
+        objLastSent = aText;
+        objSending = true;
+        objMessages.Add(new DemoMessage { Id = $"m{objNextId++}", Role = ChatRole.User, Text = aText });
+
+        var vReply = new DemoMessage
+        {
+            Id = $"m{objNextId++}",
+            Role = ChatRole.Assistant,
+            Author = "agent",
+            Text = "Looking that up",
+            Streaming = true
+        };
+        objMessages.Add(vReply);
+        objSending = false;
+        StateHasChanged();
+
+        await Task.Delay(1200);
+        vReply.Text = $"Here is what the documents say about \"{aText}\": the relevant clause is 9.2 of the MSA.";
+        vReply.Streaming = false;
+        vReply.Meta = $"{DateTime.Now:HH:mm} · qwen2.5-14b";
+        StateHasChanged();
+    }
+}

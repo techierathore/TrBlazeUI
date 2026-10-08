@@ -22,7 +22,7 @@
             </p>
         </div>
         <div class="w-64">
-            <NumericInput TValue="int" @bind-Value="objIntValue" Placeholder="Enter a number" />
+            <NumericInput TValue="int" @bind-Value="objIntValue" Placeholder="Enter a number" data-testid="numeric-plain" />
         </div>
         <p class="text-sm text-muted-foreground">Value: @objIntValue</p>
     </div>
@@ -78,7 +78,7 @@
             </p>
         </div>
         <div class="w-64">
-            <NumericInput TValue="int" @bind-Value="objButtonValue" ShowButtons="true" Min="0" Max="99" />
+            <NumericInput TValue="int" @bind-Value="objButtonValue" ShowButtons="true" Min="0" Max="99" data-testid="numeric-buttons" />
         </div>
         <p class="text-sm text-muted-foreground">Value: @objButtonValue</p>
     </div>
@@ -171,6 +171,8 @@
                     <p><strong>ShowButtons:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Show increment/decrement buttons. Default: false</p>
                     <p><strong>Format:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Custom format string (e.g., "F2", "N0")</p>
                     <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the input</p>
+                    <p><strong>Accessibility:</strong> the input is a <code class="bg-muted px-1 py-0.5 rounded">role="spinbutton"</code> with <code class="bg-muted px-1 py-0.5 rounded">aria-valuemin</code>/<code class="bg-muted px-1 py-0.5 rounded">aria-valuemax</code>/<code class="bg-muted px-1 py-0.5 rounded">aria-valuenow</code>, formatted with a dot decimal in every culture</p>
+                    <p><strong>There is no NumberInput:</strong> writing <code class="bg-muted px-1 py-0.5 rounded">&lt;NumberInput&gt;</code> fails the build with an error that names NumericInput, instead of rendering nothing</p>
                 </div>
             </div>
             <div>

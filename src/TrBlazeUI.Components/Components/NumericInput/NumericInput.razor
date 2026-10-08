@@ -1,6 +1,9 @@
 @namespace TrBlazeUI.Components.NumericInput
 @typeparam TValue where TValue : struct, System.Numerics.INumber<TValue>
 
+@* Sevak TR-033/TR-034: the range attributes below are only valid on a range role, and the control is
+   a spinbutton whether or not its buttons show (arrow keys change the value either way); ARIA numbers
+   are invariant by specification, so a comma-decimal culture must not reach them. *@
 <div class="@ContainerClass" @attributes="AdditionalAttributes">
     <input
         @ref="objInputRef"
@@ -15,10 +18,10 @@
         aria-label="@AriaLabel"
         aria-describedby="@AriaDescribedBy"
         aria-invalid="@(AriaInvalid?.ToString().ToLower())"
-        aria-valuemin="@(Min?.ToString())"
-        aria-valuemax="@(Max?.ToString())"
-        aria-valuenow="@Value.ToString()"
-        role="@(ShowButtons ? "spinbutton" : null)"
+        aria-valuemin="@AriaValueMin"
+        aria-valuemax="@AriaValueMax"
+        aria-valuenow="@AriaValueNow"
+        role="spinbutton"
         @oninput="HandleInput"
         @onkeydown="HandleKeyDown"
         @onblur="HandleBlur"

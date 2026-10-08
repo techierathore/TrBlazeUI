@@ -115,12 +115,13 @@
     <section class="space-y-4">
         <h2 class="text-2xl font-semibold">Generic Type Support</h2>
         <p class="text-sm text-muted-foreground">
-            Select component supports generic types (int, enum, custom types).
+            Select component supports generic types (int, enum, custom types). A value no item carries
+            (here the <code class="bg-muted px-1 py-0.5 rounded">int</code> default 0) shows the placeholder, not the raw value.
         </p>
 
         <div class="flex items-center gap-4">
             <Select @bind-Value="selectedNumber" TValue="int" Class="w-[280px]">
-                <SelectTrigger>
+                <SelectTrigger data-testid="select-int-trigger">
                     <SelectValue Placeholder="Select a number" />
                 </SelectTrigger>
                 <SelectContent>

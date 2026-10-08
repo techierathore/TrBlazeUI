@@ -1,0 +1,39 @@
+@namespace TrBlazeUI.Components.Table
+@using TrBlazeUI.Components.Utilities
+
+@* A plain markup table in the shadcn/ui idiom: Table > TableHeader/TableBody/TableFooter >
+   TableRow > TableHead/TableCell, plus TableCaption. Nothing is generic and nothing is bound: the
+   page writes the rows itself. Reach for DataTable when the rows need sorting, filtering, paging or
+   selection; reach for this when a table is just markup (Sevak TR-028).
+
+   The container div is the scroll region, so a wide table scrolls inside it instead of widening
+   the page - the same containment DataTable ships (TR-004). *@
+
+<div data-slot="table-container" class="relative w-full overflow-x-auto">
+    <table data-slot="table" class="@CssClass" @attributes="AdditionalAttributes">
+        @ChildContent
+    </table>
+</div>
+
+@code {
+    /// <summary>
+    /// Gets or sets the rows, header, footer and caption of the table.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes merged into the table element's own.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered <c>table</c> element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => ClassNames.cn("w-full caption-bottom text-sm", Class);
+}

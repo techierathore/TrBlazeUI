@@ -29,8 +29,14 @@ else
     /// <summary>
     /// Resolves the display text synchronously so the trigger has an accessible name
     /// from the very first render: registered display text first, then the raw bound
-    /// value as a fallback (items may not have registered yet).
+    /// value as a fallback while the items have not registered yet.
     /// </summary>
+    /// <remarks>
+    /// Sevak TR-024: once the items have registered and none of them carries the bound value,
+    /// the raw value is not shown - an <c>int</c> select bound to 0 with items 1 to 5 read "0"
+    /// where its placeholder belonged. A null value, or a value equal to its type's default,
+    /// is "nothing selected" whenever no item matches it.
+    /// </remarks>
     private string? GetSelectedText()
     {
         if (SelectContext == null)
@@ -45,7 +51,28 @@ else
         }
 
         object? vValue = SelectContext.Value;
-        return vValue?.ToString();
+        if (vValue is null || IsDefaultValue(vValue))
+        {
+            return null;
+        }
+
+        int vRegistered = SelectContext.RegisteredItemCount;
+        if (vRegistered > 0)
+        {
+            bool vHasItem = SelectContext.HasItemWithValue(vValue);
+            if (!vHasItem)
+            {
+                return null;
+            }
+        }
+
+        return vValue.ToString();
+    }
+
+    private static bool IsDefaultValue(object aValue)
+    {
+        var vType = aValue.GetType();
+        return vType.IsValueType && Equals(aValue, Activator.CreateInstance(vType));
     }
 
     /// <summary>

@@ -260,6 +260,24 @@ public class SelectContext<TValue> : PrimitiveContextWithEvents<SelectState<TVal
     public void ClearItems() => Items.Clear();
 
     /// <summary>
+    /// Gets how many items have registered with the context so far.
+    /// </summary>
+    /// <remarks>
+    /// Zero while the items have not rendered yet (the first paint, or the moment the list is
+    /// reopened and re-registers). The value display uses it to tell "no item carries this value"
+    /// from "the items have not reported in yet" (Sevak TR-024).
+    /// </remarks>
+    public int RegisteredItemCount => Items.Count;
+
+    /// <summary>
+    /// Gets whether a registered item carries the given value.
+    /// </summary>
+    /// <param name="value">The value to look for.</param>
+    /// <returns>True when a registered item has that value.</returns>
+    public bool HasItemWithValue(TValue? value) =>
+        Items.Exists(item => EqualityComparer<TValue?>.Default.Equals(item.Value, value));
+
+    /// <summary>
     /// Moves focus to the next item that is not disabled.
     /// </summary>
     /// <param name="direction">1 for next, -1 for previous.</param>

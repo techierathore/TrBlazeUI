@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sevak — Tasks and goals</title>
+<!-- Sevak mockup · route: /tasks (BRD-148) · TrBlazeUI controls: Tabs, Button, DataTable, Card, Progress, Badge, Dialog, Input, DatePicker, TimePicker, Combobox, Select, Alert, Empty, Skeleton, LucideIcon, Toast -->
+<style>
+:root{--bg:#f6f7f9;--card:#ffffff;--fg:#1a1d23;--muted:#f1f2f5;--muted-fg:#6b7280;--border:#e6e8ec;--accent:#4f46e5;--accent-hover:#4338ca;--accent-soft:#eef2ff;--accent-border:#c7d2fe;--destructive:#dc2626;--success:#16a34a;--info:#2563eb;--warning:#d97706;--radius:10px;--sidebar:#fbfbfd;--shadow-sm:0 1px 2px rgba(16,24,40,.05);--shadow:0 1px 3px rgba(16,24,40,.08),0 1px 2px rgba(16,24,40,.05);--shadow-lg:0 8px 24px rgba(16,24,40,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.shell{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 62px)}
+.sidebar{background:var(--sidebar);border-right:1px solid var(--border);padding:14px 12px;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:calc(100vh - 62px);overflow-y:auto}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15.5px;padding:6px 8px 14px;letter-spacing:-.01em}
+.logo .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#6366f1,#4338ca);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;box-shadow:var(--shadow)}
+.ws-switch{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:9px;background:var(--card);padding:8px 10px;margin:2px 0 10px;font-weight:600;font-size:13px;cursor:pointer;box-shadow:var(--shadow-sm)}
+.ws-switch:hover{border-color:var(--accent-border)}
+.ws-switch .dot{width:22px;height:22px;border-radius:6px;background:var(--accent-soft);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700}
+.ws-switch .chev{margin-left:auto;color:var(--muted-fg)}
+.navgroup{font-size:10.5px;font-weight:600;color:var(--muted-fg);text-transform:uppercase;letter-spacing:.7px;padding:12px 10px 4px}
+.navitem{display:flex;align-items:center;gap:10px;padding:7.5px 10px;border-radius:8px;color:#3d4451;font-weight:500;font-size:13.5px;transition:all .12s}
+.navitem svg{width:16px;height:16px;stroke:#9aa1ad;flex-shrink:0;transition:stroke .12s}
+.navitem:hover{background:#f0f1f4;color:var(--fg)}
+.navitem:hover svg{stroke:var(--fg)}
+.navitem.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.navitem.active svg{stroke:var(--accent)}
+.sidebar .foot{margin-top:auto;border-top:1px solid var(--border);padding-top:12px;display:flex;gap:10px;align-items:center}
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{display:flex;align-items:center;gap:12px;padding:12px 24px;border-bottom:1px solid var(--border);background:var(--card);position:sticky;top:0;z-index:5}
+.crumb{color:var(--muted-fg);font-size:13px}
+.crumb b{color:var(--fg);font-weight:600}
+.topbar .right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.content{padding:24px;display:flex;flex-direction:column;gap:16px;max-width:1180px;width:100%}
+.pagehead{display:flex;align-items:center;gap:12px}
+.pagehead h1{font-size:20px;font-weight:700;letter-spacing:-.01em}
+.pagehead .sub{color:var(--muted-fg);font-size:13px}
+.pagehead .actions{margin-left:auto;display:flex;gap:8px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow-sm)}
+.card h3{font-size:15px;font-weight:650;margin-bottom:2px}
+.card .desc{color:var(--muted-fg);font-size:13px;margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:8px;padding:8px 15px;font-size:13.5px;font-weight:600;border:1px solid transparent;cursor:pointer;background:var(--accent);color:#fff;box-shadow:var(--shadow-sm);transition:background .12s}
+.btn:hover{background:var(--accent-hover)}
+.btn.outline{background:var(--card);color:var(--fg);border-color:var(--border)}
+.btn.outline:hover{background:var(--muted)}
+.btn.ghost{background:transparent;color:var(--fg);box-shadow:none}
+.btn.ghost:hover{background:var(--muted)}
+.btn.destructive{background:var(--destructive)}
+.btn.destructive:hover{background:#b91c1c}
+.btn.sm{padding:4.5px 11px;font-size:12.5px}
+.btn svg{width:15px;height:15px;stroke:currentColor}
+.input,select.input,textarea.input{width:100%;border:1px solid var(--border);border-radius:8px;padding:8.5px 11px;font-size:13.5px;background:var(--card);color:var(--fg);font-family:inherit}
+.input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.hint{font-size:12px;color:var(--muted-fg)}
+.field{margin-bottom:14px}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2.5px 10px;font-size:11.5px;font-weight:600;background:var(--muted);color:#4b5563;border:1px solid var(--border)}
+.badge.green{background:#ecfdf3;color:#067647;border-color:#abefc6}
+.badge.blue{background:#eff4ff;color:#1d4ed8;border-color:#c7d7fe}
+.badge.amber{background:#fffaeb;color:#b54708;border-color:#fedf89}
+.badge.red{background:#fef3f2;color:#b42318;border-color:#fecdca}
+.badge.violet{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-border)}
+table.t{width:100%;border-collapse:collapse;font-size:13.5px}
+table.t th{color:var(--muted-fg);font-weight:600;text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px;text-transform:uppercase;letter-spacing:.4px;background:#fafbfc}
+table.t td{padding:11px 12px;border-bottom:1px solid #f0f1f4}
+table.t tr:hover td{background:#fafbff}
+.tabs{display:flex;gap:2px;background:var(--muted);border-radius:9px;padding:3px;width:max-content}
+.tab{padding:6px 16px;border-radius:7px;font-size:13px;font-weight:500;color:#5b6472;cursor:pointer}
+.tab.active{background:var(--card);font-weight:600;color:var(--fg);box-shadow:var(--shadow-sm)}
+.avatar{width:30px;height:30px;border-radius:999px;background:linear-gradient(135deg,#e0e7ff,#c7d2fe);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#4338ca;flex-shrink:0}
+.alert{display:flex;gap:10px;border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:13px;background:var(--card);box-shadow:var(--shadow-sm)}
+.alert.green{background:#ecfdf3;border-color:#abefc6;color:#067647}
+.alert.red{background:#fef3f2;border-color:#fecdca;color:#b42318}
+.alert.amber{background:#fffaeb;border-color:#fedf89;color:#b54708}
+.alert.blue{background:#eff4ff;border-color:#c7d7fe;color:#1d4ed8}
+.switch{width:36px;height:20px;border-radius:999px;background:var(--accent);position:relative;display:inline-block;flex-shrink:0}
+.switch:after{content:"";position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:999px;background:#fff;box-shadow:var(--shadow-sm)}
+.switch.off{background:#d1d5db}
+.switch.off:after{right:auto;left:2px}
+.progress{height:8px;border-radius:999px;background:var(--muted);overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,#6366f1,#4f46e5);border-radius:999px}
+.auth{min-height:calc(100vh - 62px);background:linear-gradient(160deg,#eef2ff 0%,#f6f7f9 45%,#f6f7f9 100%);display:flex;align-items:center;justify-content:center;padding:24px}
+.auth .box{width:410px;display:flex;flex-direction:column;gap:16px}
+.auth .card{box-shadow:var(--shadow-lg);border-radius:14px;padding:26px}
+.empty{text-align:center;color:var(--muted-fg);padding:36px;border:1.5px dashed var(--border);border-radius:12px;font-size:13px;background:#fafbfc}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:3px 11px;font-size:12px;font-weight:600;cursor:pointer}
+/* screen-specific */
+.cardtag{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.dropzone{border:1.5px dashed var(--border);border-radius:10px;padding:18px;text-align:center;color:var(--muted-fg);font-size:12.5px;background:#fafbfc}
+.swatches{display:flex;align-items:center;gap:8px}
+.sw{width:20px;height:20px;border-radius:999px;display:inline-block;cursor:pointer}
+.sw.sel{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--accent)}
+.radios{display:flex;gap:16px;font-size:13.5px}
+.codeblock{background:#0f172a;color:#93c5fd;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;border-radius:8px;padding:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-all}
+.wpreview{height:260px;background:linear-gradient(160deg,#eef2ff 0%,#f1f2f5 100%);border:1px solid var(--border);border-radius:var(--radius);position:relative}
+.wbubble{position:absolute;right:14px;bottom:14px;width:40px;height:40px;border-radius:999px;background:linear-gradient(135deg,#6366f1,#4338ca);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-lg)}
+.wbubble svg{width:19px;height:19px;stroke:#fff}
+.wwin{position:absolute;right:14px;bottom:64px;width:180px;background:#fff;border-radius:10px;box-shadow:var(--shadow-lg);overflow:hidden}
+.wwin .whead{background:linear-gradient(135deg,#6366f1,#4338ca);color:#fff;font-size:12px;font-weight:600;padding:7px 10px}
+.wwin .wmsg{margin:10px;background:var(--muted);border-radius:8px;padding:7px 9px;font-size:12px}
+.keyaction{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.strike{text-decoration:line-through;color:var(--muted-fg)}
+
+/* ===== v3 overrides — dark sidebar + dark mode ===== */
+html[data-theme="dark"] .sidebar{background:linear-gradient(180deg,#161b2e,#10131f);border-right:1px solid #232941}
+html[data-theme="dark"] .sidebar .logo{color:#fff}
+html[data-theme="dark"] .navgroup{color:#5d6480}
+html[data-theme="dark"] .navitem{color:#a6adc5}
+html[data-theme="dark"] .navitem svg{stroke:#6f7691}
+html[data-theme="dark"] .navitem:hover{background:rgba(255,255,255,.06);color:#e6e9f4}
+html[data-theme="dark"] .navitem:hover svg{stroke:#c3c9dd}
+html[data-theme="dark"] .navitem.active{background:rgba(99,102,241,.22);color:#c7d2fe}
+html[data-theme="dark"] .navitem.active svg{stroke:#a5b4fc}
+html[data-theme="dark"] .ws-switch{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#e6e9f4;box-shadow:none}
+html[data-theme="dark"] .ws-switch:hover{border-color:#6366f1}
+html[data-theme="dark"] .ws-switch .chev{color:#8b92ad}
+html[data-theme="dark"] .sidebar .foot{border-top-color:rgba(255,255,255,.1);color:#e6e9f4}
+html[data-theme="dark"] .sidebar .foot .hint{color:#8b92ad}
+.theme-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--muted-fg);cursor:pointer;padding:0}
+.theme-btn:hover{color:var(--accent);border-color:var(--accent-border)}
+.theme-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+body > .theme-btn{position:fixed;top:14px;right:16px;z-index:50;box-shadow:var(--shadow)}
+html[data-theme="dark"]{--bg:#0d1017;--card:#151a26;--fg:#e2e5ee;--muted:#1c2231;--muted-fg:#8b93a8;--border:#242b3d;--accent:#818cf8;--accent-hover:#939bfa;--accent-soft:#232a4d;--accent-border:#414a83;--sidebar:#10131f;--shadow-sm:0 1px 2px rgba(0,0,0,.4);--shadow:0 1px 3px rgba(0,0,0,.5);--shadow-lg:0 8px 24px rgba(0,0,0,.55)}
+html[data-theme="dark"] .btn{color:#fff}
+html[data-theme="dark"] .btn.outline{color:var(--fg)}
+html[data-theme="dark"] .btn.ghost{color:var(--fg)}
+html[data-theme="dark"] table.t th{background:#181e2c;color:#8b93a8}
+html[data-theme="dark"] table.t td{border-bottom-color:#1e2434}
+html[data-theme="dark"] table.t tr:hover td{background:#181e2e}
+html[data-theme="dark"] .tab{color:#9aa2b6}
+html[data-theme="dark"] .tab.active{background:#232a3d;color:#e2e5ee}
+html[data-theme="dark"] .badge{background:#1c2231;color:#a8b0c4;border-color:#2b3348}
+html[data-theme="dark"] .badge.green{background:#0d2b1e;color:#4ade80;border-color:#1c4a34}
+html[data-theme="dark"] .badge.blue{background:#122142;color:#93b4fd;border-color:#25407a}
+html[data-theme="dark"] .badge.amber{background:#32230a;color:#fbbf24;border-color:#5c4514}
+html[data-theme="dark"] .badge.red{background:#331416;color:#f87171;border-color:#5f2120}
+html[data-theme="dark"] .badge.violet{background:#232a4d;color:#a5b4fc;border-color:#414a83}
+html[data-theme="dark"] .alert.green{background:#0d2b1e;border-color:#1c4a34;color:#6ee7a0}
+html[data-theme="dark"] .alert.red{background:#331416;border-color:#5f2120;color:#fca5a5}
+html[data-theme="dark"] .alert.amber{background:#32230a;border-color:#5c4514;color:#fcd34d}
+html[data-theme="dark"] .alert.blue{background:#122142;border-color:#25407a;color:#a9c4fe}
+html[data-theme="dark"] .auth{background:linear-gradient(160deg,#151a30 0%,#0d1017 50%)}
+html[data-theme="dark"] .empty{background:#131826}
+html[data-theme="dark"] .avatar{background:linear-gradient(135deg,#2b3157,#3a4180);color:#c7d2fe}
+html[data-theme="dark"] .switch.off{background:#3a4256}
+html[data-theme="dark"] .input,html[data-theme="dark"] select.input,html[data-theme="dark"] textarea.input{background:#11151f;border-color:#2a3145;color:var(--fg)}
+html[data-theme="dark"] [style*="#f5f7ff"]{background:#1b2140!important}
+html[data-theme="dark"] [style*="#fffbfa"]{background:#231518!important}
+html[data-theme="dark"] [style*="#fafbfc"]{background:#151a26!important}
+html[data-theme="dark"] [style*="#fafbff"]{background:#161c2a!important}
+/* dark-mode screen fixes */
+html[data-theme="dark"] .dropzone{background:#131826}
+html[data-theme="dark"] .wpreview{background:linear-gradient(160deg,#1b2140 0%,#10131f 100%)}
+html[data-theme="dark"] .wwin{background:var(--card)}
+/* --- desktop window chrome (2026-07-26: MAUI Blazor Hybrid window, not a browser tab) --- */
+.winbar{display:flex;align-items:center;gap:10px;height:34px;padding:0 12px;background:linear-gradient(#f2f3f6,#e9ebef);border-bottom:1px solid var(--border);user-select:none;flex:0 0 auto}
+.traffic{display:flex;gap:7px}
+.traffic i{width:11px;height:11px;border-radius:50%;display:block}
+.traffic .r{background:#ff5f57}.traffic .y{background:#febc2e}.traffic .g{background:#28c840}
+.wintitle{flex:1;text-align:center;font-size:12.5px;font-weight:600;color:var(--muted-fg);margin-right:46px}
+.menubar{display:flex;align-items:center;gap:17px;height:28px;padding:0 14px;background:var(--card);border-bottom:1px solid var(--border);font-size:12.5px;color:#4b5563;user-select:none;flex:0 0 auto}
+.menubar b{font-weight:700;color:var(--fg)}
+html[data-theme="dark"] .winbar{background:linear-gradient(#20242e,#1a1e27);border-color:#2a3145}
+html[data-theme="dark"] .menubar{background:#151a26;border-color:#2a3145;color:#98a1b3}
+
+/* ===== prototype kit (owner review 2026-07-26) — menus, tabs, dialogs, popovers ===== */
+.menubar{position:relative;z-index:120}
+.mb{position:relative}
+.mb>button{background:none;border:0;font:inherit;color:inherit;cursor:pointer;padding:3px 9px;border-radius:6px;line-height:1.6}
+.mb>button:hover{background:var(--muted)}
+.mb.open>button{background:var(--accent);color:#fff}
+.menu{position:absolute;top:calc(100% + 3px);left:0;min-width:236px;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-lg);padding:5px;display:none;font-size:13px;color:var(--fg)}
+.mb.open>.menu{display:block}
+.menu a,.menu .mi{display:flex;align-items:center;gap:10px;padding:6px 9px;border-radius:6px;color:var(--fg);cursor:pointer;white-space:nowrap}
+.menu a:hover,.menu .mi:not(.disabled):hover{background:var(--muted)}
+.menu .mi.disabled{color:var(--muted-fg);cursor:default}
+.menu .sep{height:1px;background:var(--border);margin:4px 2px}
+.menu .k{margin-left:auto;color:var(--muted-fg);font-size:11.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.menu .grouplbl{padding:6px 9px 2px;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted-fg)}
+
+/* popovers — row overflow menus, workspace switcher, anything anchored */
+.popwrap{position:relative;display:inline-block}
+.pop{position:absolute;top:calc(100% + 5px);right:0;min-width:210px;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-lg);padding:5px;display:none;z-index:180;font-size:13px;text-align:left;font-weight:400}
+.pop.open{display:block}
+.pop.left{right:auto;left:0}
+.pop a,.pop .mi{display:flex;align-items:center;gap:9px;padding:6px 9px;border-radius:6px;color:var(--fg);cursor:pointer;white-space:nowrap}
+.pop a:hover,.pop .mi:not(.disabled):hover{background:var(--muted)}
+.pop .mi.danger{color:var(--destructive)}
+.pop .mi.disabled{color:var(--muted-fg);cursor:default}
+.pop .sep{height:1px;background:var(--border);margin:4px 2px}
+.dots{border:0;background:none;color:var(--muted-fg);cursor:pointer;font-size:16px;line-height:1;padding:3px 7px;border-radius:6px}
+.dots:hover{background:var(--muted);color:var(--fg)}
+
+/* modal dialogs */
+.modal{position:fixed;inset:0;background:rgba(12,15,23,.5);display:none;align-items:center;justify-content:center;z-index:400;padding:28px}
+.modal.open{display:flex}
+.modal .sheet{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-lg);width:min(700px,100%);max-height:84vh;overflow:auto;padding:22px}
+.modal .sheet.wide{width:min(960px,100%)}
+.modal .mhead{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.modal .mhead h3{font-size:16px;font-weight:680}
+.modal .mhead .sub{color:var(--muted-fg);font-size:12.5px;margin-top:2px}
+.modal .x{margin-left:auto;border:0;background:none;font-size:20px;line-height:1;color:var(--muted-fg);cursor:pointer;padding:0 4px}
+.modal .x:hover{color:var(--fg)}
+.modal .mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+
+/* tab panels — the tab strips were decorative; now they switch */
+.tab{user-select:none}
+.tabpanel{display:none}
+.tabpanel.active{display:block}
+
+/* 3 — fill the window instead of stranding half of it */
+.content{max-width:none !important}
+.content>*{max-width:1560px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+
+/* ===== Sevak P2 life-manager additions (2026-10-02) ===== */
+[data-tf-state]:not(.show):not([data-tf-state=dialog],[data-tf-state=toast],[data-tf-state=reviewer],[data-tf-state=popover],[data-tf-state^=tab-],[data-tf-state^=step-],[data-tf-state^=after-],[data-tf-state^=variant-]){display:none !important}
+.toast{position:fixed;right:22px;bottom:22px;z-index:600;background:#111827;color:#fff;border-radius:10px;padding:10px 16px;font-size:13px;box-shadow:var(--shadow-lg);opacity:0;transform:translateY(8px);transition:all .18s;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+html[data-theme="dark"] .toast{background:#e2e5ee;color:#111827}
+.statebar{display:inline-flex;gap:2px;background:var(--muted);border-radius:8px;padding:2px;font-size:11.5px;align-items:center}
+.statebar span{color:var(--muted-fg);padding:0 6px 0 8px}
+.statebar button{border:0;background:none;color:var(--muted-fg);font:inherit;padding:3px 9px;border-radius:6px;cursor:pointer}
+.statebar button.on{background:var(--card);color:var(--fg);font-weight:600;box-shadow:var(--shadow-sm)}
+.iconbtn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--muted-fg);cursor:pointer;padding:0}
+.iconbtn:hover{color:var(--accent);border-color:var(--accent-border)}
+.iconbtn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.iconbtn.danger:hover{color:var(--destructive);border-color:#fecdca}
+.skel{height:14px;border-radius:6px;background:linear-gradient(90deg,var(--muted),#e9ebf0,var(--muted));background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.spinner{width:18px;height:18px;border-radius:50%;border:2.5px solid var(--accent-border);border-top-color:var(--accent);animation:spin .8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat b{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.stat span{color:var(--muted-fg);font-size:12px}
+.listrow{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.listrow:last-child{border-bottom:0}
+.radiolist{display:flex;flex-direction:column;gap:8px}
+.radiolist label{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--border);border-radius:10px;padding:11px 13px;cursor:pointer}
+.radiolist label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.radiolist input{margin-top:3px;accent-color:var(--accent)}
+.checks{display:flex;flex-wrap:wrap;gap:10px}
+.checks label{display:flex;gap:8px;align-items:center;border:1px solid var(--border);border-radius:9px;padding:8px 12px;cursor:pointer}
+.checks input{accent-color:var(--accent)}
+.bigq{font-size:24px;font-weight:700;letter-spacing:-.015em;line-height:1.3}
+.steps{display:flex;flex-direction:column;gap:1px;font-size:12.5px}
+.steps li{list-style:none;display:flex;gap:8px;align-items:center;padding:5px 8px;border-radius:7px;color:var(--muted-fg);cursor:default}
+.steps li i{font-style:normal;width:20px;height:20px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:var(--muted);font-size:10.5px;font-weight:700;flex-shrink:0}
+.steps li.done i{background:#ecfdf3;color:#067647}
+.steps li.cur{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.steps li.cur i{background:var(--accent);color:#fff}
+.wstep{display:none}
+.wstep.active{display:block}
+.structure{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.structure>div{border:1px solid var(--border);border-radius:10px;padding:12px}
+.structure b{display:block;font-size:13.5px}
+.voice-later{display:flex;align-items:center;gap:6px;color:var(--muted-fg);font-size:12px}
+.topuser{display:flex;align-items:center;gap:8px;font-size:12.5px}
+.topuser .who{line-height:1.2}
+.topuser .who .hint{font-size:11px}
+.signout{font-size:12.5px;color:var(--muted-fg);border-left:1px solid var(--border);padding-left:12px}
+.signout:hover{color:var(--accent)}
+html[data-theme="dark"] .skel{background:linear-gradient(90deg,#1c2231,#252c3e,#1c2231);background-size:200% 100%}
+
+/* narrow window (<768px): the sidebar folds away behind the menu, as the app's TrBlazeUI Sidebar does */
+@media (max-width:767px){.shell{grid-template-columns:1fr}.shell>.sidebar{display:none}}
+</style>
+<script>(function(){try{if(localStorage.getItem('td-theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}})();function tdTheme(){var r=document.documentElement,d=r.getAttribute('data-theme')==='dark';if(d)r.removeAttribute('data-theme');else r.setAttribute('data-theme','dark');try{localStorage.setItem('td-theme',d?'light':'dark')}catch(e){}}</script>
+</head>
+<body>
+<div class="winbar">
+  <div class="traffic"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+  <div class="wintitle">Sevak</div>
+</div>
+<div class="menubar"><div class="mb"><button onclick="tdMenu(this,event)"><b>Sevak</b></button><div class="menu"><div class="mi" onclick="tdToast('About Sevak')">About Sevak</div><div class="mi" onclick="tdToast('Check for Updates')">Check for Updates&hellip;</div><div class="sep"></div><a href="admin-settings.html">Settings<span class="k">&#8984;,</span></a><a href="data-storage.html">Data &amp; Storage</a><a href="billing.html">Licence &amp; Account</a><div class="sep"></div><div class="mi" onclick="tdToast('Quit Sevak')">Quit Sevak<span class="k">&#8984;Q</span></div></div></div><div class="mb"><button onclick="tdMenu(this,event)">File</button><div class="menu"><a href="tasks.html">New Task&hellip;<span class="k">&#8984;N</span></a><a href="inbox.html">Add to Inbox&hellip;<span class="k">&#8984;I</span></a><div class="sep"></div><a href="document-library.html">Import Documents&hellip;<span class="k">&#8984;O</span></a><a href="connectors.html">Add a Connector&hellip;</a><div class="sep"></div><div class="mi" onclick="tdToast('Export Thread as Markdown')">Export Thread as Markdown&hellip;</div><div class="mi" onclick="tdToast('Reveal Data Folder in Finder')">Reveal Data Folder in Finder</div></div></div><div class="mb"><button onclick="tdMenu(this,event)">Edit</button><div class="menu"><div class="mi disabled">Undo<span class="k">&#8984;Z</span></div><div class="mi disabled">Redo<span class="k">&#8679;&#8984;Z</span></div><div class="sep"></div><div class="mi" onclick="tdToast('Cut')">Cut<span class="k">&#8984;X</span></div><div class="mi" onclick="tdToast('Copy')">Copy<span class="k">&#8984;C</span></div><div class="mi" onclick="tdToast('Paste')">Paste<span class="k">&#8984;V</span></div><div class="sep"></div><div class="mi" onclick="tdToast('Find in Thread')">Find in Thread&hellip;<span class="k">&#8984;F</span></div></div></div><div class="mb"><button onclick="tdMenu(this,event)">View</button><div class="menu"><div class="mi" onclick="tdToast('Toggle Sidebar')">Toggle Sidebar<span class="k">&#8984;\</span></div><div class="sep"></div><div class="grouplbl">Appearance</div><div class="mi" onclick="tdSetTheme('light')">Light</div><div class="mi" onclick="tdSetTheme('dark')">Dark</div><div class="mi" onclick="tdSetTheme('system')">Match System</div><div class="sep"></div><div class="mi" onclick="tdToast('Zoom In')">Zoom In<span class="k">&#8984;+</span></div><div class="mi" onclick="tdToast('Zoom Out')">Zoom Out<span class="k">&#8984;&minus;</span></div><div class="mi" onclick="tdToast('Actual Size')">Actual Size<span class="k">&#8984;0</span></div><div class="mi" onclick="tdToast('Enter Full Screen')">Enter Full Screen<span class="k">&#8963;&#8984;F</span></div></div></div><div class="mb"><button onclick="tdMenu(this,event)">Go</button><div class="menu"><div class="grouplbl">Life</div><a href="today.html">Today<span class="k">&#8984;1</span></a><a href="tasks.html">Tasks and goals<span class="k">&#8984;2</span></a><a href="inbox.html">Inbox<span class="k">&#8984;3</span></a><a href="review.html">Weekly review</a><a href="email.html">Email</a><a href="family.html">Family</a><div class="sep"></div><div class="grouplbl">Tools</div><a href="tools.html">All tools</a><a href="workspace-chat.html">Chat</a><a href="document-library.html">Documents</a><a href="connectors.html">Connectors</a><a href="agents.html">Agents</a><a href="automations.html">Automations</a><a href="workspace-settings.html">Workspace Settings&hellip;</a><a href="backup.html">Backup</a></div></div><div class="mb"><button onclick="tdMenu(this,event)">Window</button><div class="menu"><div class="mi" onclick="tdToast('Minimise')">Minimise<span class="k">&#8984;M</span></div><div class="mi" onclick="tdToast('Zoom')">Zoom</div><div class="sep"></div><div class="mi" onclick="tdToast('Bring All to Front')">Bring All to Front</div></div></div><div class="mb"><button onclick="tdMenu(this,event)">Help</button><div class="menu"><div class="mi" onclick="tdToast('Sevak Help')">Sevak Help<span class="k">&#8984;?</span></div><div class="mi" onclick="tdToast('Keyboard Shortcuts')">Keyboard Shortcuts</div><div class="sep"></div><a href="support.html">Support&hellip;</a><a href="admin-events.html">Event Log</a><div class="mi" onclick="tdToast('Reveal Logs in Finder')">Reveal Logs in Finder</div></div></div></div>
+<div class="shell">
+  <aside class="sidebar" data-testid="app-sidebar">
+    <a class="logo" href="today.html"><span class="mark">S</span> Sevak</a>
+    <nav class="sidenav" aria-label="Main">
+    <div class="navgroup">Life</div>
+    <a class="navitem" href="today.html" data-testid="nav-today"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>Today</a>
+    <a class="navitem active" href="tasks.html" data-testid="nav-tasks"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 12 2 2 4-4"/></svg>Tasks and goals</a>
+    <a class="navitem" href="inbox.html" data-testid="nav-inbox"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>Inbox</a>
+    <a class="navitem" href="review.html" data-testid="nav-review"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>Weekly review</a>
+    <a class="navitem" href="email.html" data-testid="nav-email"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>Email</a>
+    <a class="navitem" href="family.html" data-testid="nav-family"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Family</a>
+    <div class="navgroup">Tools</div>
+    <a class="navitem" href="tools.html" data-testid="nav-tools"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Tools</a>
+    <a class="navitem" href="backup.html" data-testid="nav-backup"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>Backup</a>
+    </nav>
+    <div class="foot"><span class="avatar" data-testid="sidebar-avatar">RK</span><div style="font-size:13px;line-height:1.25"><div style="font-weight:650">Ravi Kumar</div><div class="hint">Head of the house</div></div></div>
+  </aside>
+  <div class="main">
+    <div class="topbar" data-testid="app-topbar"><span class="crumb" data-testid="app-breadcrumb">Life / <b>Tasks and goals</b></span><div class="right"><button class="theme-btn" onclick="tdTheme()" title="Toggle dark mode" data-testid="theme-toggle"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg></button><span class="topuser"><span class="avatar" title="Ravi (head of the house)" data-testid="topbar-avatar">RK</span><span class="who"><b>Ravi</b><div class="hint">head of the house</div></span></span><a class="signout" href="login.html" data-testid="sign-out">Sign out</a></div></div>
+    <div class="content">
+      <div class="pagehead">
+        <h1>Tasks and goals</h1>
+        <div class="sub">Your tasks, and the goals, projects and areas they belong to</div>
+        <div class="actions">
+          <div class="statebar" data-testid="mockup-states" data-tf-state="reviewer"><span>Mockup state</span><button class="on" onclick="tdState('normal',this)">Normal</button><button onclick="tdState('empty',this)">Empty</button><button onclick="tdState('loading',this)">Loading</button><button onclick="tdState('error',this)">Error</button></div>
+          <button class="btn outline" onclick="tdOpen('dlgGoal')" data-testid="goals-add"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg> Add goal</button>
+          <button class="btn" onclick="tdOpen('dlgTask')" data-testid="tasks-add"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg> Add task</button>
+        </div>
+      </div>
+
+      <div class="alert red" data-tf-state="error" data-testid="tasks-error"><div style="flex:1"><b>Tasks could not be saved.</b> The task &ldquo;Book Agastya's dentist visit&rdquo; was not written to this computer. Nothing else was lost.</div><button class="btn outline sm" onclick="tdToast('Saved on the second try')" data-testid="tasks-retry">Retry</button></div>
+
+      <div class="card" data-testid="tasks-structure">
+        <div class="cardtag"><span class="badge violet" data-testid="tasks-structure-badge">Your structure</span><span class="hint">Built from your answers at setup</span></div>
+        <div class="structure">
+          <div><b>Inbox</b><span class="hint">3 to sort &middot; <a href="inbox.html" style="text-decoration:underline">open</a></span></div>
+          <div><b>Projects</b><span class="hint">4 active</span></div>
+          <div><b>Areas</b><span class="hint">5 kept an eye on</span></div>
+          <div><b>Resources</b><span class="hint">12 notes and links</span></div>
+          <div><b>Archive</b><span class="hint">7 finished</span></div>
+        </div>
+      </div>
+
+      <div class="tabs" data-testid="tasks-tabs">
+        <div class="tab active" data-tab="tasks" data-testid="tasks-tab-tasks">Tasks</div>
+        <div class="tab" data-tab="goals" data-testid="tasks-tab-goals">Goals</div>
+        <div class="tab" data-tab="projects" data-testid="tasks-tab-projects">Projects</div>
+        <div class="tab" data-tab="areas" data-testid="tasks-tab-areas">Areas</div>
+      </div>
+
+      <div class="tabpanel active" data-panel="tasks">
+        <div class="card" style="padding:0;overflow:hidden" data-testid="tasks-card">
+          <div style="padding:18px 18px 0"><h3>Tasks</h3><div class="desc">Today and the coming days. A task with a time gets a reminder by name.</div></div>
+          <div style="overflow-x:auto" data-tf-normal><table class="t" data-testid="tasks-table">
+            <thead><tr><th>Task</th><th>When</th><th>Goal or project</th><th>Area</th><th>Person</th><th>State</th><th></th></tr></thead>
+            <tbody>
+              <tr data-tf-sample><td><b>Brainstorm for Sevak</b></td><td class="mono">Today 09:30</td><td>Ship Sevak v0.1 by 15 Nov</td><td>Work</td><td>Ravi</td><td><span class="badge blue" data-testid="tasks-state-badge">Doing</span></td><td style="text-align:right"><button class="iconbtn" title="Edit task" onclick="tdOpen('dlgTask')" data-testid="tasks-edit"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></td></tr>
+              <tr data-tf-sample><td><b>Fix the sign-in redirect</b></td><td class="mono">Today 11:00</td><td>Project: Sevak v0.1</td><td>Work</td><td>Ravi</td><td><span class="badge" data-testid="tasks-done-elsewhere">Done, seen in GitHub</span></td><td style="text-align:right"><button class="iconbtn" title="Edit task" onclick="tdOpen('dlgTask')" data-testid="tasks-edit"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></td></tr>
+              <tr data-tf-sample><td><b>Pay the electricity bill</b></td><td class="mono">Today 14:00</td><td>&mdash;</td><td>Money</td><td>Ravi</td><td><span class="badge red" data-testid="tasks-state-badge">Not done</span></td><td style="text-align:right"><button class="iconbtn" title="Edit task" onclick="tdOpen('dlgTask')" data-testid="tasks-edit"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></td></tr>
+              <tr data-tf-sample><td><b>Read 30 pages of Atomic Habits</b></td><td class="mono">Today 18:00</td><td>Read 2 books a month</td><td>Learning</td><td>Ravi</td><td><span class="badge" data-testid="tasks-state-badge">To do</span></td><td style="text-align:right"><button class="iconbtn" title="Edit task" onclick="tdOpen('dlgTask')" data-testid="tasks-edit"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></td></tr>
+              <tr data-tf-sample><td><b>Maths homework, chapter 6</b></td><td class="mono">Today 17:00</td><td>&mdash;</td><td>Family</td><td>Agastya</td><td><span class="badge" data-testid="tasks-state-badge">To do</span></td><td style="text-align:right"><button class="iconbtn" title="Edit task" onclick="tdOpen('dlgTask')" data-testid="tasks-edit"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></td></tr>
+              <tr data-tf-sample><td><b>Book Agastya's dentist visit</b></td><td class="mono">Sat 3 Oct 10:00</td><td>&mdash;</td><td>Health</td><td>Meera</td><td><span class="badge" data-testid="tasks-state-badge">To do</span></td><td style="text-align:right"><button class="iconbtn" title="Edit task" onclick="tdOpen('dlgTask')" data-testid="tasks-edit"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></td></tr>
+              <tr data-tf-sample><td><b>Morning walk</b></td><td class="mono">Daily 06:30</td><td>Walk 8,000 steps daily</td><td>Health</td><td>Ravi</td><td><span class="badge green" data-testid="tasks-state-badge">Done &middot; 42 min</span></td><td style="text-align:right"><button class="iconbtn" title="Edit task" onclick="tdOpen('dlgTask')" data-testid="tasks-edit"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></td></tr>
+            </tbody>
+          </table></div>
+          <div style="padding:14px 18px 18px" data-tf-state="loading" data-testid="tasks-loading">
+            <div style="display:flex;flex-direction:column;gap:12px"><div class="skel" style="width:92%"></div><div class="skel" style="width:80%"></div><div class="skel" style="width:88%"></div><div class="skel" style="width:70%"></div><div class="skel" style="width:84%"></div></div>
+          </div>
+          <div style="padding:0 18px 18px" data-tf-state="empty" data-testid="tasks-empty">
+            <div class="empty"><b style="color:var(--fg)">No tasks yet. Add your first three tasks for today.</b><div style="margin-top:10px"><button class="btn sm" onclick="tdOpen('dlgTask')" data-testid="tasks-empty-add">Add task</button></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabpanel" data-panel="goals" data-tf-state="tab-goals">
+        <div class="grid3" data-testid="goals-list">
+          <div class="card" data-tf-sample data-testid="goal-card"><div class="cardtag"><span class="badge violet" data-testid="goal-area-badge">Work</span><span class="hint" style="margin-left:auto">by 15 Nov 2026</span></div><h3>Ship Sevak v0.1 by 15 Nov</h3><div class="desc">Three-month target: v0.1 released for Mac and Windows</div><div class="progress"><i style="width:64%"></i></div><div class="hint" style="margin-top:6px">14 of 22 tasks done</div></div>
+          <div class="card" data-tf-sample data-testid="goal-card"><div class="cardtag"><span class="badge violet" data-testid="goal-area-badge">Health</span><span class="hint" style="margin-left:auto">by 31 Dec 2026</span></div><h3>Walk 8,000 steps daily</h3><div class="desc">Three-month target: 80 of 90 days at 8,000 steps</div><div class="progress"><i style="width:80%"></i></div><div class="hint" style="margin-top:6px">24 of 30 days this month</div></div>
+          <div class="card" data-tf-sample data-testid="goal-card"><div class="cardtag"><span class="badge violet" data-testid="goal-area-badge">Learning</span><span class="hint" style="margin-left:auto">by 31 Dec 2026</span></div><h3>Read 2 books a month</h3><div class="desc">Three-month target: 6 books</div><div class="progress"><i style="width:50%"></i></div><div class="hint" style="margin-top:6px">3 of 6 books</div></div>
+        </div>
+      </div>
+
+      <div class="tabpanel" data-panel="projects" data-tf-state="tab-projects">
+        <div class="card" style="padding:0;overflow:hidden" data-testid="projects-card">
+          <div style="padding:18px 18px 0"><h3>Projects</h3><div class="desc">Work with a finish line. Each belongs to a goal or an area.</div></div>
+          <div style="overflow-x:auto"><table class="t" data-testid="projects-list">
+            <thead><tr><th>Project</th><th>Goal</th><th>Area</th><th>Open tasks</th></tr></thead>
+            <tbody>
+              <tr data-tf-sample><td><b>Sevak v0.1</b></td><td>Ship Sevak v0.1 by 15 Nov</td><td>Work</td><td><span class="badge blue" data-testid="project-open-badge">8</span></td></tr>
+              <tr data-tf-sample><td><b>TechieRag 1.0.8 release</b></td><td>Ship Sevak v0.1 by 15 Nov</td><td>Work</td><td><span class="badge blue" data-testid="project-open-badge">3</span></td></tr>
+              <tr data-tf-sample><td><b>Kitchen repairs</b></td><td>&mdash;</td><td>Family</td><td><span class="badge blue" data-testid="project-open-badge">2</span></td></tr>
+              <tr data-tf-sample><td><b>Tax filing FY 2025-26</b></td><td>&mdash;</td><td>Money</td><td><span class="badge blue" data-testid="project-open-badge">1</span></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div class="tabpanel" data-panel="areas" data-tf-state="tab-areas">
+        <div class="grid3" data-testid="areas-list">
+          <div class="card" data-testid="area-card"><h3>Health</h3><div class="hint">1 goal &middot; 2 open tasks</div></div>
+          <div class="card" data-testid="area-card"><h3>Money</h3><div class="hint">0 goals &middot; 2 open tasks</div></div>
+          <div class="card" data-testid="area-card"><h3>Learning</h3><div class="hint">1 goal &middot; 1 open task</div></div>
+          <div class="card" data-testid="area-card"><h3>Family</h3><div class="hint">0 goals &middot; 3 open tasks</div></div>
+          <div class="card" data-testid="area-card"><h3>Work</h3><div class="hint">1 goal &middot; 11 open tasks</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+/* prototype kit — menus, popovers, tabs, dialogs (owner review 2026-07-26) */
+(function(){
+  function closeAll(except){
+    document.querySelectorAll('.mb.open').forEach(function(m){ if(m!==except) m.classList.remove('open'); });
+    document.querySelectorAll('.pop.open').forEach(function(p){ if(p!==except) p.classList.remove('open'); });
+  }
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    var trigger = t.closest('.mb>button');
+    if(trigger){ return; }
+    var popBtn = t.closest('[data-pop]');
+    if(popBtn){ var p = document.getElementById(popBtn.getAttribute('data-pop')); var open = p && p.classList.contains('open'); closeAll(); if(p && !open) p.classList.add('open'); e.preventDefault(); return; }
+    if(t.closest('.menu') || t.closest('.pop')){ if(!t.closest('a')) { closeAll(); } return; }
+    closeAll();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){ closeAll(); document.querySelectorAll('.modal.open').forEach(function(m){ m.classList.remove('open'); }); }
+  });
+  /* tabs: .tab[data-tab] switches the sibling [data-panel] of the same name */
+  document.addEventListener('click', function(e){
+    var tab = e.target.closest('.tab[data-tab]');
+    if(!tab) return;
+    var strip = tab.closest('.tabs');
+    var scope = strip.closest('.content') || document;
+    strip.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('active'); });
+    tab.classList.add('active');
+    var want = tab.getAttribute('data-tab');
+    scope.querySelectorAll('[data-panel]').forEach(function(p){
+      p.classList.toggle('active', p.getAttribute('data-panel') === want);
+    });
+  });
+})();
+function tdMenu(btn,ev){ var mb=btn.parentElement, was=mb.classList.contains('open'); document.querySelectorAll('.mb.open,.pop.open').forEach(function(x){x.classList.remove('open')}); if(!was) mb.classList.add('open'); if(ev) ev.stopPropagation(); }
+function tdToast(msg){ var t=document.getElementById('tdToast'); if(!t){ t=document.createElement('div'); t.id='tdToast'; t.className='toast'; document.body.appendChild(t);} t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(function(){t.classList.remove('show')},2600); }
+function tdState(s,btn){ document.querySelectorAll('[data-tf-state]:not([data-tf-state=dialog],[data-tf-state=toast],[data-tf-state=reviewer],[data-tf-state=popover],[data-tf-state^=tab-],[data-tf-state^=step-],[data-tf-state^=after-],[data-tf-state^=variant-])').forEach(function(x){ x.classList.toggle('show', x.getAttribute('data-tf-state')===s); }); document.querySelectorAll('[data-tf-normal]').forEach(function(x){ x.style.display = s==='normal' ? '' : 'none'; }); if(btn){ btn.parentElement.querySelectorAll('button').forEach(function(b){b.classList.remove('on')}); btn.classList.add('on'); } }
+function tdOpen(id){ var m=document.getElementById(id); if(m) m.classList.add('open'); }
+function tdClose(id){ var m=document.getElementById(id); if(m) m.classList.remove('open'); }
+function tdSetTheme(m){var r=document.documentElement;if(m==='system'){try{localStorage.removeItem('td-theme')}catch(e){}r.removeAttribute('data-theme');if(window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches)r.setAttribute('data-theme','dark');return}if(m==='dark')r.setAttribute('data-theme','dark');else r.removeAttribute('data-theme');try{localStorage.setItem('td-theme',m)}catch(e){}}
+</script>
+
+
+<div class="modal" id="dlgTask" data-testid="task-dialog" data-tf-state="dialog"><div class="sheet" style="width:min(560px,100%)">
+  <div class="mhead"><div><h3>Add task</h3><div class="sub">A task with a time gets a reminder by name</div></div>
+    <button class="x" onclick="tdClose('dlgTask')" data-testid="task-dialog-close">&times;</button></div>
+  <div class="field"><label class="label" for="tTitle">Title</label><input class="input" id="tTitle" maxlength="120" value="Call the plumber about the kitchen tap" data-testid="task-title"><div class="hint" style="margin-top:4px">1 to 120 characters</div></div>
+  <div class="fgrid">
+    <div class="field"><label class="label" for="tDate">Date</label><input class="input" id="tDate" type="date" value="2026-10-03" data-testid="task-date"></div>
+    <div class="field"><label class="label" for="tTime">Time <span class="hint">optional</span></label><input class="input" id="tTime" type="time" value="10:00" data-testid="task-time"></div>
+  </div>
+  <div class="field"><label class="label" for="tGoal">Goal or project <span class="hint">optional</span></label>
+    <input class="input" id="tGoal" list="goalOpts" value="Kitchen repairs" placeholder="Search goals and projects" data-testid="task-goal">
+    <datalist id="goalOpts"><option>Ship Sevak v0.1 by 15 Nov</option><option>Walk 8,000 steps daily</option><option>Read 2 books a month</option><option>Sevak v0.1</option><option>TechieRag 1.0.8 release</option><option>Kitchen repairs</option><option>Tax filing FY 2025-26</option></datalist></div>
+  <div class="field"><label class="label" for="tPerson">Person</label>
+    <select class="input" id="tPerson" data-testid="task-person"><option>Ravi (me)</option><option>Meera</option><option>Agastya</option></select></div>
+  <div class="mfoot"><button class="btn outline" onclick="tdClose('dlgTask')" data-testid="task-cancel">Cancel</button>
+    <button class="btn" onclick="tdClose('dlgTask');tdToast('Task added under Kitchen repairs')" data-testid="task-save">Add task</button></div>
+</div></div>
+
+<div class="modal" id="dlgGoal" data-testid="goal-dialog" data-tf-state="dialog"><div class="sheet" style="width:min(520px,100%)">
+  <div class="mhead"><div><h3>Add goal</h3><div class="sub">Something you want to move in the next three months</div></div>
+    <button class="x" onclick="tdClose('dlgGoal')" data-testid="goal-dialog-close">&times;</button></div>
+  <div class="field"><label class="label" for="gName">Goal</label><input class="input" id="gName" value="Save &#8377;50,000 for the family trip" data-testid="goal-name"></div>
+  <div class="field"><label class="label" for="gTarget">Target</label><input class="input" id="gTarget" value="&#8377;50,000 by 31 Dec 2026" data-testid="goal-target"></div>
+  <div class="field"><label class="label" for="gArea">Area</label><select class="input" id="gArea" data-testid="goal-area"><option>Money</option><option>Health</option><option>Learning</option><option>Family</option><option>Work</option></select></div>
+  <div class="mfoot"><button class="btn outline" onclick="tdClose('dlgGoal')" data-testid="goal-cancel">Cancel</button>
+    <button class="btn" onclick="tdClose('dlgGoal');tdToast('Goal added')" data-testid="goal-save">Add goal</button></div>
+</div></div>
+</body>
+</html>

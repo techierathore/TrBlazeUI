@@ -146,6 +146,14 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
         }
     }
 
+    // Sevak TR-033/TR-034: ARIA numeric attributes are invariant-formatted by specification;
+    // "0,5" is not a number to assistive technology.
+    private string? AriaValueMin => Min?.ToString(null, CultureInfo.InvariantCulture);
+
+    private string? AriaValueMax => Max?.ToString(null, CultureInfo.InvariantCulture);
+
+    private string AriaValueNow => Value.ToString(null, CultureInfo.InvariantCulture);
+
     private static bool IsFloatingPoint =>
         typeof(TValue) == typeof(double) ||
         typeof(TValue) == typeof(float) ||

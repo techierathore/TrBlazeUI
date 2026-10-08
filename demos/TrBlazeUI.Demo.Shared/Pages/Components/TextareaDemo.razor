@@ -113,6 +113,24 @@
         </div>
     </div>
 
+    <!-- Rows and MaxRows -->
+    <div class="space-y-4" data-testid="textarea-rows-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Rows and MaxRows</h2>
+            <p class="text-sm text-muted-foreground">
+                A chat composer starts small and grows with what is typed, then scrolls.
+                <code class="bg-muted px-1 py-0.5 rounded">Rows</code> is the starting height in lines
+                and <code class="bg-muted px-1 py-0.5 rounded">MaxRows</code> the cap, after which the
+                box scrolls instead of growing. Growth uses the browser's
+                <code class="bg-muted px-1 py-0.5 rounded">field-sizing: content</code>; where that is
+                missing the box stays at Rows lines.
+            </p>
+        </div>
+        <div class="max-w-md">
+            <Textarea Rows="3" MaxRows="6" data-testid="textarea-rows" Placeholder="Type several lines" />
+        </div>
+    </div>
+
     <!-- ARIA Attributes -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -228,6 +246,17 @@
                 </p>
                 <p class="text-sm text-muted-foreground">
                     Maximum number of characters allowed. Browser will prevent exceeding this limit.
+                </p>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">Rows / MaxRows</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">int?</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    Rows is the starting height in lines (the rows attribute plus a matching minimum height);
+                    MaxRows is the height in lines past which the box scrolls instead of growing. Both default to unset.
                 </p>
             </div>
             <Separator />

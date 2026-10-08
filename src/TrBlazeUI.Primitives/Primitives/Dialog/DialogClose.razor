@@ -64,13 +64,22 @@ else
     /// <summary>
     /// Context passed to child components when AsChild is true.
     /// For close buttons, we only provide Close (not Toggle) so the Button
-    /// knows this is a close-only action.
+    /// knows this is a close-only action. Both close paths honour
+    /// <see cref="PreventClose"/> and run <see cref="OnClick"/>, so the AsChild form behaves
+    /// the same as the rendered button (Sevak TR-044: AlertDialogAction's OnClick).
     /// </summary>
     private TriggerContext TriggerContext => new()
     {
         IsOpen = Context.IsOpen,
         // Note: Toggle is intentionally null - this tells Button it's a close-only button
-        Close = () => Context.Close()
+        Close = () =>
+        {
+            if (!PreventClose)
+            {
+                Context.Close();
+            }
+        },
+        CloseAsync = () => HandleClick(new MouseEventArgs())
     };
 
     protected override void OnInitialized()

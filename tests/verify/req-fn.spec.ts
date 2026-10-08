@@ -337,6 +337,22 @@ test.describe('Functional requirements', () => {
     }
   });
 
+  test('REQ-FN-011 HtmlSanitizer is a stable 9.1.x release, not a pre-release (Sevak TR-037)', () => {
+    const csproj = read('src/TrBlazeUI.Components/TrBlazeUI.Components.csproj');
+    const m = csproj.match(/<PackageReference Include="HtmlSanitizer" Version="([^"]+)"/);
+    expect(m, 'HtmlSanitizer is referenced with an explicit version').not.toBeNull();
+    expect(m![1], `HtmlSanitizer ${m![1]} is a stable 9.1.x`).toMatch(/^9\.1\.\d+$/);
+
+    // The resolved graph keeps the patched AngleSharp (the 9.0.x line pins 0.17.1).
+    const assets = path.join(REPO, 'src/TrBlazeUI.Components/obj/project.assets.json');
+    if (fs.existsSync(assets)) {
+      const text = fs.readFileSync(assets, 'utf8');
+      const a = text.match(/"AngleSharp\/(\d+)\.(\d+)\.(\d+)/);
+      expect(a, 'AngleSharp is in the resolved graph').not.toBeNull();
+      expect(Number(a![1]) >= 1, `AngleSharp resolves to 1.x, saw ${a![0]}`).toBe(true);
+    }
+  });
+
   test('REQ-FN-010 the Codex agent definition is packed and deployed', () => {
     expect(exists('docs/skills/codex-trblazeui.toml'), 'the packed definition ships').toBe(true);
     const toml = read('docs/skills/codex-trblazeui.toml');

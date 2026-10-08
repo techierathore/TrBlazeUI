@@ -138,6 +138,32 @@
         </div>
     </div>
 
+    <!-- Heading level -->
+    <div class="space-y-4" data-testid="alert-title-as-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Heading Level</h2>
+            <p class="text-sm text-muted-foreground">
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">AlertTitle</code> renders an
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">h5</code> by default. Set
+                <code class="text-xs bg-muted px-1 py-0.5 rounded">As</code> to the element the page's
+                outline needs; the look does not change.
+            </p>
+        </div>
+        <div class="space-y-4">
+            <Alert Variant="AlertVariant.Info">
+                <Icon>
+                    <LucideIcon Name="info" Class="h-4 w-4" />
+                </Icon>
+                <ChildContent>
+                    <AlertTitle As="h3" data-testid="alert-title-h3">Outline-aware title</AlertTitle>
+                    <AlertDescription>
+                        This title is an h3 so it follows the h2 above it, not an h5 that skips two levels.
+                    </AlertDescription>
+                </ChildContent>
+            </Alert>
+        </div>
+    </div>
+
     <!-- Without Icons -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -196,6 +222,16 @@
                 </p>
                 <p class="text-sm text-muted-foreground">
                     Optional icon to display in the alert.
+                </p>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">AlertTitle.As</h3>
+                <p class="text-sm text-muted-foreground mb-2">
+                    Type: <code class="text-xs bg-muted px-1 py-0.5 rounded">string</code> — Default: <code class="text-xs bg-muted px-1 py-0.5 rounded">h5</code>
+                </p>
+                <p class="text-sm text-muted-foreground">
+                    The heading element the title renders, so the page keeps a correct heading outline; any element name is accepted (h2, h4, div). Classes and additional attributes are unchanged.
                 </p>
             </div>
             <Separator />

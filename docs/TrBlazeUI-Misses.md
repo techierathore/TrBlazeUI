@@ -3,9 +3,9 @@
 | | |
 |---|---|
 | App | TrBlazeUI |
-| Count | 60 logged: 10 open, 43 fixed, 0 will not fix, 7 withdrawn |
+| Count | 73 logged: 10 open, 56 fixed, 0 will not fix, 7 withdrawn |
 | Source | `docs/metrics/misses.jsonl`, one row per miss record. Rewritten by `tf-misses-md.sh` on every new record. Never edit it: a wrong row is corrected by a new record. |
-| Updated | 2026-10-07 |
+| Updated | 2026-10-08 |
 
 **Whose gap** answers the four questions of the miss protocol: **the app's spec** did not say it, so the checklist line is fixed; **the framework never said it**, so one requirement line and a check are added; **the check was too weak** (a review, or a script that did not fire), so the check is fixed; **said and ignored**, so the rule becomes a hook or is deleted. **not sorted** means the record predates the sort or nobody has answered yet; `bash .tfcore/utils/tf-emit.sh --amend <miss> sort <spec|unsaid|weak-check|ignored>` completes it.
 
@@ -24,10 +24,23 @@
 | MISS-TrBlazeUI-20260912-09 (REQ-UI-008) | 2026-09-12 by owner | the check was too weak | TfLens TR-028 (High, reproduced live on /charts/bar @1280): BarChart exposes no axis, grid or data-label control and no route to ApexChartOptions, so a chart cannot be made to match an approved design. Measured: 32 .apexcharts-gridline and 30 .apexcharts-yaxis-label rendered with no parameter to tur |
 | MISS-TrBlazeUI-20260912-08 (REQ-UI-020) | 2026-09-12 by owner | the app's spec | TfLens post-2.1.0 consumer-feedback fixes (TR-028…TR-035) |
 
-## Fixed (43)
+## Fixed (56)
 
 | Miss | Found | Closed | Whose gap | What went wrong |
 |---|---|---|---|---|
+| MISS-TrBlazeUI-20261008-02 (REQ-UI-045) | 2026-10-08 by owner | 2026-10-08 by fix-issues | the app's spec | Chat family: ChatThread, ChatMessage and ChatComposer for a message thread with a composer (Sevak TR-006) |
+| MISS-TrBlazeUI-20261008-01 (REQ-UI-044) | 2026-10-08 by owner | 2026-10-08 by fix-issues | the app's spec | A Select inside a Dialog never freezes the page: a portal or positioning failure is logged and the list falls back, never thrown into the circuit (Sevak TR-041) |
+| MISS-TrBlazeUI-20261007-16 (REQ-FN-011) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | HtmlSanitizer on a stable 9.1.x release with no vulnerable AngleSharp (Sevak TR-037) |
+| MISS-TrBlazeUI-20261007-15 (REQ-UI-043) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | The six chart components take unmatched attributes like every other component (Sevak TR-044 census) |
+| MISS-TrBlazeUI-20261007-14 (REQ-UI-042) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | Select shows its placeholder when the bound value matches no item (Sevak TR-024) |
+| MISS-TrBlazeUI-20261007-13 (REQ-UI-041) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | CardTitle and AlertTitle take an As heading level (Sevak TR-008) |
+| MISS-TrBlazeUI-20261007-12 (REQ-UI-040) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | Table family for a plain markup table: Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption (Sevak TR-028) |
+| MISS-TrBlazeUI-20261007-11 (REQ-UI-039) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | Textarea takes Rows and MaxRows and grows with its content up to the cap (Sevak TR-026) |
+| MISS-TrBlazeUI-20261007-10 (REQ-UI-038) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | NumberInput fails the build with a message naming NumericInput (Sevak TR-039) |
+| MISS-TrBlazeUI-20261007-09 (REQ-UI-037) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | NumericInput and Slider emit valid, invariant ARIA range attributes (Sevak TR-033, TR-034) |
+| MISS-TrBlazeUI-20261007-08 (REQ-UI-036) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | ToastVariant gains Success, Info and Warning with matching ToastService methods (Sevak TR-023) |
+| MISS-TrBlazeUI-20261007-07 (REQ-UI-035) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | An empty toast viewport lets clicks through to the page beneath it (Sevak TR-043) |
+| MISS-TrBlazeUI-20261007-06 (REQ-UI-034) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | AlertDialogAction and AlertDialogCancel take an OnClick that runs before the dialog closes (Sevak TR-044) |
 | MISS-TrBlazeUI-20261007-05 (REQ-UI-033) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | EditorTabs close mark can be drawn by the consumer through CloseContent (Chatur TR-018) |
 | MISS-TrBlazeUI-20261007-03 (REQ-UI-032) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | Badge has a soft red Danger variant, and a text colour in Class replaces the variant's (Chatur TR-017) |
 | MISS-TrBlazeUI-20261007-02 (REQ-UI-031) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | A Stepper step can show an icon in its marker through Icon (Chatur TR-016) |

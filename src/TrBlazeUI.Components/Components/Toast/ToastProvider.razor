@@ -75,8 +75,13 @@
     /// <summary>
     /// Gets the computed CSS classes for the toast container.
     /// </summary>
+    /// <remarks>
+    /// The viewport is <c>pointer-events-none</c> and each toast is <c>pointer-events-auto</c>:
+    /// an empty viewport sits over the corner of the window at all times, and without this a
+    /// button under it could not be clicked (Sevak TR-043).
+    /// </remarks>
     private string ContainerCssClass => ClassNames.cn(
-        "fixed z-[100] flex max-h-screen w-full flex-col-reverse gap-2 p-4 sm:flex-col md:max-w-[420px]",
+        "pointer-events-none fixed z-[100] flex max-h-screen w-full flex-col-reverse gap-2 p-4 sm:flex-col md:max-w-[420px]",
         Position switch
         {
             ToastPosition.TopRight => "top-0 right-0",

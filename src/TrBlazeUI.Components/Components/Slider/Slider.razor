@@ -3,11 +3,13 @@
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 
+@* Sevak TR-033: ARIA numbers are invariant by specification; a double rendered through the current
+   culture gives "0,5" in a comma-decimal locale, which assistive technology rejects. *@
 <div @ref="objTrackRef"
      role="slider"
-     aria-valuemin="@Min"
-     aria-valuemax="@Max"
-     aria-valuenow="@CurrentValue"
+     aria-valuemin="@Min.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+     aria-valuemax="@Max.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+     aria-valuenow="@CurrentValue.ToString(System.Globalization.CultureInfo.InvariantCulture)"
      aria-disabled="@(Disabled ? "true" : "false")"
      tabindex="@(Disabled ? -1 : 0)"
      class="@CssClass"

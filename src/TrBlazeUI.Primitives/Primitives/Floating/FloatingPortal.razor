@@ -117,6 +117,7 @@
     private bool objIsInitialized = false;
     private bool objIsPositioned = false;
     private bool objUseInlineFallback = false;
+    private bool objPendingInlineSetup = false;
     private ElementReference objPortalContentRef;
     private TaskCompletionSource<bool>? objPortalReadyTcs;
 
@@ -210,7 +211,16 @@
 
             if (completedTask == timeoutTask)
             {
-                Console.WriteLine($"Warning: Portal {PortalId} render timeout");
+                // Sevak TR-041: the host never said it rendered us, so objPortalContentRef is not
+                // valid and the content would stay parked off-screen. Render inline at the
+                // declaration site instead, the same fallback a missing PortalHost takes, and
+                // position it on the next render.
+                Console.WriteLine($"TrBlazeUI warning: Portal {PortalId} render timeout; rendering the floating content inline instead");
+                PortalService.UnregisterPortal(PortalId);
+                objUseInlineFallback = true;
+                objPendingInlineSetup = true;
+                StateHasChanged();
+                return;
             }
 
             // Yield to ensure any pending re-renders complete and objPortalContentRef is up-to-date
@@ -226,8 +236,15 @@
             // NOW objPortalContentRef is guaranteed to be valid!
             await SetupAsync();
         }
+        else if (IsOpen && objPendingInlineSetup)
+        {
+            // The render after a portal timeout: the inline content div now exists.
+            objPendingInlineSetup = false;
+            await SetupAsync();
+        }
         else if (!IsOpen && objIsInitialized)
         {
+            objPendingInlineSetup = false;
             await CleanupAsync();
         }
     }
@@ -321,7 +338,41 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to set up positioning: {ex.Message}");
+            // Sevak TR-041: a positioning failure used to leave the content at -9999px, hidden, so
+            // "nothing happened" when the user clicked. Place it directly under its anchor instead
+            // and keep that position across re-renders; the page stays usable either way.
+            Console.WriteLine($"TrBlazeUI warning: positioning failed, placing the floating content under its anchor: {ex.Message}");
+            await PlaceUnderAnchorAsync();
+        }
+    }
+
+    /// <summary>
+    /// Fallback placement when the positioning library fails: directly under the anchor, visible.
+    /// </summary>
+    private async Task PlaceUnderAnchorAsync()
+    {
+        if (AnchorElement == null || !AnchorElement.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            var vElementUtils = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/TrBlazeUI.Primitives/js/primitives/element-utils.js");
+            var vPlaced = await vElementUtils.InvokeAsync<PositionResult?>(
+                "placeUnderAnchor", AnchorElement.Value, objPortalContentRef, Offset);
+            if (vPlaced != null)
+            {
+                objPositionLeft = vPlaced.X;
+                objPositionTop = vPlaced.Y;
+            }
+
+            await vElementUtils.DisposeAsync();
+        }
+        catch (Exception)
+        {
+            // The fallback itself failed; the content stays hidden but the page keeps answering.
         }
     }
 

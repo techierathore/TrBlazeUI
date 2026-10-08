@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sevak — App Settings</title>
+<!-- Sevak mockup · route: /admin/settings · TrBlazeUI controls: Sidebar, Breadcrumb, Button, Tabs, Card, Badge, Input, Select, Textarea, RadioGroup, Table, Alert, Avatar -->
+<style>
+:root{--bg:#f6f7f9;--card:#ffffff;--fg:#1a1d23;--muted:#f1f2f5;--muted-fg:#6b7280;--border:#e6e8ec;--accent:#4f46e5;--accent-hover:#4338ca;--accent-soft:#eef2ff;--accent-border:#c7d2fe;--destructive:#dc2626;--success:#16a34a;--info:#2563eb;--warning:#d97706;--radius:10px;--sidebar:#fbfbfd;--shadow-sm:0 1px 2px rgba(16,24,40,.05);--shadow:0 1px 3px rgba(16,24,40,.08),0 1px 2px rgba(16,24,40,.05);--shadow-lg:0 8px 24px rgba(16,24,40,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.shell{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 62px)}
+.sidebar{background:var(--sidebar);border-right:1px solid var(--border);padding:14px 12px;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:calc(100vh - 62px);overflow-y:auto}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15.5px;padding:6px 8px 14px;letter-spacing:-.01em}
+.logo .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#6366f1,#4338ca);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;box-shadow:var(--shadow)}
+.ws-switch{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:9px;background:var(--card);padding:8px 10px;margin:2px 0 10px;font-weight:600;font-size:13px;cursor:pointer;box-shadow:var(--shadow-sm)}
+.ws-switch:hover{border-color:var(--accent-border)}
+.ws-switch .dot{width:22px;height:22px;border-radius:6px;background:var(--accent-soft);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700}
+.ws-switch .chev{margin-left:auto;color:var(--muted-fg)}
+.navgroup{font-size:10.5px;font-weight:600;color:var(--muted-fg);text-transform:uppercase;letter-spacing:.7px;padding:12px 10px 4px}
+.navitem{display:flex;align-items:center;gap:10px;padding:7.5px 10px;border-radius:8px;color:#3d4451;font-weight:500;font-size:13.5px;transition:all .12s}
+.navitem svg{width:16px;height:16px;stroke:#9aa1ad;flex-shrink:0;transition:stroke .12s}
+.navitem:hover{background:#f0f1f4;color:var(--fg)}
+.navitem:hover svg{stroke:var(--fg)}
+.navitem.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.navitem.active svg{stroke:var(--accent)}
+.sidebar .foot{margin-top:auto;border-top:1px solid var(--border);padding-top:12px;display:flex;gap:10px;align-items:center}
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{display:flex;align-items:center;gap:12px;padding:12px 24px;border-bottom:1px solid var(--border);background:var(--card);position:sticky;top:0;z-index:5}
+.crumb{color:var(--muted-fg);font-size:13px}
+.crumb b{color:var(--fg);font-weight:600}
+.topbar .right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.content{padding:24px;display:flex;flex-direction:column;gap:16px;max-width:1180px;width:100%}
+.pagehead{display:flex;align-items:center;gap:12px}
+.pagehead h1{font-size:20px;font-weight:700;letter-spacing:-.01em}
+.pagehead .sub{color:var(--muted-fg);font-size:13px}
+.pagehead .actions{margin-left:auto;display:flex;gap:8px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow-sm)}
+.card h3{font-size:15px;font-weight:650;margin-bottom:2px}
+.card .desc{color:var(--muted-fg);font-size:13px;margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:8px;padding:8px 15px;font-size:13.5px;font-weight:600;border:1px solid transparent;cursor:pointer;background:var(--accent);color:#fff;box-shadow:var(--shadow-sm);transition:background .12s}
+.btn:hover{background:var(--accent-hover)}
+.btn.outline{background:var(--card);color:var(--fg);border-color:var(--border)}
+.btn.outline:hover{background:var(--muted)}
+.btn.ghost{background:transparent;color:var(--fg);box-shadow:none}
+.btn.ghost:hover{background:var(--muted)}
+.btn.destructive{background:var(--destructive)}
+.btn.destructive:hover{background:#b91c1c}
+.btn.sm{padding:4.5px 11px;font-size:12.5px}
+.btn svg{width:15px;height:15px;stroke:currentColor}
+.input,select.input,textarea.input{width:100%;border:1px solid var(--border);border-radius:8px;padding:8.5px 11px;font-size:13.5px;background:var(--card);color:var(--fg);font-family:inherit}
+.input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.hint{font-size:12px;color:var(--muted-fg)}
+.field{margin-bottom:14px}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2.5px 10px;font-size:11.5px;font-weight:600;background:var(--muted);color:#4b5563;border:1px solid var(--border)}
+.badge.green{background:#ecfdf3;color:#067647;border-color:#abefc6}
+.badge.blue{background:#eff4ff;color:#1d4ed8;border-color:#c7d7fe}
+.badge.amber{background:#fffaeb;color:#b54708;border-color:#fedf89}
+.badge.red{background:#fef3f2;color:#b42318;border-color:#fecdca}
+.badge.violet{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-border)}
+table.t{width:100%;border-collapse:collapse;font-size:13.5px}
+table.t th{color:var(--muted-fg);font-weight:600;text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px;text-transform:uppercase;letter-spacing:.4px;background:#fafbfc}
+table.t td{padding:11px 12px;border-bottom:1px solid #f0f1f4}
+table.t tr:hover td{background:#fafbff}
+.tabs{display:flex;gap:2px;background:var(--muted);border-radius:9px;padding:3px;width:max-content}
+.tab{padding:6px 16px;border-radius:7px;font-size:13px;font-weight:500;color:#5b6472;cursor:pointer}
+.tab.active{background:var(--card);font-weight:600;color:var(--fg);box-shadow:var(--shadow-sm)}
+.avatar{width:30px;height:30px;border-radius:999px;background:linear-gradient(135deg,#e0e7ff,#c7d2fe);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#4338ca;flex-shrink:0}
+.alert{display:flex;gap:10px;border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:13px;background:var(--card);box-shadow:var(--shadow-sm)}
+.alert.green{background:#ecfdf3;border-color:#abefc6;color:#067647}
+.alert.red{background:#fef3f2;border-color:#fecdca;color:#b42318}
+.alert.amber{background:#fffaeb;border-color:#fedf89;color:#b54708}
+.alert.blue{background:#eff4ff;border-color:#c7d7fe;color:#1d4ed8}
+.switch{width:36px;height:20px;border-radius:999px;background:var(--accent);position:relative;display:inline-block;flex-shrink:0}
+.switch:after{content:"";position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:999px;background:#fff;box-shadow:var(--shadow-sm)}
+.switch.off{background:#d1d5db}
+.switch.off:after{right:auto;left:2px}
+.progress{height:8px;border-radius:999px;background:var(--muted);overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,#6366f1,#4f46e5);border-radius:999px}
+.auth{min-height:calc(100vh - 62px);background:linear-gradient(160deg,#eef2ff 0%,#f6f7f9 45%,#f6f7f9 100%);display:flex;align-items:center;justify-content:center;padding:24px}
+.auth .box{width:410px;display:flex;flex-direction:column;gap:16px}
+.auth .card{box-shadow:var(--shadow-lg);border-radius:14px;padding:26px}
+.empty{text-align:center;color:var(--muted-fg);padding:36px;border:1.5px dashed var(--border);border-radius:12px;font-size:13px;background:#fafbfc}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:3px 11px;font-size:12px;font-weight:600;cursor:pointer}
+/* screen-specific */
+.cardtag{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.dropzone{border:1.5px dashed var(--border);border-radius:10px;padding:18px;text-align:center;color:var(--muted-fg);font-size:12.5px;background:#fafbfc}
+.swatches{display:flex;align-items:center;gap:8px}
+.sw{width:20px;height:20px;border-radius:999px;display:inline-block;cursor:pointer}
+.sw.sel{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--accent)}
+.radios{display:flex;gap:16px;font-size:13.5px}
+.codeblock{background:#0f172a;color:#93c5fd;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;border-radius:8px;padding:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-all}
+.wpreview{height:260px;background:linear-gradient(160deg,#eef2ff 0%,#f1f2f5 100%);border:1px solid var(--border);border-radius:var(--radius);position:relative}
+.wbubble{position:absolute;right:14px;bottom:14px;width:40px;height:40px;border-radius:999px;background:linear-gradient(135deg,#6366f1,#4338ca);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-lg)}
+.wbubble svg{width:19px;height:19px;stroke:#fff}
+.wwin{position:absolute;right:14px;bottom:64px;width:180px;background:#fff;border-radius:10px;box-shadow:var(--shadow-lg);overflow:hidden}
+.wwin .whead{background:linear-gradient(135deg,#6366f1,#4338ca);color:#fff;font-size:12px;font-weight:600;padding:7px 10px}
+.wwin .wmsg{margin:10px;background:var(--muted);border-radius:8px;padding:7px 9px;font-size:12px}
+.keyaction{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.strike{text-decoration:line-through;color:var(--muted-fg)}
+
+/* ===== v3 overrides — dark sidebar + dark mode ===== */
+html[data-theme="dark"] .sidebar{background:linear-gradient(180deg,#161b2e,#10131f);border-right:1px solid #232941}
+html[data-theme="dark"] .sidebar .logo{color:#fff}
+html[data-theme="dark"] .navgroup{color:#5d6480}
+html[data-theme="dark"] .navitem{color:#a6adc5}
+html[data-theme="dark"] .navitem svg{stroke:#6f7691}
+html[data-theme="dark"] .navitem:hover{background:rgba(255,255,255,.06);color:#e6e9f4}
+html[data-theme="dark"] .navitem:hover svg{stroke:#c3c9dd}
+html[data-theme="dark"] .navitem.active{background:rgba(99,102,241,.22);color:#c7d2fe}
+html[data-theme="dark"] .navitem.active svg{stroke:#a5b4fc}
+html[data-theme="dark"] .ws-switch{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#e6e9f4;box-shadow:none}
+html[data-theme="dark"] .ws-switch:hover{border-color:#6366f1}
+html[data-theme="dark"] .ws-switch .chev{color:#8b92ad}
+html[data-theme="dark"] .sidebar .foot{border-top-color:rgba(255,255,255,.1);color:#e6e9f4}
+html[data-theme="dark"] .sidebar .foot .hint{color:#8b92ad}
+.theme-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--muted-fg);cursor:pointer;padding:0}
+.theme-btn:hover{color:var(--accent);border-color:var(--accent-border)}
+.theme-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+body > .theme-btn{position:fixed;top:14px;right:16px;z-index:50;box-shadow:var(--shadow)}
+html[data-theme="dark"]{--bg:#0d1017;--card:#151a26;--fg:#e2e5ee;--muted:#1c2231;--muted-fg:#8b93a8;--border:#242b3d;--accent:#818cf8;--accent-hover:#939bfa;--accent-soft:#232a4d;--accent-border:#414a83;--sidebar:#10131f;--shadow-sm:0 1px 2px rgba(0,0,0,.4);--shadow:0 1px 3px rgba(0,0,0,.5);--shadow-lg:0 8px 24px rgba(0,0,0,.55)}
+html[data-theme="dark"] .btn{color:#fff}
+html[data-theme="dark"] .btn.outline{color:var(--fg)}
+html[data-theme="dark"] .btn.ghost{color:var(--fg)}
+html[data-theme="dark"] table.t th{background:#181e2c;color:#8b93a8}
+html[data-theme="dark"] table.t td{border-bottom-color:#1e2434}
+html[data-theme="dark"] table.t tr:hover td{background:#181e2e}
+html[data-theme="dark"] .tab{color:#9aa2b6}
+html[data-theme="dark"] .tab.active{background:#232a3d;color:#e2e5ee}
+html[data-theme="dark"] .badge{background:#1c2231;color:#a8b0c4;border-color:#2b3348}
+html[data-theme="dark"] .badge.green{background:#0d2b1e;color:#4ade80;border-color:#1c4a34}
+html[data-theme="dark"] .badge.blue{background:#122142;color:#93b4fd;border-color:#25407a}
+html[data-theme="dark"] .badge.amber{background:#32230a;color:#fbbf24;border-color:#5c4514}
+html[data-theme="dark"] .badge.red{background:#331416;color:#f87171;border-color:#5f2120}
+html[data-theme="dark"] .badge.violet{background:#232a4d;color:#a5b4fc;border-color:#414a83}
+html[data-theme="dark"] .alert.green{background:#0d2b1e;border-color:#1c4a34;color:#6ee7a0}
+html[data-theme="dark"] .alert.red{background:#331416;border-color:#5f2120;color:#fca5a5}
+html[data-theme="dark"] .alert.amber{background:#32230a;border-color:#5c4514;color:#fcd34d}
+html[data-theme="dark"] .alert.blue{background:#122142;border-color:#25407a;color:#a9c4fe}
+html[data-theme="dark"] .auth{background:linear-gradient(160deg,#151a30 0%,#0d1017 50%)}
+html[data-theme="dark"] .empty{background:#131826}
+html[data-theme="dark"] .avatar{background:linear-gradient(135deg,#2b3157,#3a4180);color:#c7d2fe}
+html[data-theme="dark"] .switch.off{background:#3a4256}
+html[data-theme="dark"] .input,html[data-theme="dark"] select.input,html[data-theme="dark"] textarea.input{background:#11151f;border-color:#2a3145;color:var(--fg)}
+html[data-theme="dark"] [style*="#f5f7ff"]{background:#1b2140!important}
+html[data-theme="dark"] [style*="#fffbfa"]{background:#231518!important}
+html[data-theme="dark"] [style*="#fafbfc"]{background:#151a26!important}
+html[data-theme="dark"] [style*="#fafbff"]{background:#161c2a!important}
+/* dark-mode screen fixes */
+html[data-theme="dark"] .dropzone{background:#131826}
+html[data-theme="dark"] .wpreview{background:linear-gradient(160deg,#1b2140 0%,#10131f 100%)}
+html[data-theme="dark"] .wwin{background:var(--card)}
+/* --- desktop window chrome (2026-07-26: MAUI Blazor Hybrid window, not a browser tab) --- */
+.winbar{display:flex;align-items:center;gap:10px;height:34px;padding:0 12px;background:linear-gradient(#f2f3f6,#e9ebef);border-bottom:1px solid var(--border);user-select:none;flex:0 0 auto}
+.traffic{display:flex;gap:7px}
+.traffic i{width:11px;height:11px;border-radius:50%;display:block}
+.traffic .r{background:#ff5f57}.traffic .y{background:#febc2e}.traffic .g{background:#28c840}
+.wintitle{flex:1;text-align:center;font-size:12.5px;font-weight:600;color:var(--muted-fg);margin-right:46px}
+.menubar{display:flex;align-items:center;gap:17px;height:28px;padding:0 14px;background:var(--card);border-bottom:1px solid var(--border);font-size:12.5px;color:#4b5563;user-select:none;flex:0 0 auto}
+.menubar b{font-weight:700;color:var(--fg)}
+html[data-theme="dark"] .winbar{background:linear-gradient(#20242e,#1a1e27);border-color:#2a3145}
+html[data-theme="dark"] .menubar{background:#151a26;border-color:#2a3145;color:#98a1b3}
+
+/* ===== prototype kit (owner review 2026-07-26) — menus, tabs, dialogs, popovers ===== */
+.menubar{position:relative;z-index:120}
+.mb{position:relative}
+.mb>button{background:none;border:0;font:inherit;color:inherit;cursor:pointer;padding:3px 9px;border-radius:6px;line-height:1.6}
+.mb>button:hover{background:var(--muted)}
+.mb.open>button{background:var(--accent);color:#fff}
+.menu{position:absolute;top:calc(100% + 3px);left:0;min-width:236px;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-lg);padding:5px;display:none;font-size:13px;color:var(--fg)}
+.mb.open>.menu{display:block}
+.menu a,.menu .mi{display:flex;align-items:center;gap:10px;padding:6px 9px;border-radius:6px;color:var(--fg);cursor:pointer;white-space:nowrap}
+.menu a:hover,.menu .mi:not(.disabled):hover{background:var(--muted)}
+.menu .mi.disabled{color:var(--muted-fg);cursor:default}
+.menu .sep{height:1px;background:var(--border);margin:4px 2px}
+.menu .k{margin-left:auto;color:var(--muted-fg);font-size:11.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.menu .grouplbl{padding:6px 9px 2px;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted-fg)}
+
+/* popovers — row overflow menus, workspace switcher, anything anchored */
+.popwrap{position:relative;display:inline-block}
+.pop{position:absolute;top:calc(100% + 5px);right:0;min-width:210px;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-lg);padding:5px;display:none;z-index:180;font-size:13px;text-align:left;font-weight:400}
+.pop.open{display:block}
+.pop.left{right:auto;left:0}
+.pop a,.pop .mi{display:flex;align-items:center;gap:9px;padding:6px 9px;border-radius:6px;color:var(--fg);cursor:pointer;white-space:nowrap}
+.pop a:hover,.pop .mi:not(.disabled):hover{background:var(--muted)}
+.pop .mi.danger{color:var(--destructive)}
+.pop .mi.disabled{color:var(--muted-fg);cursor:default}
+.pop .sep{height:1px;background:var(--border);margin:4px 2px}
+.dots{border:0;background:none;color:var(--muted-fg);cursor:pointer;font-size:16px;line-height:1;padding:3px 7px;border-radius:6px}
+.dots:hover{background:var(--muted);color:var(--fg)}
+
+/* modal dialogs */
+.modal{position:fixed;inset:0;background:rgba(12,15,23,.5);display:none;align-items:center;justify-content:center;z-index:400;padding:28px}
+.modal.open{display:flex}
+.modal .sheet{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-lg);width:min(700px,100%);max-height:84vh;overflow:auto;padding:22px}
+.modal .sheet.wide{width:min(960px,100%)}
+.modal .mhead{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.modal .mhead h3{font-size:16px;font-weight:680}
+.modal .mhead .sub{color:var(--muted-fg);font-size:12.5px;margin-top:2px}
+.modal .x{margin-left:auto;border:0;background:none;font-size:20px;line-height:1;color:var(--muted-fg);cursor:pointer;padding:0 4px}
+.modal .x:hover{color:var(--fg)}
+.modal .mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+
+/* tab panels — the tab strips were decorative; now they switch */
+.tab{user-select:none}
+.tabpanel{display:none}
+.tabpanel.active{display:block}
+
+/* 3 — fill the window instead of stranding half of it */
+.content{max-width:none !important}
+.content>*{max-width:1560px}
+/* alternate states (2026-10-03) — View > Preview state shows the empty, loading or error variant */
+[data-tf-state]:not(.show):not([data-tf-state=dialog],[data-tf-state=toast],[data-tf-state=reviewer],[data-tf-state=popover],[data-tf-state^=tab-],[data-tf-state^=step-],[data-tf-state^=after-],[data-tf-state^=variant-]){display:none !important}
+.skel{height:14px;border-radius:6px;background:linear-gradient(90deg,var(--muted),#e9ebf0,var(--muted));background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+html[data-theme="dark"] .skel{background:linear-gradient(90deg,#1c2231,#252c3e,#1c2231);background-size:200% 100%}
+.spinner{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--accent-border);border-top-color:var(--accent);animation:spin .8s linear infinite;display:inline-block;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.switch[onclick]{cursor:pointer}
+.switch.disabled{opacity:.45;cursor:not-allowed}
+.btn:disabled,.btn[disabled]{opacity:.5;cursor:not-allowed;pointer-events:none}
+.menu .mi.on{font-weight:650}
+.menu .mi.on:before{content:"\2713";margin-left:-2px;width:10px}
+
+/* narrow window (<768px): the sidebar folds away behind the menu, as the app's TrBlazeUI Sidebar does */
+@media (max-width:767px){.shell{grid-template-columns:1fr}.shell>.sidebar{display:none}}
+</style>
+<script>(function(){try{if(localStorage.getItem('td-theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}})();function tdTheme(){var r=document.documentElement,d=r.getAttribute('data-theme')==='dark';if(d)r.removeAttribute('data-theme');else r.setAttribute('data-theme','dark');try{localStorage.setItem('td-theme',d?'light':'dark')}catch(e){}}</script>
+</head>
+<body>
+<div class="winbar">
+  <div class="traffic"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+  <div class="wintitle">Sevak</div>
+</div>
+<div class="menubar"><div class="mb"><button onclick="tdMenu(this,event)"><b>Sevak</b></button><div class="menu"><div class="mi" onclick="tdToast('About Sevak')">About Sevak</div><div class="mi" onclick="tdToast('Check for Updates')">Check for Updates&hellip;</div><div class="sep"></div><a href="admin-settings.html">Settings<span class="k">&#8984;,</span></a><a href="data-storage.html">Data &amp; Storage</a><a href="billing.html">Licence &amp; Account</a><div class="sep"></div><div class="mi" onclick="tdToast('Quit Sevak')">Quit Sevak<span class="k">&#8984;Q</span></div></div></div><div class="mb"><button onclick="tdMenu(this,event)">File</button><div class="menu"><div class="mi" onclick="tdOpen('dlgNewWs')">New Workspace&hellip;<span class="k">&#8984;N</span></div><div class="mi" onclick="tdToast('New Thread')">New Thread<span class="k">&#8984;T</span></div><div class="sep"></div><a href="document-library.html">Import Documents&hellip;<span class="k">&#8984;O</span></a><a href="connectors.html">Add a Connector&hellip;</a><div class="sep"></div><div class="mi" onclick="tdToast('Export Thread as Markdown')">Export Thread as Markdown&hellip;</div><div class="mi" onclick="tdToast('Reveal Data Folder in Finder')">Reveal Data Folder in Finder</div></div></div><div class="mb"><button onclick="tdMenu(this,event)">Edit</button><div class="menu"><div class="mi disabled">Undo<span class="k">&#8984;Z</span></div><div class="mi disabled">Redo<span class="k">&#8679;&#8984;Z</span></div><div class="sep"></div><div class="mi" onclick="tdToast('Cut')">Cut<span class="k">&#8984;X</span></div><div class="mi" onclick="tdToast('Copy')">Copy<span class="k">&#8984;C</span></div><div class="mi" onclick="tdToast('Paste')">Paste<span class="k">&#8984;V</span></div><div class="sep"></div><div class="mi" onclick="tdToast('Find in Thread')">Find in Thread&hellip;<span class="k">&#8984;F</span></div></div></div><div class="mb"><button onclick="tdMenu(this,event)">View</button><div class="menu"><div class="mi" onclick="tdToast('Toggle Sidebar')">Toggle Sidebar<span class="k">&#8984;\</span></div><div class="sep"></div><div data-testid="mockup-states" data-tf-state="reviewer"><div class="grouplbl">Preview state</div><div class="mi on" data-state="normal" onclick="tdState('normal')" data-testid="mockup-state-normal" data-tf-state="reviewer">Normal</div><div class="mi" data-state="loading" onclick="tdState('loading')" data-testid="mockup-state-loading" data-tf-state="reviewer">Loading</div><div class="mi" data-state="error" onclick="tdState('error')" data-testid="mockup-state-error" data-tf-state="reviewer">Error</div></div><div class="sep"></div><div class="grouplbl">Appearance</div><div class="mi" onclick="tdSetTheme('light')">Light</div><div class="mi" onclick="tdSetTheme('dark')">Dark</div><div class="mi" onclick="tdSetTheme('system')">Match System</div><div class="sep"></div><div class="mi" onclick="tdToast('Zoom In')">Zoom In<span class="k">&#8984;+</span></div><div class="mi" onclick="tdToast('Zoom Out')">Zoom Out<span class="k">&#8984;&minus;</span></div><div class="mi" onclick="tdToast('Actual Size')">Actual Size<span class="k">&#8984;0</span></div><div class="mi" onclick="tdToast('Enter Full Screen')">Enter Full Screen<span class="k">&#8963;&#8984;F</span></div></div></div><div class="mb"><button onclick="tdMenu(this,event)">Go</button><div class="menu"><div class="grouplbl">Life</div><a href="today.html">Today<span class="k">&#8984;1</span></a><a href="tasks.html">Tasks and goals<span class="k">&#8984;2</span></a><a href="inbox.html">Inbox<span class="k">&#8984;3</span></a><a href="review.html">Weekly review</a><a href="email.html">Email</a><a href="family.html">Family</a><div class="sep"></div><div class="grouplbl">Tools</div><a href="tools.html">All tools</a><a href="workspace-chat.html">Chat</a><a href="document-library.html">Documents</a><a href="connectors.html">Connectors</a><a href="agents.html">Agents</a><a href="automations.html">Automations</a><a href="workspace-settings.html">Workspace Settings&hellip;</a><a href="backup.html">Backup</a></div></div><div class="mb"><button onclick="tdMenu(this,event)">Window</button><div class="menu"><div class="mi" onclick="tdToast('Minimise')">Minimise<span class="k">&#8984;M</span></div><div class="mi" onclick="tdToast('Zoom')">Zoom</div><div class="sep"></div><div class="mi" onclick="tdToast('Bring All to Front')">Bring All to Front</div></div></div><div class="mb"><button onclick="tdMenu(this,event)">Help</button><div class="menu"><div class="mi" onclick="tdToast('Sevak Help')">Sevak Help<span class="k">&#8984;?</span></div><div class="mi" onclick="tdToast('Keyboard Shortcuts')">Keyboard Shortcuts</div><div class="sep"></div><a href="support.html">Support&hellip;</a><a href="admin-events.html">Event Log</a><div class="mi" onclick="tdToast('Reveal Logs in Finder')">Reveal Logs in Finder</div></div></div></div>
+<div class="shell">
+  <aside class="sidebar">
+    <a class="logo" href="today.html"><span class="mark">S</span> Sevak</a>
+    <div class="popwrap" style="display:block"><div class="ws-switch" data-pop="wsPop"><span class="dot">C</span> Contracts <span class="chev">&#9662;</span></div><div class="pop left" id="wsPop" style="min-width:236px" data-tf-state="popover"><div class="grouplbl" style="padding:6px 9px 2px;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted-fg)">Workspaces</div><a href="workspace-chat.html"><span class="dot" style="width:20px;height:20px;border-radius:6px;background:var(--accent-soft);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">C</span> Contracts <span class="k" style="margin-left:auto;color:var(--muted-fg);font-size:11.5px">231</span></a><a href="workspace-chat.html"><span class="dot" style="width:20px;height:20px;border-radius:6px;background:var(--muted);color:var(--muted-fg);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">H</span> HR Docs <span class="k" style="margin-left:auto;color:var(--muted-fg);font-size:11.5px">412</span></a><a href="workspace-chat.html"><span class="dot" style="width:20px;height:20px;border-radius:6px;background:var(--muted);color:var(--muted-fg);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">L</span> Legal Archive <span class="k" style="margin-left:auto;color:var(--muted-fg);font-size:11.5px">8,201</span></a><div class="sep"></div><div class="mi" onclick="tdOpen('dlgNewWs')">New workspace&hellip;</div><a href="workspace-settings.html">Workspace settings&hellip;</a></div></div>
+    <div class="navgroup">Life</div>
+    <a class="navitem" href="today.html" data-testid="nav-today"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>Today</a>
+    <a class="navitem" href="tasks.html" data-testid="nav-tasks"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 12 2 2 4-4"/></svg>Tasks and goals</a>
+    <a class="navitem" href="inbox.html" data-testid="nav-inbox"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/></svg>Inbox</a>
+    <a class="navitem" href="review.html" data-testid="nav-review"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/></svg>Weekly review</a>
+    <a class="navitem" href="email.html" data-testid="nav-email"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>Email</a>
+    <a class="navitem" href="family.html" data-testid="nav-family"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/></svg>Family</a>
+    <div class="navgroup">Tools</div>
+    <a class="navitem" href="tools.html" data-testid="nav-tools"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>All tools</a>
+    <a class="navitem" href="backup.html" data-testid="nav-backup"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/></svg>Backup</a>
+    <div class="navgroup">Workspace</div>
+    <a class="navitem" href="workspace-chat.html"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</a>
+    <a class="navitem" href="document-library.html"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>Documents</a>
+    <a class="navitem" href="connectors.html"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Connectors</a>
+    <a class="navitem" href="agents.html"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><path d="M8 16h.01"/><path d="M16 16h.01"/></svg>Agents</a>
+    <a class="navitem" href="automations.html"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Automations</a>
+    <a class="navitem" href="workspace-settings.html"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/></svg>Workspace Settings</a>
+    <div class="navgroup">Account</div>
+    <a class="navitem" href="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
+    <a class="navitem" href="pricing.html"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/></svg>Pricing</a>
+    <a class="navitem" href="billing.html"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>Billing</a>
+    <a class="navitem" href="support.html"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m4.93 19.07 4.24-4.24"/></svg>Support</a>
+    <div class="navgroup">Operator</div>
+    <a class="navitem" href="admin-events.html"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>Event Log</a>
+    <a class="navitem active" href="admin-settings.html"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4"/><path d="M12 19v4"/><path d="m4.22 4.22 2.83 2.83"/><path d="m16.95 16.95 2.83 2.83"/><path d="M1 12h4"/><path d="M19 12h4"/><path d="m4.22 19.78 2.83-2.83"/><path d="m16.95 7.05 2.83-2.83"/></svg>App Settings</a>
+    <a class="navitem" href="data-storage.html"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>Data &amp; Storage</a>
+    <div class="navgroup">Console</div>
+    <a class="navitem" href="qdrant-admin.html" title="Qdrant Admin (console)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>Qdrant Admin</a>
+    <a class="navitem" href="llm-settings.html" title="LLM Settings (console)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3"/><path d="M15 1v3"/><path d="M9 20v3"/><path d="M15 20v3"/><path d="M20 9h3"/><path d="M20 14h3"/><path d="M1 9h3"/><path d="M1 14h3"/></svg>LLM Settings</a>
+    <a class="navitem" href="token-usage.html" title="Token Usage (console)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>Token Usage</a>
+    <div class="foot"><span class="avatar">RK</span><div style="font-size:13px;line-height:1.25"><div style="font-weight:650">Ravi Kumar</div><div class="hint">This Mac</div></div><span class="badge violet" style="margin-left:auto">Pro</span></div>
+  </aside>
+  <div class="main">
+    <div class="topbar" data-testid="topbar"><span class="crumb" data-testid="breadcrumb">Operator / <b>App Settings</b></span><div class="right"><button class="theme-btn" data-testid="theme-toggle" onclick="tdTheme()" title="Toggle dark mode"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg></button><a class="badge green" href="billing.html" data-testid="plan-badge">Professional</a><a class="avatar" href="profile.html" data-testid="user-avatar">RK</a></div></div>
+    <div class="content" data-testid="appset-page">
+
+      <div class="pagehead" data-testid="appset-header">
+        <h1 data-testid="appset-title">App settings</h1>
+        <div class="actions"><button class="btn" onclick="tdToast('Settings saved.')" data-testid="appset-save">Save changes</button></div>
+      </div>
+
+      <div class="alert red" data-tf-state="error" data-testid="appset-error-alert"><div><b>Settings could not be saved.</b> Sevak could not write to its settings file, so your changes are still on screen and nothing was changed. Check that the data folder is writable in <a href="data-storage.html" style="text-decoration:underline" data-testid="appset-error-storage-link">Data &amp; storage</a>, then choose Save changes again.</div></div>
+
+      <div class="tabs" data-testid="appset-tabs">
+        <div class="tab active" data-tab="defaults" data-testid="appset-tab-defaults">Defaults</div>
+        <div class="tab" data-tab="branding" data-testid="appset-tab-branding">Branding</div>
+        <div class="tab" data-tab="updates" data-testid="appset-tab-updates">Updates</div>
+                      </div>
+
+      <div class="tabpanel active" data-panel="defaults" data-testid="appset-defaults-panel">
+      <div class="card" data-tf-state="loading" data-testid="appset-defaults-skeleton"><div class="cardtag"><div class="skel" style="width:90px;height:20px;border-radius:999px"></div></div><div class="field"><div class="skel" style="width:38%%;height:11px;margin-bottom:8px"></div><div class="skel" style="height:34px;border-radius:8px"></div></div><div class="field"><div class="skel" style="width:38%%;height:11px;margin-bottom:8px"></div><div class="skel" style="height:34px;border-radius:8px"></div></div><div class="field"><div class="skel" style="width:38%%;height:11px;margin-bottom:8px"></div><div class="skel" style="height:34px;border-radius:8px"></div></div><div class="field"><div class="skel" style="width:38%%;height:11px;margin-bottom:8px"></div><div class="skel" style="height:34px;border-radius:8px"></div></div></div>
+      <div class="card" data-testid="appset-defaults" data-tf-hide="loading">
+        <div class="cardtag"><span class="badge violet" data-testid="appset-defaults-badge">Defaults</span></div>
+        <div class="fgrid">
+          <div class="field">
+            <label class="label">Default LLM</label>
+            <select class="input" data-testid="appset-default-llm"><option>LM Studio · qwen2.5-14b</option><option>Ollama · llama3.1:8b</option><option>None &mdash; set one in LLM Settings</option></select>
+          </div>
+          <div class="field">
+            <label class="label">Default embeddings</label>
+            <select class="input" data-testid="appset-default-embeddings"><option>TechieRag.Embedded · BGE-M3 (offline)</option><option>Ollama · nomic-embed-text</option></select>
+          </div>
+          <div class="field">
+            <label class="label">Vector store</label>
+            <select class="input" data-testid="appset-vector-store"><option>SqliteVec (default)</option><option>Qdrant</option></select>
+          </div>
+          <div class="field">
+            <label class="label">Max upload size</label>
+            <input class="input" type="number" value="50" data-testid="appset-max-upload"> <span class="hint">MB</span>
+          </div>
+        </div>
+        <div style="margin-top:4px"><a class="btn outline" href="setup-wizard.html" data-testid="appset-run-wizard">Run the provider setup wizard</a></div>
+      </div>
+      </div>
+
+      <div class="tabpanel" data-panel="branding" data-testid="appset-branding-panel" data-tf-state="tab-branding">
+      <div class="card" data-tf-state="loading" data-testid="appset-branding-skeleton"><div class="cardtag"><div class="skel" style="width:90px;height:20px;border-radius:999px"></div></div><div class="field"><div class="skel" style="width:38%%;height:11px;margin-bottom:8px"></div><div class="skel" style="height:34px;border-radius:8px"></div></div><div class="field"><div class="skel" style="width:38%%;height:11px;margin-bottom:8px"></div><div class="skel" style="height:34px;border-radius:8px"></div></div><div class="field"><div class="skel" style="width:38%%;height:11px;margin-bottom:8px"></div><div class="skel" style="height:34px;border-radius:8px"></div></div><div class="field"><div class="skel" style="width:38%%;height:11px;margin-bottom:8px"></div><div class="skel" style="height:34px;border-radius:8px"></div></div><div class="field"><div class="skel" style="width:38%%;height:11px;margin-bottom:8px"></div><div class="skel" style="height:34px;border-radius:8px"></div></div></div>
+      <div class="card" data-testid="appset-branding" data-tf-hide="loading">
+        <div class="cardtag"><span class="badge violet" data-testid="appset-branding-badge">Branding</span><a href="pricing.html" data-testid="appset-white-label-link"><span class="badge amber" data-testid="appset-white-label-badge">WHITE_LABEL — limited in the free tier</span></a></div>
+        <div class="field">
+          <div class="dropzone" style="cursor:pointer" onclick="tdToast('Choose a logo file (SVG or PNG).')" data-testid="appset-logo-upload">Drop logo (SVG/PNG) or click to choose</div>
+        </div>
+        <div class="field">
+          <label class="label">Display name</label>
+          <input class="input" value="Sevak" data-testid="appset-display-name">
+        </div>
+        <div class="field">
+          <label class="label">Welcome message</label>
+          <textarea class="input" rows="2" data-testid="appset-welcome-message">Welcome! Ask anything about your documents.</textarea>
+        </div>
+        <div class="field">
+          <label class="label">Footer links</label>
+          <input class="input" value="Docs | Privacy" data-testid="appset-footer-links">
+        </div>
+        <div class="field">
+          <label class="label">Accent color</label>
+          <div class="swatches" data-testid="appset-accent-swatches">
+            <span class="sw sel" onclick="tdSwatch(this)" style="background:#4f46e5"></span>
+            <span class="sw" onclick="tdSwatch(this)" style="background:#2563eb"></span>
+            <span class="sw" onclick="tdSwatch(this)" style="background:#16a34a"></span>
+            <span class="sw" onclick="tdSwatch(this)" style="background:#d97706"></span>
+            <span class="sw" onclick="tdSwatch(this)" style="background:#dc2626"></span>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label class="label">Default theme</label>
+          <div class="radios" data-testid="appset-default-theme"><label><input type="radio" name="apptheme" checked> Light</label><label><input type="radio" name="apptheme"> Dark</label><label><input type="radio" name="apptheme"> System</label></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="tabpanel" data-panel="updates" data-testid="appset-updates-panel" data-tf-state="tab-updates">
+        <div class="card" data-tf-state="loading" data-testid="appset-updates-skeleton"><div class="cardtag"><div class="skel" style="width:90px;height:20px;border-radius:999px"></div></div><div class="field"><div class="skel" style="width:38%%;height:11px;margin-bottom:8px"></div><div class="skel" style="height:34px;border-radius:8px"></div></div><div class="field"><div class="skel" style="width:38%%;height:11px;margin-bottom:8px"></div><div class="skel" style="height:34px;border-radius:8px"></div></div><div class="field"><div class="skel" style="width:38%%;height:11px;margin-bottom:8px"></div><div class="skel" style="height:34px;border-radius:8px"></div></div></div>
+        <div class="card" data-testid="appset-updates" data-tf-hide="loading">
+          <div class="cardtag"><span class="badge violet" data-testid="appset-updates-badge">Updates</span><span class="badge green" data-testid="appset-update-status">Up to date</span></div>
+          <h3>Application updates</h3>
+          <div class="desc" data-testid="appset-version">Sevak 1.4.0 &middot; installed 24 Jul 2026 &middot; last checked by hand 12 minutes ago</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+            <div style="display:flex;align-items:center;gap:9px"><span class="switch off" role="switch" onclick="tdSwitch(this)" data-testid="appset-auto-check"></span> Check for updates automatically <span class="hint">off until you turn it on</span></div>
+            <div style="display:flex;align-items:center;gap:9px"><span class="switch off disabled" role="switch" aria-disabled="true" onclick="tdSwitch(this)" data-testid="appset-background-install"></span> Install updates in the background <span class="hint">unavailable until downloads are signed &mdash; installing an unverified download is unsafe</span></div>
+            <div style="display:flex;align-items:center;gap:9px"><span class="switch off" role="switch" onclick="tdSwitch(this)" data-testid="appset-prerelease"></span> Include pre-release builds</div>
+          </div>
+          <div style="display:flex;gap:8px"><button class="btn outline" onclick="tdToast('Checking for updates… Sevak is up to date.')" data-testid="appset-check-now">Check now</button><button class="btn ghost" onclick="tdToast('Release notes for Sevak 1.4.0.')" data-testid="appset-release-notes">Release notes</button></div>
+          <div class="alert blue" style="margin-top:14px;margin-bottom:0" data-testid="appset-updates-alert">Updates never touch your data directory &mdash; workspaces, documents and embeddings survive every version (BRD-131). See <a href="data-storage.html" style="text-decoration:underline">Data &amp; storage</a>.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+/* prototype kit — menus, popovers, tabs, dialogs (owner review 2026-07-26) */
+(function(){
+  function closeAll(except){
+    document.querySelectorAll('.mb.open').forEach(function(m){ if(m!==except) m.classList.remove('open'); });
+    document.querySelectorAll('.pop.open').forEach(function(p){ if(p!==except) p.classList.remove('open'); });
+  }
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    var trigger = t.closest('.mb>button');
+    if(trigger){ var mb = trigger.parentElement; var was = mb.classList.contains('open'); closeAll(); if(!was) mb.classList.add('open'); e.preventDefault(); return; }
+    var popBtn = t.closest('[data-pop]');
+    if(popBtn){ var p = document.getElementById(popBtn.getAttribute('data-pop')); var open = p && p.classList.contains('open'); closeAll(); if(p && !open) p.classList.add('open'); e.preventDefault(); return; }
+    if(t.closest('.menu') || t.closest('.pop')){ if(!t.closest('a')) { closeAll(); } return; }
+    closeAll();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){ closeAll(); document.querySelectorAll('.modal.open').forEach(function(m){ m.classList.remove('open'); }); }
+  });
+  /* tabs: .tab[data-tab] switches the sibling [data-panel] of the same name */
+  document.addEventListener('click', function(e){
+    var tab = e.target.closest('.tab[data-tab]');
+    if(!tab) return;
+    var strip = tab.closest('.tabs');
+    var scope = strip.closest('.content') || document;
+    strip.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('active'); });
+    tab.classList.add('active');
+    var want = tab.getAttribute('data-tab');
+    scope.querySelectorAll('[data-panel]').forEach(function(p){
+      p.classList.toggle('active', p.getAttribute('data-panel') === want);
+    });
+  });
+})();
+function tdOpen(id){ var m=document.getElementById(id); if(m) m.classList.add('open'); }
+function tdClose(id){ var m=document.getElementById(id); if(m) m.classList.remove('open'); }
+function tdMenu(btn,ev){ var mb=btn.parentElement, was=mb.classList.contains('open'); document.querySelectorAll('.mb.open,.pop.open').forEach(function(x){x.classList.remove('open')}); if(!was) mb.classList.add('open'); if(ev) ev.stopPropagation(); }
+function tdToast(msg){ var t=document.getElementById('tdToast'); if(!t){ t=document.createElement('div'); t.id='tdToast'; t.setAttribute('role','status'); t.style.cssText='position:fixed;right:22px;bottom:22px;z-index:600;background:#111827;color:#fff;border-radius:10px;padding:10px 16px;font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;transform:translateY(8px);transition:all .18s;pointer-events:none'; document.body.appendChild(t);} t.textContent=msg; t.style.opacity='1'; t.style.transform='none'; clearTimeout(t._h); t._h=setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(8px)'},2600); }
+/* View > Preview state (reviewer-only): [data-tf-state] shows in its state; [data-tf-normal] and [data-tf-sample] show only in Normal; [data-tf-hide] lists the states that hide it */
+function tdState(s,btn){ s=s||'normal'; document.querySelectorAll('[data-tf-state]:not([data-tf-state=dialog],[data-tf-state=toast],[data-tf-state=reviewer],[data-tf-state=popover],[data-tf-state^=tab-],[data-tf-state^=step-],[data-tf-state^=after-],[data-tf-state^=variant-])').forEach(function(x){ x.classList.toggle('show', x.getAttribute('data-tf-state')===s); }); document.querySelectorAll('[data-tf-normal],[data-tf-sample]').forEach(function(x){ x.style.display = s==='normal' ? '' : 'none'; }); document.querySelectorAll('[data-tf-hide]').forEach(function(x){ x.style.display = x.getAttribute('data-tf-hide').split(' ').indexOf(s)>-1 ? 'none' : ''; }); document.querySelectorAll('[data-testid="mockup-states"] .mi').forEach(function(m){ m.classList.toggle('on', (m.getAttribute('onclick')||'').indexOf("'"+s+"'")>-1); }); }
+function tdSwatch(el){ el.parentElement.querySelectorAll('.sw').forEach(function(s){ s.classList.remove('sel'); }); el.classList.add('sel'); }
+/* menu commands that belong to the operating system or are not drawn in this mockup say so instead of doing nothing */
+document.addEventListener('click', function(e){ var m=e.target.closest('.menu .mi'); if(!m || m.hasAttribute('onclick') || m.classList.contains('disabled')) return; tdToast((m.childNodes[0].textContent||'').trim()+' is a standard app command; it is not drawn in this mockup.'); });
+function tdSwitch(el){ if(el.classList.contains('disabled')) return; el.classList.toggle('off'); }
+function tdSetTheme(m){var r=document.documentElement;if(m==='system'){try{localStorage.removeItem('td-theme')}catch(e){}r.removeAttribute('data-theme');if(window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches)r.setAttribute('data-theme','dark');return}if(m==='dark')r.setAttribute('data-theme','dark');else r.removeAttribute('data-theme');try{localStorage.setItem('td-theme',m)}catch(e){}}
+</script>
+
+<div class="modal" id="dlgNewWs" data-testid="newws-dialog" data-tf-state="dialog"><div class="sheet">
+  <div class="mhead"><div><h3>New workspace</h3><div class="sub">A workspace is an isolated set of documents, threads and retrieval settings</div></div>
+    <button class="x" onclick="tdClose('dlgNewWs')" data-testid="newws-close">&times;</button></div>
+  <div class="field"><label class="label">Name</label><input class="input" placeholder="Vendor agreements"></div>
+  <div class="field"><label class="label">Description <span class="hint">optional</span></label><textarea class="input" rows="2" placeholder="What lives in here, and what it is for"></textarea></div>
+  <div class="field"><label class="label">Start from</label>
+    <select class="input"><option>Empty workspace</option><option>Copy settings from &ldquo;Contracts&rdquo;</option><option>Copy settings and documents from &ldquo;Contracts&rdquo;</option></select></div>
+  <div class="field"><label class="label">System prompt <span class="hint">optional &mdash; how the assistant should behave here</span></label>
+    <textarea class="input" rows="2" placeholder="You are a contracts analyst. Always cite the clause you relied on."></textarea></div>
+  <div class="hint">Retrieval settings (Top-K, threshold, reranking) can be tuned later in Workspace settings &rarr; Retrieval.</div>
+  <div class="mfoot"><button class="btn outline" onclick="tdClose('dlgNewWs')" data-testid="newws-cancel">Cancel</button>
+    <button class="btn" onclick="tdClose('dlgNewWs')" data-testid="newws-create">Create workspace</button></div>
+</div></div>
+</body>
+</html>

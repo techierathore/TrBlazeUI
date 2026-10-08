@@ -58,7 +58,12 @@
         <div class="space-y-2">
             <h2 class="text-2xl font-semibold">Variants</h2>
             <p class="text-sm text-muted-foreground">
-                Toasts come in default and destructive variants.
+                Toasts come in Default and Destructive, plus the three tinted status variants
+                Alert and Badge have: Success, Info and Warning. <code class="bg-muted px-1 py-0.5 rounded">ToastService.Warning</code>
+                is for a caution about something that succeeded, which neither a plain nor a red
+                toast says. <code class="bg-muted px-1 py-0.5 rounded">Success()</code> keeps the
+                Default look it has always had; pass <code class="bg-muted px-1 py-0.5 rounded">ToastVariant.Success</code>
+                to <code class="bg-muted px-1 py-0.5 rounded">Show</code> for the green tint.
             </p>
         </div>
         <div class="flex flex-wrap gap-4">
@@ -68,7 +73,20 @@
             <Button Variant="ButtonVariant.Destructive" OnClick="@(() => ToastService.Error("Something went wrong.", "Error"))">
                 Error
             </Button>
+            <Button Variant="ButtonVariant.Outline" data-testid="toast-warning" OnClick="@(() => ToastService.Warning("This endpoint is plain, unauthenticated TCP.", "Saved, with a caution"))">
+                Warning
+            </Button>
+            <Button Variant="ButtonVariant.Outline" data-testid="toast-info" OnClick="@(() => ToastService.Info("A newer version is available.", "Info"))">
+                Info
+            </Button>
+            <Button Variant="ButtonVariant.Outline" data-testid="toast-success-variant" OnClick="@(() => ToastService.Show("Connector saved.", "Success", ToastVariant.Success))">
+                Success (tinted)
+            </Button>
         </div>
+        <p class="text-sm text-muted-foreground" data-testid="toast-viewport-note">
+            The toast viewport at the corner of the window lets clicks through when it is empty;
+            only a toast itself takes pointer events, so a button near the window's edge stays clickable.
+        </p>
     </div>
 
     <!-- With Action -->
@@ -159,6 +177,8 @@
                     <p><code class="bg-muted px-1 py-0.5 rounded">Show(description, title?, variant?, duration?)</code> - Quick toast</p>
                     <p><code class="bg-muted px-1 py-0.5 rounded">Success(description, title?)</code> - Show success toast</p>
                     <p><code class="bg-muted px-1 py-0.5 rounded">Error(description, title?)</code> - Show error toast</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">Warning(description, title?)</code> - Show a warning toast (tinted amber)</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">Info(description, title?)</code> - Show an informational toast (tinted blue)</p>
                     <p><code class="bg-muted px-1 py-0.5 rounded">Dismiss(id)</code> - Dismiss specific toast</p>
                     <p><code class="bg-muted px-1 py-0.5 rounded">DismissAll()</code> - Dismiss all toasts</p>
                 </div>
@@ -177,7 +197,7 @@
                 <div class="space-y-2 text-sm">
                     <p><strong>Title:</strong> Optional title text</p>
                     <p><strong>Description:</strong> Main message content</p>
-                    <p><strong>Variant:</strong> Default or Destructive</p>
+                    <p><strong>Variant:</strong> Default, Destructive, Success, Info or Warning</p>
                     <p><strong>Duration:</strong> Auto-dismiss time in ms (0 for no auto-dismiss). Default: 5000</p>
                     <p><strong>ShowClose:</strong> Show close button. Default: true</p>
                     <p><strong>ActionText:</strong> Optional action button text</p>

@@ -207,14 +207,19 @@
     }
 
     /// <summary>
-    /// Gets the display text for a value using the DisplayTextSelector if available,
-    /// otherwise falls back to Value.ToString().
+    /// Gets the display text for a value using the DisplayTextSelector if available.
     /// </summary>
+    /// <remarks>
+    /// Without a selector this returns null rather than <c>value.ToString()</c>: the registered
+    /// item's text is filled in by <c>RegisterItem</c> when an item carries the value, and the value
+    /// display decides what to show when none does. Seeding the raw value here is what made an
+    /// <c>int</c> select bound to 0 read "0" where its placeholder belonged (Sevak TR-024).
+    /// </remarks>
     private string? GetDisplayText(TValue? value)
     {
         if (value == null) return null;
         if (DisplayTextSelector != null) return DisplayTextSelector(value);
-        return value.ToString();
+        return null;
     }
 
     public void Dispose()

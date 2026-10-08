@@ -1,0 +1,32 @@
+@namespace TrBlazeUI.Components.Table
+@using TrBlazeUI.Components.Utilities
+
+@* Wraps the headless TrBlazeUI.Primitives.Table.TableBody, which needs no table context. *@
+<TrBlazeUI.Primitives.Table.TableBody Class="@CssClass" @attributes="SlotAttributes">
+    @ChildContent
+</TrBlazeUI.Primitives.Table.TableBody>
+
+@code {
+    /// <summary>
+    /// Gets or sets the body rows (<c>TableRow</c> holding <c>TableCell</c> cells).
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes merged into the element's own.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered <c>tbody</c> element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string? CssClass => string.IsNullOrWhiteSpace(Class) ? null : ClassNames.cn(Class);
+
+    private Dictionary<string, object> SlotAttributes => TableSlot.With("table-body", AdditionalAttributes);
+}

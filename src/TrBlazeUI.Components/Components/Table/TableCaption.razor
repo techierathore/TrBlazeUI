@@ -1,0 +1,29 @@
+@namespace TrBlazeUI.Components.Table
+@using TrBlazeUI.Components.Utilities
+
+<caption data-slot="table-caption" class="@CssClass" @attributes="AdditionalAttributes">
+    @ChildContent
+</caption>
+
+@code {
+    /// <summary>
+    /// Gets or sets the caption text. The table places it below the rows (<c>caption-bottom</c>).
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes merged into the element's own.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes (id, style, data-*, aria-*, event handlers)
+    /// forwarded to the rendered <c>caption</c> element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => ClassNames.cn("mt-4 text-sm text-muted-foreground", Class);
+}

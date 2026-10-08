@@ -1,0 +1,126 @@
+@page "/components/table"
+@using TrBlazeUI.Components.Table
+
+<PageTitle>Table Component - TrBlazeUI</PageTitle>
+
+<div class="space-y-8 max-w-4xl">
+    <div class="space-y-3">
+        <h1 class="text-4xl font-bold tracking-tight">Table Component</h1>
+        <p class="text-xl text-muted-foreground">
+            A table that is just markup: header, body, footer and caption written by the page, with
+            no record type, no toolbar and no pager.
+        </p>
+        <p class="text-sm text-muted-foreground">
+            Reach for <code class="bg-muted px-1 py-0.5 rounded">DataTable</code> when the rows need
+            sorting, filtering, paging or selection. Reach for this family when a fixed, already
+            ordered list is shown as a table. A wide table scrolls inside its own container instead
+            of widening the page.
+        </p>
+    </div>
+
+    <!-- Invoices -->
+    <div class="space-y-4" data-testid="table-section">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Invoices</h2>
+            <p class="text-sm text-muted-foreground">
+                Four rows, a caption below the rows, a footer with the total, and one row marked
+                <code class="bg-muted px-1 py-0.5 rounded">Selected</code>.
+            </p>
+        </div>
+
+        <Table data-testid="table-demo">
+            <TableCaption>A list of recent invoices.</TableCaption>
+            <TableHeader>
+                <TableRow>
+                    <TableHead Class="w-[100px]">Invoice</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Method</TableHead>
+                    <TableHead Class="text-right">Amount</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                @foreach (var vInvoice in objInvoices)
+                {
+                    <TableRow Selected="@(vInvoice.Id == "INV002")"
+                              data-testid="@(vInvoice.Id == "INV002" ? "table-row-selected" : null)">
+                        <TableCell Class="font-medium">@vInvoice.Id</TableCell>
+                        <TableCell>@vInvoice.Status</TableCell>
+                        <TableCell>@vInvoice.Method</TableCell>
+                        <TableCell Class="text-right">@vInvoice.Amount.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</TableCell>
+                    </TableRow>
+                }
+            </TableBody>
+            <TableFooter>
+                <TableRow>
+                    <TableCell Class="font-medium" colspan="3">Total</TableCell>
+                    <TableCell Class="text-right" data-testid="table-total">@objInvoices.Sum(vInvoice => vInvoice.Amount).ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</TableCell>
+                </TableRow>
+            </TableFooter>
+        </Table>
+    </div>
+
+    <!-- Usage -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">Usage</h2>
+        <pre class="overflow-x-auto rounded-md border bg-muted/30 p-4 text-xs"><code>&lt;Table&gt;
+    &lt;TableCaption&gt;A list of recent invoices.&lt;/TableCaption&gt;
+    &lt;TableHeader&gt;
+        &lt;TableRow&gt;
+            &lt;TableHead&gt;Invoice&lt;/TableHead&gt;
+            &lt;TableHead Class="text-right"&gt;Amount&lt;/TableHead&gt;
+        &lt;/TableRow&gt;
+    &lt;/TableHeader&gt;
+    &lt;TableBody&gt;
+        &lt;TableRow Selected="true"&gt;
+            &lt;TableCell&gt;INV001&lt;/TableCell&gt;
+            &lt;TableCell Class="text-right"&gt;$250&lt;/TableCell&gt;
+        &lt;/TableRow&gt;
+    &lt;/TableBody&gt;
+    &lt;TableFooter&gt;
+        &lt;TableRow&gt;
+            &lt;TableCell&gt;Total&lt;/TableCell&gt;
+            &lt;TableCell Class="text-right"&gt;$250&lt;/TableCell&gt;
+        &lt;/TableRow&gt;
+    &lt;/TableFooter&gt;
+&lt;/Table&gt;</code></pre>
+    </div>
+
+    <!-- API Reference -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-semibold">API Reference</h2>
+        <div class="border rounded-lg p-6 space-y-4 text-sm">
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">Table</h3>
+                <p>Renders a <code class="bg-muted px-1 py-0.5 rounded">table</code> inside a <code class="bg-muted px-1 py-0.5 rounded">div</code> that scrolls sideways (<code class="bg-muted px-1 py-0.5 rounded">data-slot="table-container"</code>). The caption sits below the rows.</p>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">TableHeader / TableBody / TableFooter</h3>
+                <p><code class="bg-muted px-1 py-0.5 rounded">thead</code>, <code class="bg-muted px-1 py-0.5 rounded">tbody</code> and <code class="bg-muted px-1 py-0.5 rounded">tfoot</code>; the footer takes a top border and the muted surface.</p>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">TableRow</h3>
+                <p><strong>Selected:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - the row carries <code class="bg-muted px-1 py-0.5 rounded">data-state="selected"</code> and the muted background (default false). Every row has a bottom border and a hover tint.</p>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">TableHead / TableCell / TableCaption</h3>
+                <p><code class="bg-muted px-1 py-0.5 rounded">th</code>, <code class="bg-muted px-1 py-0.5 rounded">td</code> and <code class="bg-muted px-1 py-0.5 rounded">caption</code>.</p>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-mono font-semibold">Every part</h3>
+                <p><strong>Class / additional attributes:</strong> Merged classes, and any HTML attribute (<code class="bg-muted px-1 py-0.5 rounded">colspan</code>, <code class="bg-muted px-1 py-0.5 rounded">data-testid</code>, ...) forwarded to the element.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private sealed record Invoice(string Id, string Status, string Method, decimal Amount);
+
+    private readonly List<Invoice> objInvoices =
+    [
+        new("INV001", "Paid", "Credit card", 250m),
+        new("INV002", "Pending", "PayPal", 150m),
+        new("INV003", "Unpaid", "Bank transfer", 350m),
+        new("INV004", "Paid", "Credit card", 450m)
+    ];
+}

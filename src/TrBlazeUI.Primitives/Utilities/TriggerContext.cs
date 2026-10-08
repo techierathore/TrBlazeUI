@@ -46,6 +46,13 @@ public class TriggerContext
     public Action? Close { get; init; }
 
     /// <summary>
+    /// Asynchronous close for a close-only trigger whose owner also runs a handler of its own
+    /// (<c>DialogClose.OnClick</c>). When set, a child component awaits this instead of invoking
+    /// <see cref="Close"/>, so the owner's handler is awaited rather than fired and forgotten.
+    /// </summary>
+    public Func<Task>? CloseAsync { get; init; }
+
+    /// <summary>
     /// The value for aria-haspopup attribute.
     /// Common values: "dialog", "menu", "listbox", "true".
     /// </summary>
