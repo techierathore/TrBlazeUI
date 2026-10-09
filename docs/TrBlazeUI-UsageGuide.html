@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)</h1>
-    <div class="sub">Last rendered: 2026-10-08</div>
+    <div class="sub">Last rendered: 2026-10-09</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#test-users-canonical-use-these-for-all-smoke-verify-uat">Test users (canonical — use THESE for all smoke / verify / UAT)</a></li>
@@ -134,6 +134,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
+        <li class="h3"><a href="#added-2026-10-09-chatur-tr-019-req-ui-046-not-yet-released">Added 2026-10-09 (Chatur TR-019 — REQ-UI-046 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-07-sevak-feedback-req-ui-034-req-ui-043-req-fn-011-not-yet-released">Added 2026-10-07 (Sevak feedback — REQ-UI-034…REQ-UI-043, REQ-FN-011 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-07-chatur-tr-018-req-ui-033-2-1-4">Added 2026-10-07 (Chatur TR-018 — REQ-UI-033 — 2.1.4)</a></li>
         <li class="h3"><a href="#added-2026-10-07-chatur-batch-5-req-ui-030-req-ui-032-2-1-3">Added 2026-10-07 (Chatur batch 5 — REQ-UI-030…REQ-UI-032 — 2.1.3)</a></li>
@@ -149,7 +150,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)</h1>
-    <div class="subtitle">Rendered 2026-10-08 &middot; source <code>TrBlazeUI-UsageGuide.md</code></div>
+    <div class="subtitle">Rendered 2026-10-09 &middot; source <code>TrBlazeUI-UsageGuide.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -179,6 +180,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
+        <li class="h3"><a href="#added-2026-10-09-chatur-tr-019-req-ui-046-not-yet-released">Added 2026-10-09 (Chatur TR-019 — REQ-UI-046 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-07-sevak-feedback-req-ui-034-req-ui-043-req-fn-011-not-yet-released">Added 2026-10-07 (Sevak feedback — REQ-UI-034…REQ-UI-043, REQ-FN-011 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-07-chatur-tr-018-req-ui-033-2-1-4">Added 2026-10-07 (Chatur TR-018 — REQ-UI-033 — 2.1.4)</a></li>
         <li class="h3"><a href="#added-2026-10-07-chatur-batch-5-req-ui-030-req-ui-032-2-1-3">Added 2026-10-07 (Chatur batch 5 — REQ-UI-030…REQ-UI-032 — 2.1.3)</a></li>
@@ -426,6 +428,11 @@ bash tests/package/codex-agent-deployment.sh</code></pre>
 </li>
 </ul>
 <h2 id="consumer-integration-notes">Consumer integration notes<a class="anchor-link" href="#consumer-integration-notes">#</a></h2>
+<h3 id="added-2026-10-09-chatur-tr-019-req-ui-046-not-yet-released"><a id="added-2026-10-09-chatur-tr-019--req-ui-046--not-yet-released"></a>Added 2026-10-09 (Chatur TR-019 — REQ-UI-046 — not yet released)<a class="anchor-link" href="#added-2026-10-09-chatur-tr-019-req-ui-046-not-yet-released">#</a></h3>
+<ul>
+<li><strong><code>DataTableColumn.HideBelow</code></strong> hides a column's header and cells below a screen width (<code>DataTableBreakpoint.Sm</code> 640 px, <code>Md</code>, <code>Lg</code>, <code>Xl</code>) and shows them again above it. <code>Visible="false"</code> still hides a column at every width.
+</li>
+</ul>
 <h3 id="added-2026-10-07-sevak-feedback-req-ui-034-req-ui-043-req-fn-011-not-yet-released"><a id="added-2026-10-07-sevak-feedback--req-ui-034req-ui-043-req-fn-011--not-yet-released"></a>Added 2026-10-07 (Sevak feedback — REQ-UI-034…REQ-UI-043, REQ-FN-011 — not yet released)<a class="anchor-link" href="#added-2026-10-07-sevak-feedback-req-ui-034-req-ui-043-req-fn-011-not-yet-released">#</a></h3>
 <ul>
 <li><strong><code>Table</code> family</strong> (<code>Table</code>, <code>TableHeader</code>, <code>TableBody</code>, <code>TableFooter</code>, <code>TableRow</code>, <code>TableHead</code>, <code>TableCell</code>, <code>TableCaption</code>) for a table that is just markup; import <code>TrBlazeUI.Components.Table</code> in the page, not globally.

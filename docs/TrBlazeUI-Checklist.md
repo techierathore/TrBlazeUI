@@ -79,6 +79,7 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-FN-011 | HtmlSanitizer on a stable 9.1.x release with no vulnerable AngleSharp (Sevak TR-037) | Verified | 100% | 2026-10-07 verify: PASS — test `Functional requirements REQ-FN-011 HtmlSanitizer is a stable` | [d](#d-req-fn-011) |
 | REQ-UI-044 | A Select inside a Dialog never freezes the page: a portal or positioning failure is logged and the list falls back, never thrown into the circuit (Sevak TR-041) | Verified | 100% | 2026-10-08 verify: PASS — test `Sevak feedback — a Select inside a Dialog never freezes the ` | [d](#d-req-ui-044) |
 | REQ-UI-045 | Chat family: ChatThread, ChatMessage and ChatComposer for a message thread with a composer (Sevak TR-006) | Verified | 100% | 2026-10-08 verify: PASS — test `Sevak feedback — chat family (TR-006) REQ-UI-045 messages al` | [d](#d-req-ui-045) |
+| REQ-UI-046 | DataTableColumn hides itself below a screen width through HideBelow (Chatur TR-019) | Verified | 100% | 2026-10-09 verify: PASS — test `Chatur TR-019 — a DataTable column hidden below a screen wid` | [d](#d-req-ui-046) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -380,6 +381,10 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 - <a id="d-req-ui-045"></a> **REQ-UI-045** (extends BRD-28 display components and BRD-5 Textarea) Chat family: ChatThread, ChatMessage and ChatComposer for a message thread with a composer (Sevak TR-006)
   - *Acceptance:* When a consumer composes the chat family on the Chat demo screen, then messages align by role, a streaming message shows Typing, and Enter sends while Shift+Enter adds a line.
   - *Mockup:* [mockups/sevak-workspace-chat.html](mockups/sevak-workspace-chat.html), the message column and composer; copied unchanged from Sevak's `docs/mockups/` on 2026-10-07 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-046"></a> **REQ-UI-046** (extends BRD-25 DataTable) DataTableColumn hides itself below a screen width through HideBelow (Chatur TR-019)
+  - *Acceptance:* When a consumer sets HideBelow on a column on the DataTable demo screen, then that column is gone at phone width and back at wider screens.
+  - *Mockup:* [mockups/run-queue.html](mockups/run-queue.html), the seven-column queue table (`#`, Project, Brief, State, Started, Time, Do); copied unchanged from Chatur's `docs/mockups/` on 2026-10-09 — the consumer's design, not a library screen.
 
 
 ## Editor

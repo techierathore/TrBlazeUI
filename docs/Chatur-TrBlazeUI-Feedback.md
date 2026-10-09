@@ -256,9 +256,64 @@ The first ten were found on day one, against the 2.0.7 reference; each entry say
 - **Workaround:** none; the close button is the library's own. The mockups could instead draw the svg.
 - **Suggested fix:** add `EditorTabs.CloseContent` (`RenderFragment?`, default the current svg) so an app can draw the close mark as its mockup does, e.g. a text `×`.
 
+### TR-019 — A DataTable column cannot be hidden below a screen width
+
+- **Status:** fixed upstream 2026-10-09 (`DataTableColumn.HideBelow`, in the release after 2.1.4 — see the 2026-10-09 reply), filed 2026-10-07
+- **Severity:** minor
+- **Blocks:** no — the Run queue reads fully at 1280 and at 390 it scrolls sideways inside its card, as the mockup's table does; but a phone-width reader must scroll to reach Pause, Resume and Remove, which a hidden Started/Time pair would keep in view.
+- **Repro:** TrBlazeUI 2.1.4 `DataTable` with seven columns (Run queue, `/auto/queue`) in a tab about 430 px wide, and on a 390 px screen. `DataTableColumn.Visible` is a fixed initial value and `CellClass`/`HeaderClass` accept `hidden`, but no `sm:table-cell` (or any `table-cell` variant) is in the shipped `trblazeui.css`, so a column hidden by `hidden` cannot come back at a wider screen.
+- **Expected:** a column parameter such as `HideBelow="DataTableBreakpoint.Sm"`, or the `table-cell` display utility with its responsive variants in the bundle.
+- **Actual:** the only way to drop a column at 390 is to drop it at every width.
+- **Encountered in:** REQ-UI-057
+- **Workaround:** none; the table keeps every column and scrolls inside its card at 390 (`MinWidth="420px"`).
+- **Suggested fix:** ship `table-cell` plus `sm:`/`md:` variants, or add a responsive visibility parameter on `DataTableColumn`.
+
 ## Replies from TrBlazeUI
 
 <!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
+
+### 2026-10-09 — TR-019 is fixed; it ships in the release after 2.1.4
+
+Fixed and tested in the library. It ships in the next release after 2.1.4 (**2.1.5** by the usual
+count) on GitHub Packages (`https://nuget.pkg.github.com/techierathore/index.json`). When this reply
+was written, the fix was built and verified but the release had not been cut yet. If the feed still
+stops at 2.1.4, wait; do not drop the Started and Time columns at every width.
+
+| Entry | State | What you get |
+|---|---|---|
+| **TR-019** a DataTable column cannot be hidden below a screen width | fixed | `DataTableColumn` gains `HideBelow`, a `DataTableBreakpoint?`: `Sm` (640 px), `Md` (768 px), `Lg` (1024 px) or `Xl` (1280 px). Below that width the column's header cell and every body cell are hidden; at or above it they show again. Left out, the column shows at every width, so nothing you have changes until you opt in. |
+
+```razor
+<DataTableColumn TData="QueueRun" TValue="DateTime" Property="@(r => r.Started)"
+                 Header="Started" HideBelow="DataTableBreakpoint.Sm" />
+<DataTableColumn TData="QueueRun" TValue="string" Property="@(r => r.Elapsed)"
+                 Header="Time" HideBelow="DataTableBreakpoint.Sm" />
+```
+
+Things to know before you use it:
+
+1. **The breakpoint is the screen width, not the tab's.** It is a CSS media query. At 390 px a
+   `Sm` column is gone; in a 430 px tab on a 1280 px screen it still shows, because the screen is
+   wide. If the Run queue must also drop columns inside a narrow tab on a wide screen, tell us and we
+   will look at a container-width version.
+2. **Use the parameter, not `hidden` in `CellClass`.** `HideBelow` puts the same classes on the
+   header cell and on the body cells. The shipped `trblazeui.css` now also carries
+   `sm:`/`md:`/`lg:`/`xl:table-cell`, which it never did before.
+3. **The table still owns the column.** Sorting, the search filter and the column chooser behave as
+   before; `Visible="false"` still hides a column at every width.
+4. **Your agent's reference describes it.** After the upgrade, the build refreshes
+   `.trblazeui/TrBlazeUI-AI-Reference.md`: "Which control do I use for…" has a row for this, and the
+   `DataTableColumn` table has the parameter. `CHANGELOG.md` has the full entry.
+
+#### What we need from you
+
+Upgrade once the release is on the feed, set `HideBelow="DataTableBreakpoint.Sm"` on the Run queue's
+Started and Time columns, and check `/auto/queue` at 390 (Pause, Resume and Remove in view without
+scrolling sideways) and at 1280 (all seven columns). Then close this entry here
+(`bash .tfcore/utils/tf-feedback.sh Chatur --close TR-019 "<what you ran and what it showed>"`) or
+tell us what does not fit.
+
+---
 
 ### 2026-10-07, later the same day — TR-018 is fixed; it ships in 2.1.4
 

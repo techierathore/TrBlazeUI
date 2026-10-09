@@ -144,6 +144,10 @@ bash tests/package/codex-agent-deployment.sh
 
 ## Consumer integration notes
 
+### Added 2026-10-09 (Chatur TR-019 — REQ-UI-046 — not yet released)
+
+- **`DataTableColumn.HideBelow`** hides a column's header and cells below a screen width (`DataTableBreakpoint.Sm` 640 px, `Md`, `Lg`, `Xl`) and shows them again above it. `Visible="false"` still hides a column at every width.
+
 ### Added 2026-10-07 (Sevak feedback — REQ-UI-034…REQ-UI-043, REQ-FN-011 — not yet released)
 
 - **`Table` family** (`Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`) for a table that is just markup; import `TrBlazeUI.Components.Table` in the page, not globally.

@@ -183,6 +183,28 @@
         </div>
     </div>
 
+    <!-- Columns hidden below a screen width -->
+    <div class="space-y-4 rounded-lg border border-alert-success bg-alert-success-bg p-6" data-testid="req-ui-046">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold text-alert-success-foreground">Hiding a column on narrow screens</h2>
+            <p class="text-sm text-alert-success-foreground">
+                <code>Visible="false"</code> drops a column at every width. <code>HideBelow</code> drops
+                its header and cells only below a screen width and brings them back above it, so a
+                phone keeps the columns that matter in view. Narrow the window: Email goes below
+                640 px (<code>DataTableBreakpoint.Sm</code>) and Role below 768 px
+                (<code>DataTableBreakpoint.Md</code>).
+            </p>
+        </div>
+        <DataTable TData="Person" Data="@objAllRows" ShowPagination="false" data-testid="req-ui-046-table">
+            <Columns>
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Name)" Header="Name" Sortable />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Email)" Header="Email" HideBelow="DataTableBreakpoint.Sm" />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Role)" Header="Role" HideBelow="DataTableBreakpoint.Md" />
+                <DataTableColumn TData="Person" TValue="string" Property="@(p => p.Status)" Header="Status" />
+            </Columns>
+        </DataTable>
+    </div>
+
     <!-- Custom Cell Templates -->
     <div class="space-y-4">
         <div class="space-y-2">

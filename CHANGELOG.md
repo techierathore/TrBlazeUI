@@ -71,6 +71,16 @@ the entries below are the ones that still needed code on 2.1.4.
 - **`HtmlSanitizer` on a stable 9.1.x release (TR-037)**: the deliberate `9.1.949-beta` (the only line
   then carrying the patched AngleSharp) is replaced by the stable release; no transitive advisory.
 
+### Added — Chatur TR-019
+
+- **`DataTableColumn.HideBelow` (TR-019)**: a `DataTableBreakpoint` (`Sm` 640 px, `Md` 768 px,
+  `Lg` 1024 px, `Xl` 1280 px) below which the column's header and cells are hidden and above which
+  they come back. `Visible="false"` still drops a column at every width; `HideBelow` keeps a
+  seven-column table readable on a 390 px phone without scrolling sideways to its actions. The
+  shipped `trblazeui.css` gains `sm:`/`md:`/`lg:`/`xl:table-cell`, which it never carried, so a
+  column hidden with `hidden` in `CellClass` could not be brought back. Demo on
+  `/components/datatable`, test `tests/verify/req-ui-046.spec.ts`.
+
 ### Not changed, by decision
 
 - **Charts already took unmatched attributes** through `ChartBase`; the TR-044 census against 1.0.7
