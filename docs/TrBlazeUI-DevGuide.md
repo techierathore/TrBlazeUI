@@ -141,7 +141,7 @@ Call chain (badge classes): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → 
 | Badge | `/components/badge` | `Pages/Components/BadgeDemo.razor` | `Badge` (`Danger`) → `ClassNames.cn` → `TailwindMerge` | renders at 1366 and 390 |
 | Switch | `/components/switch` | `Pages/Components/SwitchDemo.razor` | `Switch` (`Outlined`, 2.1.2) | renders at 1366 and 390 |
 | Toggle Group | `/components/toggle-group` | `Pages/Components/ToggleGroupDemo.razor` | `ToggleGroup` (`Joined` 2.0.8, `OnVariant` 2.1.0) | renders at 1366 and 390 |
-| DataTable | `/components/datatable` | `Pages/Components/DataTableDemo.razor` | `DataTable` (`RowAttributes`/`HeaderRowAttributes`/`SelectAllAttributes` 2.1.0, `SelectedCount` 2.0.9) | renders at 1366 and 390 |
+| DataTable | `/components/datatable` | `Pages/Components/DataTableDemo.razor` | `DataTable` (`RowAttributes`/`HeaderRowAttributes`/`SelectAllAttributes` 2.1.0, `SelectedCount` 2.0.9), `DataTableColumn.HideBelow` (after 2.1.4, Chatur TR-019, section `req-ui-046`) | renders at 1366 and 390; at 390 the `req-ui-046-table` grid shows Name and Status only, at 700 Email returns, at 1280 all four |
 | Tree View | `/components/tree-view` | `Pages/Components/TreeViewDemo.razor` | `TreeView`, `TreeItem` (2.0.8) | renders at 1366 and 390 |
 | Diff View | `/components/diff-view` | `Pages/Components/DiffViewDemo.razor` | `DiffView`, `TextDiff` (2.0.8) | renders at 1366 and 390 |
 | Log View | `/components/log-view` | `Pages/Components/LogViewDemo.razor` | `LogView` (2.0.9) | renders at 1366 and 390 |
@@ -153,6 +153,8 @@ Call chain (tab attributes): `EditorTabs.razor` `@foreach` over `Items` → `Tab
 Call chain (Select inside a Dialog, Sevak TR-041): `SelectContent.razor` (Primitives) `OnAfterRenderAsync` → `import select.js` inside try/catch → `FloatingPortal.razor` `OnAfterRenderAsync` → portal ready or timeout → timeout sets `objUseInlineFallback` + `objPendingInlineSetup`, re-renders inline → `SetupAsync` → `SetupPositioningAsync`; its catch → `PlaceUnderAnchorAsync` → `element-utils.js placeUnderAnchor`.
 
 Call chain (close mark): `EditorTabs.razor` close `<button data-slot="editor-tab-close">` → `CloseContent` when set, else the built-in 12px svg; the button's `aria-label`, classes and `@onclick` are outside the branch, so they never change.
+
+Call chain (column hidden below a width, Chatur TR-019): `DataTableColumn.HideBelow` → `HideBelowClass` (`hidden sm:table-cell` … `hidden xl:table-cell`, written in full so the Tailwind scan of the file puts each variant in `trblazeui.css`) → `DataTable.RegisterColumn` copies it to `ColumnData.HideBelowClass` → `DataTable.razor` merges it last through `ClassNames.cn` on the header cell and on every body cell.
 
 Call chain (step icon): `StepperItem.razor` marker `<span data-slot="stepper-item-marker">` → `Icon` when set, else `MarkerText` → `MarkerCssClass` adds `[&_svg]:size-4`.
 
@@ -173,7 +175,9 @@ Call chain (badge colour): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → `
 | `src/TrBlazeUI.Components/Utilities/TailwindMerge.cs:429` | `ComputeBaseUtilityGroup` | return value for `text-sm/6` | `"font-size"`, never `"text-color"` |
 | `src/TrBlazeUI.Components/Components/Switch/Switch.razor.cs:124` | `Outlined` parameter | `Outlined` | `true` gives an off switch a muted track and a border in `--border` |
 | `src/TrBlazeUI.Components/Components/Toggle/ToggleGroup.razor:62` | `OnVariant` parameter | `OnVariant` | `Accent` unless the caller chose `Card` or `Primary` |
-| `src/TrBlazeUI.Components/Components/DataTable/DataTable.razor.cs:361` | `RowAttributes` parameter | the function's result per row | the row's own attributes, `class` merged |
+| `src/TrBlazeUI.Components/Components/DataTable/DataTableColumn.razor.cs:188` | `HideBelowClass` | the class string | `null` unless `HideBelow` is set; else `hidden` plus the one `<bp>:table-cell` variant |
+| `src/TrBlazeUI.Components/Components/DataTable/DataTable.razor:142` | header cell markup | `column.HideBelowClass` | the same string on the `<th>` as on that column's `<td>` at line 192 |
+| `src/TrBlazeUI.Components/Components/DataTable/DataTable.razor.cs:368` | `RowAttributes` parameter | the function's result per row | the row's own attributes, `class` merged |
 
 Screenshots: `screenshots/TrBlazeUI/code-editor.png`, `stepper.png`, `badge.png` and their `-mobile` versions (§6).
 

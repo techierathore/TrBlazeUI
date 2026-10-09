@@ -139,7 +139,7 @@
                                    together; text-align alone could never move the label, which is
                                    why HeaderClass="text-right" appeared to do nothing (TR-031). *@
                                 <TableHeaderCell TData="TData" ColumnId="@(column.Sortable ? column.Id : null)"
-                                                 Class="@ClassNames.cn(HeaderCellCssClass, column.Sortable ? "cursor-pointer select-none" : "", column.AlignTextClass, column.HeaderClass)"
+                                                 Class="@ClassNames.cn(HeaderCellCssClass, column.Sortable ? "cursor-pointer select-none" : "", column.AlignTextClass, column.HeaderClass, column.HideBelowClass)"
                                                  style="@GetColumnWidthStyle(column)"
                                                  aria-sort="@ariaSortValue">
                                     <div class="@ClassNames.cn("flex items-center gap-2", column.HeaderJustifyClass)">
@@ -189,7 +189,7 @@
                                 }
                                 @foreach (var column in objColumns.Where(c => c.Visible))
                                 {
-                                    <TableCell Class="@ClassNames.cn(BodyCellCssClass, "[&:has([role=checkbox])]:pr-0", column.AlignTextClass, column.CellClass)">
+                                    <TableCell Class="@ClassNames.cn(BodyCellCssClass, "[&:has([role=checkbox])]:pr-0", column.AlignTextClass, column.CellClass, column.HideBelowClass)">
                                         @if (column.CellTemplate != null)
                                         {
                                             @column.CellTemplate(item)

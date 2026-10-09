@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="sub">Last rendered: 2026-10-08</div>
+    <div class="sub">Last rendered: 2026-10-09</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#table-of-contents">Table of Contents</a></li>
@@ -126,7 +126,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="subtitle">Rendered 2026-10-08 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
+    <div class="subtitle">Rendered 2026-10-09 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -305,7 +305,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>Badge</td><td><code>/components/badge</code></td><td><code>Pages/Components/BadgeDemo.razor</code></td><td><code>Badge</code> (<code>Danger</code>) → <code>ClassNames.cn</code> → <code>TailwindMerge</code></td><td>renders at 1366 and 390</td></tr>
 <tr><td>Switch</td><td><code>/components/switch</code></td><td><code>Pages/Components/SwitchDemo.razor</code></td><td><code>Switch</code> (<code>Outlined</code>, 2.1.2)</td><td>renders at 1366 and 390</td></tr>
 <tr><td>Toggle Group</td><td><code>/components/toggle-group</code></td><td><code>Pages/Components/ToggleGroupDemo.razor</code></td><td><code>ToggleGroup</code> (<code>Joined</code> 2.0.8, <code>OnVariant</code> 2.1.0)</td><td>renders at 1366 and 390</td></tr>
-<tr><td>DataTable</td><td><code>/components/datatable</code></td><td><code>Pages/Components/DataTableDemo.razor</code></td><td><code>DataTable</code> (<code>RowAttributes</code>/<code>HeaderRowAttributes</code>/<code>SelectAllAttributes</code> 2.1.0, <code>SelectedCount</code> 2.0.9)</td><td>renders at 1366 and 390</td></tr>
+<tr><td>DataTable</td><td><code>/components/datatable</code></td><td><code>Pages/Components/DataTableDemo.razor</code></td><td><code>DataTable</code> (<code>RowAttributes</code>/<code>HeaderRowAttributes</code>/<code>SelectAllAttributes</code> 2.1.0, <code>SelectedCount</code> 2.0.9), <code>DataTableColumn.HideBelow</code> (after 2.1.4, Chatur TR-019, section <code>req-ui-046</code>)</td><td>renders at 1366 and 390; at 390 the <code>req-ui-046-table</code> grid shows Name and Status only, at 700 Email returns, at 1280 all four</td></tr>
 <tr><td>Tree View</td><td><code>/components/tree-view</code></td><td><code>Pages/Components/TreeViewDemo.razor</code></td><td><code>TreeView</code>, <code>TreeItem</code> (2.0.8)</td><td>renders at 1366 and 390</td></tr>
 <tr><td>Diff View</td><td><code>/components/diff-view</code></td><td><code>Pages/Components/DiffViewDemo.razor</code></td><td><code>DiffView</code>, <code>TextDiff</code> (2.0.8)</td><td>renders at 1366 and 390</td></tr>
 <tr><td>Log View</td><td><code>/components/log-view</code></td><td><code>Pages/Components/LogViewDemo.razor</code></td><td><code>LogView</code> (2.0.9)</td><td>renders at 1366 and 390</td></tr>
@@ -316,6 +316,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <p>Call chain (tab attributes): <code>EditorTabs.razor</code> <code>@foreach</code> over <code>Items</code> → <code>TabAttributes(vItem)</code> → <code>SplitTabAttributes</code> → <code>class</code> merged through <code>ClassNames.cn</code>, the rest splatted on the tab's <code>&lt;li&gt;</code>.</p>
 <p>Call chain (Select inside a Dialog, Sevak TR-041): <code>SelectContent.razor</code> (Primitives) <code>OnAfterRenderAsync</code> → <code>import select.js</code> inside try/catch → <code>FloatingPortal.razor</code> <code>OnAfterRenderAsync</code> → portal ready or timeout → timeout sets <code>objUseInlineFallback</code> + <code>objPendingInlineSetup</code>, re-renders inline → <code>SetupAsync</code> → <code>SetupPositioningAsync</code>; its catch → <code>PlaceUnderAnchorAsync</code> → <code>element-utils.js placeUnderAnchor</code>.</p>
 <p>Call chain (close mark): <code>EditorTabs.razor</code> close <code>&lt;button data-slot="editor-tab-close"&gt;</code> → <code>CloseContent</code> when set, else the built-in 12px svg; the button's <code>aria-label</code>, classes and <code>@onclick</code> are outside the branch, so they never change.</p>
+<p>Call chain (column hidden below a width, Chatur TR-019): <code>DataTableColumn.HideBelow</code> → <code>HideBelowClass</code> (<code>hidden sm:table-cell</code> … <code>hidden xl:table-cell</code>, written in full so the Tailwind scan of the file puts each variant in <code>trblazeui.css</code>) → <code>DataTable.RegisterColumn</code> copies it to <code>ColumnData.HideBelowClass</code> → <code>DataTable.razor</code> merges it last through <code>ClassNames.cn</code> on the header cell and on every body cell.</p>
 <p>Call chain (step icon): <code>StepperItem.razor</code> marker <code>&lt;span data-slot="stepper-item-marker"&gt;</code> → <code>Icon</code> when set, else <code>MarkerText</code> → <code>MarkerCssClass</code> adds <code>[&amp;_svg]:size-4</code>.</p>
 <p>Call chain (badge colour): <code>Badge.razor.cs</code> <code>CssClass</code> → <code>ClassNames.cn</code> → <code>TailwindMerge.Merge</code> → <code>ComputeBaseUtilityGroup</code> → <code>TextColorRegex</code> (hyphenated colours are one group).</p>
 <p><strong>Where to break</strong></p>
@@ -333,7 +334,9 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td><code>src/TrBlazeUI.Components/Utilities/TailwindMerge.cs:429</code></td><td><code>ComputeBaseUtilityGroup</code></td><td>return value for <code>text-sm/6</code></td><td><code>"font-size"</code>, never <code>"text-color"</code></td></tr>
 <tr><td><code>src/TrBlazeUI.Components/Components/Switch/Switch.razor.cs:124</code></td><td><code>Outlined</code> parameter</td><td><code>Outlined</code></td><td><code>true</code> gives an off switch a muted track and a border in <code>--border</code></td></tr>
 <tr><td><code>src/TrBlazeUI.Components/Components/Toggle/ToggleGroup.razor:62</code></td><td><code>OnVariant</code> parameter</td><td><code>OnVariant</code></td><td><code>Accent</code> unless the caller chose <code>Card</code> or <code>Primary</code></td></tr>
-<tr><td><code>src/TrBlazeUI.Components/Components/DataTable/DataTable.razor.cs:361</code></td><td><code>RowAttributes</code> parameter</td><td>the function's result per row</td><td>the row's own attributes, <code>class</code> merged</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/DataTable/DataTableColumn.razor.cs:188</code></td><td><code>HideBelowClass</code></td><td>the class string</td><td><code>null</code> unless <code>HideBelow</code> is set; else <code>hidden</code> plus the one <code>&lt;bp&gt;:table-cell</code> variant</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/DataTable/DataTable.razor:142</code></td><td>header cell markup</td><td><code>column.HideBelowClass</code></td><td>the same string on the <code>&lt;th&gt;</code> as on that column's <code>&lt;td&gt;</code> at line 192</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/DataTable/DataTable.razor.cs:368</code></td><td><code>RowAttributes</code> parameter</td><td>the function's result per row</td><td>the row's own attributes, <code>class</code> merged</td></tr>
 </tbody>
 </table>
 <p>Screenshots: <code>screenshots/TrBlazeUI/code-editor.png</code>, <code>stepper.png</code>, <code>badge.png</code> and their <code>-mobile</code> versions (§6).</p>

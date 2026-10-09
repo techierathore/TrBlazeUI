@@ -161,6 +161,40 @@ public partial class DataTableColumn<TData, TValue> : ComponentBase where TData 
     public DataTableColumnAlign? Align { get; set; }
 
     /// <summary>
+    /// Gets or sets the screen width below which this column's header and cells are hidden.
+    /// </summary>
+    /// <remarks>
+    /// Leave null to show the column at every width, as before. Unlike <see cref="Visible"/>,
+    /// which removes the column at every width, this hides it only on narrow screens and brings it
+    /// back on wider ones, through the shipped <c>hidden</c> plus <c>sm:</c>/<c>md:</c>/<c>lg:</c>/<c>xl:table-cell</c>
+    /// classes (Chatur TR-019).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// &lt;DataTableColumn TData="Run" TValue="DateTime" Property="@(r =&gt; r.Started)"
+    ///                  Header="Started" HideBelow="DataTableBreakpoint.Sm" /&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public DataTableBreakpoint? HideBelow { get; set; }
+
+    /// <summary>
+    /// Gets the display classes that hide this column below <see cref="HideBelow"/>, or null when
+    /// the column shows at every width.
+    /// </summary>
+    /// <remarks>
+    /// Written out in full so the Tailwind scan of this file puts every variant in the bundle.
+    /// </remarks>
+    internal string? HideBelowClass => HideBelow switch
+    {
+        DataTableBreakpoint.Sm => "hidden sm:table-cell",
+        DataTableBreakpoint.Md => "hidden md:table-cell",
+        DataTableBreakpoint.Lg => "hidden lg:table-cell",
+        DataTableBreakpoint.Xl => "hidden xl:table-cell",
+        _ => null
+    };
+
+    /// <summary>
     /// Gets the alignment this column is drawn with, falling back to the alignment implied by
     /// <see cref="HeaderClass"/> when <see cref="Align"/> was not set.
     /// </summary>

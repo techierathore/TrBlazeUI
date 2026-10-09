@@ -121,6 +121,13 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         /// the caller set <c>DataTableColumn.Align</c>, or null when they did not.
         /// </summary>
         public string? AlignTextClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets the display classes that hide the column's header and cells below the
+        /// caller's <c>DataTableColumn.HideBelow</c> width, or null when it shows at every width
+        /// (Chatur TR-019).
+        /// </summary>
+        public string? HideBelowClass { get; set; }
     }
 
     private List<ColumnData> objColumns = new();
@@ -605,7 +612,8 @@ public partial class DataTable<TData> : ComponentBase where TData : class
             CellClass = column.CellClass,
             HeaderClass = column.HeaderClass,
             HeaderJustifyClass = column.HeaderJustifyClass,
-            AlignTextClass = column.AlignTextClass
+            AlignTextClass = column.AlignTextClass,
+            HideBelowClass = column.HideBelowClass
         };
 
         objColumns.Add(columnData);

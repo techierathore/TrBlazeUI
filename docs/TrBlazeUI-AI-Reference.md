@@ -36,6 +36,7 @@ problem is in this table, the control exists — do not hand-build it.
 | A text box that grows with its content up to a cap, then scrolls | `Textarea Rows="3" MaxRows="12"` (after 2.1.4) | §5 |
 | A card or alert title at another heading level | `CardTitle As="h2"`, `AlertTitle As="h3"` (after 2.1.4) | §3, §7 |
 | A chat: a thread that follows new messages, bubbles by role with a streaming state, a composer where Enter sends | `ChatThread` + `ChatMessage` + `ChatComposer` (after 2.1.4) | §8 |
+| Hide a table column on a phone and show it again on wider screens | `DataTableColumn HideBelow="DataTableBreakpoint.Sm"` (after 2.1.4) | §6 |
 
 ---
 
@@ -1920,7 +1921,8 @@ Every one of these is honoured — the grid reads them when it registers and ren
 | Format | string? | null | Format string applied to the cell value |
 | Sortable | bool | false | Enables click-to-sort on this column's header |
 | Filterable | bool | false | Includes this column in the toolbar's search filter |
-| Visible | bool | **true** | Initial visibility; the column-visibility toolbar toggles it |
+| Visible | bool | **true** | Initial visibility; the column-visibility toolbar toggles it. `false` hides the column at **every** width |
+| HideBelow | DataTableBreakpoint? | null | (after 2.1.4) `Sm` (640 px), `Md` (768 px), `Lg` (1024 px) or `Xl` (1280 px). Hides the header cell and every body cell below that screen width and shows them again above it. Use it, not `hidden` in `CellClass`, to drop a column on a phone |
 | Width | string? | null | CSS length for the column, e.g. `"200px"`, `"20%"`, `"auto"` |
 | MinWidth | string? | null | CSS length, e.g. `"120px"`. Emitted as an inline `min-width` on the column. |
 | MaxWidth | string? | null | CSS length, e.g. `"400px"`. Prevents an over-wide column. |
@@ -1942,6 +1944,22 @@ Every one of these is honoured — the grid reads them when it registers and ren
 >
 > `HeaderClass="text-right"` on its own is still honoured for markup written before `Align`
 > existed — the grid reads the intent off the class and aligns the label box to match.
+
+> **Drop a column on a phone with `HideBelow` (after 2.1.4).** A seven-column table at 390 px
+> either scrolls sideways inside its card or loses a column at every width. `HideBelow` hides the
+> column's header and cells together below a screen width and brings them back above it, so the
+> action column stays in view on a phone:
+>
+> ```razor
+> <DataTableColumn TData="Run" TValue="DateTime" Property="@(r => r.Started)"
+>                  Header="Started" HideBelow="DataTableBreakpoint.Sm" />
+> <DataTableColumn TData="Run" TValue="string" Property="@(r => r.Elapsed)"
+>                  Header="Time" HideBelow="DataTableBreakpoint.Sm" />
+> ```
+>
+> The breakpoint is the **screen** width (a media query), not the width of the card the table sits
+> in. Do not write `hidden sm:table-cell` in `CellClass` yourself: before this parameter the shipped
+> CSS carried no `table-cell` variant, and `CellClass` does not reach the header cell.
 
 > **Identifier columns need `whitespace-nowrap`, or they soft-wrap with nothing to show for it.**
 > The grid renders its `<table>` as `w-full` inside its own `relative w-full overflow-x-auto`

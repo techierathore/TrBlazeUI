@@ -3,9 +3,9 @@
 | | |
 |---|---|
 | App | TrBlazeUI |
-| Count | 73 logged: 10 open, 56 fixed, 0 will not fix, 7 withdrawn |
+| Count | 74 logged: 10 open, 57 fixed, 0 will not fix, 7 withdrawn |
 | Source | `docs/metrics/misses.jsonl`, one row per miss record. Rewritten by `tf-misses-md.sh` on every new record. Never edit it: a wrong row is corrected by a new record. |
-| Updated | 2026-10-08 |
+| Updated | 2026-10-09 |
 
 **Whose gap** answers the four questions of the miss protocol: **the app's spec** did not say it, so the checklist line is fixed; **the framework never said it**, so one requirement line and a check are added; **the check was too weak** (a review, or a script that did not fire), so the check is fixed; **said and ignored**, so the rule becomes a hook or is deleted. **not sorted** means the record predates the sort or nobody has answered yet; `bash .tfcore/utils/tf-emit.sh --amend <miss> sort <spec|unsaid|weak-check|ignored>` completes it.
 
@@ -24,10 +24,11 @@
 | MISS-TrBlazeUI-20260912-09 (REQ-UI-008) | 2026-09-12 by owner | the check was too weak | TfLens TR-028 (High, reproduced live on /charts/bar @1280): BarChart exposes no axis, grid or data-label control and no route to ApexChartOptions, so a chart cannot be made to match an approved design. Measured: 32 .apexcharts-gridline and 30 .apexcharts-yaxis-label rendered with no parameter to tur |
 | MISS-TrBlazeUI-20260912-08 (REQ-UI-020) | 2026-09-12 by owner | the app's spec | TfLens post-2.1.0 consumer-feedback fixes (TR-028…TR-035) |
 
-## Fixed (56)
+## Fixed (57)
 
 | Miss | Found | Closed | Whose gap | What went wrong |
 |---|---|---|---|---|
+| MISS-TrBlazeUI-20261009-01 (REQ-UI-046) | 2026-10-09 by owner | 2026-10-09 by fix-issues | the app's spec | DataTableColumn hides itself below a screen width through HideBelow (Chatur TR-019) |
 | MISS-TrBlazeUI-20261008-02 (REQ-UI-045) | 2026-10-08 by owner | 2026-10-08 by fix-issues | the app's spec | Chat family: ChatThread, ChatMessage and ChatComposer for a message thread with a composer (Sevak TR-006) |
 | MISS-TrBlazeUI-20261008-01 (REQ-UI-044) | 2026-10-08 by owner | 2026-10-08 by fix-issues | the app's spec | A Select inside a Dialog never freezes the page: a portal or positioning failure is logged and the list falls back, never thrown into the circuit (Sevak TR-041) |
 | MISS-TrBlazeUI-20261007-16 (REQ-FN-011) | 2026-10-07 by owner | 2026-10-07 by fix-issues | the app's spec | HtmlSanitizer on a stable 9.1.x release with no vulnerable AngleSharp (Sevak TR-037) |
