@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TrBlazeUI Demo (WebAssembly)</title>
     <base href="/" />
+    <!-- Layer order first, before any Tailwind-built sheet: gives host CSS the trblazeui-host slot (Lekhak TR-002). -->
+    <link href="_content/TrBlazeUI.Components/trblazeui-layers.css" rel="stylesheet" />
     <link href="_content/TrBlazeUI.Demo.Shared/css/app.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.core.css" rel="stylesheet" />
     <link href="_content/TrBlazeUI.Components/trblazeui.css" rel="stylesheet" />

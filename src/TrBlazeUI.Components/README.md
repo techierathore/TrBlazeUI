@@ -343,6 +343,15 @@ Reference it in your `App.razor` **before** the TrBlazeUI CSS:
 <link rel="stylesheet" href="_content/TrBlazeUI.Components/trblazeui.css" />
 ```
 
+### Beside another CSS framework
+
+Every rule in `trblazeui.css` is in a cascade layer (`properties`, `theme`, `base`, `components`,
+`utilities`), so an unlayered reboot from Bootstrap or Fluent UI beats it. Link
+`_content/TrBlazeUI.Components/trblazeui-layers.css` **first**, before any other stylesheet, and put
+the host's global CSS in its `trblazeui-host` layer:
+`@import url("reboot.css") layer(trblazeui-host);`. The host then beats Preflight, and the
+components beat the host.
+
 ### Dark Mode
 
 Dark mode automatically activates when you add the `.dark` class to the `<html>` element. All components will switch to dark mode colors.

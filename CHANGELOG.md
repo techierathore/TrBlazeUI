@@ -11,7 +11,40 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
-Built and verified on 2026-10-07, after 2.1.4.
+### Lekhak — built and verified on 2026-10-09, after 2.1.6
+
+Answers the four entries Lekhak re-checked as still open on 2.1.6
+(`docs/Lekhak-TrBlazeUI-Feedback.md`; TR-001 and TR-005 were already fixed and are closed there).
+
+#### Added
+
+- **`trblazeui-layers.css` and public cascade-layer names (TR-002)**: every rule in
+  `trblazeui.css` sits in `properties`, `theme`, `base`, `components` or `utilities`, so an
+  unlayered host reboot (Bootstrap's, Fluent UI's) beat it and gave buttons and inputs its borders
+  and radius. The new one-line file declares that order with an empty `trblazeui-host` layer
+  between `base` and `components`. Link it before any other stylesheet and put the host's global
+  CSS in `trblazeui-host`: the host beats Preflight and the components beat the host. The layer
+  names are now documented as public; `tests/verify/req-lekhak.spec.ts` fails if a Tailwind
+  upgrade renames one.
+- **The agent reference covers living beside another component library (TR-003)**: aliases for
+  `ToastService`, `ToastPosition` and `ButtonType`, and the host-CSS layer above.
+
+#### Changed
+
+- **`@using ApexCharts` left the reference's `_Imports.razor` block (TR-003).** Its `Color` and
+  `Orientation` collided with Fluent UI (84 CS0104 errors in 30 files). Put it at the top of each
+  chart page. An app that copied the old block keeps compiling; only new copies change.
+- **The sidebar width tokens are declared through `:where(:root)` (TR-004)**, like every other
+  library token, so a host's own `--sidebar-width`, `--sidebar-width-mobile` and
+  `--sidebar-width-icon` win in any layer and in any order.
+- **Every `Button` variant but Outline carries `border-0` (TR-006).** A filled button relied on
+  Preflight's `border-width:0`, which a host reboot in a later layer outranked, leaving a 1px
+  hairline. A `Class="border"` from the caller still wins.
+
+### Sevak and Chatur TR-019 — built and verified on 2026-10-07 to 2026-10-09, after 2.1.4
+
+Lekhak's re-check found `DataTableColumn.HideBelow` in the 2.1.6 package, so the entries in this
+section have shipped; the owner moves them under their release heading.
 
 Answers Sevak's feedback file (`docs/Sevak-TrBlazeUI-Feedback.md`, 34 entries filed against
 **1.0.7**). Most of it was already fixed between 1.0.7 and 2.1.4 and the answer there is *upgrade*;

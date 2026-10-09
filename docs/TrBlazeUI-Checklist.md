@@ -80,6 +80,10 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-UI-044 | A Select inside a Dialog never freezes the page: a portal or positioning failure is logged and the list falls back, never thrown into the circuit (Sevak TR-041) | Verified | 100% | 2026-10-08 verify: PASS — test `Sevak feedback — a Select inside a Dialog never freezes the ` | [d](#d-req-ui-044) |
 | REQ-UI-045 | Chat family: ChatThread, ChatMessage and ChatComposer for a message thread with a composer (Sevak TR-006) | Verified | 100% | 2026-10-08 verify: PASS — test `Sevak feedback — chat family (TR-006) REQ-UI-045 messages al` | [d](#d-req-ui-045) |
 | REQ-UI-046 | DataTableColumn hides itself below a screen width through HideBelow (Chatur TR-019) | Verified | 100% | 2026-10-09 verify: PASS — test `Chatur TR-019 — a DataTable column hidden below a screen wid` | [d](#d-req-ui-046) |
+| REQ-UI-047 | Host CSS gets a documented cascade-layer slot between Preflight and the components (Lekhak TR-002) | Verified | 100% | 2026-10-09 verify: PASS — test `Lekhak feedback — host CSS, imports, tokens and Button borde` | [d](#d-req-ui-047) |
+| REQ-FN-012 | Agent reference explains coexisting with another component library and scopes ApexCharts to chart pages (Lekhak TR-003) | Verified | 100% | 2026-10-09 verify: PASS — test `Lekhak feedback — host CSS, imports, tokens and Button borde` | [d](#d-req-fn-012) |
+| REQ-UI-048 | Sidebar width tokens are declared through zero-specificity :where(:root) (Lekhak TR-004) | Verified | 100% | 2026-10-09 verify: PASS — test `Lekhak feedback — host CSS, imports, tokens and Button borde` | [d](#d-req-ui-048) |
+| REQ-UI-049 | A filled Button draws no border even when host CSS gives buttons one (Lekhak TR-006) | Verified | 100% | 2026-10-09 verify: PASS — test `Lekhak feedback — host CSS, imports, tokens and Button borde` | [d](#d-req-ui-049) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -385,6 +389,18 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 - <a id="d-req-ui-046"></a> **REQ-UI-046** (extends BRD-25 DataTable) DataTableColumn hides itself below a screen width through HideBelow (Chatur TR-019)
   - *Acceptance:* When a consumer sets HideBelow on a column on the DataTable demo screen, then that column is gone at phone width and back at wider screens.
   - *Mockup:* [mockups/run-queue.html](mockups/run-queue.html), the seven-column queue table (`#`, Project, Brief, State, Started, Time, Do); copied unchanged from Chatur's `docs/mockups/` on 2026-10-09 — the consumer's design, not a library screen.
+
+- <a id="d-req-ui-047"></a> **REQ-UI-047** (extends BRD-35 theming and BRD-37 pre-built CSS) Host CSS gets a documented cascade-layer slot between Preflight and the components (Lekhak TR-002)
+  - *Acceptance:* When a host loads trblazeui-layers.css and puts its reboot in layer trblazeui-host, then its headings keep their styles and TrBlazeUI buttons keep theirs.
+
+- <a id="d-req-fn-012"></a> **REQ-FN-012** (extends BRD-47 agent reference) Agent reference explains coexisting with another component library and scopes ApexCharts to chart pages (Lekhak TR-003)
+  - *Acceptance:* When an agent copies the reference's import block beside Fluent UI on the Charts demo screen, then it compiles: ApexCharts is chart-page only, colliding names aliased.
+
+- <a id="d-req-ui-048"></a> **REQ-UI-048** (extends BRD-13 Sidebar and BRD-35 theming) Sidebar width tokens are declared through zero-specificity :where(:root) (Lekhak TR-004)
+  - *Acceptance:* When a host sets --sidebar-width on the Sidebar demo screen, then its value wins because the library declares the three width tokens through :where(:root).
+
+- <a id="d-req-ui-049"></a> **REQ-UI-049** (extends BRD-4 Button) A filled Button draws no border even when host CSS gives buttons one (Lekhak TR-006)
+  - *Acceptance:* When host CSS in the host layer gives every button a border on the Button demo screen, then filled Buttons show none and Outline keeps its own.
 
 
 ## Editor

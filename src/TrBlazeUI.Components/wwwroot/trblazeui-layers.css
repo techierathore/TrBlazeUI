@@ -1,0 +1,17 @@
+/* TrBlazeUI cascade-layer order (Lekhak TR-002).
+ *
+ * trblazeui.css puts every rule in a cascade layer: properties, theme, base (Preflight and the
+ * token fallbacks), components and utilities. Unlayered host CSS beats every layered rule, so a
+ * host reboot loaded beside it (Bootstrap's, Fluent UI's) gave TrBlazeUI buttons and inputs its
+ * borders and radius. These layer names are public and stable.
+ *
+ * Link this file BEFORE trblazeui.css. It adds one empty layer, trblazeui-host, after base and
+ * before components. Put the host's global CSS in it:
+ *
+ *   @import url("css/reboot.css") layer(trblazeui-host);
+ *   @layer trblazeui-host { h1 { font-size: 2rem; } }
+ *
+ * Host rules there beat Preflight, so headings, links and lists keep the host's look, and
+ * TrBlazeUI's components and utilities beat the host, so its controls keep their own.
+ */
+@layer properties, theme, base, trblazeui-host, components, utilities;

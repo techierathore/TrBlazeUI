@@ -37,6 +37,7 @@ problem is in this table, the control exists — do not hand-build it.
 | A card or alert title at another heading level | `CardTitle As="h2"`, `AlertTitle As="h3"` (after 2.1.4) | §3, §7 |
 | A chat: a thread that follows new messages, bubbles by role with a streaming state, a composer where Enter sends | `ChatThread` + `ChatMessage` + `ChatComposer` (after 2.1.4) | §8 |
 | Hide a table column on a phone and show it again on wider screens | `DataTableColumn HideBelow="DataTableBreakpoint.Sm"` (after 2.1.4) | §6 |
+| Use TrBlazeUI beside Fluent UI, MudBlazor or Bootstrap: aliases for the shared names, the host's CSS in the `trblazeui-host` layer | `trblazeui-layers.css` (after 2.1.6) | §1 |
 
 ---
 
@@ -238,8 +239,11 @@ builder.Services.AddScoped<ToastService>();  // Required for Toast notifications
 >   table; it also brings `SelectionMode`, `SortDirection` and `ColumnDefinition` into scope, which
 >   are common names in application code, so it does not belong in every page. For an ordinary data
 >   grid use `DataTable` (§6) and import nothing extra.
-> - `@using ApexCharts` is required by the chart family (see §8) — the charts are a
->   Blazor-ApexCharts wrapper and the series types come from that package.
+> - `@using ApexCharts` is **not** in the block (after 2.1.6). The chart family is a
+>   Blazor-ApexCharts wrapper and the series types come from that package, but the namespace also
+>   brings `Color`, `Orientation` and other common names into every page; beside another component
+>   library that was 84 CS0104 errors in 30 files (Lekhak TR-003). Put `@using ApexCharts` **at the
+>   top of each chart page** only (§8).
 > - The block below lists **every one of the 85 `TrBlazeUI.Components.*` component namespaces in
 >   the 2.0.9 assembly** — one per component folder. Copy it whole. A partial copy is the single
 >   most common cause of a silently broken page — see the RZ10012 note under the block.
@@ -254,7 +258,6 @@ builder.Services.AddScoped<ToastService>();  // Required for Toast notifications
 @using TrBlazeUI.Components
 @using TrBlazeUI.Primitives
 @using TrBlazeUI.Primitives.Services
-@using ApexCharts
 @using TrBlazeUI.Components.Button
 @using TrBlazeUI.Components.Card
 @using TrBlazeUI.Components.Chat
@@ -376,6 +379,33 @@ silently at runtime; the compiler does not diagnose the missing namespace.
 > `dotnet run --project tools/splat-audit -- <bin dir>`, which already reflects over the built
 > assemblies, and diff the result against this block whenever the library version changes.
 
+### Beside another component library (Fluent UI, MudBlazor, Radzen)
+
+TrBlazeUI can live in the same app as another Blazor component library; Lekhak ran it beside Fluent
+UI Blazor. Two things collide: type names in `_Imports.razor` and the other library's global CSS.
+
+**Names.** Keep the block above, keep the other library's `@using` lines, and build. Every CS0104
+("ambiguous reference") names a type both libraries define. Resolve each one with an alias in
+`_Imports.razor` rather than by dropping a namespace (a dropped TrBlazeUI namespace is the silent
+RZ10012 failure above):
+
+```razor
+@* The three names Fluent UI Blazor shares with TrBlazeUI (Lekhak TR-003) *@
+@using TrToastService = TrBlazeUI.Components.Toast.ToastService
+@using TrToastPosition = TrBlazeUI.Components.Toast.ToastPosition
+@using TrButtonType = TrBlazeUI.Components.Button.ButtonType
+```
+
+Then write `@inject TrToastService Toasts`, `Position="TrToastPosition.BottomRight"` and
+`Type="TrButtonType.Submit"`. A component tag is not ambiguous when the two libraries prefix their
+tags differently (`<FluentButton>` against `<Button>`); only the enums and services are. Keep
+`@using ApexCharts` on chart pages only: its `Color` and `Orientation` collide with nearly every
+other library.
+
+**CSS.** The other library's reboot or global stylesheet is usually unlayered, and unlayered CSS
+beats every rule in `trblazeui.css`, which is all in cascade layers. Put it in the
+`trblazeui-host` layer — see "CSS Imports" below.
+
 ### App.razor / MainLayout.razor Setup
 
 ```razor
@@ -415,10 +445,29 @@ silently at runtime; the compiler does not diagnose the missing namespace.
 ### CSS Imports (in order)
 
 ```html
+<link rel="stylesheet" href="_content/TrBlazeUI.Components/trblazeui-layers.css" />
 <link rel="stylesheet" href="styles/theme.css" />
 <link rel="stylesheet" href="_content/TrBlazeUI.Components/trblazeui.css" />
 <link rel="stylesheet" href="styles/base.css" />
 ```
+
+> **Cascade layers are public API (after 2.1.6).** Every rule in `trblazeui.css` sits in one of
+> these layers, in this order: `properties`, `theme`, `base` (Preflight and the token fallbacks),
+> `components`, `utilities`. Unlayered CSS beats all of them, so a host reboot loaded beside the
+> library (Bootstrap's, Fluent UI's) gave buttons and inputs its own borders and radius (Lekhak
+> TR-002). `trblazeui-layers.css` (one line, no rules) declares the order with one extra empty
+> layer, **`trblazeui-host`**, between `base` and `components`. Put the host's global CSS there:
+>
+> ```css
+> @import url("reboot.css") layer(trblazeui-host);
+> @layer trblazeui-host { h1 { font-size: 2rem; } }
+> ```
+>
+> Host rules then beat Preflight (headings, links and lists keep the host's look) and TrBlazeUI's
+> components and utilities beat the host (its controls keep theirs). **Link the file first**, before
+> any other stylesheet built with Tailwind v4: the first sheet that names the layers fixes their
+> order, and a Tailwind build names them in its first line. CSS the host leaves unlayered still beats
+> everything; layer it or accept that.
 
 Link the project's own scoped bundle (`<link href="{AssemblyName}.styles.css" />`) **only if the
 project has `.razor.css` files**; without them the bundle is never generated and the link 404s on
@@ -2743,8 +2792,9 @@ Sub-components: `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`
 
 Chart types: `AreaChart`, `BarChart`, `LineChart`, `PieChart`, `RadarChart`, `RadialChart`.
 
-The chart family wraps **Blazor-ApexCharts**, so `@using ApexCharts` is required (it is in the §1
-import block). `ChartContainer` is optional.
+The chart family wraps **Blazor-ApexCharts**, so `@using ApexCharts` is required **at the top of
+each chart page** (after 2.1.6 it is no longer in the §1 import block: its `Color` and
+`Orientation` collide with other component libraries, Lekhak TR-003). `ChartContainer` is optional.
 
 **You never have to drop the wrapper to change an option.** `Options` takes a real
 `ApexChartOptions<TItem>`, merged over the wrapper's own defaults — so a chart can be made to match

@@ -5,9 +5,10 @@
 /* Configure source paths for scanning Razor files */
 @source "../../Components";
 
-/* Component structural variables */
+/* Component structural variables. Declared through zero-specificity :where(:root), like the
+ * design-token fallbacks below, so any host declaration of the same token wins (Lekhak TR-004). */
 @layer base {
-  :root {
+  :where(:root) {
     --sidebar-width: 16rem;
     --sidebar-width-mobile: 18rem;
     --sidebar-width-icon: 3rem;

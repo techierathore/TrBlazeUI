@@ -134,6 +134,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
+        <li class="h3"><a href="#added-2026-10-09-lekhak-tr-002-tr-006-req-ui-047-req-ui-049-req-fn-012-not-yet-released">Added 2026-10-09 (Lekhak TR-002…TR-006 — REQ-UI-047…REQ-UI-049, REQ-FN-012 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-09-chatur-tr-019-req-ui-046-not-yet-released">Added 2026-10-09 (Chatur TR-019 — REQ-UI-046 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-07-sevak-feedback-req-ui-034-req-ui-043-req-fn-011-not-yet-released">Added 2026-10-07 (Sevak feedback — REQ-UI-034…REQ-UI-043, REQ-FN-011 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-07-chatur-tr-018-req-ui-033-2-1-4">Added 2026-10-07 (Chatur TR-018 — REQ-UI-033 — 2.1.4)</a></li>
@@ -180,6 +181,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
+        <li class="h3"><a href="#added-2026-10-09-lekhak-tr-002-tr-006-req-ui-047-req-ui-049-req-fn-012-not-yet-released">Added 2026-10-09 (Lekhak TR-002…TR-006 — REQ-UI-047…REQ-UI-049, REQ-FN-012 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-09-chatur-tr-019-req-ui-046-not-yet-released">Added 2026-10-09 (Chatur TR-019 — REQ-UI-046 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-07-sevak-feedback-req-ui-034-req-ui-043-req-fn-011-not-yet-released">Added 2026-10-07 (Sevak feedback — REQ-UI-034…REQ-UI-043, REQ-FN-011 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-07-chatur-tr-018-req-ui-033-2-1-4">Added 2026-10-07 (Chatur TR-018 — REQ-UI-033 — 2.1.4)</a></li>
@@ -428,6 +430,17 @@ bash tests/package/codex-agent-deployment.sh</code></pre>
 </li>
 </ul>
 <h2 id="consumer-integration-notes">Consumer integration notes<a class="anchor-link" href="#consumer-integration-notes">#</a></h2>
+<h3 id="added-2026-10-09-lekhak-tr-002-tr-006-req-ui-047-req-ui-049-req-fn-012-not-yet-released"><a id="added-2026-10-09-lekhak-tr-002tr-006--req-ui-047req-ui-049-req-fn-012--not-yet-released"></a>Added 2026-10-09 (Lekhak TR-002…TR-006 — REQ-UI-047…REQ-UI-049, REQ-FN-012 — not yet released)<a class="anchor-link" href="#added-2026-10-09-lekhak-tr-002-tr-006-req-ui-047-req-ui-049-req-fn-012-not-yet-released">#</a></h3>
+<ul>
+<li><strong><code>trblazeui-layers.css</code></strong>: link it first, before any other stylesheet, and put a host reboot in its <code>trblazeui-host</code> cascade layer. The host then beats Preflight and TrBlazeUI's controls beat the host. The layer names are public.
+</li>
+<li><strong>Beside another component library</strong>: the agent reference gives aliases for <code>ToastService</code>, <code>ToastPosition</code> and <code>ButtonType</code>. <code>@using ApexCharts</code> now goes on chart pages only.
+</li>
+<li><strong>⚠ Sidebar width tokens use <code>:where(:root)</code></strong>, so a host value always wins. Remove any copy of the library's own defaults from your CSS; it now overrides them.
+</li>
+<li><strong>Filled <code>Button</code>s carry <code>border-0</code></strong>: no hairline from a host <code>button { border: … }</code> rule.
+</li>
+</ul>
 <h3 id="added-2026-10-09-chatur-tr-019-req-ui-046-not-yet-released"><a id="added-2026-10-09-chatur-tr-019--req-ui-046--not-yet-released"></a>Added 2026-10-09 (Chatur TR-019 — REQ-UI-046 — not yet released)<a class="anchor-link" href="#added-2026-10-09-chatur-tr-019-req-ui-046-not-yet-released">#</a></h3>
 <ul>
 <li><strong><code>DataTableColumn.HideBelow</code></strong> hides a column's header and cells below a screen width (<code>DataTableBreakpoint.Sm</code> 640 px, <code>Md</code>, <code>Lg</code>, <code>Xl</code>) and shows them again above it. <code>Visible="false"</code> still hides a column at every width.
