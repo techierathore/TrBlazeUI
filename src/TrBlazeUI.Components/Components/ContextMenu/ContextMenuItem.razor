@@ -1,13 +1,17 @@
 @namespace TrBlazeUI.Components.ContextMenu
+@implements IContextMenuItem
 @implements IDisposable
 
 <div @ref="objItemRef"
      role="menuitem"
      class="@CssClass"
      tabindex="-1"
+     aria-disabled="@(Disabled ? "true" : null)"
+     data-disabled="@(Disabled ? "" : null)"
      data-focused="@IsFocused.ToString().ToLower()"
      @onclick="HandleClick"
      @onclick:stopPropagation="true"
+     @onmouseenter="HandleMouseEnter"
      @onkeydown="HandleKeyDown"
      @onkeydown:preventDefault="true" @attributes="AdditionalAttributes">
     @ChildContent
@@ -16,6 +20,9 @@
 @code {
     [CascadingParameter]
     public ContextMenu? Context { get; set; }
+
+    [CascadingParameter(Name = "ContextMenuLevel")]
+    private MenuLevel<IContextMenuItem>? ParentLevel { get; set; }
 
     [Parameter]
     public string? Class { get; set; }
@@ -33,16 +40,17 @@
     public EventCallback OnClick { get; set; }
 
     private ElementReference objItemRef;
+    private MenuLevel<IContextMenuItem>? objLevel;
 
     public bool IsDisabled => Disabled;
 
-    private bool IsFocused => Context != null &&
-                              Context.FocusedIndex >= 0 &&
-                              Context.GetMenuItems().IndexOf(this) == Context.FocusedIndex;
+    private bool IsFocused => objLevel != null && ReferenceEquals(objLevel.Focused, this);
 
     protected override void OnInitialized()
     {
-        Context?.RegisterMenuItem(this);
+        // Inside a ContextMenuSubContent the item belongs to that submenu's list (Chatur TR-020).
+        objLevel = ParentLevel ?? Context?.Level;
+        objLevel?.Register(this);
     }
 
     public async Task FocusAsync()
@@ -69,6 +77,12 @@
         }
     }
 
+    // Pointing at an ordinary row closes a submenu open beside a sibling row.
+    private void HandleMouseEnter()
+    {
+        objLevel?.SetOpenSub(null);
+    }
+
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
         if (Disabled) return;
@@ -81,7 +95,7 @@
 
     public void Dispose()
     {
-        Context?.UnregisterMenuItem(this);
+        objLevel?.Unregister(this);
     }
 
     private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(

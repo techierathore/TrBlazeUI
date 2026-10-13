@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Status</h1>
-    <div class="sub">Last rendered: 2026-10-09</div>
+    <div class="sub">Last rendered: 2026-10-13</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#where-i-am">Where I am</a></li>
@@ -121,7 +121,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Status</h1>
-    <div class="subtitle">Rendered 2026-10-09 &middot; source <code>PROJECT-STATUS.md</code></div>
+    <div class="subtitle">Rendered 2026-10-13 &middot; source <code>PROJECT-STATUS.md</code></div>
     <div class="cta-next" style="padding:20px; background:var(--cta-bg); border:2px solid var(--accent); border-radius:10px; margin:20px 0;">
       <div style="font-size:11px; color:var(--muted); letter-spacing:.5px;">NEXT COMMAND TO RUN</div>
       <div style="font-family:var(--mono); font-size:18px; margin-top:6px;">(owner) commit, then build and publish the package — its shipped documents are current; no agent command</div>
@@ -129,10 +129,10 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <table>
 <tbody>
 <tr><th>project</th><td>TrBlazeUI</td></tr>
-<tr><th>last_updated</th><td>2026-10-09</td></tr>
-<tr><th>current_phase</th><td>Release — handoff done, 66 of 66 verified</td></tr>
+<tr><th>last_updated</th><td>2026-10-13</td></tr>
+<tr><th>current_phase</th><td>Release — handoff done, 68 of 68 verified</td></tr>
 <tr><th>last_verified_build</th><td>PASS</td></tr>
-<tr><th>last_verified_date</th><td>2026-10-09</td></tr>
+<tr><th>last_verified_date</th><td>2026-10-13</td></tr>
 </tbody>
 </table>
     <div class="toc-inline">
@@ -149,11 +149,11 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
       </ol>
     </div>
 <h2 id="where-i-am">Where I am<a class="anchor-link" href="#where-i-am">#</a></h2>
-<p>2.1.6 is the latest published version and carries the Sevak and Chatur TR-019 fixes. The next
-release is ready and not yet cut: Lekhak's four open entries (REQ-UI-047 to 049, REQ-FN-012) — the
-<code>trblazeui-host</code> cascade layer, the coexistence section, the sidebar tokens through <code>:where(:root)</code>
-and borderless filled Buttons — verified on 2026-10-09. CHANGELOG, the agent reference, the guides
-and both copies of the Lekhak reply describe them. All 66 rows are verified.</p>
+<p>2.1.6 is the latest published version. The next release is ready and not yet cut. It carries
+Lekhak's four fixes (verified 2026-10-09) and Chatur TR-020 and TR-021 (verified 2026-10-13):
+submenus for Menubar, DropdownMenu and ContextMenu, and disabled menu items that render
+aria-disabled. CHANGELOG, the agent reference, the guides and both copies of the Chatur reply
+describe them. All 68 rows are verified.</p>
 <h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2>
 <p>Claude Code:</p>
 <pre><code>(owner) commit, then build and publish the package — its shipped documents are current; no agent command</code></pre>
@@ -177,7 +177,7 @@ and both copies of the Lekhak reply describe them. All 66 rows are verified.</p>
 </ul>
 <h2 id="known-blockers">Known blockers<a class="anchor-link" href="#known-blockers">#</a></h2>
 <ul>
-<li>The Lekhak fixes reach the feed only when the owner commits and cuts the next GitHub Release; agents cannot run git. Lekhak's upgrade waits on it.
+<li>The Lekhak and Chatur TR-020/TR-021 fixes reach the feed only when the owner commits and cuts the next GitHub Release; agents cannot run git. Both consumers' re-checks wait on it.
 </li>
 <li>CHANGELOG <code>[Unreleased]</code> still holds the Sevak and TR-019 entries that shipped by 2.1.6; the owner moves them under their release heading.
 </li>
@@ -187,11 +187,11 @@ and both copies of the Lekhak reply describe them. All 66 rows are verified.</p>
 <table>
 <thead><tr><th>Date</th><th>Phase</th><th>Result</th><th>Status table</th></tr></thead>
 <tbody>
-<tr><td>2026-10-07</td><td>triage-and-fix</td><td>48/48 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-10-07</td><td>triage-and-fix</td><td>59/59 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-10-08</td><td>triage-and-fix</td><td>61/61 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-10-09</td><td>triage-and-fix + handoff</td><td>62/62 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-10-09</td><td>triage-and-fix + handoff</td><td>66/66 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-10-13</td><td>triage-and-fix + handoff</td><td>68/68 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 </tbody>
 </table>
 <h2 id="library-feedback-summary">Library feedback summary<a class="anchor-link" href="#library-feedback-summary">#</a></h2>
@@ -206,7 +206,7 @@ and both copies of the Lekhak reply describe them. All 66 rows are verified.</p>
 </ul>
 <h2 id="deferred-future"><a id="deferred--future"></a>Deferred / future<a class="anchor-link" href="#deferred-future">#</a></h2>
 <ul>
-<li>REQ-UI-030 to 049 and REQ-FN-012 extend existing BRD items; <code>*amend-docs</code> can give them their own.
+<li>REQ-UI-030 to 051 and REQ-FN-012 extend existing BRD items; <code>*amend-docs</code> can give them their own.
 </li>
 <li>A container-width <code>HideBelow</code>, if Chatur asks.
 </li>

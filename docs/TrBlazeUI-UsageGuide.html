@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)</h1>
-    <div class="sub">Last rendered: 2026-10-09</div>
+    <div class="sub">Last rendered: 2026-10-13</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#test-users-canonical-use-these-for-all-smoke-verify-uat">Test users (canonical — use THESE for all smoke / verify / UAT)</a></li>
@@ -134,6 +134,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
+        <li class="h3"><a href="#added-2026-10-13-chatur-tr-020-tr-021-req-ui-050-req-ui-051-not-yet-released">Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-09-lekhak-tr-002-tr-006-req-ui-047-req-ui-049-req-fn-012-not-yet-released">Added 2026-10-09 (Lekhak TR-002…TR-006 — REQ-UI-047…REQ-UI-049, REQ-FN-012 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-09-chatur-tr-019-req-ui-046-not-yet-released">Added 2026-10-09 (Chatur TR-019 — REQ-UI-046 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-07-sevak-feedback-req-ui-034-req-ui-043-req-fn-011-not-yet-released">Added 2026-10-07 (Sevak feedback — REQ-UI-034…REQ-UI-043, REQ-FN-011 — not yet released)</a></li>
@@ -151,7 +152,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)</h1>
-    <div class="subtitle">Rendered 2026-10-09 &middot; source <code>TrBlazeUI-UsageGuide.md</code></div>
+    <div class="subtitle">Rendered 2026-10-13 &middot; source <code>TrBlazeUI-UsageGuide.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -181,6 +182,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
+        <li class="h3"><a href="#added-2026-10-13-chatur-tr-020-tr-021-req-ui-050-req-ui-051-not-yet-released">Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-09-lekhak-tr-002-tr-006-req-ui-047-req-ui-049-req-fn-012-not-yet-released">Added 2026-10-09 (Lekhak TR-002…TR-006 — REQ-UI-047…REQ-UI-049, REQ-FN-012 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-09-chatur-tr-019-req-ui-046-not-yet-released">Added 2026-10-09 (Chatur TR-019 — REQ-UI-046 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-07-sevak-feedback-req-ui-034-req-ui-043-req-fn-011-not-yet-released">Added 2026-10-07 (Sevak feedback — REQ-UI-034…REQ-UI-043, REQ-FN-011 — not yet released)</a></li>
@@ -428,8 +430,19 @@ bash tests/package/codex-agent-deployment.sh</code></pre>
 </li>
 <li>[ ] Open the Badge demo — pills sit inside sentences and long labels wrap or truncate as asked
 </li>
+<li>[ ] Open the Menubar demo, File ▸ Recent projects ▸ More — each list opens beside its row; Save is dim and cannot be chosen
+</li>
 </ul>
 <h2 id="consumer-integration-notes">Consumer integration notes<a class="anchor-link" href="#consumer-integration-notes">#</a></h2>
+<h3 id="added-2026-10-13-chatur-tr-020-tr-021-req-ui-050-req-ui-051-not-yet-released"><a id="added-2026-10-13-chatur-tr-020-tr-021--req-ui-050-req-ui-051--not-yet-released"></a>Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)<a class="anchor-link" href="#added-2026-10-13-chatur-tr-020-tr-021-req-ui-050-req-ui-051-not-yet-released">#</a></h3>
+<ul>
+<li><strong>Submenus</strong>: <code>MenubarSub</code> + <code>MenubarSubTrigger</code> + <code>MenubarSubContent</code>, and the same three for <code>DropdownMenu</code> and <code>ContextMenu</code>. The row draws a ▸; hover, click, ArrowRight or Enter opens the list beside it; ArrowLeft or Escape closes one level. Nests to any depth.
+</li>
+<li><strong>Disabled menu items announce themselves</strong>: a disabled <code>MenubarItem</code>, <code>MenubarCheckboxItem</code> or <code>ContextMenuItem</code> renders <code>aria-disabled="true"</code> and <code>data-disabled</code>. A spec that read the <code>pointer-events-none</code> class can use <code>toBeDisabled()</code>.
+</li>
+<li><strong>⚠ Menu panels no longer clip</strong>: <code>MenubarContent</code>, <code>DropdownMenuContent</code> and <code>ContextMenuContent</code> dropped <code>overflow-hidden</code> so a submenu can sit outside them. A menu that relied on it to clip a long list needs <code>Class="max-h-80 overflow-y-auto"</code>, and then holds no submenu.
+</li>
+</ul>
 <h3 id="added-2026-10-09-lekhak-tr-002-tr-006-req-ui-047-req-ui-049-req-fn-012-not-yet-released"><a id="added-2026-10-09-lekhak-tr-002tr-006--req-ui-047req-ui-049-req-fn-012--not-yet-released"></a>Added 2026-10-09 (Lekhak TR-002…TR-006 — REQ-UI-047…REQ-UI-049, REQ-FN-012 — not yet released)<a class="anchor-link" href="#added-2026-10-09-lekhak-tr-002-tr-006-req-ui-047-req-ui-049-req-fn-012-not-yet-released">#</a></h3>
 <ul>
 <li><strong><code>trblazeui-layers.css</code></strong>: link it first, before any other stylesheet, and put a host reboot in its <code>trblazeui-host</code> cascade layer. The host then beats Preflight and TrBlazeUI's controls beat the host. The layer names are public.

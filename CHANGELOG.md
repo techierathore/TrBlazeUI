@@ -11,6 +11,39 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
+### Chatur TR-020 and TR-021 — built and verified on 2026-10-13, after 2.1.6
+
+Answers the two entries Chatur filed on 2026-10-13 against 2.1.6
+(`docs/Chatur-TrBlazeUI-Feedback.md`; REQ-UI-050, REQ-UI-051).
+
+#### Added
+
+- **Submenus for `Menubar`, `DropdownMenu` and `ContextMenu` (TR-020)**: `MenubarSub`,
+  `MenubarSubTrigger`, `MenubarSubContent`, and the same three parts for `DropdownMenu…` and
+  `ContextMenu…`. The trigger row is a `menuitem` with `aria-haspopup="menu"` and
+  `aria-expanded`, and draws a ▸ at its right edge (`Chevron` replaces it). Hover, click,
+  ArrowRight or Enter opens the list beside the row; ArrowLeft or Escape closes that one list and
+  focuses its row; pointing at a sibling row closes it. Submenus nest to any depth; the list flips
+  to the left when the window has no room on the right. The three demo pages show them.
+
+#### Fixed
+
+- **A disabled menu item says it is disabled (TR-021)**: `MenubarItem`, `MenubarCheckboxItem`
+  and `ContextMenuItem` with `Disabled="true"` now render `aria-disabled="true"` and
+  `data-disabled`. Before, the only sign was the `pointer-events-none` class, so a screen reader
+  read the item as available and Playwright's `toBeDisabled()` failed. `DropdownMenuItem` already
+  rendered both.
+
+#### Changed
+
+- **`MenubarContent`, `DropdownMenuContent` and `ContextMenuContent` no longer carry
+  `overflow-hidden`**, so a submenu can be drawn outside the panel. A menu that relied on it to
+  clip a long list needs its own `Class="max-h-80 overflow-y-auto"`.
+- **`keyboard-nav.js` counts only the rows of the list being navigated**, not the rows of a
+  submenu open inside it.
+- **`MenubarMenu` now implements `IDisposable`**: it always had a `Dispose` that unregisters it
+  from its `Menubar`, but the framework never called it.
+
 ### Lekhak — built and verified on 2026-10-09, after 2.1.6
 
 Answers the four entries Lekhak re-checked as still open on 2.1.6

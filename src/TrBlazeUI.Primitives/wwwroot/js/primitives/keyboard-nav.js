@@ -26,12 +26,16 @@ export function setupKeyboardNav(element, dotNetRef) {
 /**
  * Gets menu items in DOM order within a container.
  * Includes menuitem, menuitemcheckbox, and menuitemradio roles.
+ * An item inside a submenu list (a nested role="menu") belongs to that list, not to this one
+ * (Chatur TR-020), so only items whose nearest menu is the container count.
  * @param {HTMLElement} container - The menu container element
  * @returns {HTMLElement[]} Array of menu item elements in DOM order
  */
 function getMenuItemsInDomOrder(container) {
     if (!container) return [];
-    return Array.from(container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]'));
+    const menu = container.closest('[role="menu"]') || container;
+    return Array.from(container.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]'))
+        .filter(item => item.parentElement && item.parentElement.closest('[role="menu"]') === menu);
 }
 
 /**

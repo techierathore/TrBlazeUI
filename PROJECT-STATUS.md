@@ -1,20 +1,20 @@
 ---
 project: TrBlazeUI
-last_updated: 2026-10-09
-current_phase: Release — handoff done, 66 of 66 verified
+last_updated: 2026-10-13
+current_phase: Release — handoff done, 68 of 68 verified
 last_verified_build: PASS
-last_verified_date: 2026-10-09
+last_verified_date: 2026-10-13
 ---
 
 # TrBlazeUI — Status
 
 ## Where I am
 
-2.1.6 is the latest published version and carries the Sevak and Chatur TR-019 fixes. The next
-release is ready and not yet cut: Lekhak's four open entries (REQ-UI-047 to 049, REQ-FN-012) — the
-`trblazeui-host` cascade layer, the coexistence section, the sidebar tokens through `:where(:root)`
-and borderless filled Buttons — verified on 2026-10-09. CHANGELOG, the agent reference, the guides
-and both copies of the Lekhak reply describe them. All 66 rows are verified.
+2.1.6 is the latest published version. The next release is ready and not yet cut. It carries
+Lekhak's four fixes (verified 2026-10-09) and Chatur TR-020 and TR-021 (verified 2026-10-13):
+submenus for Menubar, DropdownMenu and ContextMenu, and disabled menu items that render
+aria-disabled. CHANGELOG, the agent reference, the guides and both copies of the Chatur reply
+describe them. All 68 rows are verified.
 
 ## Next command to run
 
@@ -42,7 +42,7 @@ Why: every row in this phase's scope is terminal and the shipped documents were 
 
 ## Known blockers
 
-- The Lekhak fixes reach the feed only when the owner commits and cuts the next GitHub Release; agents cannot run git. Lekhak's upgrade waits on it.
+- The Lekhak and Chatur TR-020/TR-021 fixes reach the feed only when the owner commits and cuts the next GitHub Release; agents cannot run git. Both consumers' re-checks wait on it.
 - CHANGELOG `[Unreleased]` still holds the Sevak and TR-019 entries that shipped by 2.1.6; the owner moves them under their release heading.
 
 ## Verification log
@@ -51,11 +51,11 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 | Date | Phase | Result | Status table |
 |---|---|---|---|
-| 2026-10-07 | triage-and-fix | 48/48 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-07 | triage-and-fix | 59/59 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-08 | triage-and-fix | 61/61 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-09 | triage-and-fix + handoff | 62/62 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-09 | triage-and-fix + handoff | 66/66 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-10-13 | triage-and-fix + handoff | 68/68 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 
@@ -67,7 +67,7 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 ## Deferred / future
 
-- REQ-UI-030 to 049 and REQ-FN-012 extend existing BRD items; `*amend-docs` can give them their own.
+- REQ-UI-030 to 051 and REQ-FN-012 extend existing BRD items; `*amend-docs` can give them their own.
 - A container-width `HideBelow`, if Chatur asks.
 - `ToastService.Success()` keeps the default look; tinting it is a later behaviour change.
 - No test forces the portal-timeout inline fallback.

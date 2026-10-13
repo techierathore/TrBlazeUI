@@ -38,6 +38,8 @@ problem is in this table, the control exists — do not hand-build it.
 | A chat: a thread that follows new messages, bubbles by role with a streaming state, a composer where Enter sends | `ChatThread` + `ChatMessage` + `ChatComposer` (after 2.1.4) | §8 |
 | Hide a table column on a phone and show it again on wider screens | `DataTableColumn HideBelow="DataTableBreakpoint.Sm"` (after 2.1.4) | §6 |
 | Use TrBlazeUI beside Fluent UI, MudBlazor or Bootstrap: aliases for the shared names, the host's CSS in the `trblazeui-host` layer | `trblazeui-layers.css` (after 2.1.6) | §1 |
+| A menu row with a ▸ that opens a second list beside it — File ▸ Recent projects ▸, View ▸ Zoom ▸ — nested to any depth | `MenubarSub` + `MenubarSubTrigger` + `MenubarSubContent`; the same three for `DropdownMenu` and `ContextMenu` (after 2.1.6) | §4, §7 |
+| A menu item that is unavailable and must say so to a screen reader and to `toBeDisabled()` | `Disabled="true"` on `MenubarItem`, `MenubarCheckboxItem` or `ContextMenuItem` renders `aria-disabled="true"` and `data-disabled` (after 2.1.6) | §4, §7 |
 
 ---
 
@@ -1018,20 +1020,56 @@ tables get pagination for free through `<DataTable>`, which embeds this internal
 </NavigationMenu>
 ```
 
-### Menubar
+### Menubar — including submenus (File ▸ Recent projects ▸) and disabled items
+
+Parts: `Menubar`, `MenubarMenu`, `MenubarTrigger`, `MenubarContent`, `MenubarItem`,
+`MenubarCheckboxItem`, `MenubarLabel`, `MenubarSeparator`, `MenubarShortcut`, and (after 2.1.6)
+`MenubarSub`, `MenubarSubTrigger`, `MenubarSubContent`.
 
 ```razor
 <Menubar>
     <MenubarMenu>
         <MenubarTrigger>File</MenubarTrigger>
         <MenubarContent>
-            <MenubarItem>New Tab</MenubarItem>
+            <MenubarItem OnClick="NewProject">New project</MenubarItem>
+            <MenubarSub>
+                <MenubarSubTrigger>Recent projects</MenubarSubTrigger>
+                <MenubarSubContent>
+                    <MenubarItem OnClick="OpenChatur">Chatur</MenubarItem>
+                    <MenubarSub>
+                        <MenubarSubTrigger>More</MenubarSubTrigger>
+                        <MenubarSubContent>
+                            <MenubarItem OnClick="OpenSevak">Sevak</MenubarItem>
+                        </MenubarSubContent>
+                    </MenubarSub>
+                </MenubarSubContent>
+            </MenubarSub>
             <MenubarSeparator />
-            <MenubarItem>Exit</MenubarItem>
+            <MenubarItem Disabled="true">Save<MenubarShortcut>Ctrl+S</MenubarShortcut></MenubarItem>
         </MenubarContent>
     </MenubarMenu>
 </Menubar>
 ```
+
+| Part | Parameter | Type | Default | Description |
+|---|---|---|---|---|
+| MenubarItem, MenubarCheckboxItem | Disabled | bool | false | Dim, takes no click, skipped by the arrow keys. Renders `aria-disabled="true"` and `data-disabled` (after 2.1.6; before, only a class), so a screen reader says it is unavailable and Playwright's `toBeDisabled()` passes |
+| MenubarSub | — | — | — | Holds one `MenubarSubTrigger` and one `MenubarSubContent`. Goes inside a `MenubarContent` or inside another `MenubarSubContent`, to any depth |
+| MenubarSubTrigger | Disabled | bool | false | The row cannot open its list; `aria-disabled="true"` and `data-disabled` |
+| MenubarSubTrigger | Inset | bool | false | Left padding, to line up with checkbox items |
+| MenubarSubTrigger | Chevron | RenderFragment? | `▸` | The mark at the right of the row. Pass a `LucideIcon Name="chevron-right"` to draw an icon instead |
+| MenubarSubContent | Loop | bool | true | ArrowDown on the last item wraps to the first |
+
+> **How a submenu behaves.** The row is a `role="menuitem"` with `aria-haspopup="menu"` and
+> `aria-expanded`, and draws its ▸ at the right edge. Hovering it or clicking it opens the list
+> beside it; pointing at an ordinary row of the same list closes it again. From the keyboard,
+> ArrowRight or Enter on the row opens the list and focuses its first enabled item; ArrowLeft or
+> Escape closes **that one list** and puts the focus back on its row, so Escape walks back one
+> level at a time. ArrowRight on an ordinary row moves to the next menu of the bar, as before.
+> Choosing an item at any depth runs it and closes the whole menu. The list opens on the right
+> and flips to the left when the window has no room on the right (at 390 px, the third level
+> opens over the first). Test hooks go on the parts: `data-testid` on `MenubarSubTrigger` lands
+> on the row, on `MenubarSubContent` on the list (`role="menu"`).
 
 ---
 
@@ -2700,9 +2738,20 @@ TooltipContent parameters: `Side` (PopoverSide: Top, Bottom, Left, Right), `Alig
         <ContextMenuItem>Forward</ContextMenuItem>
         <ContextMenuSeparator />
         <ContextMenuItem>Reload</ContextMenuItem>
+        <ContextMenuSub>
+            <ContextMenuSubTrigger>Open with</ContextMenuSubTrigger>
+            <ContextMenuSubContent>
+                <ContextMenuItem OnClick="OpenInEditor">Editor</ContextMenuItem>
+            </ContextMenuSubContent>
+        </ContextMenuSub>
+        <ContextMenuItem Disabled="true">Delete</ContextMenuItem>
     </ContextMenuContent>
 </ContextMenu>
 ```
+
+`ContextMenuSub`, `ContextMenuSubTrigger` and `ContextMenuSubContent` (after 2.1.6) work exactly as
+the Menubar's submenu parts above, with the same parameters. A disabled `ContextMenuItem` renders
+`aria-disabled="true"` and `data-disabled` (after 2.1.6).
 
 ### DropdownMenu
 
@@ -2712,7 +2761,22 @@ TooltipContent parameters: `Side` (PopoverSide: Top, Bottom, Left, Right), `Alig
 | OpenChanged | EventCallback<bool> | - | Two-way: @bind-Open |
 | Modal | bool | true | Dismiss on outside click/Escape |
 
-Sub-components: `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`, `DropdownMenuCheckboxItem`, `DropdownMenuRadioItem`, `DropdownMenuRadioGroup`, `DropdownMenuLabel`, `DropdownMenuSeparator`, `DropdownMenuGroup`, `DropdownMenuShortcut`
+Sub-components: `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`, `DropdownMenuCheckboxItem`, `DropdownMenuRadioItem`, `DropdownMenuRadioGroup`, `DropdownMenuLabel`, `DropdownMenuSeparator`, `DropdownMenuGroup`, `DropdownMenuShortcut`, and (after 2.1.6) `DropdownMenuSub`, `DropdownMenuSubTrigger`, `DropdownMenuSubContent`
+
+A submenu works exactly as the Menubar's (§4): a ▸ row that opens a list beside it, ArrowRight to
+open, ArrowLeft or Escape to close one level, nested to any depth.
+
+```razor
+<DropdownMenuContent>
+    <DropdownMenuItem>Copy link</DropdownMenuItem>
+    <DropdownMenuSub>
+        <DropdownMenuSubTrigger>Send to</DropdownMenuSubTrigger>
+        <DropdownMenuSubContent>
+            <DropdownMenuItem OnClick="SendByEmail">Email</DropdownMenuItem>
+        </DropdownMenuSubContent>
+    </DropdownMenuSub>
+</DropdownMenuContent>
+```
 
 ```razor
 <DropdownMenu>
@@ -3911,6 +3975,7 @@ source* — see the next heading — and only rarely *wait for it to be built*.
 
 | Version | Released | Component namespaces | What it added |
 |---|---|---|---|
+| **After 2.1.6** | — | 87 | `trblazeui-layers.css` and the `trblazeui-host` cascade layer; submenus for `Menubar`, `DropdownMenu` and `ContextMenu` (`…Sub`, `…SubTrigger`, `…SubContent`); a disabled `MenubarItem`, `MenubarCheckboxItem` or `ContextMenuItem` renders `aria-disabled="true"` and `data-disabled` |
 | **After 2.1.4** | — | 87 | `Chat` family (`ChatThread`, `ChatMessage`, `ChatComposer`); a `Select` inside a `Dialog` never freezes the page (script, positioning and portal failures fall back and log); `Table` family (plain markup table); `ToastVariant.Success`/`Info`/`Warning` + `ToastService.Warning`/`Info`; `AlertDialogAction`/`AlertDialogCancel` `OnClick`/`PreventClose`; `Textarea.Rows`/`MaxRows`; `CardTitle`/`AlertTitle` `As`; `NumericInput` always `role="spinbutton"`, invariant ARIA numbers on `NumericInput` and `Slider`; `NumberInput` is a compile error naming `NumericInput`; a `Select` bound to a value no item carries shows its placeholder; the empty toast viewport lets clicks through; `HtmlSanitizer` on a stable 9.1.x |
 | **2.1.4** | 2026-10-07 | 85 | `EditorTabs.CloseContent` — draw a tab's close mark yourself (a text `×`) in place of the svg |
 | **2.1.3** | 2026-10-07 | 85 | `EditorTabs.TabAttributes`; `StepperItem.Icon`; `BadgeVariant.Danger`; `cn()` treats hyphenated text colours (`text-secondary-foreground`) as one group, so a `Class` text colour replaces a component's own |

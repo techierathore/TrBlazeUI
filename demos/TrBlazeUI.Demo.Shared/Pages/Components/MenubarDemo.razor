@@ -142,6 +142,79 @@
         </div>
     </div>
 
+    <!-- Submenus and disabled items (Chatur TR-020, TR-021) -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Submenus and disabled items</h2>
+            <p class="text-sm text-muted-foreground">
+                A row with a ▸ opens a second list beside it. Hover or click it, or press ArrowRight on it;
+                ArrowLeft or Escape closes the list and puts the focus back on the row. Submenus nest:
+                File ▸ Recent projects ▸ More ▸ is three levels deep. Save, Redo and Word wrap are
+                disabled and say so to a screen reader.
+            </p>
+        </div>
+
+        <div class="flex flex-wrap items-start gap-4">
+            <Menubar data-testid="menubar-sub-demo">
+                <MenubarMenu>
+                    <MenubarTrigger data-testid="menubar-sub-file">File</MenubarTrigger>
+                    <MenubarContent>
+                        <MenubarItem OnClick="@(() => objSubChoice = "New project")">New project</MenubarItem>
+                        <MenubarSub>
+                            <MenubarSubTrigger data-testid="menubar-sub-recent">Recent projects</MenubarSubTrigger>
+                            <MenubarSubContent data-testid="menubar-sub-recent-list">
+                                <MenubarItem OnClick="@(() => objSubChoice = "Chatur")">Chatur</MenubarItem>
+                                <MenubarItem OnClick="@(() => objSubChoice = "Lekhak")">Lekhak</MenubarItem>
+                                <MenubarSeparator />
+                                <MenubarSub>
+                                    <MenubarSubTrigger data-testid="menubar-sub-more">More</MenubarSubTrigger>
+                                    <MenubarSubContent data-testid="menubar-sub-more-list">
+                                        <MenubarItem OnClick="@(() => objSubChoice = "Sevak")" data-testid="menubar-sub-sevak">Sevak</MenubarItem>
+                                        <MenubarItem OnClick="@(() => objSubChoice = "TfLens")">TfLens</MenubarItem>
+                                    </MenubarSubContent>
+                                </MenubarSub>
+                            </MenubarSubContent>
+                        </MenubarSub>
+                        <MenubarSeparator />
+                        <MenubarItem Disabled="true" data-testid="menubar-sub-save">
+                            Save
+                            <MenubarShortcut>Ctrl+S</MenubarShortcut>
+                        </MenubarItem>
+                    </MenubarContent>
+                </MenubarMenu>
+                <MenubarMenu>
+                    <MenubarTrigger>Edit</MenubarTrigger>
+                    <MenubarContent>
+                        <MenubarItem OnClick="@(() => objSubChoice = "Undo")">Undo</MenubarItem>
+                        <MenubarItem Disabled="true" data-testid="menubar-sub-redo">Redo</MenubarItem>
+                    </MenubarContent>
+                </MenubarMenu>
+                <MenubarMenu>
+                    <MenubarTrigger data-testid="menubar-sub-view">View</MenubarTrigger>
+                    <MenubarContent>
+                        <MenubarCheckboxItem @bind-Checked="objMinimap">Minimap</MenubarCheckboxItem>
+                        <MenubarCheckboxItem Disabled="true" data-testid="menubar-sub-wrap">Word wrap</MenubarCheckboxItem>
+                        <MenubarSeparator />
+                        <MenubarSub>
+                            <MenubarSubTrigger data-testid="menubar-sub-zoom">Zoom</MenubarSubTrigger>
+                            <MenubarSubContent data-testid="menubar-sub-zoom-list">
+                                <MenubarItem OnClick="@(() => objSubChoice = "Zoom in")">Zoom in</MenubarItem>
+                                <MenubarItem OnClick="@(() => objSubChoice = "Zoom out")">Zoom out</MenubarItem>
+                                <MenubarItem OnClick="@(() => objSubChoice = "Reset zoom")">Reset zoom</MenubarItem>
+                            </MenubarSubContent>
+                        </MenubarSub>
+                    </MenubarContent>
+                </MenubarMenu>
+            </Menubar>
+
+            <p class="text-sm text-muted-foreground" data-testid="menubar-sub-choice">
+                Chosen: <strong>@(objSubChoice ?? "nothing yet")</strong>
+            </p>
+        </div>
+
+        <pre class="overflow-x-auto rounded-md bg-muted p-4 text-xs"><code>@SubSample</code></pre>
+    </div>
+
     <!-- API Reference -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -160,6 +233,18 @@
                     <p><code class="bg-muted px-1 py-0.5 rounded">MenubarLabel</code> - Section label</p>
                     <p><code class="bg-muted px-1 py-0.5 rounded">MenubarSeparator</code> - Visual divider</p>
                     <p><code class="bg-muted px-1 py-0.5 rounded">MenubarShortcut</code> - Keyboard shortcut hint</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">MenubarSub</code> - Submenu: holds a trigger row and its list; nests to any depth</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">MenubarSubTrigger</code> - Row that opens the submenu, with a ▸ at its right</p>
+                    <p><code class="bg-muted px-1 py-0.5 rounded">MenubarSubContent</code> - The list beside the row</p>
+                </div>
+            </div>
+            <Separator />
+            <div>
+                <h3 class="font-mono text-sm font-semibold mb-2">MenubarSubTrigger Parameters</h3>
+                <div class="space-y-2 text-sm">
+                    <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - The row cannot open its list</p>
+                    <p><strong>Inset:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Adds left padding</p>
+                    <p><strong>Chevron:</strong> <code class="bg-muted px-1 py-0.5 rounded">RenderFragment</code> - The mark at the right of the row; defaults to ▸</p>
                 </div>
             </div>
             <Separator />
@@ -167,7 +252,7 @@
                 <h3 class="font-mono text-sm font-semibold mb-2">MenubarItem Parameters</h3>
                 <div class="space-y-2 text-sm">
                     <p><strong>OnClick:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback</code> - Click handler</p>
-                    <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the item</p>
+                    <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the item; renders aria-disabled="true" and data-disabled</p>
                     <p><strong>Inset:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Adds left padding</p>
                 </div>
             </div>
@@ -192,6 +277,31 @@
     private bool objShowActivityBar = true;
     private bool objShowSidebar = false;
     private bool objFullScreen = false;
+
+    // Submenus and disabled items section
+    private string? objSubChoice;
+    private bool objMinimap = true;
+
+    private const string SubSample = """
+        <MenubarMenu>
+            <MenubarTrigger>File</MenubarTrigger>
+            <MenubarContent>
+                <MenubarSub>
+                    <MenubarSubTrigger>Recent projects</MenubarSubTrigger>
+                    <MenubarSubContent>
+                        <MenubarItem OnClick="OpenChatur">Chatur</MenubarItem>
+                        <MenubarSub>
+                            <MenubarSubTrigger>More</MenubarSubTrigger>
+                            <MenubarSubContent>
+                                <MenubarItem OnClick="OpenSevak">Sevak</MenubarItem>
+                            </MenubarSubContent>
+                        </MenubarSub>
+                    </MenubarSubContent>
+                </MenubarSub>
+                <MenubarItem Disabled="true">Save</MenubarItem>
+            </MenubarContent>
+        </MenubarMenu>
+        """;
 
     // Keyboard shortcut registrations
     private IDisposable? objShortcutNewTab;

@@ -84,6 +84,8 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-FN-012 | Agent reference explains coexisting with another component library and scopes ApexCharts to chart pages (Lekhak TR-003) | Verified | 100% | 2026-10-09 verify: PASS — test `Lekhak feedback — host CSS, imports, tokens and Button borde` | [d](#d-req-fn-012) |
 | REQ-UI-048 | Sidebar width tokens are declared through zero-specificity :where(:root) (Lekhak TR-004) | Verified | 100% | 2026-10-09 verify: PASS — test `Lekhak feedback — host CSS, imports, tokens and Button borde` | [d](#d-req-ui-048) |
 | REQ-UI-049 | A filled Button draws no border even when host CSS gives buttons one (Lekhak TR-006) | Verified | 100% | 2026-10-09 verify: PASS — test `Lekhak feedback — host CSS, imports, tokens and Button borde` | [d](#d-req-ui-049) |
+| REQ-UI-050 | Menubar, DropdownMenu and ContextMenu submenus: Sub, SubTrigger and SubContent, nestable three levels (Chatur TR-020) | Verified | 100% | 2026-10-13 verify: PASS — test `Chatur TR-020 — submenus in Menubar, DropdownMenu and Contex` | [d](#d-req-ui-050) |
+| REQ-UI-051 | A disabled menu item renders aria-disabled and data-disabled (Chatur TR-021) | Verified | 100% | 2026-10-13 verify: PASS — test `Chatur TR-021 — a disabled menu item is announced as disable` | [d](#d-req-ui-051) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -425,3 +427,12 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 
 - <a id="d-req-ui-025"></a> **REQ-UI-025** (BRD-pending) List that drives a detail pane (NavList)
   - *Acceptance:* When a Chatur user picks a role on the roles tab, then a list of multi-line rows carries the choice two ways, moves with the arrow keys, and the rest of the screen follows the chosen row.
+
+
+## Menubar demo
+
+- <a id="d-req-ui-050"></a> **REQ-UI-050** (extends BRD-21 floating panels and menus) Menubar, DropdownMenu and ContextMenu submenus: Sub, SubTrigger and SubContent, nestable three levels (Chatur TR-020)
+  - *Acceptance:* When a consumer nests submenus on the Menubar demo screen, then a row with ▸ opens a list beside it, ArrowRight opens, ArrowLeft or Escape closes, three levels deep.
+
+- <a id="d-req-ui-051"></a> **REQ-UI-051** (extends BRD-21 floating panels and menus) A disabled menu item renders aria-disabled and data-disabled (Chatur TR-021)
+  - *Acceptance:* When a MenubarItem or MenubarCheckboxItem is disabled on the Menubar demo screen, then it carries aria-disabled=true and data-disabled, and Playwright's toBeDisabled passes.

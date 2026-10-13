@@ -1,0 +1,125 @@
+@namespace TrBlazeUI.Components.DropdownMenu
+
+@* The row that opens a submenu (Chatur TR-020). It draws a ▸ at its right edge; hovering it,
+   clicking it, Enter, Space or ArrowRight opens the list beside it. *@
+<div @ref="objItemRef"
+     id="@Sub?.TriggerId"
+     role="menuitem"
+     class="@CssClass"
+     tabindex="-1"
+     aria-haspopup="menu"
+     aria-expanded="@(IsOpen ? "true" : "false")"
+     aria-controls="@(IsOpen ? Sub?.ContentId : null)"
+     aria-disabled="@(Disabled ? "true" : null)"
+     data-disabled="@(Disabled ? "" : null)"
+     data-state="@(IsOpen ? "open" : "closed")"
+     data-slot="dropdown-menu-sub-trigger"
+     @onclick="HandleClick"
+     @onmouseenter="HandleMouseEnter"
+     @onkeydown="HandleKeyDown"
+     @onkeydown:preventDefault="true"
+     @attributes="AdditionalAttributes">
+    @ChildContent
+    <span class="@SubmenuPlacer.ChevronClasses" aria-hidden="true">@Chevron</span>
+</div>
+
+@code {
+    [CascadingParameter]
+    private DropdownMenuSub? Sub { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes for the row.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets the row's label.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the row is disabled: it cannot open its submenu, the arrow keys skip
+    /// it, and it renders aria-disabled="true" and data-disabled.
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the row has left padding to line up with checkbox items.
+    /// </summary>
+    [Parameter]
+    public bool Inset { get; set; }
+
+    /// <summary>
+    /// Gets or sets the mark drawn at the right of the row. Defaults to ▸.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Chevron { get; set; } = ChevronDefault;
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes forwarded to the row element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private static readonly RenderFragment ChevronDefault = aBuilder => aBuilder.AddContent(0, "▸");
+
+    private ElementReference objItemRef;
+
+    private bool IsOpen => Sub?.IsOpen == true;
+
+    protected override void OnInitialized()
+    {
+        if (Sub != null)
+        {
+            Sub.Trigger = this;
+        }
+    }
+
+    /// <summary>Moves the focus to the row.</summary>
+    /// <returns>A task that completes when the row has the focus.</returns>
+    internal async Task FocusAsync()
+    {
+        try
+        {
+            await objItemRef.FocusAsync();
+        }
+        catch
+        {
+            // Ignore focus errors
+        }
+    }
+
+    private void HandleClick()
+    {
+        if (!Disabled)
+        {
+            Sub?.Open();
+        }
+    }
+
+    private void HandleMouseEnter()
+    {
+        if (!Disabled)
+        {
+            Sub?.Open();
+        }
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        // The dropdown's own list does not use ArrowRight, so the row opens its submenu itself.
+        if (!Disabled && (e.Key == "ArrowRight" || e.Key == "Enter" || e.Key == " "))
+        {
+            Sub?.OpenAndFocusFirst();
+        }
+    }
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        SubmenuPlacer.TriggerClasses,
+        Inset ? "pl-8" : null,
+        Class
+    );
+}

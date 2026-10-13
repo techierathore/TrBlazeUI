@@ -86,6 +86,40 @@
         </ContextMenu>
     </div>
 
+    <!-- Submenus (Chatur TR-020) -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Submenus</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>ContextMenuSub</code>, <code>ContextMenuSubTrigger</code> and <code>ContextMenuSubContent</code>
+                open a second list beside a row marked ▸. ArrowRight opens it; ArrowLeft or Escape closes it.
+            </p>
+        </div>
+        <ContextMenu>
+            <ContextMenuTrigger data-testid="context-sub-area">
+                <div class="flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm">
+                    Right click here
+                </div>
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+                <ContextMenuItem OnClick="@(() => HandleAction("Open"))">Open</ContextMenuItem>
+                <ContextMenuSub>
+                    <ContextMenuSubTrigger data-testid="context-sub-open-with">Open with</ContextMenuSubTrigger>
+                    <ContextMenuSubContent data-testid="context-sub-open-with-list">
+                        <ContextMenuItem OnClick="@(() => HandleAction("Editor"))">Editor</ContextMenuItem>
+                        <ContextMenuSub>
+                            <ContextMenuSubTrigger data-testid="context-sub-other">Other</ContextMenuSubTrigger>
+                            <ContextMenuSubContent data-testid="context-sub-other-list">
+                                <ContextMenuItem OnClick="@(() => HandleAction("Hex viewer"))" data-testid="context-sub-hex">Hex viewer</ContextMenuItem>
+                            </ContextMenuSubContent>
+                        </ContextMenuSub>
+                    </ContextMenuSubContent>
+                </ContextMenuSub>
+                <ContextMenuItem Disabled="true" data-testid="context-sub-delete">Delete</ContextMenuItem>
+            </ContextMenuContent>
+        </ContextMenu>
+    </div>
+
     <!-- API Reference -->
     <div class="space-y-4">
         <div class="space-y-2">

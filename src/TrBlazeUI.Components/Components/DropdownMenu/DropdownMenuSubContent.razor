@@ -1,0 +1,170 @@
+@namespace TrBlazeUI.Components.DropdownMenu
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+@* The list a submenu opens beside its trigger row (Chatur TR-020). ArrowLeft or Escape closes it
+   and puts the focus back on the row; it opens on the left when the right has no room. *@
+@if (Sub?.IsOpen == true)
+{
+    <div @ref="objListRef"
+         id="@Sub.ContentId"
+         role="menu"
+         aria-labelledby="@Sub.TriggerId"
+         tabindex="-1"
+         class="@CssClass"
+         data-state="open"
+         data-side="@objSide"
+         data-slot="dropdown-menu-sub-content"
+         @onkeydown="HandleKeyDown"
+         @onkeydown:stopPropagation="true"
+         @onkeydown:preventDefault="true"
+         @attributes="AdditionalAttributes">
+        <CascadingValue Name="DropdownMenuLevel" Value="Sub.ChildLevel" IsFixed="false">
+            @ChildContent
+        </CascadingValue>
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    private DropdownMenuSub? Sub { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes for the list.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets the list's items: DropdownMenuItem, DropdownMenuCheckboxItem,
+    /// DropdownMenuLabel, DropdownMenuSeparator, or another DropdownMenuSub.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether ArrowDown on the last item wraps to the first. Default is true.
+    /// </summary>
+    [Parameter]
+    public bool Loop { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes forwarded to the list element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private readonly SubmenuPlacer objPlacer = new();
+    private IJSObjectReference? objNavModule;
+    private ElementReference objListRef;
+    private bool objWasClosed = true;
+    private string objSide = "right";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Sub?.IsOpen != true)
+        {
+            objWasClosed = true;
+            objSide = "right";
+            return;
+        }
+
+        if (objWasClosed)
+        {
+            objWasClosed = false;
+            var vSide = await objPlacer.FitAsync(JSRuntime, objListRef);
+            if (vSide != objSide)
+            {
+                objSide = vSide;
+                StateHasChanged();
+            }
+        }
+
+        if (Sub.TakeFocusFirst())
+        {
+            await NavigateAsync("navigateFirst");
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (Sub == null)
+        {
+            return;
+        }
+
+        switch (e.Key)
+        {
+            case "ArrowLeft":
+            case "Escape":
+                await Sub.CloseAndFocusTriggerAsync();
+                break;
+
+            case "ArrowDown":
+                await NavigateAsync("navigateNext", Loop);
+                break;
+
+            case "ArrowUp":
+                await NavigateAsync("navigatePrevious", Loop);
+                break;
+
+            case "Home":
+                await NavigateAsync("navigateFirst");
+                break;
+
+            case "End":
+                await NavigateAsync("navigateLast");
+                break;
+        }
+    }
+
+    // The same in-list navigation the dropdown's top list uses, scoped to this list's own rows.
+    private async Task NavigateAsync(string aFunction, params object[] aExtra)
+    {
+        try
+        {
+            objNavModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/TrBlazeUI.Primitives/js/primitives/keyboard-nav.js");
+            await objNavModule.InvokeVoidAsync(aFunction, [objListRef, .. aExtra]);
+        }
+        catch (JSException)
+        {
+            // The list closed between the key and the call.
+        }
+        catch (JSDisconnectedException)
+        {
+            // Circuit already torn down.
+        }
+        catch (TaskCanceledException)
+        {
+            // The page went away before it answered.
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await objPlacer.DisposeAsync();
+        if (objNavModule == null)
+        {
+            return;
+        }
+
+        try
+        {
+            await objNavModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+            // Circuit already torn down - the module died with it.
+        }
+        catch (TaskCanceledException)
+        {
+            // The page went away before it answered; the module died with it.
+        }
+    }
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        SubmenuPlacer.ListClasses,
+        Class
+    );
+}

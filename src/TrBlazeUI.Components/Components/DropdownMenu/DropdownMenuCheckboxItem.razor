@@ -6,7 +6,8 @@
                                                            Checked="@Checked"
                                                            CheckedChanged="@HandleCheckedChanged"
                                                            Disabled="@Disabled"
-                                                           CloseOnSelect="@CloseOnSelect" @attributes="AdditionalAttributes">
+                                                           CloseOnSelect="@CloseOnSelect"
+                                                           @onmouseenter="HandleMouseEnter" @attributes="AdditionalAttributes">
     <span class="@IndicatorClass">
         @if (Checked)
         {
@@ -64,6 +65,15 @@
     /// </summary>
     [Parameter]
     public bool CloseOnSelect { get; set; } = false;
+
+    [CascadingParameter(Name = "DropdownMenuLevel")]
+    private MenuLevel<object>? Level { get; set; }
+
+    // Pointing at an ordinary row closes a submenu open beside a sibling row (Chatur TR-020).
+    private void HandleMouseEnter()
+    {
+        Level?.SetOpenSub(null);
+    }
 
     private async Task HandleCheckedChanged(bool value)
     {

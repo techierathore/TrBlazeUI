@@ -141,8 +141,15 @@ bash tests/package/codex-agent-deployment.sh
 - [ ] Toggle dark mode — every component restyles
 - [ ] At phone width, open the menu — it slides out and every link works
 - [ ] Open the Badge demo — pills sit inside sentences and long labels wrap or truncate as asked
+- [ ] Open the Menubar demo, File ▸ Recent projects ▸ More — each list opens beside its row; Save is dim and cannot be chosen
 
 ## Consumer integration notes
+
+### Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)
+
+- **Submenus**: `MenubarSub` + `MenubarSubTrigger` + `MenubarSubContent`, and the same three for `DropdownMenu` and `ContextMenu`. The row draws a ▸; hover, click, ArrowRight or Enter opens the list beside it; ArrowLeft or Escape closes one level. Nests to any depth.
+- **Disabled menu items announce themselves**: a disabled `MenubarItem`, `MenubarCheckboxItem` or `ContextMenuItem` renders `aria-disabled="true"` and `data-disabled`. A spec that read the `pointer-events-none` class can use `toBeDisabled()`.
+- **⚠ Menu panels no longer clip**: `MenubarContent`, `DropdownMenuContent` and `ContextMenuContent` dropped `overflow-hidden` so a submenu can sit outside them. A menu that relied on it to clip a long list needs `Class="max-h-80 overflow-y-auto"`, and then holds no submenu.
 
 ### Added 2026-10-09 (Lekhak TR-002…TR-006 — REQ-UI-047…REQ-UI-049, REQ-FN-012 — not yet released)
 

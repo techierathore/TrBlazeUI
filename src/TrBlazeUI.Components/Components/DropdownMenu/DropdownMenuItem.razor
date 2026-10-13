@@ -5,11 +5,21 @@
 <TrBlazeUI.Primitives.DropdownMenu.DropdownMenuItem class="@CssClass"
                                                          Disabled="@Disabled"
                                                          OnClick="@OnClick"
-                                                         CloseOnSelect="@CloseOnSelect" @attributes="AdditionalAttributes">
+                                                         CloseOnSelect="@CloseOnSelect"
+                                                         @onmouseenter="HandleMouseEnter" @attributes="AdditionalAttributes">
     @ChildContent
 </TrBlazeUI.Primitives.DropdownMenu.DropdownMenuItem>
 
 @code {
+    [CascadingParameter(Name = "DropdownMenuLevel")]
+    private MenuLevel<object>? Level { get; set; }
+
+    // Pointing at an ordinary row closes a submenu open beside a sibling row (Chatur TR-020).
+    private void HandleMouseEnter()
+    {
+        Level?.SetOpenSub(null);
+    }
+
     /// <summary>
     /// The content to display inside the menu item.
     /// </summary>
