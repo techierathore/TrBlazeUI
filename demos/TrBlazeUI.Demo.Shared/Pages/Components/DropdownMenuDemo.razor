@@ -46,6 +46,41 @@
         </div>
     </section>
 
+    <!-- Submenus (Chatur TR-020) -->
+    <section class="space-y-4">
+        <h2 class="text-2xl font-semibold">Submenus</h2>
+        <p class="text-sm text-muted-foreground">
+            <code>DropdownMenuSub</code> holds a <code>DropdownMenuSubTrigger</code> row, drawn with a ▸, and the
+            <code>DropdownMenuSubContent</code> list that opens beside it. ArrowRight opens it; ArrowLeft or Escape
+            closes it. Submenus nest.
+        </p>
+
+        <div class="flex items-start gap-2">
+            <DropdownMenu>
+                <DropdownMenuTrigger data-testid="dropdown-sub-open" Class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                    Share
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                    <DropdownMenuItem OnClick="@(() => HandleBasicAction("Copy link"))">Copy link</DropdownMenuItem>
+                    <DropdownMenuSub>
+                        <DropdownMenuSubTrigger data-testid="dropdown-sub-send">Send to</DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent data-testid="dropdown-sub-send-list">
+                            <DropdownMenuItem OnClick="@(() => HandleBasicAction("Email"))">Email</DropdownMenuItem>
+                            <DropdownMenuSub>
+                                <DropdownMenuSubTrigger data-testid="dropdown-sub-apps">Apps</DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent data-testid="dropdown-sub-apps-list">
+                                    <DropdownMenuItem OnClick="@(() => HandleBasicAction("Slack"))" data-testid="dropdown-sub-slack">Slack</DropdownMenuItem>
+                                    <DropdownMenuItem OnClick="@(() => HandleBasicAction("Teams"))">Teams</DropdownMenuItem>
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
+                        </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                    <DropdownMenuItem Disabled="true">Export (disabled)</DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
+    </section>
+
     <!-- Button as trigger via AsChild (no nested interactive controls) -->
     <section class="space-y-4">
         <h2 class="text-2xl font-semibold">Button As Trigger (AsChild)</h2>

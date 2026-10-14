@@ -138,10 +138,15 @@ Call chain (badge classes): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → 
 | Dialog (Select inside) | `/components/dialog` | `Pages/Components/DialogDemo.razor` | `SelectContent` → `FloatingPortal` (inline when nested) → `positioning.js`, `element-utils.js placeUnderAnchor` | renders at 1280 and 390; with select.js blocked or computePosition failing the page keeps answering (req-ui-044.spec.ts) |
 | Table | `/components/table` | `Pages/Components/TableDemo.razor` | `Table` family (`Components/Table/`) | renders at 1280 and 390; plain markup, no record type |
 | Stepper | `/components/stepper` | `Pages/Components/StepperDemo.razor` | `StepperItem` (`Status`, `Trailing`, `Icon`) | renders at 1366 and 390 |
+| Menubar (2026-10-13) | `/components/menubar` | `Pages/Components/MenubarDemo.razor` | `MenubarSub`/`MenubarSubTrigger`/`MenubarSubContent`, three levels; disabled `MenubarItem`/`MenubarCheckboxItem` (Chatur TR-020, TR-021) | 1280: each level opens on the right; 390: the third level flips left (`menubar-sub-1280.png`, `menubar-sub-390.png` under `tests/.artifacts/verify/screens/`) |
+| Dropdown Menu (2026-10-13) | `/components/dropdown-menu` | `Pages/Components/DropdownMenuDemo.razor` | `DropdownMenuSub`/`…SubTrigger`/`…SubContent`, two levels, keyboard through `keyboard-nav.js` | renders at 1280; ArrowRight, Escape and ArrowLeft move one level |
+| Context Menu (2026-10-13) | `/components/context-menu` | `Pages/Components/ContextMenuDemo.razor` | `ContextMenuSub`/`…SubTrigger`/`…SubContent`; a disabled `ContextMenuItem` | renders at 1280; hover and keyboard open the list |
 | Badge | `/components/badge` | `Pages/Components/BadgeDemo.razor` | `Badge` (`Danger`) → `ClassNames.cn` → `TailwindMerge` | renders at 1366 and 390 |
 | Switch | `/components/switch` | `Pages/Components/SwitchDemo.razor` | `Switch` (`Outlined`, 2.1.2) | renders at 1366 and 390 |
 | Toggle Group | `/components/toggle-group` | `Pages/Components/ToggleGroupDemo.razor` | `ToggleGroup` (`Joined` 2.0.8, `OnVariant` 2.1.0) | renders at 1366 and 390 |
 | DataTable | `/components/datatable` | `Pages/Components/DataTableDemo.razor` | `DataTable` (`RowAttributes`/`HeaderRowAttributes`/`SelectAllAttributes` 2.1.0, `SelectedCount` 2.0.9), `DataTableColumn.HideBelow` (after 2.1.4, Chatur TR-019, section `req-ui-046`) | renders at 1366 and 390; at 390 the `req-ui-046-table` grid shows Name and Status only, at 700 Email returns, at 1280 all four |
+| Button | `/components/button` | `Pages/Components/ButtonDemo.razor` | `Button` (`border-0` on every variant but Outline, after 2.1.6, Lekhak TR-006) | renders at 1280; under a host `button { border }` rule in `trblazeui-host`, filled buttons 0px, Outline 1px in `--input` |
+| Sidebar | `/components/sidebar` | `Pages/Components/SidebarDemo.razor` | `--sidebar-width*` from `trblazeui.css` `:where(:root)` only (after 2.1.6, Lekhak TR-004) | renders at 1280; sidebar 256px; a host `html { --sidebar-width }` wins |
 | Tree View | `/components/tree-view` | `Pages/Components/TreeViewDemo.razor` | `TreeView`, `TreeItem` (2.0.8) | renders at 1366 and 390 |
 | Diff View | `/components/diff-view` | `Pages/Components/DiffViewDemo.razor` | `DiffView`, `TextDiff` (2.0.8) | renders at 1366 and 390 |
 | Log View | `/components/log-view` | `Pages/Components/LogViewDemo.razor` | `LogView` (2.0.9) | renders at 1366 and 390 |
@@ -155,6 +160,12 @@ Call chain (Select inside a Dialog, Sevak TR-041): `SelectContent.razor` (Primit
 Call chain (close mark): `EditorTabs.razor` close `<button data-slot="editor-tab-close">` → `CloseContent` when set, else the built-in 12px svg; the button's `aria-label`, classes and `@onclick` are outside the branch, so they never change.
 
 Call chain (column hidden below a width, Chatur TR-019): `DataTableColumn.HideBelow` → `HideBelowClass` (`hidden sm:table-cell` … `hidden xl:table-cell`, written in full so the Tailwind scan of the file puts each variant in `trblazeui.css`) → `DataTable.RegisterColumn` copies it to `ColumnData.HideBelowClass` → `DataTable.razor` merges it last through `ClassNames.cn` on the header cell and on every body cell.
+
+Call chain (host CSS, Lekhak TR-002/TR-004): `App.razor` / `index.html` `<head>` links `_content/TrBlazeUI.Components/trblazeui-layers.css` **first** (it fixes the layer order `properties, theme, base, trblazeui-host, components, utilities` before the demo's own Tailwind-built `app.css` and `trblazeui.css` name theirs) → host CSS in `trblazeui-host` → Preflight (`base`) loses to it, `components`/`utilities` win over it. The sidebar width tokens come only from `trblazeui-input.css` `:where(:root)`; the demo's `app-input.css` no longer repeats them.
+
+Call chain (submenu, Chatur TR-020): `MenubarSubTrigger` hover/click → `MenubarSub.Open` → the parent list's `MenuLevel.SetOpenSub(this)` → `OpenSubChanged` → every sibling `MenubarSub` re-renders → `MenubarSubContent` draws its list → `OnAfterRenderAsync` → `SubmenuPlacer.FitAsync` (`submenu.js` `fitSide`, `data-side="left"` when the right has no room). Keyboard: ArrowRight reaches `MenubarContent`/`MenubarSubContent.HandleKeyDown`, which opens the focused `MenubarSubTrigger` (`OpenFromKeyboard` → `OpenAndFocusFirst`); ArrowLeft/Escape in a `…SubContent` → `MenubarSub.CloseAndFocusTriggerAsync`. Items find their list through the `MenubarLevel` cascade, else the menu's own `Level`. `ContextMenu…` is the same shape (`ContextMenuLevel` cascade); `DropdownMenu…` tracks only the open submenu (`DropdownMenuLevel`) and moves focus with `keyboard-nav.js`, which counts only the rows whose nearest `role="menu"` is the list.
+
+Call chain (disabled menu item, Chatur TR-021): `MenubarItem`/`MenubarCheckboxItem`/`ContextMenuItem` `Disabled` → `aria-disabled="true"` + `data-disabled` on the row, beside the existing `pointer-events-none opacity-50`.
 
 Call chain (step icon): `StepperItem.razor` marker `<span data-slot="stepper-item-marker">` → `Icon` when set, else `MarkerText` → `MarkerCssClass` adds `[&_svg]:size-4`.
 
@@ -171,6 +182,8 @@ Call chain (badge colour): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → `
 | `src/TrBlazeUI.Components/Components/Stepper/StepperItem.razor:18` | marker markup | `Icon` | non-null draws the icon and no glyph text |
 | `src/TrBlazeUI.Components/Components/Stepper/StepperItem.razor:173` | `MarkerCssClass` | the class string | `[&_svg]:size-4 [&_svg]:shrink-0` only when `Icon` is set |
 | `src/TrBlazeUI.Components/Components/Badge/Badge.razor.cs:165` | `CssClass` (Danger arm) | the variant classes | `border-alert-danger/30 bg-alert-danger-bg text-alert-danger-foreground` |
+| `src/TrBlazeUI.Components/Components/Button/Button.razor.cs:212` | `CssClass` (variant arm) | the variant classes | `border-0 …` for every variant but Outline, which carries `border border-input` |
+| `src/TrBlazeUI.Components/wwwroot/trblazeui-layers.css:17` | the one `@layer` statement | the declared order | the shipped `trblazeui.css` layers with `trblazeui-host` after `base`; `req-lekhak.spec.ts` compares the two |
 | `src/TrBlazeUI.Components/Utilities/TailwindMerge.cs:462` | `ComputeBaseUtilityGroup` | return value for `text-secondary-foreground` | `"text-color"`, so a later `text-destructive` replaces it |
 | `src/TrBlazeUI.Components/Utilities/TailwindMerge.cs:429` | `ComputeBaseUtilityGroup` | return value for `text-sm/6` | `"font-size"`, never `"text-color"` |
 | `src/TrBlazeUI.Components/Components/Switch/Switch.razor.cs:124` | `Outlined` parameter | `Outlined` | `true` gives an off switch a muted track and a border in `--border` |
@@ -178,6 +191,14 @@ Call chain (badge colour): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → `
 | `src/TrBlazeUI.Components/Components/DataTable/DataTableColumn.razor.cs:188` | `HideBelowClass` | the class string | `null` unless `HideBelow` is set; else `hidden` plus the one `<bp>:table-cell` variant |
 | `src/TrBlazeUI.Components/Components/DataTable/DataTable.razor:142` | header cell markup | `column.HideBelowClass` | the same string on the `<th>` as on that column's `<td>` at line 192 |
 | `src/TrBlazeUI.Components/Components/DataTable/DataTable.razor.cs:368` | `RowAttributes` parameter | the function's result per row | the row's own attributes, `class` merged |
+| `src/TrBlazeUI.Components/Utilities/MenuLevel.cs:45` | `SetOpenSub` | `OpenSub` | the one open submenu of this list, or `null`; a sibling opening replaces it |
+| `src/TrBlazeUI.Components/Utilities/MenuLevel.cs:85` | `Move` | `FocusedIndex` | the index of the row the arrow key moved to, disabled rows skipped |
+| `src/TrBlazeUI.Components/Components/Menubar/MenubarContent.razor:107` | `HandleKeyDown` ArrowRight | `Menu.Level.Focused` | a `MenubarSubTrigger` opens its list; anything else moves to the next menu |
+| `src/TrBlazeUI.Components/Components/Menubar/MenubarSubContent.razor:85` | `OnAfterRenderAsync` | `Sub.TakeFocusFirst()` | `true` once after a keyboard open, then the first enabled row has the focus |
+| `src/TrBlazeUI.Components/Components/Menubar/MenubarSub.razor:86` | `CloseAndFocusTriggerAsync` | `Trigger` | the row that opened the list; it gets the focus back |
+| `src/TrBlazeUI.Components/wwwroot/js/submenu.js:12` | `fitSide` | return value | `"left"` only when the list runs past the window's right edge |
+| `src/TrBlazeUI.Primitives/wwwroot/js/primitives/keyboard-nav.js:36` | `getMenuItemsInDomOrder` | `menu` | the list being navigated; rows of an open submenu inside it are not counted |
+| `src/TrBlazeUI.Components/Components/Menubar/MenubarItem.razor:9` | row markup | `aria-disabled` | `"true"` when `Disabled`, absent otherwise |
 
 Screenshots: `screenshots/TrBlazeUI/code-editor.png`, `stepper.png`, `badge.png` and their `-mobile` versions (§6).
 

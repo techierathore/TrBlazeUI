@@ -1,0 +1,156 @@
+@namespace TrBlazeUI.Components.Menubar
+@implements IMenubarItem
+@implements IDisposable
+
+@* The row that opens a submenu (Chatur TR-020). It draws a ▸ at its right edge; hovering it,
+   clicking it, Enter, Space or ArrowRight opens the list beside it. *@
+<div @ref="objItemRef"
+     id="@Sub?.TriggerId"
+     role="menuitem"
+     class="@CssClass"
+     tabindex="-1"
+     aria-haspopup="menu"
+     aria-expanded="@(IsOpen ? "true" : "false")"
+     aria-controls="@(IsOpen ? Sub?.ContentId : null)"
+     aria-disabled="@(Disabled ? "true" : null)"
+     data-disabled="@(Disabled ? "" : null)"
+     data-state="@(IsOpen ? "open" : "closed")"
+     data-slot="menubar-sub-trigger"
+     @onclick="HandleClick"
+     @onmouseenter="HandleMouseEnter"
+     @onkeydown="HandleKeyDown"
+     @onkeydown:preventDefault="true"
+     @attributes="AdditionalAttributes">
+    @ChildContent
+    <span class="@SubmenuPlacer.ChevronClasses" aria-hidden="true">@Chevron</span>
+</div>
+
+@code {
+    [CascadingParameter]
+    private MenubarSub? Sub { get; set; }
+
+    [CascadingParameter]
+    private MenubarMenu? Menu { get; set; }
+
+    [CascadingParameter(Name = "MenubarLevel")]
+    private MenuLevel<IMenubarItem>? ParentLevel { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes for the row.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets the row's label.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the row is disabled: it cannot open its submenu, and it renders
+    /// aria-disabled="true" and data-disabled.
+    /// </summary>
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the row has left padding to line up with checkbox items.
+    /// </summary>
+    [Parameter]
+    public bool Inset { get; set; }
+
+    /// <summary>
+    /// Gets or sets the mark drawn at the right of the row. Defaults to ▸.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Chevron { get; set; } = ChevronDefault;
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes forwarded to the row element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private static readonly RenderFragment ChevronDefault = aBuilder => aBuilder.AddContent(0, "▸");
+
+    private ElementReference objItemRef;
+    private MenuLevel<IMenubarItem>? objLevel;
+
+    /// <inheritdoc />
+    public bool IsDisabled => Disabled;
+
+    private bool IsOpen => Sub?.IsOpen == true;
+
+    protected override void OnInitialized()
+    {
+        if (Sub != null)
+        {
+            Sub.Trigger = this;
+        }
+
+        objLevel = ParentLevel ?? Menu?.Level;
+        objLevel?.Register(this);
+    }
+
+    /// <inheritdoc />
+    public async Task FocusAsync()
+    {
+        try
+        {
+            await objItemRef.FocusAsync();
+        }
+        catch
+        {
+            // Ignore focus errors
+        }
+    }
+
+    /// <summary>Opens the submenu from the keyboard and focuses its first item.</summary>
+    internal void OpenFromKeyboard()
+    {
+        if (!Disabled)
+        {
+            Sub?.OpenAndFocusFirst();
+        }
+    }
+
+    private void HandleClick()
+    {
+        if (!Disabled)
+        {
+            Sub?.Open();
+        }
+    }
+
+    private void HandleMouseEnter()
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        objLevel?.MarkFocused(this);
+        Sub?.Open();
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        // ArrowRight reaches the list this row sits in, which opens the submenu from there.
+        if (e.Key == "Enter" || e.Key == " ")
+        {
+            OpenFromKeyboard();
+        }
+    }
+
+    public void Dispose()
+    {
+        objLevel?.Unregister(this);
+    }
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        SubmenuPlacer.TriggerClasses,
+        Inset ? "pl-8" : null,
+        Class
+    );
+}

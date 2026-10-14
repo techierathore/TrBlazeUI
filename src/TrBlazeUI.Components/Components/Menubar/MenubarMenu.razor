@@ -1,4 +1,5 @@
 @namespace TrBlazeUI.Components.Menubar
+@implements IDisposable
 
 <div class="relative" @attributes="AdditionalAttributes">
     <CascadingValue Value="this" IsFixed="false">
@@ -18,38 +19,30 @@
 
     internal string MenuId { get; } = Guid.NewGuid().ToString();
     internal bool IsOpen => Context?.ActiveMenu == MenuId;
-    internal int FocusedIndex { get; private set; } = -1;
+    internal int FocusedIndex => Level.FocusedIndex;
 
-    private List<IMenubarItem> objMenuItems = new();
+    /// <summary>The menu's top list: its items for the arrow keys and its open submenu.</summary>
+    internal MenuLevel<IMenubarItem> Level { get; } = new();
 
     protected override void OnInitialized()
     {
         Context?.RegisterMenu(this);
     }
 
-    internal void RegisterMenuItem(IMenubarItem item)
-    {
-        if (!objMenuItems.Contains(item))
-        {
-            objMenuItems.Add(item);
-        }
-    }
+    internal void RegisterMenuItem(IMenubarItem item) => Level.Register(item);
 
-    internal void UnregisterMenuItem(IMenubarItem item)
-    {
-        objMenuItems.Remove(item);
-    }
+    internal void UnregisterMenuItem(IMenubarItem item) => Level.Unregister(item);
 
-    internal List<IMenubarItem> GetMenuItems() => objMenuItems;
+    internal List<IMenubarItem> GetMenuItems() => Level.Items;
 
     internal void SetFocusedIndex(int index)
     {
-        FocusedIndex = index;
+        Level.FocusedIndex = index;
     }
 
     internal void Open()
     {
-        FocusedIndex = -1;
+        Level.Reset();
         Context?.SetActiveMenu(MenuId);
     }
 
@@ -57,7 +50,7 @@
     {
         if (IsOpen)
         {
-            FocusedIndex = -1;
+            Level.Reset();
             Context?.SetActiveMenu(null);
         }
     }

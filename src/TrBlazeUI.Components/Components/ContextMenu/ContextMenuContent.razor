@@ -118,133 +118,28 @@
                 await Context.CloseAsync();
                 break;
 
-            case "ArrowDown":
-                await NavigateNextAsync();
+            case "ArrowRight":
+                // On a submenu row ArrowRight opens the submenu (Chatur TR-020).
+                if (Context.Level.Focused is ContextMenuSubTrigger vTrigger)
+                {
+                    vTrigger.OpenFromKeyboard();
+                }
                 break;
 
-            case "ArrowUp":
-                await NavigatePreviousAsync();
-                break;
-
-            case "Home":
-                await FocusFirstAsync();
-                break;
-
-            case "End":
-                await FocusLastAsync();
+            default:
+                var vItem = Context.Level.Move(e.Key, Loop, aItem => aItem.IsDisabled);
+                if (vItem != null)
+                {
+                    Context.SetFocusedIndex(Context.Level.FocusedIndex);
+                    await vItem.FocusAsync();
+                }
                 break;
         }
     }
 
-    private async Task NavigateNextAsync()
-    {
-        if (Context == null) return;
-
-        var items = Context.GetMenuItems();
-        var enabledItems = items.Where(i => !i.IsDisabled).ToList();
-        if (enabledItems.Count == 0) return;
-
-        var currentIndex = Context.FocusedIndex;
-        int nextIndex;
-
-        if (currentIndex == -1)
-        {
-            nextIndex = 0;
-        }
-        else
-        {
-            var currentItem = currentIndex < items.Count ? items[currentIndex] : null;
-            var enabledIndex = currentItem != null ? enabledItems.IndexOf(currentItem) : -1;
-
-            if (enabledIndex == -1)
-            {
-                nextIndex = 0;
-            }
-            else if (enabledIndex == enabledItems.Count - 1)
-            {
-                nextIndex = Loop ? 0 : enabledIndex;
-            }
-            else
-            {
-                nextIndex = enabledIndex + 1;
-            }
-        }
-
-        await FocusEnabledItemAsync(enabledItems, items, nextIndex);
-    }
-
-    private async Task NavigatePreviousAsync()
-    {
-        if (Context == null) return;
-
-        var items = Context.GetMenuItems();
-        var enabledItems = items.Where(i => !i.IsDisabled).ToList();
-        if (enabledItems.Count == 0) return;
-
-        var currentIndex = Context.FocusedIndex;
-        int prevIndex;
-
-        if (currentIndex == -1)
-        {
-            prevIndex = enabledItems.Count - 1;
-        }
-        else
-        {
-            var currentItem = currentIndex < items.Count ? items[currentIndex] : null;
-            var enabledIndex = currentItem != null ? enabledItems.IndexOf(currentItem) : -1;
-
-            if (enabledIndex == -1)
-            {
-                prevIndex = enabledItems.Count - 1;
-            }
-            else if (enabledIndex == 0)
-            {
-                prevIndex = Loop ? enabledItems.Count - 1 : 0;
-            }
-            else
-            {
-                prevIndex = enabledIndex - 1;
-            }
-        }
-
-        await FocusEnabledItemAsync(enabledItems, items, prevIndex);
-    }
-
-    private async Task FocusFirstAsync()
-    {
-        if (Context == null) return;
-
-        var items = Context.GetMenuItems();
-        var enabledItems = items.Where(i => !i.IsDisabled).ToList();
-        if (enabledItems.Count == 0) return;
-
-        await FocusEnabledItemAsync(enabledItems, items, 0);
-    }
-
-    private async Task FocusLastAsync()
-    {
-        if (Context == null) return;
-
-        var items = Context.GetMenuItems();
-        var enabledItems = items.Where(i => !i.IsDisabled).ToList();
-        if (enabledItems.Count == 0) return;
-
-        await FocusEnabledItemAsync(enabledItems, items, enabledItems.Count - 1);
-    }
-
-    private async Task FocusEnabledItemAsync(List<ContextMenuItem> enabledItems, List<ContextMenuItem> allItems, int enabledIndex)
-    {
-        if (enabledIndex < 0 || enabledIndex >= enabledItems.Count) return;
-
-        var item = enabledItems[enabledIndex];
-        var absoluteIndex = allItems.IndexOf(item);
-
-        Context!.SetFocusedIndex(absoluteIndex);
-        await item.FocusAsync();
-    }
-
+    // No overflow-hidden: a submenu list is drawn outside this box, beside its trigger row (Chatur TR-020).
     private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
-        "min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md outline-none",
+        "min-w-[8rem] rounded-md border bg-popover text-popover-foreground shadow-md outline-none",
         "animate-in fade-in-0 zoom-in-95",
         Class
     );

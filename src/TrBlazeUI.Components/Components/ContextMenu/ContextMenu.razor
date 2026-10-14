@@ -20,34 +20,27 @@
     internal bool IsOpen { get; private set; }
     internal double X { get; private set; }
     internal double Y { get; private set; }
-    internal int FocusedIndex { get; private set; } = -1;
+    internal int FocusedIndex => Level.FocusedIndex;
+
+    /// <summary>The menu's top list: its items for the arrow keys and its open submenu (Chatur TR-020).</summary>
+    internal MenuLevel<IContextMenuItem> Level { get; } = new();
 
     private DotNetObjectReference<ContextMenu>? objDotNetRef;
-    private List<ContextMenuItem> objMenuItems = new();
 
     protected override void OnInitialized()
     {
         objDotNetRef = DotNetObjectReference.Create(this);
     }
 
-    internal void RegisterMenuItem(ContextMenuItem item)
-    {
-        if (!objMenuItems.Contains(item))
-        {
-            objMenuItems.Add(item);
-        }
-    }
+    internal void RegisterMenuItem(IContextMenuItem item) => Level.Register(item);
 
-    internal void UnregisterMenuItem(ContextMenuItem item)
-    {
-        objMenuItems.Remove(item);
-    }
+    internal void UnregisterMenuItem(IContextMenuItem item) => Level.Unregister(item);
 
-    internal List<ContextMenuItem> GetMenuItems() => objMenuItems;
+    internal List<IContextMenuItem> GetMenuItems() => Level.Items;
 
     internal void SetFocusedIndex(int index)
     {
-        FocusedIndex = index;
+        Level.FocusedIndex = index;
         StateHasChanged();
     }
 
@@ -56,7 +49,7 @@
         X = x;
         Y = y;
         IsOpen = true;
-        FocusedIndex = -1;
+        Level.Reset();
 
         if (Open.HasValue)
         {
@@ -69,7 +62,7 @@
     internal async Task CloseAsync()
     {
         IsOpen = false;
-        FocusedIndex = -1;
+        Level.Reset();
 
         if (Open.HasValue)
         {

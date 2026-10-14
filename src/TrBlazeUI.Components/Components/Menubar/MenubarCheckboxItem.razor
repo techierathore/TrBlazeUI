@@ -6,9 +6,12 @@
      role="menuitemcheckbox"
      class="@CssClass"
      tabindex="-1"
+     aria-disabled="@(Disabled ? "true" : null)"
+     data-disabled="@(Disabled ? "" : null)"
      aria-checked="@Checked.ToString().ToLower()"
      data-state="@(Checked ? "checked" : "unchecked")"
      @onclick="HandleClick"
+     @onmouseenter="HandleMouseEnter"
      @onkeydown="HandleKeyDown"
      @onkeydown:preventDefault="true"
      @attributes="AdditionalAttributes">
@@ -36,6 +39,9 @@
     [CascadingParameter]
     public MenubarMenu? Menu { get; set; }
 
+    [CascadingParameter(Name = "MenubarLevel")]
+    private MenuLevel<IMenubarItem>? ParentLevel { get; set; }
+
     [Parameter]
     public string? Class { get; set; }
 
@@ -55,12 +61,15 @@
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private ElementReference objItemRef;
+    private MenuLevel<IMenubarItem>? objLevel;
 
     public bool IsDisabled => Disabled;
 
     protected override void OnInitialized()
     {
-        Menu?.RegisterMenuItem(this);
+        // Inside a MenubarSubContent the item belongs to that submenu's list (Chatur TR-020).
+        objLevel = ParentLevel ?? Menu?.Level;
+        objLevel?.Register(this);
     }
 
     public async Task FocusAsync()
@@ -86,6 +95,12 @@
         }
     }
 
+    // Pointing at an ordinary row closes a submenu open beside a sibling row.
+    private void HandleMouseEnter()
+    {
+        objLevel?.SetOpenSub(null);
+    }
+
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
         if (Disabled) return;
@@ -98,7 +113,7 @@
 
     public void Dispose()
     {
-        Menu?.UnregisterMenuItem(this);
+        objLevel?.Unregister(this);
     }
 
     private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(

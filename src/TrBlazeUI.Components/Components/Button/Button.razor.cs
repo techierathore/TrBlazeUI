@@ -204,16 +204,18 @@ public partial class Button : ComponentBase
         "transition-colors focus-visible:outline-none focus-visible:ring-2",
         "focus-visible:ring-ring focus-visible:ring-offset-2",
         "disabled:opacity-50 disabled:pointer-events-none",
-        // Variant-specific styles
+        // Variant-specific styles. Every variant but Outline says border-0 itself rather than
+        // leaning on Preflight's border-width:0, which a host reboot placed in a later layer
+        // outranks: filled buttons then drew a 1px hairline (Lekhak TR-006).
         Variant switch
         {
-            ButtonVariant.Default => "bg-primary text-primary-foreground hover:bg-primary/90",
-            ButtonVariant.Destructive => "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+            ButtonVariant.Default => "border-0 bg-primary text-primary-foreground hover:bg-primary/90",
+            ButtonVariant.Destructive => "border-0 bg-destructive text-destructive-foreground hover:bg-destructive/90",
             ButtonVariant.Outline => "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-            ButtonVariant.Secondary => "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-            ButtonVariant.Ghost => "hover:bg-accent hover:text-accent-foreground",
-            ButtonVariant.Link => "text-primary underline-offset-4 hover:underline",
-            _ => "bg-primary text-primary-foreground hover:bg-primary/90"
+            ButtonVariant.Secondary => "border-0 bg-secondary text-secondary-foreground hover:bg-secondary/80",
+            ButtonVariant.Ghost => "border-0 hover:bg-accent hover:text-accent-foreground",
+            ButtonVariant.Link => "border-0 text-primary underline-offset-4 hover:underline",
+            _ => "border-0 bg-primary text-primary-foreground hover:bg-primary/90"
         },
         // Size-specific styles
         Size switch

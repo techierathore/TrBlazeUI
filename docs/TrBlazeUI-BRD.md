@@ -72,18 +72,19 @@ This document captures, for the product owner, what TrBlazeUI delivers today (th
 
 Written by the status gate after every build, verify and handoff; not by hand.
 
-**Snapshot as of 2026-10-09.** Live per-requirement status: `PROJECT-STATUS.md` and the Requirements Status table in `docs/TrBlazeUI-Checklist.md`.
+**Snapshot as of 2026-10-13.** Live per-requirement status: `PROJECT-STATUS.md` and the Requirements Status table in `docs/TrBlazeUI-Checklist.md`.
 
 | Screen | Requirements | Verified | Open | Status |
 |---|---|---|---|---|
 | UI / Pages | 19 | 19 | 0 | Done |
 | Functional requirements | 10 | 10 | 0 | Done |
 | Non-functional | 5 | 5 | 0 | Done |
-| Component demos | 24 | 24 | 0 | Done |
+| Component demos | 28 | 28 | 0 | Done |
 | Editor | 1 | 1 | 0 | Done |
 | Chat | 1 | 1 | 0 | Done |
 | Run | 1 | 1 | 0 | Done |
 | Roles | 1 | 1 | 0 | Done |
+| Menubar demo | 2 | 2 | 0 | Done |
 
 ## 5. Stakeholders / users
 

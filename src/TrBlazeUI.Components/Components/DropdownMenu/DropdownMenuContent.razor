@@ -17,7 +17,9 @@
                                                             MatchTriggerWidth="@MatchTriggerWidth"
                                                             ZIndex="@ZIndex" @attributes="AdditionalAttributes">
     <div class="p-1">
-        @ChildContent
+        <CascadingValue Name="DropdownMenuLevel" Value="objLevel" IsFixed="true">
+            @ChildContent
+        </CascadingValue>
     </div>
 </TrBlazeUI.Primitives.DropdownMenu.DropdownMenuContent>
 
@@ -110,11 +112,15 @@
     [Parameter]
     public string? Style { get; set; }
 
+    // The top list's open submenu (Chatur TR-020); the arrow keys are the primitive's.
+    private readonly MenuLevel<object> objLevel = new();
+
+    // No overflow-hidden: a submenu list is drawn outside this box, beside its trigger row (Chatur TR-020).
     private string CssClass
     {
         get
         {
-            var baseClasses = "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover " +
+            var baseClasses = "z-50 min-w-[8rem] rounded-md border bg-popover " +
                             "text-popover-foreground shadow-md " +
                             "data-[state=open]:animate-in data-[state=closed]:animate-out " +
                             "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 " +

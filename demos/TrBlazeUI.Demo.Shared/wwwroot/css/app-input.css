@@ -14,14 +14,9 @@
 @source "../../../src/TrBlazeUI.Primitives";
 @source "../../../src/TrBlazeUI.Icons";
 
-/* Component structural variables (not part of replaceable theme) */
-@layer base {
-  :root {
-    --sidebar-width: 16rem;
-    --sidebar-width-mobile: 18rem;
-    --sidebar-width-icon: 3rem;
-  }
-}
+/* The sidebar width tokens come from trblazeui.css, declared through :where(:root) so a host value
+ * always wins (Lekhak TR-004). The demo used to repeat them here in a plain :root, which is exactly
+ * the host override that pattern makes possible, and which hid the library's own declaration. */
 
 /* Custom styles for keyboard navigation focus */
 /* HEADLESS DESIGN: Use data attributes instead of CSS classes */

@@ -1,0 +1,112 @@
+@namespace TrBlazeUI.Components.DropdownMenu
+@implements IDisposable
+
+@* A submenu inside a dropdown menu (Chatur TR-020): holds a DropdownMenuSubTrigger and a
+   DropdownMenuSubContent, and may sit inside another DropdownMenuSubContent to any depth. *@
+<div class="relative" data-slot="dropdown-menu-sub" @attributes="AdditionalAttributes">
+    <CascadingValue Value="this" IsFixed="false">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+@code {
+    [CascadingParameter(Name = "DropdownMenuLevel")]
+    private MenuLevel<object>? ParentLevel { get; set; }
+
+    /// <summary>
+    /// Gets or sets the trigger row and the list that opens beside it.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes forwarded to the wrapper element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private MenuLevel<object>? objHostLevel;
+    private bool objFocusFirstPending;
+    private readonly string objId = Guid.NewGuid().ToString("N");
+
+    /// <summary>Gets the submenu's own list, which tracks its open submenu.</summary>
+    internal MenuLevel<object> ChildLevel { get; } = new();
+
+    /// <summary>Gets or sets the trigger row, set by DropdownMenuSubTrigger.</summary>
+    internal DropdownMenuSubTrigger? Trigger { get; set; }
+
+    internal string TriggerId => $"dropdown-menu-sub-trigger-{objId}";
+
+    internal string ContentId => $"dropdown-menu-sub-content-{objId}";
+
+    internal bool IsOpen => objHostLevel != null && ReferenceEquals(objHostLevel.OpenSub, this);
+
+    protected override void OnInitialized()
+    {
+        objHostLevel = ParentLevel;
+        if (objHostLevel != null)
+        {
+            objHostLevel.OpenSubChanged += HandleOpenSubChanged;
+        }
+    }
+
+    /// <summary>Opens this submenu and closes any sibling.</summary>
+    internal void Open() => objHostLevel?.SetOpenSub(this);
+
+    /// <summary>Opens this submenu and moves the focus to its first enabled item once it is drawn.</summary>
+    internal void OpenAndFocusFirst()
+    {
+        objFocusFirstPending = true;
+        if (IsOpen)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        Open();
+    }
+
+    /// <summary>Tells DropdownMenuSubContent, once, that it should focus its first item.</summary>
+    /// <returns>Whether the focus should move.</returns>
+    internal bool TakeFocusFirst()
+    {
+        var vPending = objFocusFirstPending;
+        objFocusFirstPending = false;
+        return vPending;
+    }
+
+    /// <summary>Closes this submenu and puts the focus back on its trigger row.</summary>
+    /// <returns>A task that completes when the trigger has the focus.</returns>
+    internal async Task CloseAndFocusTriggerAsync()
+    {
+        if (IsOpen)
+        {
+            objHostLevel?.SetOpenSub(null);
+        }
+
+        if (Trigger != null)
+        {
+            await Trigger.FocusAsync();
+        }
+    }
+
+    private void HandleOpenSubChanged()
+    {
+        if (!IsOpen)
+        {
+            ChildLevel.Reset();
+            objFocusFirstPending = false;
+        }
+
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        if (objHostLevel != null)
+        {
+            objHostLevel.OpenSubChanged -= HandleOpenSubChanged;
+            objHostLevel.Forget(this);
+        }
+    }
+}

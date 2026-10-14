@@ -1,0 +1,136 @@
+@namespace TrBlazeUI.Components.Menubar
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+@* The list a submenu opens beside its trigger row (Chatur TR-020). ArrowLeft or Escape closes it
+   and puts the focus back on the row; it opens on the left when the right has no room. *@
+@if (Sub?.IsOpen == true)
+{
+    <div @ref="objListRef"
+         id="@Sub.ContentId"
+         role="menu"
+         aria-labelledby="@Sub.TriggerId"
+         tabindex="-1"
+         class="@CssClass"
+         data-state="open"
+         data-side="@objSide"
+         data-slot="menubar-sub-content"
+         @onkeydown="HandleKeyDown"
+         @onkeydown:stopPropagation="true"
+         @onkeydown:preventDefault="true"
+         @attributes="AdditionalAttributes">
+        <CascadingValue Name="MenubarLevel" Value="Sub.ChildLevel" IsFixed="false">
+            @ChildContent
+        </CascadingValue>
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    private MenubarSub? Sub { get; set; }
+
+    [CascadingParameter]
+    private Menubar? Context { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional CSS classes for the list.
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Gets or sets the list's items: MenubarItem, MenubarCheckboxItem, MenubarLabel,
+    /// MenubarSeparator, or another MenubarSub.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether ArrowDown on the last item wraps to the first. Default is true.
+    /// </summary>
+    [Parameter]
+    public bool Loop { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets additional HTML attributes forwarded to the list element.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private readonly SubmenuPlacer objPlacer = new();
+    private ElementReference objListRef;
+    private bool objWasClosed = true;
+    private string objSide = "right";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Sub?.IsOpen != true)
+        {
+            objWasClosed = true;
+            objSide = "right";
+            return;
+        }
+
+        if (objWasClosed)
+        {
+            objWasClosed = false;
+            var vSide = await objPlacer.FitAsync(JSRuntime, objListRef);
+            if (vSide != objSide)
+            {
+                objSide = vSide;
+                StateHasChanged();
+            }
+        }
+
+        if (Sub.TakeFocusFirst())
+        {
+            var vItem = Sub.ChildLevel.Move("Home", Loop, aItem => aItem.IsDisabled);
+            if (vItem != null)
+            {
+                await vItem.FocusAsync();
+            }
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (Sub == null)
+        {
+            return;
+        }
+
+        switch (e.Key)
+        {
+            case "ArrowLeft":
+            case "Escape":
+                await Sub.CloseAndFocusTriggerAsync();
+                break;
+
+            case "ArrowRight":
+                if (Sub.ChildLevel.Focused is MenubarSubTrigger vTrigger)
+                {
+                    vTrigger.OpenFromKeyboard();
+                }
+                else
+                {
+                    Context?.NavigateToNextMenu();
+                }
+                break;
+
+            default:
+                var vItem = Sub.ChildLevel.Move(e.Key, Loop, aItem => aItem.IsDisabled);
+                if (vItem != null)
+                {
+                    await vItem.FocusAsync();
+                }
+                break;
+        }
+    }
+
+    public ValueTask DisposeAsync() => objPlacer.DisposeAsync();
+
+    private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(
+        SubmenuPlacer.ListClasses,
+        Class
+    );
+}
