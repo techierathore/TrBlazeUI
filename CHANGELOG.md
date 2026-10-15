@@ -11,6 +11,17 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
+### Build Validation restore failure — fixed on 2026-10-15
+
+#### Security
+
+- **The demo apps move to ASP.NET Core 10.0.13** (`Microsoft.AspNetCore.Components.WebAssembly.Server`,
+  `WebAssembly`, `WebAssembly.DevServer`, `Web`). 10.0.3 carries the high-severity advisories
+  GHSA-g27p-qf6j-c96c and GHSA-qjpx-jqm5-h2c4 (published 2026-10-13), which failed CI's restore with
+  NU1903 (`docs/CI-Issues.md` CI-002). The library packages are unchanged and still need 10.0.3 or
+  later. Apps on the WebAssembly or Auto render mode should move their own
+  `Microsoft.AspNetCore.Components.WebAssembly.Server` reference to 10.0.13.
+
 ### Lekhak TR-007 — built on 2026-10-15, after 2.1.7
 
 Answers the entry Lekhak filed on 2026-10-12 and re-checked on 2.1.7

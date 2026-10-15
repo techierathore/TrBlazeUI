@@ -10,10 +10,10 @@ last_verified_date: 2026-10-15
 
 ## Where I am
 
-Lekhak re-checked on 2.1.7 and closed TR-002, TR-003, TR-004 and TR-006. Lekhak TR-007 is fixed
-(REQ-UI-052, verified 2026-10-15): the reference's InputGroup example no longer nests a button,
-and InputGroupButton forwards its attributes. CHANGELOG, the agent reference, the guides and both
-copies of the Lekhak reply describe it. It ships in the release after 2.1.7. All 69 rows are
+Build Validation run 38773955449 failed restore: the demos' ASP.NET Core 10.0.3 packages hit two
+advisories published 2026-10-13. The demos now use 10.0.13, the clean-cache CI reproduction
+passes, and a new test reads advisories fresh (REQ-NFR-005 verified). Lekhak TR-007 is fixed and
+verified (REQ-UI-052). CHANGELOG, the guides and CI-Issues CI-002 describe both. All 69 rows are
 verified.
 
 ## Next command to run
@@ -42,8 +42,9 @@ Why: every row in this phase's scope is terminal and the shipped documents were 
 
 ## Known blockers
 
-- Lekhak TR-007 reaches the feed only when the owner commits and cuts the next GitHub Release; agents cannot run git. Lekhak's re-check waits on it.
-- CHANGELOG `[Unreleased]` still holds entries that shipped by 2.1.6 and 2.1.7; the owner moves them under their release headings.
+- The CI fix is proven on a clean local copy only; the owner's next push to `Dev` is the final check. Agents cannot run git.
+- Lekhak TR-007 reaches the feed only when the owner cuts the next release.
+- CHANGELOG `[Unreleased]` still holds entries that shipped by 2.1.6 and 2.1.7; the owner moves them.
 
 ## Verification log
 
@@ -51,11 +52,11 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 | Date | Phase | Result | Status table |
 |---|---|---|---|
-| 2026-10-08 | triage-and-fix | 61/61 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-09 | triage-and-fix + handoff | 62/62 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-09 | triage-and-fix + handoff | 66/66 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-13 | triage-and-fix + handoff | 68/68 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-15 | triage-and-fix + handoff | 69/69 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-10-15 | fix-issues + handoff | 69/69 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 
@@ -68,9 +69,9 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 ## Deferred / future
 
 - REQ-UI-030 to 052 and REQ-FN-012 extend BRD items; `*amend-docs` can split them.
+- Dark Destructive Button text is 2.77:1, under 3:1.
 - InputGroup demo menu items only log; show the choice.
 - A container-width `HideBelow`, if Chatur asks.
-- Tinting `ToastService.Success()` is a later behaviour change.
 - No test forces the portal-timeout inline fallback.
 - The framework's `Virtualize` throws on dispose; not fixable here.
 - `tools/splat-audit` throws on the library alone; report `ApexChart.Dispose` upstream.

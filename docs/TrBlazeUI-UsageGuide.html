@@ -134,6 +134,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
+        <li class="h3"><a href="#added-2026-10-15-asp-net-core-advisories-req-nfr-005">Added 2026-10-15 (ASP.NET Core advisories — REQ-NFR-005)</a></li>
         <li class="h3"><a href="#added-2026-10-15-lekhak-tr-007-req-ui-052-not-yet-released">Added 2026-10-15 (Lekhak TR-007 — REQ-UI-052 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-13-chatur-tr-020-tr-021-req-ui-050-req-ui-051-not-yet-released">Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-09-lekhak-tr-002-tr-006-req-ui-047-req-ui-049-req-fn-012-not-yet-released">Added 2026-10-09 (Lekhak TR-002…TR-006 — REQ-UI-047…REQ-UI-049, REQ-FN-012 — not yet released)</a></li>
@@ -183,6 +184,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
+        <li class="h3"><a href="#added-2026-10-15-asp-net-core-advisories-req-nfr-005">Added 2026-10-15 (ASP.NET Core advisories — REQ-NFR-005)</a></li>
         <li class="h3"><a href="#added-2026-10-15-lekhak-tr-007-req-ui-052-not-yet-released">Added 2026-10-15 (Lekhak TR-007 — REQ-UI-052 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-13-chatur-tr-020-tr-021-req-ui-050-req-ui-051-not-yet-released">Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-09-lekhak-tr-002-tr-006-req-ui-047-req-ui-049-req-fn-012-not-yet-released">Added 2026-10-09 (Lekhak TR-002…TR-006 — REQ-UI-047…REQ-UI-049, REQ-FN-012 — not yet released)</a></li>
@@ -438,6 +440,11 @@ bash tests/package/codex-agent-deployment.sh</code></pre>
 </li>
 </ul>
 <h2 id="consumer-integration-notes">Consumer integration notes<a class="anchor-link" href="#consumer-integration-notes">#</a></h2>
+<h3 id="added-2026-10-15-asp-net-core-advisories-req-nfr-005"><a id="added-2026-10-15-aspnet-core-advisories--req-nfr-005"></a>Added 2026-10-15 (ASP.NET Core advisories — REQ-NFR-005)<a class="anchor-link" href="#added-2026-10-15-asp-net-core-advisories-req-nfr-005">#</a></h3>
+<ul>
+<li><strong>⚠ WebAssembly and Auto apps: move <code>Microsoft.AspNetCore.Components.WebAssembly.Server</code> to 10.0.13.</strong> 10.0.0 to 10.0.12 carry GHSA-g27p-qf6j-c96c and GHSA-qjpx-jqm5-h2c4; with warnings as errors, restore fails with NU1903. The TrBlazeUI packages need no change.
+</li>
+</ul>
 <h3 id="added-2026-10-15-lekhak-tr-007-req-ui-052-not-yet-released"><a id="added-2026-10-15-lekhak-tr-007--req-ui-052--not-yet-released"></a>Added 2026-10-15 (Lekhak TR-007 — REQ-UI-052 — not yet released)<a class="anchor-link" href="#added-2026-10-15-lekhak-tr-007-req-ui-052-not-yet-released">#</a></h3>
 <ul>
 <li><strong><code>InputGroupButton</code> is the button</strong>: <code>&lt;InputGroupAddon Align="InputGroupAlign.InlineEnd"&gt;&lt;InputGroupButton OnClick="Go"&gt;Go&lt;/InputGroupButton&gt;&lt;/InputGroupAddon&gt;</code>. Never put a <code>&lt;Button&gt;</code> inside it; that nests two buttons. Attributes such as <code>title</code> and <code>data-testid</code> now reach its <code>&lt;button&gt;</code>.

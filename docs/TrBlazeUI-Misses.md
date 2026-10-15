@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | App | TrBlazeUI |
-| Count | 81 logged: 10 open, 64 fixed, 0 will not fix, 7 withdrawn |
+| Count | 82 logged: 10 open, 65 fixed, 0 will not fix, 7 withdrawn |
 | Source | `docs/metrics/misses.jsonl`, one row per miss record. Rewritten by `tf-misses-md.sh` on every new record. Never edit it: a wrong row is corrected by a new record. |
 | Updated | 2026-10-15 |
 
@@ -24,10 +24,11 @@
 | MISS-TrBlazeUI-20260912-09 (REQ-UI-008) | 2026-09-12 by owner | the check was too weak | TfLens TR-028 (High, reproduced live on /charts/bar @1280): BarChart exposes no axis, grid or data-label control and no route to ApexChartOptions, so a chart cannot be made to match an approved design. Measured: 32 .apexcharts-gridline and 30 .apexcharts-yaxis-label rendered with no parameter to tur |
 | MISS-TrBlazeUI-20260912-08 (REQ-UI-020) | 2026-09-12 by owner | the app's spec | TfLens post-2.1.0 consumer-feedback fixes (TR-028…TR-035) |
 
-## Fixed (64)
+## Fixed (65)
 
 | Miss | Found | Closed | Whose gap | What went wrong |
 |---|---|---|---|---|
+| MISS-TrBlazeUI-20261015-02 (REQ-NFR-005) | 2026-10-15 by owner | 2026-10-15 by fix-issues | the check was too weak | CI run 38773955449 (Build Validation, Dev, ce677f4) fails at Restore: NU1903 — Microsoft.AspNetCore.Components.WebAssembly.Server 10.0.3 has high-severity advisories GHSA-g27p-qf6j-c96c and GHSA-qjpx-jqm5-h2c4 (published 2026-10-13; patched 10.0.13) |
 | MISS-TrBlazeUI-20261015-01 (REQ-UI-052) | 2026-10-15 by owner | 2026-10-15 by fix-issues | the app's spec | InputGroupButton is the button itself: the reference shows one button, and its attributes reach it (Lekhak TR-007) |
 | MISS-TrBlazeUI-20261013-02 (REQ-UI-051) | 2026-10-13 by owner | 2026-10-13 by fix-issues | the app's spec | A disabled menu item renders aria-disabled and data-disabled (Chatur TR-021) |
 | MISS-TrBlazeUI-20261013-01 (REQ-UI-050) | 2026-10-13 by owner | 2026-10-13 by fix-issues | the app's spec | Menubar, DropdownMenu and ContextMenu submenus: Sub, SubTrigger and SubContent, nestable three levels (Chatur TR-020) |

@@ -503,4 +503,24 @@ test.describe('Non-functional requirements', () => {
     expect(props, 'warnings are errors').toMatch(/<TreatWarningsAsErrors>true<\/TreatWarningsAsErrors>/i);
     expect(props, 'code style is enforced in the build').toMatch(/<EnforceCodeStyleInBuild>true<\/EnforceCodeStyleInBuild>/i);
   });
+
+  test('REQ-NFR-005 no package in the solution has a known advisory, read fresh from the feed', () => {
+    // A local build restores with the machine's cached advisory data, so it stayed green while CI's
+    // empty cache failed NU1903 on WebAssembly.Server 10.0.3 (run 38773955449, advisories published
+    // 2026-10-13). An empty HTTP cache makes this read today's advisories, as a fresh runner does.
+    test.setTimeout(300_000);
+    const vHome = process.env.HOME ?? '';
+    const vDotnet = fs.existsSync(path.join(vHome, '.dotnet/dotnet')) ? path.join(vHome, '.dotnet/dotnet') : 'dotnet';
+    fs.mkdirSync(path.join(REPO, 'tests/.artifacts'), { recursive: true });
+    const vCache = fs.mkdtempSync(path.join(REPO, 'tests/.artifacts/nuget-http-'));
+    let vOutput = '';
+    try {
+      vOutput = execFileSync(vDotnet, ['list', 'TrBlazeUI.sln', 'package', '--vulnerable', '--include-transitive'],
+        { cwd: REPO, encoding: 'utf8', env: { ...process.env, NUGET_HTTP_CACHE_PATH: vCache } });
+    } finally {
+      fs.rmSync(vCache, { recursive: true, force: true });
+    }
+    expect(vOutput, 'every project was read').toMatch(/TrBlazeUI\.Components/);
+    expect(vOutput, 'no project lists a vulnerable package').not.toMatch(/has the following vulnerable packages/);
+  });
 });

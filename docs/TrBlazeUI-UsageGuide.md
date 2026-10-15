@@ -146,6 +146,10 @@ bash tests/package/codex-agent-deployment.sh
 
 ## Consumer integration notes
 
+### Added 2026-10-15 (ASP.NET Core advisories — REQ-NFR-005)
+
+- **⚠ WebAssembly and Auto apps: move `Microsoft.AspNetCore.Components.WebAssembly.Server` to 10.0.13.** 10.0.0 to 10.0.12 carry GHSA-g27p-qf6j-c96c and GHSA-qjpx-jqm5-h2c4; with warnings as errors, restore fails with NU1903. The TrBlazeUI packages need no change.
+
 ### Added 2026-10-15 (Lekhak TR-007 — REQ-UI-052 — not yet released)
 
 - **`InputGroupButton` is the button**: `<InputGroupAddon Align="InputGroupAlign.InlineEnd"><InputGroupButton OnClick="Go">Go</InputGroupButton></InputGroupAddon>`. Never put a `<Button>` inside it; that nests two buttons. Attributes such as `title` and `data-testid` now reach its `<button>`.

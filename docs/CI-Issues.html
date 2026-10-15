@@ -106,13 +106,50 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout no-toc">
   <main>
     <h1>TrBlazeUI — CI / release pipeline issues</h1>
-    <div class="subtitle">Rendered 2026-09-12 &middot; source <code>CI-Issues.md</code></div>
+    <div class="subtitle">Rendered 2026-10-15 &middot; source <code>CI-Issues.md</code></div>
 
+    <div class="toc-inline">
+      <div>Contents</div>
+      <ol>
+        <li><a href="#ci-002-restore-fails-on-new-asp-net-core-advisories-against-the-demos-10-0-3-packages-2026-10-15">CI-002 — restore fails on new ASP.NET Core advisories against the demos&#x27; 10.0.3 packages (2026-10-15)</a></li>
+        <li class="h3"><a href="#reproduced">Reproduced</a></li>
+        <li class="h3"><a href="#root-cause">Root cause</a></li>
+        <li class="h3"><a href="#fixed">Fixed</a></li>
+        <li><a href="#ci-001-a-release-tag-with-any-prefix-other-than-v-kills-the-publish-2026-09-12">CI-001 — a release tag with any prefix other than v kills the publish (2026-09-12)</a></li>
+        <li class="h3"><a href="#the-log-as-handed-over">The log, as handed over</a></li>
+        <li class="h3"><a href="#reproduced-2">Reproduced</a></li>
+        <li class="h3"><a href="#root-cause-2">Root cause</a></li>
+        <li class="h3"><a href="#fixed-2">Fixed</a></li>
+      </ol>
+    </div>
 <p>Pipeline defects reported from a GitHub Actions run log, as opposed to the consumer feedback
 files (<code>docs/&lt;Consumer&gt;-TrBlazeUI-Feedback.md</code>) and the component issue reports. One dated entry
 per report, newest first, with the log as it was handed over.</p>
 <hr>
-<h2 id="ci-001-a-release-tag-with-any-prefix-other-than-v-kills-the-publish-2026-09-12">CI-001 — a release tag with any prefix other than <code>v</code> kills the publish (2026-09-12)<a class="anchor-link" href="#ci-001-a-release-tag-with-any-prefix-other-than-v-kills-the-publish-2026-09-12">#</a></h2>
+<h2 id="ci-002-restore-fails-on-new-asp-net-core-advisories-against-the-demos-10-0-3-packages-2026-10-15"><a id="ci-002--restore-fails-on-new-aspnet-core-advisories-against-the-demos-1003-packages-2026-10-15"></a>CI-002 — restore fails on new ASP.NET Core advisories against the demos' 10.0.3 packages (2026-10-15)<a class="anchor-link" href="#ci-002-restore-fails-on-new-asp-net-core-advisories-against-the-demos-10-0-3-packages-2026-10-15">#</a></h2>
+<p><strong>Reported by:</strong> the owner, from run <a href="https://github.com/techierathore/TrBlazeUI/actions/runs/38773955449">38773955449</a> (Build Validation, <code>Dev</code>, <code>ce677f4</code>).
+<strong>Workflow:</strong> <code>.github/workflows/build.yml</code>, step <em>Restore dependencies</em>; <em>Build solution</em> was skipped.</p>
+<h3 id="reproduced">Reproduced<a class="anchor-link" href="#reproduced">#</a></h3>
+<p><code>bash .tfcore/utils/tf-ci-repro.sh .github/workflows/build.yml</code> on a clean copy with empty caches:</p>
+<pre><code>error NU1903: Warning As Error: Package 'Microsoft.AspNetCore.Components.WebAssembly.Server' 10.0.3
+has a known high severity vulnerability, https://github.com/advisories/GHSA-g27p-qf6j-c96c</code></pre>
+<p>The same for GHSA-qjpx-jqm5-h2c4. Both advisories were published on 2026-10-13 and cover 10.0.0
+to 10.0.12; 10.0.13 is patched.</p>
+<h3 id="root-cause">Root cause<a class="anchor-link" href="#root-cause">#</a></h3>
+<p>The demo projects pinned the ASP.NET Core packages at 10.0.3. <code>TreatWarningsAsErrors</code> turns
+NuGet's audit warning NU1903 into an error. The local build stayed green because its restore used
+advisory data the machine had cached before 2026-10-13.</p>
+<h3 id="fixed">Fixed<a class="anchor-link" href="#fixed">#</a></h3>
+<ul>
+<li>The demos' <code>Microsoft.AspNetCore.Components.*</code> packages (<code>WebAssembly.Server</code>, <code>WebAssembly</code>, <code>WebAssembly.DevServer</code>, <code>Web</code>) move to 10.0.13 together. The five library packages keep their 10.0.3 minimum: they never reference <code>WebAssembly.Server</code>, and the consumer's own app picks its ASP.NET Core version.
+</li>
+<li><code>tests/verify/req-fn.spec.ts</code> gains a REQ-NFR-005 test that runs <code>dotnet list TrBlazeUI.sln package --vulnerable --include-transitive</code> with an empty NuGet HTTP cache. A local run now reads today's advisories, the way a fresh runner does.
+</li>
+<li><code>tf-ci-repro.sh</code> passes on empty caches: restore, then a Release build with 0 warnings. The owner's next push is the final check.
+</li>
+</ul>
+<hr>
+<h2 id="ci-001-a-release-tag-with-any-prefix-other-than-v-kills-the-publish-2026-09-12"><a id="ci-001--a-release-tag-with-any-prefix-other-than-v-kills-the-publish-2026-09-12"></a>CI-001 — a release tag with any prefix other than <code>v</code> kills the publish (2026-09-12)<a class="anchor-link" href="#ci-001-a-release-tag-with-any-prefix-other-than-v-kills-the-publish-2026-09-12">#</a></h2>
 <p><strong>Reported by:</strong> the owner, from the failed Actions run.
 <strong>Workflow:</strong> <code>.github/workflows/publish-github-packages.yml</code>, step <em>Determine package version</em>.
 <strong>Tag:</strong> <code>c2.0.5</code> (a stray <code>c</code> where <code>v2.0.5</code> was meant).
@@ -127,7 +164,7 @@ Line |
      | Invalid semver version 'c2.0.5' (from release tag 'c2.0.5'). Expected MAJOR.MINOR.PATCH with an optional
      | pre-release suffix, e.g. 1.10.0 or v1.10.0-beta.1
 Error: Process completed with exit code 1.</code></pre>
-<h3 id="reproduced">Reproduced<a class="anchor-link" href="#reproduced">#</a></h3>
+<h3 id="reproduced-2"><a id="reproduced-1"></a>Reproduced<a class="anchor-link" href="#reproduced-2">#</a></h3>
 <p>The step's own script was lifted verbatim into
 <code>tests/.artifacts/verify/tagver/repro-before.ps1</code> (run material, swept after 7 days — the durable
 form of these cases is <code>tests/version/TagVersion.Tests.ps1</code>) and run on pwsh 7, the same shell the
@@ -145,7 +182,7 @@ workflow uses. It reproduces the owner's message character for character:</p>
 <tr><td><code>v2.1.1-beta.1</code></td><td>2.1.1-beta.1</td></tr>
 </tbody>
 </table>
-<h3 id="root-cause">Root cause<a class="anchor-link" href="#root-cause">#</a></h3>
+<h3 id="root-cause-2"><a id="root-cause-1"></a>Root cause<a class="anchor-link" href="#root-cause-2">#</a></h3>
 <p><code>$ver = $tag -replace '^v', ''</code> strips a single leading <code>v</code> and nothing else, so any other
 prefix survives into the semver gate and the step throws. Two consequences, only the first of
 which the owner saw:</p>
@@ -157,7 +194,7 @@ which the owner saw:</p>
 </ol>
 <p>The thrown message also named neither the fix nor the fact that the release itself has to be
 re-cut.</p>
-<h3 id="fixed">Fixed<a class="anchor-link" href="#fixed">#</a></h3>
+<h3 id="fixed-2"><a id="fixed-1"></a>Fixed<a class="anchor-link" href="#fixed-2">#</a></h3>
 <p><code>scripts/TagVersion.ps1</code> — one shared <code>ConvertTo-PackageVersion</code>, dot-sourced by both publish
 workflows, replacing the two drifted copies of the parsing rule. It strips <strong>any</strong> leading
 non-digit prefix, warns in the run summary when that prefix is not the standard <code>v</code>, keeps the
