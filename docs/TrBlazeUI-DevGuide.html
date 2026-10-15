@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="sub">Last rendered: 2026-10-13</div>
+    <div class="sub">Last rendered: 2026-10-15</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#table-of-contents">Table of Contents</a></li>
@@ -126,7 +126,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="subtitle">Rendered 2026-10-13 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
+    <div class="subtitle">Rendered 2026-10-15 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -146,7 +146,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li class="h3"><a href="#earlier-sampled-key-screens-2026-06-30-datatable-png-recaptured-2026-07-21">6.2 Earlier sampled key screens (2026-06-30; datatable.png recaptured 2026-07-21)</a></li>
       </ol>
     </div>
-<p><strong>Last updated:</strong> 2026-10-07 (handoff — as-built source)
+<p><strong>Last updated:</strong> 2026-10-15 (triage-and-fix + handoff — Lekhak TR-007, InputGroup)
 <strong>Verification status:</strong> ✅ <strong>RUNTIME-VERIFIED.</strong> On <strong>2026-10-07</strong> the anonymous demo visitor drove the 11 screens of the Chatur controls (§3, Chatur screens) at 1366 and 390 wide: all render, 0 console errors, 0 sideways scroll. Before that, the visitor drove the 8 screens changed by the TfLens passes on <strong>2026-09-13</strong> at 1366 and 390 wide, plus the phone menu at 390: all render, 0 console errors, 0 sideways scroll (screenshots in §6.3). Acceptance suite 33/33; Release build <strong>0 warnings / 0 errors</strong>. Earlier screens were last runtime-verified on 2026-08-25.</p>
 <blockquote>
 <p><strong>What this document is.</strong> The screen-by-screen, as-built map a developer uses to chase a bug or catch AI-hallucinated code. TrBlazeUI is a <strong>component library with a demo application</strong> and has <strong>no database, no API, no stored procedures, and no auth</strong> — so the usual <em>page → service → data-access → proc</em> lineage collapses to <strong>demo page → demo-shared composition → library component → primitive → JS interop / service</strong>. There is exactly one role: the <strong>anonymous demo visitor</strong>.</p>
@@ -311,6 +311,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>DataTable</td><td><code>/components/datatable</code></td><td><code>Pages/Components/DataTableDemo.razor</code></td><td><code>DataTable</code> (<code>RowAttributes</code>/<code>HeaderRowAttributes</code>/<code>SelectAllAttributes</code> 2.1.0, <code>SelectedCount</code> 2.0.9), <code>DataTableColumn.HideBelow</code> (after 2.1.4, Chatur TR-019, section <code>req-ui-046</code>)</td><td>renders at 1366 and 390; at 390 the <code>req-ui-046-table</code> grid shows Name and Status only, at 700 Email returns, at 1280 all four</td></tr>
 <tr><td>Button</td><td><code>/components/button</code></td><td><code>Pages/Components/ButtonDemo.razor</code></td><td><code>Button</code> (<code>border-0</code> on every variant but Outline, after 2.1.6, Lekhak TR-006)</td><td>renders at 1280; under a host <code>button { border }</code> rule in <code>trblazeui-host</code>, filled buttons 0px, Outline 1px in <code>--input</code></td></tr>
 <tr><td>Sidebar</td><td><code>/components/sidebar</code></td><td><code>Pages/Components/SidebarDemo.razor</code></td><td><code>--sidebar-width*</code> from <code>trblazeui.css</code> <code>:where(:root)</code> only (after 2.1.6, Lekhak TR-004)</td><td>renders at 1280; sidebar 256px; a host <code>html { --sidebar-width }</code> wins</td></tr>
+<tr><td>InputGroup (2026-10-15)</td><td><code>/components/input-group</code></td><td><code>Pages/Components/InputGroupDemo.razor</code></td><td><code>InputGroupButton</code> → <code>Button</code> (one <code>&lt;button&gt;</code>; unmatched attributes forwarded after 2.1.7, Lekhak TR-007), section <code>ig-reference-example</code></td><td>renders at 1280 in light and dark; no <code>button button</code> on the page; Go carries <code>ig-reference-go</code>, <code>title</code> and <code>aria-label</code> (req-ui-052.spec.ts)</td></tr>
 <tr><td>Tree View</td><td><code>/components/tree-view</code></td><td><code>Pages/Components/TreeViewDemo.razor</code></td><td><code>TreeView</code>, <code>TreeItem</code> (2.0.8)</td><td>renders at 1366 and 390</td></tr>
 <tr><td>Diff View</td><td><code>/components/diff-view</code></td><td><code>Pages/Components/DiffViewDemo.razor</code></td><td><code>DiffView</code>, <code>TextDiff</code> (2.0.8)</td><td>renders at 1366 and 390</td></tr>
 <tr><td>Log View</td><td><code>/components/log-view</code></td><td><code>Pages/Components/LogViewDemo.razor</code></td><td><code>LogView</code> (2.0.9)</td><td>renders at 1366 and 390</td></tr>
@@ -325,6 +326,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <p>Call chain (host CSS, Lekhak TR-002/TR-004): <code>App.razor</code> / <code>index.html</code> <code>&lt;head&gt;</code> links <code>_content/TrBlazeUI.Components/trblazeui-layers.css</code> <strong>first</strong> (it fixes the layer order <code>properties, theme, base, trblazeui-host, components, utilities</code> before the demo's own Tailwind-built <code>app.css</code> and <code>trblazeui.css</code> name theirs) → host CSS in <code>trblazeui-host</code> → Preflight (<code>base</code>) loses to it, <code>components</code>/<code>utilities</code> win over it. The sidebar width tokens come only from <code>trblazeui-input.css</code> <code>:where(:root)</code>; the demo's <code>app-input.css</code> no longer repeats them.</p>
 <p>Call chain (submenu, Chatur TR-020): <code>MenubarSubTrigger</code> hover/click → <code>MenubarSub.Open</code> → the parent list's <code>MenuLevel.SetOpenSub(this)</code> → <code>OpenSubChanged</code> → every sibling <code>MenubarSub</code> re-renders → <code>MenubarSubContent</code> draws its list → <code>OnAfterRenderAsync</code> → <code>SubmenuPlacer.FitAsync</code> (<code>submenu.js</code> <code>fitSide</code>, <code>data-side="left"</code> when the right has no room). Keyboard: ArrowRight reaches <code>MenubarContent</code>/<code>MenubarSubContent.HandleKeyDown</code>, which opens the focused <code>MenubarSubTrigger</code> (<code>OpenFromKeyboard</code> → <code>OpenAndFocusFirst</code>); ArrowLeft/Escape in a <code>…SubContent</code> → <code>MenubarSub.CloseAndFocusTriggerAsync</code>. Items find their list through the <code>MenubarLevel</code> cascade, else the menu's own <code>Level</code>. <code>ContextMenu…</code> is the same shape (<code>ContextMenuLevel</code> cascade); <code>DropdownMenu…</code> tracks only the open submenu (<code>DropdownMenuLevel</code>) and moves focus with <code>keyboard-nav.js</code>, which counts only the rows whose nearest <code>role="menu"</code> is the list.</p>
 <p>Call chain (disabled menu item, Chatur TR-021): <code>MenubarItem</code>/<code>MenubarCheckboxItem</code>/<code>ContextMenuItem</code> <code>Disabled</code> → <code>aria-disabled="true"</code> + <code>data-disabled</code> on the row, beside the existing <code>pointer-events-none opacity-50</code>.</p>
+<p>Call chain (input-group button, Lekhak TR-007): <code>InputGroupButton.razor</code> → one <code>&lt;Button&gt;</code> with <code>CssClass</code> (<code>!border-0 !shadow-none !h-auto !text-sm</code>) and <code>@attributes="AdditionalAttributes"</code> → <code>Button.razor</code> <code>&lt;button … @attributes&gt;</code>. It is the button, so a <code>&lt;Button&gt;</code> inside it nests two; inside <code>DropdownMenuTrigger AsChild</code> it picks up the trigger's <code>TriggerContext</code> through <code>Button</code>.</p>
 <p>Call chain (step icon): <code>StepperItem.razor</code> marker <code>&lt;span data-slot="stepper-item-marker"&gt;</code> → <code>Icon</code> when set, else <code>MarkerText</code> → <code>MarkerCssClass</code> adds <code>[&amp;_svg]:size-4</code>.</p>
 <p>Call chain (badge colour): <code>Badge.razor.cs</code> <code>CssClass</code> → <code>ClassNames.cn</code> → <code>TailwindMerge.Merge</code> → <code>ComputeBaseUtilityGroup</code> → <code>TextColorRegex</code> (hyphenated colours are one group).</p>
 <p><strong>Where to break</strong></p>
@@ -355,6 +357,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td><code>src/TrBlazeUI.Components/wwwroot/js/submenu.js:12</code></td><td><code>fitSide</code></td><td>return value</td><td><code>"left"</code> only when the list runs past the window's right edge</td></tr>
 <tr><td><code>src/TrBlazeUI.Primitives/wwwroot/js/primitives/keyboard-nav.js:36</code></td><td><code>getMenuItemsInDomOrder</code></td><td><code>menu</code></td><td>the list being navigated; rows of an open submenu inside it are not counted</td></tr>
 <tr><td><code>src/TrBlazeUI.Components/Components/Menubar/MenubarItem.razor:9</code></td><td>row markup</td><td><code>aria-disabled</code></td><td><code>"true"</code> when <code>Disabled</code>, absent otherwise</td></tr>
+<tr><td><code>src/TrBlazeUI.Components/Components/InputGroup/InputGroupButton.razor:14</code></td><td><code>@attributes</code> on the inner <code>Button</code></td><td><code>AdditionalAttributes</code></td><td>the caller's <code>title</code>, <code>data-testid</code>, <code>aria-*</code>; they land on the one <code>&lt;button&gt;</code></td></tr>
+<tr><td><code>demos/TrBlazeUI.Demo.Shared/Pages/Components/InputGroupDemo.razor:465</code></td><td><code>RunSearch</code></td><td><code>objLastSearch</code></td><td>the text typed in the reference example's input after Go is pressed</td></tr>
 </tbody>
 </table>
 <p>Screenshots: <code>screenshots/TrBlazeUI/code-editor.png</code>, <code>stepper.png</code>, <code>badge.png</code> and their <code>-mobile</code> versions (§6).</p>

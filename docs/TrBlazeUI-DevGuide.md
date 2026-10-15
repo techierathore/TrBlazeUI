@@ -1,6 +1,6 @@
 # TrBlazeUI — Developer Guide (as-built screen map)
 
-**Last updated:** 2026-10-07 (handoff — as-built source)
+**Last updated:** 2026-10-15 (triage-and-fix + handoff — Lekhak TR-007, InputGroup)
 **Verification status:** ✅ **RUNTIME-VERIFIED.** On **2026-10-07** the anonymous demo visitor drove the 11 screens of the Chatur controls (§3, Chatur screens) at 1366 and 390 wide: all render, 0 console errors, 0 sideways scroll. Before that, the visitor drove the 8 screens changed by the TfLens passes on **2026-09-13** at 1366 and 390 wide, plus the phone menu at 390: all render, 0 console errors, 0 sideways scroll (screenshots in §6.3). Acceptance suite 33/33; Release build **0 warnings / 0 errors**. Earlier screens were last runtime-verified on 2026-08-25.
 
 > **What this document is.** The screen-by-screen, as-built map a developer uses to chase a bug or catch AI-hallucinated code. TrBlazeUI is a **component library with a demo application** and has **no database, no API, no stored procedures, and no auth** — so the usual *page → service → data-access → proc* lineage collapses to **demo page → demo-shared composition → library component → primitive → JS interop / service**. There is exactly one role: the **anonymous demo visitor**.
@@ -147,6 +147,7 @@ Call chain (badge classes): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → 
 | DataTable | `/components/datatable` | `Pages/Components/DataTableDemo.razor` | `DataTable` (`RowAttributes`/`HeaderRowAttributes`/`SelectAllAttributes` 2.1.0, `SelectedCount` 2.0.9), `DataTableColumn.HideBelow` (after 2.1.4, Chatur TR-019, section `req-ui-046`) | renders at 1366 and 390; at 390 the `req-ui-046-table` grid shows Name and Status only, at 700 Email returns, at 1280 all four |
 | Button | `/components/button` | `Pages/Components/ButtonDemo.razor` | `Button` (`border-0` on every variant but Outline, after 2.1.6, Lekhak TR-006) | renders at 1280; under a host `button { border }` rule in `trblazeui-host`, filled buttons 0px, Outline 1px in `--input` |
 | Sidebar | `/components/sidebar` | `Pages/Components/SidebarDemo.razor` | `--sidebar-width*` from `trblazeui.css` `:where(:root)` only (after 2.1.6, Lekhak TR-004) | renders at 1280; sidebar 256px; a host `html { --sidebar-width }` wins |
+| InputGroup (2026-10-15) | `/components/input-group` | `Pages/Components/InputGroupDemo.razor` | `InputGroupButton` → `Button` (one `<button>`; unmatched attributes forwarded after 2.1.7, Lekhak TR-007), section `ig-reference-example` | renders at 1280 in light and dark; no `button button` on the page; Go carries `ig-reference-go`, `title` and `aria-label` (req-ui-052.spec.ts) |
 | Tree View | `/components/tree-view` | `Pages/Components/TreeViewDemo.razor` | `TreeView`, `TreeItem` (2.0.8) | renders at 1366 and 390 |
 | Diff View | `/components/diff-view` | `Pages/Components/DiffViewDemo.razor` | `DiffView`, `TextDiff` (2.0.8) | renders at 1366 and 390 |
 | Log View | `/components/log-view` | `Pages/Components/LogViewDemo.razor` | `LogView` (2.0.9) | renders at 1366 and 390 |
@@ -166,6 +167,8 @@ Call chain (host CSS, Lekhak TR-002/TR-004): `App.razor` / `index.html` `<head>`
 Call chain (submenu, Chatur TR-020): `MenubarSubTrigger` hover/click → `MenubarSub.Open` → the parent list's `MenuLevel.SetOpenSub(this)` → `OpenSubChanged` → every sibling `MenubarSub` re-renders → `MenubarSubContent` draws its list → `OnAfterRenderAsync` → `SubmenuPlacer.FitAsync` (`submenu.js` `fitSide`, `data-side="left"` when the right has no room). Keyboard: ArrowRight reaches `MenubarContent`/`MenubarSubContent.HandleKeyDown`, which opens the focused `MenubarSubTrigger` (`OpenFromKeyboard` → `OpenAndFocusFirst`); ArrowLeft/Escape in a `…SubContent` → `MenubarSub.CloseAndFocusTriggerAsync`. Items find their list through the `MenubarLevel` cascade, else the menu's own `Level`. `ContextMenu…` is the same shape (`ContextMenuLevel` cascade); `DropdownMenu…` tracks only the open submenu (`DropdownMenuLevel`) and moves focus with `keyboard-nav.js`, which counts only the rows whose nearest `role="menu"` is the list.
 
 Call chain (disabled menu item, Chatur TR-021): `MenubarItem`/`MenubarCheckboxItem`/`ContextMenuItem` `Disabled` → `aria-disabled="true"` + `data-disabled` on the row, beside the existing `pointer-events-none opacity-50`.
+
+Call chain (input-group button, Lekhak TR-007): `InputGroupButton.razor` → one `<Button>` with `CssClass` (`!border-0 !shadow-none !h-auto !text-sm`) and `@attributes="AdditionalAttributes"` → `Button.razor` `<button … @attributes>`. It is the button, so a `<Button>` inside it nests two; inside `DropdownMenuTrigger AsChild` it picks up the trigger's `TriggerContext` through `Button`.
 
 Call chain (step icon): `StepperItem.razor` marker `<span data-slot="stepper-item-marker">` → `Icon` when set, else `MarkerText` → `MarkerCssClass` adds `[&_svg]:size-4`.
 
@@ -199,6 +202,8 @@ Call chain (badge colour): `Badge.razor.cs` `CssClass` → `ClassNames.cn` → `
 | `src/TrBlazeUI.Components/wwwroot/js/submenu.js:12` | `fitSide` | return value | `"left"` only when the list runs past the window's right edge |
 | `src/TrBlazeUI.Primitives/wwwroot/js/primitives/keyboard-nav.js:36` | `getMenuItemsInDomOrder` | `menu` | the list being navigated; rows of an open submenu inside it are not counted |
 | `src/TrBlazeUI.Components/Components/Menubar/MenubarItem.razor:9` | row markup | `aria-disabled` | `"true"` when `Disabled`, absent otherwise |
+| `src/TrBlazeUI.Components/Components/InputGroup/InputGroupButton.razor:14` | `@attributes` on the inner `Button` | `AdditionalAttributes` | the caller's `title`, `data-testid`, `aria-*`; they land on the one `<button>` |
+| `demos/TrBlazeUI.Demo.Shared/Pages/Components/InputGroupDemo.razor:465` | `RunSearch` | `objLastSearch` | the text typed in the reference example's input after Go is pressed |
 
 Screenshots: `screenshots/TrBlazeUI/code-editor.png`, `stepper.png`, `badge.png` and their `-mobile` versions (§6).
 

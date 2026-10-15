@@ -180,6 +180,29 @@
         </div>
     </section>
 
+    <!-- Reference Example -->
+    <section class="space-y-6" data-testid="ig-reference-example">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Search with a button (the reference example)</h2>
+            <p class="text-muted-foreground">
+                InputGroupButton is the button itself: put text or an icon inside it, never a Button.
+            </p>
+        </div>
+
+        <div class="space-y-2">
+            <InputGroup>
+                <InputGroupAddon>
+                    <LucideIcon Name="search" Size="16" />
+                </InputGroupAddon>
+                <InputGroupInput Placeholder="Search..." @bind-Value="objSearchQuery" />
+                <InputGroupAddon Align="InputGroupAlign.InlineEnd">
+                    <InputGroupButton OnClick="RunSearch" AriaLabel="Run search" data-testid="ig-reference-go" title="Run search">Go</InputGroupButton>
+                </InputGroupAddon>
+            </InputGroup>
+            <p class="text-sm text-muted-foreground" data-testid="ig-reference-result">Searched for: @objLastSearch</p>
+        </div>
+    </section>
+
     <!-- Form Validation -->
     <section class="space-y-6">
         <div class="space-y-2">
@@ -436,6 +459,14 @@
 </section>
 
 @code {
+    private string? objSearchQuery;
+    private string objLastSearch = "(nothing yet)";
+
+    private void RunSearch()
+    {
+        objLastSearch = string.IsNullOrWhiteSpace(objSearchQuery) ? "(nothing yet)" : objSearchQuery;
+    }
+
     private void HandleMenuAction(string action)
     {
         // Handle menu action

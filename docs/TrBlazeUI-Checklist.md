@@ -86,6 +86,7 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-UI-049 | A filled Button draws no border even when host CSS gives buttons one (Lekhak TR-006) | Verified | 100% | 2026-10-09 verify: PASS — test `Lekhak feedback — host CSS, imports, tokens and Button borde` | [d](#d-req-ui-049) |
 | REQ-UI-050 | Menubar, DropdownMenu and ContextMenu submenus: Sub, SubTrigger and SubContent, nestable three levels (Chatur TR-020) | Verified | 100% | 2026-10-13 verify: PASS — test `Chatur TR-020 — submenus in Menubar, DropdownMenu and Contex` | [d](#d-req-ui-050) |
 | REQ-UI-051 | A disabled menu item renders aria-disabled and data-disabled (Chatur TR-021) | Verified | 100% | 2026-10-13 verify: PASS — test `Chatur TR-021 — a disabled menu item is announced as disable` | [d](#d-req-ui-051) |
+| REQ-UI-052 | InputGroupButton is the button itself: the reference shows one button, and its attributes reach it (Lekhak TR-007) | Verified | 100% | 2026-10-15 verify: PASS — test `REQ-UI-052 InputGroupButton is the button itself REQ-UI-052 ` | [d](#d-req-ui-052) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -436,3 +437,9 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 
 - <a id="d-req-ui-051"></a> **REQ-UI-051** (extends BRD-21 floating panels and menus) A disabled menu item renders aria-disabled and data-disabled (Chatur TR-021)
   - *Acceptance:* When a MenubarItem or MenubarCheckboxItem is disabled on the Menubar demo screen, then it carries aria-disabled=true and data-disabled, and Playwright's toBeDisabled passes.
+
+
+## InputGroup
+
+- <a id="d-req-ui-052"></a> **REQ-UI-052** (extends BRD-4 Button) InputGroupButton is the button itself: the reference shows one button, and its attributes reach it (Lekhak TR-007)
+  - *Acceptance:* When a consumer copies the reference's InputGroup example on the InputGroup demo screen, then exactly one button renders, carrying its own attributes.

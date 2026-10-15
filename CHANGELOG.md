@@ -11,6 +11,24 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
+### Lekhak TR-007 — built on 2026-10-15, after 2.1.7
+
+Answers the entry Lekhak filed on 2026-10-12 and re-checked on 2.1.7
+(`docs/Lekhak-TrBlazeUI-Feedback.md`; REQ-UI-052).
+
+#### Fixed
+
+- **The agent reference's `InputGroup` example no longer nests a button in a button (TR-007).**
+  It wrapped a `<Button>` inside `<InputGroupButton>`, but `InputGroupButton` renders a `<Button>`
+  itself, so the copy produced `<button><button>`. The example now writes
+  `<InputGroupButton OnClick=…>Go</InputGroupButton>` inside an `InputGroupAddon`, and the
+  reference's NEVER list gains item 11. An app that copied the old example should drop the inner
+  `<Button>` and move its parameters onto `InputGroupButton`.
+- **`InputGroupButton` passes unmatched attributes to its `<button>`.** It declared
+  `CaptureUnmatchedValues` but never forwarded them, so `title`, `data-testid`, `form` and `aria-*`
+  were dropped. The InputGroup demo page shows the reference example;
+  `tests/verify/req-ui-052.spec.ts` checks the page has no nested buttons.
+
 ### Chatur TR-020 and TR-021 — built and verified on 2026-10-13, after 2.1.6
 
 Answers the two entries Chatur filed on 2026-10-13 against 2.1.6

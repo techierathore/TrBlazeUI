@@ -142,8 +142,13 @@ bash tests/package/codex-agent-deployment.sh
 - [ ] At phone width, open the menu — it slides out and every link works
 - [ ] Open the Badge demo — pills sit inside sentences and long labels wrap or truncate as asked
 - [ ] Open the Menubar demo, File ▸ Recent projects ▸ More — each list opens beside its row; Save is dim and cannot be chosen
+- [ ] Open the InputGroup demo, type in "Search with a button" and press Go — the line below shows what you typed
 
 ## Consumer integration notes
+
+### Added 2026-10-15 (Lekhak TR-007 — REQ-UI-052 — not yet released)
+
+- **`InputGroupButton` is the button**: `<InputGroupAddon Align="InputGroupAlign.InlineEnd"><InputGroupButton OnClick="Go">Go</InputGroupButton></InputGroupAddon>`. Never put a `<Button>` inside it; that nests two buttons. Attributes such as `title` and `data-testid` now reach its `<button>`.
 
 ### Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)
 
