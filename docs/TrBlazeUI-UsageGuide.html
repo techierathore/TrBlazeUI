@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)</h1>
-    <div class="sub">Last rendered: 2026-10-13</div>
+    <div class="sub">Last rendered: 2026-10-15</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#test-users-canonical-use-these-for-all-smoke-verify-uat">Test users (canonical — use THESE for all smoke / verify / UAT)</a></li>
@@ -134,6 +134,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
+        <li class="h3"><a href="#added-2026-10-15-asp-net-core-advisories-req-nfr-005">Added 2026-10-15 (ASP.NET Core advisories — REQ-NFR-005)</a></li>
+        <li class="h3"><a href="#added-2026-10-15-lekhak-tr-007-req-ui-052-not-yet-released">Added 2026-10-15 (Lekhak TR-007 — REQ-UI-052 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-13-chatur-tr-020-tr-021-req-ui-050-req-ui-051-not-yet-released">Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-09-lekhak-tr-002-tr-006-req-ui-047-req-ui-049-req-fn-012-not-yet-released">Added 2026-10-09 (Lekhak TR-002…TR-006 — REQ-UI-047…REQ-UI-049, REQ-FN-012 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-09-chatur-tr-019-req-ui-046-not-yet-released">Added 2026-10-09 (Chatur TR-019 — REQ-UI-046 — not yet released)</a></li>
@@ -152,7 +154,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)</h1>
-    <div class="subtitle">Rendered 2026-10-13 &middot; source <code>TrBlazeUI-UsageGuide.md</code></div>
+    <div class="subtitle">Rendered 2026-10-15 &middot; source <code>TrBlazeUI-UsageGuide.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -182,6 +184,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
+        <li class="h3"><a href="#added-2026-10-15-asp-net-core-advisories-req-nfr-005">Added 2026-10-15 (ASP.NET Core advisories — REQ-NFR-005)</a></li>
+        <li class="h3"><a href="#added-2026-10-15-lekhak-tr-007-req-ui-052-not-yet-released">Added 2026-10-15 (Lekhak TR-007 — REQ-UI-052 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-13-chatur-tr-020-tr-021-req-ui-050-req-ui-051-not-yet-released">Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-09-lekhak-tr-002-tr-006-req-ui-047-req-ui-049-req-fn-012-not-yet-released">Added 2026-10-09 (Lekhak TR-002…TR-006 — REQ-UI-047…REQ-UI-049, REQ-FN-012 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-09-chatur-tr-019-req-ui-046-not-yet-released">Added 2026-10-09 (Chatur TR-019 — REQ-UI-046 — not yet released)</a></li>
@@ -432,8 +436,20 @@ bash tests/package/codex-agent-deployment.sh</code></pre>
 </li>
 <li>[ ] Open the Menubar demo, File ▸ Recent projects ▸ More — each list opens beside its row; Save is dim and cannot be chosen
 </li>
+<li>[ ] Open the InputGroup demo, type in "Search with a button" and press Go — the line below shows what you typed
+</li>
 </ul>
 <h2 id="consumer-integration-notes">Consumer integration notes<a class="anchor-link" href="#consumer-integration-notes">#</a></h2>
+<h3 id="added-2026-10-15-asp-net-core-advisories-req-nfr-005"><a id="added-2026-10-15-aspnet-core-advisories--req-nfr-005"></a>Added 2026-10-15 (ASP.NET Core advisories — REQ-NFR-005)<a class="anchor-link" href="#added-2026-10-15-asp-net-core-advisories-req-nfr-005">#</a></h3>
+<ul>
+<li><strong>⚠ WebAssembly and Auto apps: move <code>Microsoft.AspNetCore.Components.WebAssembly.Server</code> to 10.0.13.</strong> 10.0.0 to 10.0.12 carry GHSA-g27p-qf6j-c96c and GHSA-qjpx-jqm5-h2c4; with warnings as errors, restore fails with NU1903. The TrBlazeUI packages need no change.
+</li>
+</ul>
+<h3 id="added-2026-10-15-lekhak-tr-007-req-ui-052-not-yet-released"><a id="added-2026-10-15-lekhak-tr-007--req-ui-052--not-yet-released"></a>Added 2026-10-15 (Lekhak TR-007 — REQ-UI-052 — not yet released)<a class="anchor-link" href="#added-2026-10-15-lekhak-tr-007-req-ui-052-not-yet-released">#</a></h3>
+<ul>
+<li><strong><code>InputGroupButton</code> is the button</strong>: <code>&lt;InputGroupAddon Align="InputGroupAlign.InlineEnd"&gt;&lt;InputGroupButton OnClick="Go"&gt;Go&lt;/InputGroupButton&gt;&lt;/InputGroupAddon&gt;</code>. Never put a <code>&lt;Button&gt;</code> inside it; that nests two buttons. Attributes such as <code>title</code> and <code>data-testid</code> now reach its <code>&lt;button&gt;</code>.
+</li>
+</ul>
 <h3 id="added-2026-10-13-chatur-tr-020-tr-021-req-ui-050-req-ui-051-not-yet-released"><a id="added-2026-10-13-chatur-tr-020-tr-021--req-ui-050-req-ui-051--not-yet-released"></a>Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)<a class="anchor-link" href="#added-2026-10-13-chatur-tr-020-tr-021-req-ui-050-req-ui-051-not-yet-released">#</a></h3>
 <ul>
 <li><strong>Submenus</strong>: <code>MenubarSub</code> + <code>MenubarSubTrigger</code> + <code>MenubarSubContent</code>, and the same three for <code>DropdownMenu</code> and <code>ContextMenu</code>. The row draws a ▸; hover, click, ArrowRight or Enter opens the list beside it; ArrowLeft or Escape closes one level. Nests to any depth.

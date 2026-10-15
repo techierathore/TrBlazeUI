@@ -11,6 +11,35 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
+### Build Validation restore failure — fixed on 2026-10-15
+
+#### Security
+
+- **The demo apps move to ASP.NET Core 10.0.13** (`Microsoft.AspNetCore.Components.WebAssembly.Server`,
+  `WebAssembly`, `WebAssembly.DevServer`, `Web`). 10.0.3 carries the high-severity advisories
+  GHSA-g27p-qf6j-c96c and GHSA-qjpx-jqm5-h2c4 (published 2026-10-13), which failed CI's restore with
+  NU1903 (`docs/CI-Issues.md` CI-002). The library packages are unchanged and still need 10.0.3 or
+  later. Apps on the WebAssembly or Auto render mode should move their own
+  `Microsoft.AspNetCore.Components.WebAssembly.Server` reference to 10.0.13.
+
+### Lekhak TR-007 — built on 2026-10-15, after 2.1.7
+
+Answers the entry Lekhak filed on 2026-10-12 and re-checked on 2.1.7
+(`docs/Lekhak-TrBlazeUI-Feedback.md`; REQ-UI-052).
+
+#### Fixed
+
+- **The agent reference's `InputGroup` example no longer nests a button in a button (TR-007).**
+  It wrapped a `<Button>` inside `<InputGroupButton>`, but `InputGroupButton` renders a `<Button>`
+  itself, so the copy produced `<button><button>`. The example now writes
+  `<InputGroupButton OnClick=…>Go</InputGroupButton>` inside an `InputGroupAddon`, and the
+  reference's NEVER list gains item 11. An app that copied the old example should drop the inner
+  `<Button>` and move its parameters onto `InputGroupButton`.
+- **`InputGroupButton` passes unmatched attributes to its `<button>`.** It declared
+  `CaptureUnmatchedValues` but never forwarded them, so `title`, `data-testid`, `form` and `aria-*`
+  were dropped. The InputGroup demo page shows the reference example;
+  `tests/verify/req-ui-052.spec.ts` checks the page has no nested buttons.
+
 ### Chatur TR-020 and TR-021 — built and verified on 2026-10-13, after 2.1.6
 
 Answers the two entries Chatur filed on 2026-10-13 against 2.1.6

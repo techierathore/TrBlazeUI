@@ -72,6 +72,7 @@ These rules are non-negotiable. Violating them produces broken or inconsistent U
 8. **NEVER forget the `@code` block** — Every page must compile; all fields and methods referenced in markup must be declared
 9. **NEVER use `onclick` handlers on raw HTML** — Use `<Button OnClick="HandleClick">`
 10. **NEVER use JavaScript `alert()` or `console.log()`** for user feedback — Use `ToastService`
+11. **NEVER put a `<Button>` inside `<InputGroupButton>`** — `InputGroupButton` is already the button; write `<InputGroupButton OnClick="Go">Go</InputGroupButton>` inside an `InputGroupAddon` (§InputGroup)
 
 ### Guarantees you can rely on
 
@@ -1533,11 +1534,20 @@ TR-033, TR-034). Parameters: `Value`/`ValueChanged`, `Min`, `Max`, `Step`, `Deci
         <LucideIcon Name="search" Size="16" />
     </InputGroupAddon>
     <InputGroupInput Placeholder="Search..." @bind-Value="searchQuery" />
-    <InputGroupButton>
-        <Button Size="ButtonSize.Small">Go</Button>
-    </InputGroupButton>
+    <InputGroupAddon Align="InputGroupAlign.InlineEnd">
+        <InputGroupButton OnClick="RunSearch" AriaLabel="Run search">Go</InputGroupButton>
+    </InputGroupAddon>
 </InputGroup>
 ```
+
+`InputGroupButton` **is** the button: it renders one `<Button>` (so one `<button>`) styled to sit
+inside the group, `Size` defaulting to `Small`. Give it the text, `OnClick`, `Variant`, `Type`,
+`Disabled`, `AriaLabel` and `Icon` directly, and put it in an `InputGroupAddon` (usually
+`Align="InputGroupAlign.InlineEnd"`) so it sits at the end of the box. **Never put a `<Button>`
+inside it**: that renders a `<button>` inside a `<button>`, which is invalid HTML that browsers and
+screen readers handle unpredictably (Lekhak TR-007). Attributes it does not declare (`title`,
+`data-testid`, `form`, `aria-*`) go onto that one `<button>` (after 2.1.7). For a dropdown, wrap it:
+`<DropdownMenuTrigger AsChild="true"><InputGroupButton …>…</InputGroupButton></DropdownMenuTrigger>`.
 
 `InputGroupInput` takes the same `DebounceMilliseconds` as `Input` (default 0, one `ValueChanged` per
 keystroke). This is how to draw a filter box with a leading icon that re-filters only once typing pauses:

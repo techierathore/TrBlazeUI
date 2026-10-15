@@ -5,12 +5,23 @@ using Microsoft.AspNetCore.Components;
 namespace TrBlazeUI.Components.InputGroup;
 
 /// <summary>
-/// A button component optimized for use within InputGroup.
+/// The button of an InputGroup. InputGroupButton IS the button: it renders exactly one
+/// <c>&lt;button&gt;</c>, so put text or an icon inside it, never a <c>&lt;Button&gt;</c>.
 /// </summary>
 /// <remarks>
 /// <para>
 /// InputGroupButton is a specialized button designed for integration with InputGroup.
 /// It removes the shadow and adjusts sizing to work seamlessly alongside input controls.
+/// </para>
+/// <para>
+/// NEVER put a <c>&lt;Button&gt;</c> inside InputGroupButton: that renders a button inside a
+/// button, which is invalid HTML and breaks clicks and focus. Write
+/// <c>&lt;InputGroupButton OnClick="RunSearch"&gt;Go&lt;/InputGroupButton&gt;</c> instead.
+/// </para>
+/// <para>
+/// Any attribute that is not a parameter (<c>title</c>, <c>data-testid</c>, <c>form</c>,
+/// <c>aria-*</c>, <c>@onkeydown</c>, ...) is captured by <see cref="AdditionalAttributes"/> and
+/// lands on that one <c>&lt;button&gt;</c> element.
 /// </para>
 /// <para>
 /// Features:
@@ -98,6 +109,10 @@ public partial class InputGroupButton : ComponentBase
     /// <summary>
     /// Gets or sets additional attributes to be applied to the button element.
     /// </summary>
+    /// <remarks>
+    /// Captures every unmatched attribute (<c>title</c>, <c>data-testid</c>, <c>form</c>, <c>aria-*</c>,
+    /// event handlers) and forwards it to the inner Button, which splats it onto its <c>&lt;button&gt;</c>.
+    /// </remarks>
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 

@@ -6,6 +6,43 @@ per report, newest first, with the log as it was handed over.
 
 ---
 
+## CI-002 — restore fails on new ASP.NET Core advisories against the demos' 10.0.3 packages (2026-10-15)
+
+**Reported by:** the owner, from run [38773955449](https://github.com/techierathore/TrBlazeUI/actions/runs/38773955449) (Build Validation, `Dev`, `ce677f4`).
+**Workflow:** `.github/workflows/build.yml`, step *Restore dependencies*; *Build solution* was skipped.
+
+### Reproduced
+
+`bash .tfcore/utils/tf-ci-repro.sh .github/workflows/build.yml` on a clean copy with empty caches:
+
+```
+error NU1903: Warning As Error: Package 'Microsoft.AspNetCore.Components.WebAssembly.Server' 10.0.3
+has a known high severity vulnerability, https://github.com/advisories/GHSA-g27p-qf6j-c96c
+```
+
+The same for GHSA-qjpx-jqm5-h2c4. Both advisories were published on 2026-10-13 and cover 10.0.0
+to 10.0.12; 10.0.13 is patched.
+
+### Root cause
+
+The demo projects pinned the ASP.NET Core packages at 10.0.3. `TreatWarningsAsErrors` turns
+NuGet's audit warning NU1903 into an error. The local build stayed green because its restore used
+advisory data the machine had cached before 2026-10-13.
+
+### Fixed
+
+- The demos' `Microsoft.AspNetCore.Components.*` packages (`WebAssembly.Server`, `WebAssembly`,
+  `WebAssembly.DevServer`, `Web`) move to 10.0.13 together. The five library packages keep their
+  10.0.3 minimum: they never reference `WebAssembly.Server`, and the consumer's own app picks its
+  ASP.NET Core version.
+- `tests/verify/req-fn.spec.ts` gains a REQ-NFR-005 test that runs
+  `dotnet list TrBlazeUI.sln package --vulnerable --include-transitive` with an empty NuGet HTTP
+  cache. A local run now reads today's advisories, the way a fresh runner does.
+- `tf-ci-repro.sh` passes on empty caches: restore, then a Release build with 0 warnings. The
+  owner's next push is the final check.
+
+---
+
 ## CI-001 — a release tag with any prefix other than `v` kills the publish (2026-09-12)
 
 **Reported by:** the owner, from the failed Actions run.

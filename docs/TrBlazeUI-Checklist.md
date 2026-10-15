@@ -51,7 +51,7 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-NFR-002 | Zero-config pre-built CSS | Verified | 100% | 2026-10-02 verify: PASS — test `Non-functional requirements REQ-NFR-002 the pre-built styles` | [view](#d-req-nfr-002) |
 | REQ-NFR-003 | RichTextEditor HTML sanitization | Verified | 100% | 2026-10-02 verify: PASS — test `Non-functional requirements REQ-NFR-003 rich-text HTML is sa` | [view](#d-req-nfr-003) |
 | REQ-NFR-004 | Render-mode parity (Server/WASM/Auto) | Verified | 100% | 2026-10-02 verify: PASS — test `Non-functional requirements REQ-NFR-004 Server, WASM and Aut` | [view](#d-req-nfr-004) |
-| REQ-NFR-005 | Clean Release build (0 warnings / 0 errors, warnings-as-errors) | Verified | 100% | 2026-10-02 verify: PASS — test `Non-functional requirements REQ-NFR-005 the Release build is` | [view](#d-req-nfr-005) |
+| REQ-NFR-005 | Clean Release build (0 warnings / 0 errors, warnings-as-errors) | Verified | 100% | 2026-10-15 verify: PASS — test `Non-functional requirements REQ-NFR-005 the Release build is` | [view](#d-req-nfr-005) |
 | REQ-UI-020 | TfLens post-2.1.0 consumer-feedback fixes (TR-028…TR-035) | Verified | 100% | 2026-10-02 verify: PASS — test `REQ-UI-020 — TfLens post-2.1.0 consumer-feedback fixes (TR-0` | [d](#d-req-ui-020) |
 | REQ-UI-021 | Chatur consumer-feedback fixes (TR-001…TR-004): ScrollArea StickToEnd, TreeView, DiffView, ToggleGroup | Verified | 100% | 2026-10-02 verify: PASS — test `REQ-UI-021 — Chatur consumer-feedback fixes (TR-001…TR-004) ` | [d](#d-req-ui-021) |
 | REQ-UI-022 | Editable code area and an open-file tab strip (CodeEditor, EditorTabs) | Verified | 100% | 2026-10-07 verify: PASS — test `Chatur batch 2 — consumer-feedback fixes REQ-UI-022 CodeEdit` | [d](#d-req-ui-022) |
@@ -86,6 +86,7 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-UI-049 | A filled Button draws no border even when host CSS gives buttons one (Lekhak TR-006) | Verified | 100% | 2026-10-09 verify: PASS — test `Lekhak feedback — host CSS, imports, tokens and Button borde` | [d](#d-req-ui-049) |
 | REQ-UI-050 | Menubar, DropdownMenu and ContextMenu submenus: Sub, SubTrigger and SubContent, nestable three levels (Chatur TR-020) | Verified | 100% | 2026-10-13 verify: PASS — test `Chatur TR-020 — submenus in Menubar, DropdownMenu and Contex` | [d](#d-req-ui-050) |
 | REQ-UI-051 | A disabled menu item renders aria-disabled and data-disabled (Chatur TR-021) | Verified | 100% | 2026-10-13 verify: PASS — test `Chatur TR-021 — a disabled menu item is announced as disable` | [d](#d-req-ui-051) |
+| REQ-UI-052 | InputGroupButton is the button itself: the reference shows one button, and its attributes reach it (Lekhak TR-007) | Verified | 100% | 2026-10-15 verify: PASS — test `REQ-UI-052 InputGroupButton is the button itself REQ-UI-052 ` | [d](#d-req-ui-052) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -436,3 +437,9 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 
 - <a id="d-req-ui-051"></a> **REQ-UI-051** (extends BRD-21 floating panels and menus) A disabled menu item renders aria-disabled and data-disabled (Chatur TR-021)
   - *Acceptance:* When a MenubarItem or MenubarCheckboxItem is disabled on the Menubar demo screen, then it carries aria-disabled=true and data-disabled, and Playwright's toBeDisabled passes.
+
+
+## InputGroup
+
+- <a id="d-req-ui-052"></a> **REQ-UI-052** (extends BRD-4 Button) InputGroupButton is the button itself: the reference shows one button, and its attributes reach it (Lekhak TR-007)
+  - *Acceptance:* When a consumer copies the reference's InputGroup example on the InputGroup demo screen, then exactly one button renders, carrying its own attributes.
