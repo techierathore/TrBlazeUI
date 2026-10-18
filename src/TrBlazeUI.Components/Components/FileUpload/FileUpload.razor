@@ -22,7 +22,8 @@
                    multiple="@Multiple"
                    disabled="@Disabled"
                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                   id="@objInputId" />
+                   id="@InputIdValue"
+                   aria-label="@AriaLabel" />
 
         @if (DropzoneContent != null)
         {
@@ -208,10 +209,26 @@
     public RenderFragment? DropzoneContent { get; set; }
 
     /// <summary>
+    /// The accessible name for the file input. Required for WCAG 2.1 AA; without it axe reports
+    /// a critical <c>label</c> violation on every screen that shows a FileUpload (Sevak TR-046).
+    /// </summary>
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    /// <summary>
+    /// The id for the rendered file input. A stable id lets a page point a <c>&lt;label for&gt;</c>
+    /// at the input. If omitted, a GUID is generated.
+    /// </summary>
+    [Parameter]
+    public string? InputId { get; set; }
+
+    /// <summary>
     /// Additional CSS classes.
     /// </summary>
     [Parameter]
     public string? Class { get; set; }
+
+    private string InputIdValue => string.IsNullOrEmpty(InputId) ? objInputId : InputId;
 
     protected override void OnParametersSet()
     {

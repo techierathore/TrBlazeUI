@@ -1,32 +1,33 @@
 ---
 project: TrBlazeUI
-last_updated: 2026-10-15
-current_phase: Release — handoff done, 69 of 69 verified
+last_updated: 2026-10-18
+current_phase: Verify — 2.1.9 package prepared, new feedback rows Verified, pending owner tag/release
 last_verified_build: PASS
-last_verified_date: 2026-10-15
+last_verified_date: 2026-10-18
 ---
 
 # TrBlazeUI — Status
 
 ## Where I am
 
-Build Validation run 38773955449 failed restore: the demos' ASP.NET Core 10.0.3 packages hit two
-advisories published 2026-10-13. The demos now use 10.0.13, the clean-cache CI reproduction
-passes, and a new test reads advisories fresh (REQ-NFR-005 verified). Lekhak TR-007 is fixed and
-verified (REQ-UI-052). CHANGELOG, the guides and CI-Issues CI-002 describe both. All 69 rows are
-verified.
+Release 2.1.9 is prepared. Source fixes are in place for Sevak TR-045/TR-046, TechieBlog TR-075,
+and Lekhak TR-008/TR-009; doc attribution is updated for Chatur TR-020/TR-021, TechieFlow TR-004
+and TrSetup TR-001. The five new checklist rows REQ-UI-053…057 are Verified, the build is clean,
+and 2.1.9 NuGet packages live under `/tmp/opencode/packages`.
 
 ## Next command to run
 
 Claude Code:
 ```
-(owner) commit, then build and publish the package — its shipped documents are current; no agent command
+(owner) create the GitHub Release/tag v2.1.9 and push the five .nupkg files to GitHub Packages
 ```
+
 OpenCode:
 ```
-(owner) commit, then build and publish the package — its shipped documents are current; no agent command
+(owner) create the GitHub Release/tag v2.1.9 and push the five .nupkg files to GitHub Packages
 ```
-Why: every row in this phase's scope is terminal and the shipped documents were brought up to date.
+Why: the verifier has already written `Verified` for the five new rows; only the owner can create the
+git tag and GitHub Release, and agents cannot run git.
 
 ## Open requirements
 
@@ -52,11 +53,11 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 | Date | Phase | Result | Status table |
 |---|---|---|---|
-| 2026-10-09 | triage-and-fix + handoff | 62/62 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-09 | triage-and-fix + handoff | 66/66 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-13 | triage-and-fix + handoff | 68/68 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-15 | triage-and-fix + handoff | 69/69 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-15 | fix-issues + handoff | 69/69 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-10-18 | consumer-feedback sweep + 2.1.9 prep | 5 new rows Verified (REQ-UI-053…057); packages built | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 

@@ -134,7 +134,7 @@ test.describe('Chatur TR-020 — submenus in Menubar, DropdownMenu and ContextMe
   test('REQ-UI-050 DropdownMenu submenu opens and closes from the keyboard, three levels', async ({ page }) => {
     await open(page, '/components/dropdown-menu');
     await byId(page, 'dropdown-sub-open').click();
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(1200);
     await page.keyboard.press('ArrowDown');
     await page.keyboard.press('ArrowDown');
     await expect.poll(() => focusedText(page)).toContain('Send to');
@@ -181,7 +181,7 @@ test.describe('Chatur TR-020 — submenus in Menubar, DropdownMenu and ContextMe
     await expect(page.getByText('Last action: Hex viewer')).toBeVisible();
 
     await byId(page, 'context-sub-area').click({ button: 'right' });
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(1200);
     await page.keyboard.press('ArrowDown');
     await page.keyboard.press('ArrowDown');
     await page.keyboard.press('ArrowRight');

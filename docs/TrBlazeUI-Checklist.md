@@ -1,3 +1,8 @@
+---
+App: TrBlazeUI
+Size: Medium
+---
+
 # TrBlazeUI — Checklist
 
 > Migrated from `docs/TrBlazeUI-Update-plan.md` and `docs/toolbarplan.md` on 2026-06-30. Phase structure, completion %, and status remarks carried over verbatim — verify before building. Both source plans were fully delivered, so nearly every REQ is `Done (pre-existing)`; build agents must NOT rebuild these.
@@ -87,6 +92,11 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-UI-050 | Menubar, DropdownMenu and ContextMenu submenus: Sub, SubTrigger and SubContent, nestable three levels (Chatur TR-020) | Verified | 100% | 2026-10-13 verify: PASS — test `Chatur TR-020 — submenus in Menubar, DropdownMenu and Contex` | [d](#d-req-ui-050) |
 | REQ-UI-051 | A disabled menu item renders aria-disabled and data-disabled (Chatur TR-021) | Verified | 100% | 2026-10-13 verify: PASS — test `Chatur TR-021 — a disabled menu item is announced as disable` | [d](#d-req-ui-051) |
 | REQ-UI-052 | InputGroupButton is the button itself: the reference shows one button, and its attributes reach it (Lekhak TR-007) | Verified | 100% | 2026-10-15 verify: PASS — test `REQ-UI-052 InputGroupButton is the button itself REQ-UI-052 ` | [d](#d-req-ui-052) |
+| REQ-UI-053 | Toast description draws at full opacity so it clears WCAG 2.1 AA contrast (Sevak TR-045) | Verified | 100% | 2026-10-18 verify: PASS — test `Sevak TR-045 — toast description contrast REQ-UI-053 the toa` | [d](#d-req-ui-053) |
+| REQ-UI-054 | FileUpload AriaLabel and InputId reach the rendered file input (Sevak TR-046) | Verified | 100% | 2026-10-18 verify: PASS — test `Sevak TR-046 — FileUpload aria-label and input id REQ-UI-054` | [d](#d-req-ui-054) |
+| REQ-UI-055 | Select returns focus to its trigger after selection so Escape still dismisses a parent Dialog (TechieBlog TR-075) | Verified | 100% | 2026-10-18 verify: PASS — test `TechieBlog TR-075 — Select focus returns to trigger inside a` | [d](#d-req-ui-055) |
+| REQ-UI-056 | NumericInput supports nullable binding so an empty box binds null (Lekhak TR-008) | Verified | 100% | 2026-10-18 verify: PASS — test `Lekhak TR-008 — NumericInput nullable value binding REQ-UI-0` | [d](#d-req-ui-056) |
+| REQ-UI-057 | CardAction sits at the right edge of the title row when placed inside CardHeader (Lekhak TR-009) | Verified | 100% | 2026-10-18 verify: PASS — test `Lekhak TR-009 — CardAction positioned at the header right ed` | [d](#d-req-ui-057) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -97,69 +107,69 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 <!-- Component-library "pages" = demo pages under demos/TrBlazeUI.Demo.Shared/Pages. UI REQs map to component families, not mockups (this library predates the mockup flow). -->
 
 <a id="d-req-ui-001"></a>
-- **REQ-UI-001** — 16 headless primitives (Accordion, Checkbox, Collapsible, Dialog, DropdownMenu, Floating, HoverCard, Label, Popover, RadioGroup, Select, Sheet, Switch, Table, Tabs, Tooltip), each accessible and unstyled. *Demo:* `/primitives`.
+- **REQ-UI-001** — 16 headless primitives (Accordion, Checkbox, Collapsible, Dialog, DropdownMenu, Floating, HoverCard, Label, Popover, RadioGroup, Select, Sheet, Switch, Table, Tabs, Tooltip), each accessible and unstyled. *Demo:* `/primitives`. (extends BRD-1/BRD-2/BRD-3)
   - *Acceptance:* every primitive demo renders; keyboard nav + ARIA work; services registered via `AddTrBlazeUIPrimitives()`.
 
 <a id="d-req-ui-002"></a>
-- **REQ-UI-002** — ~28 form components with two-way binding and validation compatibility. *Demo:* `/components/*`.
+- **REQ-UI-002** — ~28 form components with two-way binding and validation compatibility. *Demo:* `/components/*`. (extends BRD-4 to BRD-12)
   - *Acceptance:* Button, Input, Textarea, Checkbox, Switch, RadioGroup, Toggle, Select, NativeSelect, Combobox, MultiSelect, Calendar, DatePicker, DateRangePicker, TimePicker, NumericInput, CurrencyInput, MaskedInput, InputOTP, InputGroup, Slider, RangeSlider, Rating, ColorPicker, FileUpload, Field, Label all render and bind.
 
 <a id="d-req-ui-003"></a>
-- **REQ-UI-003** — Layout & navigation: Sidebar (22 parts, collapsible, variants, mobile sheet, Ctrl/Cmd+B, persistence), Card, Resizable, ScrollArea, AspectRatio, Separator, Item, Breadcrumb, NavigationMenu, Menubar, Pagination, ResponsiveNav, Tabs.
+- **REQ-UI-003** — Layout & navigation: Sidebar (22 parts, collapsible, variants, mobile sheet, Ctrl/Cmd+B, persistence), Card, Resizable, ScrollArea, AspectRatio, Separator, Item, Breadcrumb, NavigationMenu, Menubar, Pagination, ResponsiveNav, Tabs. (extends BRD-13 to BRD-18)
   - *Acceptance:* shell composes; sidebar collapse persists; horizontal nav dropdowns don't clip (FloatingPortal fix). *(The Sidebar analyzer issue that previously blocked the Release build is resolved — see REQ-NFR-005.)*
 
 <a id="d-req-ui-004"></a>
-- **REQ-UI-004** — Overlay & feedback: Dialog, AlertDialog, Sheet, Drawer, Popover, HoverCard, Tooltip, DropdownMenu, ContextMenu, Command, Alert, Toast — rendered via reactive PortalHost.
+- **REQ-UI-004** — Overlay & feedback: Dialog, AlertDialog, Sheet, Drawer, Popover, HoverCard, Tooltip, DropdownMenu, ContextMenu, Command, Alert, Toast — rendered via reactive PortalHost. (extends BRD-19 to BRD-24)
   - *Acceptance:* overlays open with focus trap; internal state changes re-render (portal RefreshPortal fix); ToastService shows success/error/warning/info.
 
 <a id="d-req-ui-005"></a>
-- **REQ-UI-005** — DataTable (sort/filter/paginate/select/toolbar), MarkdownEditor (Markdig), RichTextEditor (Quill + sanitized output).
+- **REQ-UI-005** — DataTable (sort/filter/paginate/select/toolbar), MarkdownEditor (Markdig), RichTextEditor (Quill + sanitized output). (extends BRD-25 to BRD-27)
   - *Acceptance:* DataTable demo sorts/paginates/selects; editors produce expected output.
 
 <a id="d-req-ui-006"></a>
-- **REQ-UI-006** — Display components: Avatar, Badge, Empty, Item, Kbd, Progress, Skeleton, Spinner, Typography.
+- **REQ-UI-006** — Display components: Avatar, Badge, Empty, Item, Kbd, Progress, Skeleton, Spinner, Typography. (extends BRD-28/BRD-29)
   - *Acceptance:* render; `style`/`id`/`data-*` forwarded (attribute splatting).
 
 <a id="d-req-ui-007"></a>
-- **REQ-UI-007** — Toolbar family: Toolbar (Default/Compact/Dense, horizontal/vertical), ToolbarGroup, ToolbarButton, ToolbarToggleButton (`@bind-IsPressed`), ToolbarSeparator. *Demo:* `/components/toolbar`.
+- **REQ-UI-007** — Toolbar family: Toolbar (Default/Compact/Dense, horizontal/vertical), ToolbarGroup, ToolbarButton, ToolbarToggleButton (`@bind-IsPressed`), ToolbarSeparator. *Demo:* `/components/toolbar`. (extends BRD-30/BRD-31)
   - *Acceptance:* all toolbar-plan demo sections render; `role="toolbar"`/`aria-pressed` present; composes Button/DropdownMenu as children. Migrated from toolbarplan.md (16/16 tasks delivered).
 
 <a id="d-req-ui-008"></a>
-- **REQ-UI-008** — Charts: Area, Bar, Line, Pie, Radar, Radial via Blazor-ApexCharts, themed by `--chart-*`. *Demo:* `/charts/*`.
+- **REQ-UI-008** — Charts: Area, Bar, Line, Pie, Radar, Radial via Blazor-ApexCharts, themed by `--chart-*`. *Demo:* `/charts/*`. (extends BRD-32)
   - *Acceptance:* each chart type renders with theme colors.
 
 <a id="d-req-ui-009"></a>
-- **REQ-UI-009** — Icon components: `LucideIcon`, `HeroIcon` (4 variants), `FeatherIcon`. *Demo:* `/icons`.
+- **REQ-UI-009** — Icon components: `LucideIcon`, `HeroIcon` (4 variants), `FeatherIcon`. *Demo:* `/icons`. (extends BRD-33/BRD-34)
   - *Acceptance:* icon browser renders; typed icon names resolve.
 
 <a id="d-req-ui-010"></a>
-- **REQ-UI-010** — Theming: shadcn/tweakcn CSS variables in `theme.css`; `.dark` class dark mode; OKLCH colors.
+- **REQ-UI-010** — Theming: shadcn/tweakcn CSS variables in `theme.css`; `.dark` class dark mode; OKLCH colors. (extends BRD-35 to BRD-37)
   - *Acceptance:* swapping theme variables restyles all components; dark mode toggles.
 
 <a id="d-req-ui-011"></a>
-- **REQ-UI-011** — Demo apps in Server (5183/7172), WASM (5184/7173), Auto (5185/7174) + horizontal/vertical layout toggle.
+- **REQ-UI-011** — Demo apps in Server (5183/7172), WASM (5184/7173), Auto (5185/7174) + horizontal/vertical layout toggle. (extends BRD-40/BRD-41)
   - *Acceptance:* each host boots and shows identical component behavior; layout toggle works.
 
 <a id="d-req-ui-012"></a>
-- **REQ-UI-012** — `CaptureUnmatchedValues` attribute splatting on all components.
+- **REQ-UI-012** — `CaptureUnmatchedValues` attribute splatting on all components. (extends BRD-53)
   - *Acceptance:* passing `id`/`style`/`@onkeydown` to any component does not throw `InvalidOperationException`.
 
 <a id="d-req-ui-013"></a>
-- **REQ-UI-013** — `ButtonIcon` / `AlertIcon` wrapper components (warning-free icon child content).
+- **REQ-UI-013** — `ButtonIcon` / `AlertIcon` wrapper components (warning-free icon child content). (extends BRD-4)
   - *Acceptance:* `<ButtonIcon>`/`<AlertIcon>` compile with no RZ10012; suppression removed from Directory.Build.props.
 
 <a id="d-req-ui-014"></a>
-- **REQ-UI-014** — Resolve all AstroLyfe consumer feedback (`docs/AstroLyfe-TrBlazeUI-Feedback.md`, TR-001…TR-009) in the library, not via app-side workarounds.
+- **REQ-UI-014** — Resolve all AstroLyfe consumer feedback (`docs/AstroLyfe-TrBlazeUI-Feedback.md`, TR-001…TR-009) in the library, not via app-side workarounds. (extends BRD-7/BRD-8/BRD-18/BRD-21/BRD-23/BRD-24/BRD-28/BRD-53)
   - *Acceptance:* Tab/Shift+Tab leave a closed SelectTrigger (WCAG 2.1.2); Select popup renders and operates with **and without** a `PortalHost` in the layout (inline fallback + console warning); trigger has an accessible name at first render (`SelectValue` sync text + raw-value fallback + `id` for `aria-labelledby`); `DropdownMenuTrigger AsChild` slots a `Button` as the trigger with no nested buttons; icons are `aria-hidden` by default and expose `role="img"`+`aria-label` only when `AriaLabel` is set (Feather/Lucide/Heroicons); unknown icon names render an empty size-preserving placeholder (`data-trblazeui-missing-icon`) and log a one-time warning — never an alert-triangle; `.sr-only` in `trblazeui.css` has zero scroll footprint (no page horizontal overflow at 390px); `<Input Label="…">` renders an associated `<label>`; `Grid`/`GridItem` (12-col, `Xs/Sm/Md/Lg/Xl`, `Spacing`/`Gap`/`Columns`) ship with CSS + demo (`/components/grid`) + FluentUI migration note. *Verified 2026-07-02:* Release build 0/0; Playwright/Chromium runtime smoke across `/components/select`, `/components/dropdown-menu`, `/components/input`, `/components/grid`, `/components/datatable` (390px), `/icons/feather` — 18/18 PASS, including a dedicated no-PortalHost build of the demo.
   - **⚠ Re-opened 2026-07-22 (TR-003 only) — `Needs re-verify`.** AstroLyfe's live 2.0.0 re-verification, reproduced today on the demo, shows the "accessible name at first render" acceptance is **not** met: `SelectTrigger` renders `<button role="combobox">` with the value as inner text but no `aria-label`/`aria-labelledby`, and `combobox` is not a name-from-content role, so the accessible name is empty and axe `button-name` (critical) fires. *Revised acceptance to close:* the trigger exposes a non-empty accessible name at first render **via `aria-labelledby` → the `SelectValue` span id (and/or the surrounding `FieldLabel`) or an `AriaLabel` param** — rendering the value as inner text alone does not satisfy it. The other eight fixes (TR-001/002/004/005/006/007/008/009) remain confirmed fixed live in 2.0.0.
   - **✅ Closed 2026-07-22 (`*fix-issues`) → `Verified`.** Primitive `SelectTrigger` now emits a default `aria-labelledby` pointing at the already-rendered `SelectValue` span (`GetDefaultLabelledBy()` returns `objContext.ValueId`), so the `role="combobox"` trigger carries a non-empty accessible name from first render; it defers (returns null, attribute omitted) only when the author splats a **non-empty** `aria-label`/`aria-labelledby` — a null-valued forwarded key no longer counts, which was the first-cut bug caught live. Styled `SelectTrigger` adds an `AriaLabel` parameter (emits `aria-label`) for a descriptive purpose-name that overrides the value-derived default per ARIA precedence. *Verified 2026-07-22:* Release build **0/0**; headless-Chromium **8/8** on the new `/verify-ui014` harness (`tests/verify/ui-ui014.spec.js`) — axe **`button-name` = 0 violations** (@axe-core/playwright), accessible names present for valued ("Patreon") + placeholder-only ("Select a role") triggers, and `AriaLabel="Choose your role"` wins with no default `aria-labelledby`. Regression reconfirm: `tests/verify/ui-ui016.spec.js` **21/21**. Ledger `docs/.last-verify.json`.
 
 <a id="d-req-ui-015"></a>
-- **REQ-UI-015** — Resolve all TrStudio consumer feedback (`docs/TrStudio-TrBlazeUI-Feedback.md`, TR-001…TR-011) in the library, not via app-side workarounds.
+- **REQ-UI-015** — Resolve all TrStudio consumer feedback (`docs/TrStudio-TrBlazeUI-Feedback.md`, TR-001…TR-011) in the library, not via app-side workarounds. (extends BRD-25/BRD-40/BRD-42 to BRD-44)
   - *Acceptance:* `DataTable`, `Alert`, `Checkbox`, `Switch` splat unmatched attributes (`data-testid`/`data-*`/`id`) onto their rendered root without an `InvalidOperationException` (Badge/FieldError already did — TR-001/002/004/008); a controlled `Switch` (`CheckedChanged` bound but the bound `Checked` left unchanged by a gate/interceptor) does NOT flip `aria-checked`, while an uncontrolled `Switch` still toggles (TR-009); a `DataTable` on a ≤400px viewport keeps `document.documentElement.scrollWidth == clientWidth` (root `min-w-0`, footer wraps) with no control clipped (TR-010); `FileUpload.OnFilesSelected` exists as an alias of `FilesChanged` (TR-007); the AI reference compiles as written for the inline Button/Alert icon pattern (TR-003), the flat `Empty` API (TR-005), the composite `Pagination` API + namespace (TR-006), and `FileUpload` (TR-007); and every published nupkg (Components/Primitives/Icons.Lucide) carries **no** `<frameworkReferences>` block, so a MAUI Mac Catalyst consumer resolves them without NETSDK1082 (TR-011, `AddRazorSupportForMvc` removed). *Verified 2026-07-12:* Release build 0/0; `dotnet pack` + `unzip -p *.nuspec | grep -c frameworkReference == 0` on all three packages; headless-Chromium runtime verification (`tests/verify/ui-trstudio.spec.js` on `/verify-trstudio`) — 14/14 incl. §4a splat render-truth + table data, gated-vs-uncontrolled Switch, TR-010 scrollWidth==390, and §4b visual-truth at 1280px + 390px.
 
 <a id="d-req-ui-016"></a>
-- **REQ-UI-016** — Resolve the AstroLyfe UAT-2/UAT-3 consumer feedback (`docs/AstroLyfe-TrBlazeUI-Feedback.md`, TR-010…TR-012) in the library, not via app-side workarounds. Logged by triage 2026-07-21; **fixed + verified 2026-07-21**.
+- **REQ-UI-016** — Resolve the AstroLyfe UAT-2/UAT-3 consumer feedback (`docs/AstroLyfe-TrBlazeUI-Feedback.md`, TR-010…TR-012) in the library, not via app-side workarounds. Logged by triage 2026-07-21; **fixed + verified 2026-07-21**. (extends BRD-25/BRD-19/BRD-20/BRD-37)
   - *Acceptance (TR-010 — DataTable default chrome):* a bare `<DataTable TData="X" Data="@List">` renders **just the table** — the search/Columns toolbar is opt-in (`ShowToolbar` defaults `false`, or search is split out of the toolbar), and the pagination bar auto-suppresses when the row count fits a single page (guard becomes row-count > `PageSize`, not merely `Any()`). Verified by: a ≤`PageSize` grid showing no "Rows per page"/"Page 1 of 1" chrome, and a >`PageSize` grid still paginating.
   - *Acceptance (TR-011 — Dialog vertical clamp):* `DialogContent`/`AlertDialogContent` are clamped inside the visual viewport at every viewport height — `getBoundingClientRect().top >= 0` and the title/header visible — for content taller than the viewport, with internal scrolling (`max-height: calc(100vh - 2×gutter)` + `overflow-y:auto`) rather than overflow in both directions. Must hold at 1366×720 and 1280×600 (currently −245px / −305px) and at 390px width. Sheet/Drawer (`inset-y-0`) must be left untouched. The fix must also be robust across the `transform` vs standalone-`translate` centering mechanisms, since consumers have shipped overrides against both.
   - *Acceptance (TR-012 — popover token dependency):* `SelectContent` (and the other `bg-popover` surfaces) paint an **opaque** panel with legible text even when the host application defines no `--popover`/`--popover-foreground` — e.g. the library ships sensible token fallbacks (`var(--popover, <light>)`) or default `:root` definitions in `trblazeui.css`. Verified by opening a Select with the host tokens stripped and asserting the listbox `background-color` is not `rgba(0,0,0,0)`.
@@ -172,7 +182,7 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 
 
 <a id="d-req-ui-017"></a>
-- **REQ-UI-017** — Resolve the TechieBlog consumer feedback (`docs/TechieBlog-TrBlazeUI-Feedback.md`, TR-001…TR-065) in the library, not via app-side workarounds. Logged and fixed 2026-08-11.
+- **REQ-UI-017** — Resolve the TechieBlog consumer feedback (`docs/TechieBlog-TrBlazeUI-Feedback.md`, TR-001…TR-065) in the library, not via app-side workarounds. Logged and fixed 2026-08-11. (extends BRD-4 to BRD-12/BRD-28/BRD-38)
   - *Acceptance (splatting):* every public component type in both shipped assemblies declares `[Parameter(CaptureUnmatchedValues = true)]`, verified by reflection, and a `data-testid` on `Label`, `Typography*`, `Breadcrumb*`, `TabsList`, `Rating`, `Select*`, `Alert*` and `Item*` lands on the rendered element instead of throwing. Components with no element of their own accept the attributes without rendering them, and that exception list is published.
   - *Acceptance (Rating):* options are individually focusable with a roving `tabindex`, carry a literal `aria-checked="true"/"false"`, are operable with the arrow keys, and emit no duplicate `<linearGradient>` ids; a `ReadOnly` rating renders `role="img"` + `aria-label` with no radio semantics and no tab stop; `Focusable="false"` removes the tab stop for a decorative rating.
   - *Acceptance (Tabs):* exactly one trigger per group reports `aria-selected="true"`; `aria-controls` either names an element that exists or is absent; no `role="tab"` exists without a `role="tablist"` ancestor, including inside `MarkdownEditor`.
@@ -188,12 +198,12 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
   - *Not in scope (recorded as TechieBlog-side):* the `Tb` component-name prefix in their UIDesign spec and mockups, the Coding-Standards `_variables.css` conflict, the captcha (TR-015), and the `INewsletterService` progress observation.
 
 <a id="d-req-ui-018"></a>
-- **REQ-UI-018** — Resolve post-2.0.2 TechieBlog feedback not owned by the closed TR-001…TR-065 acceptance set.
+- **REQ-UI-018** — Resolve post-2.0.2 TechieBlog feedback not owned by the closed TR-001…TR-065 acceptance set. (extends BRD-4 to BRD-12)
   - *Acceptance:* a styled `Select` can initialize a one-way value without requiring a dummy callback; delayed/stale parent echoes cannot overwrite newer focused text; Rating keyboard movement keeps DOM focus, roving tabindex, and selection aligned; `ItemContent` safely shrinks at 390px; `StatTile` exposes stable value/label hooks; documented standard utility families include the reported min-height, opacity, responsive negative-margin, and gradient-stop cases (or documentation states exact exclusions); and `AnchorNav` preserves the current route when navigating to a fragment under a document `<base>`.
   - *Documentation note:* explain that newly introduced component namespaces require an `_Imports.razor` update; this is expected Razor behavior, not a standalone defect. If the utility-family promise or component API expands beyond the BRD, run `*amend-docs TrBlazeUI` before implementation.
 
 <a id="d-req-ui-019"></a>
-- **REQ-UI-019** — Resolve the TfLens consumer feedback in `docs/TfLens-TrBlazeUI-Feedback.md` that is still open against 2.1.0 source. Logged 2026-08-31 by `*triage-issues`; the stale entries (TR-002/003/013/020/023) are explicitly **out of scope — they need a publish, not a fix**.
+- **REQ-UI-019** — Resolve the TfLens consumer feedback in `docs/TfLens-TrBlazeUI-Feedback.md` that is still open against 2.1.0 source. Logged 2026-08-31 by `*triage-issues`; the stale entries (TR-002/003/013/020/023) are explicitly **out of scope — they need a publish, not a fix**. (extends BRD-1 to BRD-3/BRD-38/BRD-39)
   - *Acceptance (code):*
     - **TR-009** — with `ShowPagination="false"`, a `DataTable` renders **every** row of `Data` regardless of `InitialPageSize`; a 500-row grid with pagination off renders 500 body rows and no pager.
     - **TR-008** — `LucideIcon` resolves every name in `lucide.json`'s `aliases` map by falling back to the alias's parent in `icons`; `check-circle`, `check-circle-2`, `alert-circle`, `alert-triangle`, `x-circle`, `help-circle` and `circle-help` all render a real `<svg>` with 0 `data-trblazeui-missing-icon` placeholders. `lucide.json` is packed into the nupkg so the documented name lookup works.
@@ -213,57 +223,57 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 ## Functional requirements
 
 <a id="d-req-fn-001"></a>
-- **REQ-FN-001** — All 10 projects target `net10.0`; Microsoft.AspNetCore.* at 10.0.2; third-party packages at .NET-10-compatible versions. *(Phase WS-1)*
+- **REQ-FN-001** — All 10 projects target `net10.0`; Microsoft.AspNetCore.* at 10.0.2; third-party packages at .NET-10-compatible versions. *(Phase WS-1)* (extends BRD-52)
   - *Acceptance:* When a developer builds the solution in Release, then every project targets net10.0, ASP.NET Core resolves at 10.0.2 or later, and the build returns 0 errors.
   - *(Acceptance line written 2026-09-12 by the verifier from this row's own description; no scope changed.)*
 
 <a id="d-req-fn-002"></a>
-- **REQ-FN-002** — Coding standards enforced across `src/`+`demos/`: `obj`-prefixed instance fields (0 underscore violations), file-scoped namespaces (0 block-scoped across 356 files), `ConfigureAwait(false)` in library code, specific-exception handling. *(Phase WS-1.5)*
+- **REQ-FN-002** — Coding standards enforced across `src/`+`demos/`: `obj`-prefixed instance fields (0 underscore violations), file-scoped namespaces (0 block-scoped across 356 files), `ConfigureAwait(false)` in library code, specific-exception handling. *(Phase WS-1.5)* (extends BRD-52)
   - *Acceptance:* When a developer builds the solution in Release, then no underscore field, block-scoped namespace or bare library await remains, and warnings are errors.
   - *(Acceptance line written 2026-09-12 by the verifier from this row's own description; no scope changed.)*
 
 <a id="d-req-fn-003"></a>
-- **REQ-FN-003** — XML documentation on all public members. *(Phase WS-1.5.3)* — **Done 2026-06-30.** Un-suppressed CS1591 to enumerate the gap (236 warnings / 34 files, incl. enums, DTOs, demo services, and Blazor lifecycle overrides), documented every member with accurate summaries (+ `<param>`/`<returns>` where applicable), then removed the `<NoWarn>$(NoWarn);CS1591</NoWarn>` suppression from `Directory.Build.props` so docs are now build-enforced. Full Release rebuild: 0 warnings / 0 errors.
+- **REQ-FN-003** — XML documentation on all public members. *(Phase WS-1.5.3)* — **Done 2026-06-30.** Un-suppressed CS1591 to enumerate the gap (236 warnings / 34 files, incl. enums, DTOs, demo services, and Blazor lifecycle overrides), documented every member with accurate summaries (+ `<param>`/`<returns>` where applicable), then removed the `<NoWarn>$(NoWarn);CS1591</NoWarn>` suppression from `Directory.Build.props` so docs are now build-enforced. Full Release rebuild: 0 warnings / 0 errors. (extends BRD-52)
   - *Acceptance:* When a developer builds the solution in Release, then CS1591 is unsuppressed, no undocumented-member warning appears, and the build returns 0 warnings.
   - *(Acceptance line written 2026-09-12 by the verifier from this row's own description; no scope changed.)*
 
 <a id="d-req-fn-004"></a>
-- **REQ-FN-004** — `.github/workflows/publish-github-packages.yml` (pack and push all five packages to GitHub Packages when a release is published) and `build.yml` (PR validation) present and functioning. *(Phase WS-2)*
+- **REQ-FN-004** — `.github/workflows/publish-github-packages.yml` (pack and push all five packages to GitHub Packages when a release is published) and `build.yml` (PR validation) present and functioning. *(Phase WS-2)* (extends BRD-42)
   - *Acceptance:* When the owner publishes a release, then the publish workflow puts all five packages on GitHub Packages at the release tag's version.
   - *(Acceptance line corrected 2026-10-02. GitHub Packages is the source for every application the owner builds; nuget.org is for external users, and what is published there, and when, is the owner's decision. This row never checks nuget.org. `publish-nuget.yml` is the separate, manually run public workflow; its own guards are still asserted by this row's test.)*
 
 <a id="d-req-fn-005"></a>
-- **REQ-FN-005** — Per-package MinVer versioning (tag prefixes) + Directory.Build.props metadata (Apache-2.0, repo URLs, strict build flags). *(Phase WS-2)*
+- **REQ-FN-005** — Per-package MinVer versioning (tag prefixes) + Directory.Build.props metadata (Apache-2.0, repo URLs, strict build flags). *(Phase WS-2)* (extends BRD-43)
   - *Acceptance:* When a developer packs at a given version on the repository, then one shared version stamps all five packages and the props file declares Apache-2.0 and the repository URL.
   - *(Acceptance line written 2026-09-12 by the verifier from this row's own description; no scope changed.)*
 
 <a id="d-req-fn-006"></a>
-- **REQ-FN-006** — `docs/TrBlazeUI-AI-Reference.md` covers all components/primitives/icons/patterns for AI consumption. *(Phase WS-3)*
+- **REQ-FN-006** — `docs/TrBlazeUI-AI-Reference.md` covers all components/primitives/icons/patterns for AI consumption. *(Phase WS-3)* (extends BRD-45/BRD-46/BRD-47)
   - *Acceptance:* When a developer follows the AI reference's imports block on a new page, then every shipped component namespace resolves and no example names a missing API.
   - *(Acceptance line written 2026-09-12 by the verifier from this row's own description; no scope changed.)*
 
 <a id="d-req-fn-007"></a>
-- **REQ-FN-007** — Claude Code `/trblazeui` skill (integrate, generate page/form/dashboard/component/service, setup-theme, list-components) + distributable copy. *(Phase WS-4)*
+- **REQ-FN-007** — Claude Code `/trblazeui` skill (integrate, generate page/form/dashboard/component/service, setup-theme, list-components) + distributable copy. *(Phase WS-4)* (extends BRD-45)
   - *Acceptance:* When a consumer opens the shipped Claude Code skill, then it offers integrate, generate, setup-theme and list-components, with a distributable copy under docs/skills.
   - *(Acceptance line written 2026-09-12 by the verifier from this row's own description; no scope changed.)*
 
 <a id="d-req-fn-008"></a>
-- **REQ-FN-008** — OpenCode `trblazeui` agent mirroring the Claude Code skill + distributable copy. *(Phase WS-5)*
+- **REQ-FN-008** — OpenCode `trblazeui` agent mirroring the Claude Code skill + distributable copy. *(Phase WS-5)* (extends BRD-45)
   - *Acceptance:* When a consumer opens the shipped OpenCode agent, then it offers the same commands as the Claude Code skill, from a distributable copy under docs/skills.
   - *(Acceptance line written 2026-09-12 by the verifier from this row's own description; no scope changed.)*
 
 <a id="d-req-fn-009"></a>
-- **REQ-FN-009** — The strict Release build (`dotnet build TrBlazeUI.sln -c Release -p:CI=true`) must restore and compile with **0 NU1902** audit errors. Currently `HtmlSanitizer 9.0.892` (referenced by `TrBlazeUI.Components` for REQ-NFR-003) drags in `AngleSharp 0.17.1`, which carries a known moderate-severity advisory (GHSA-pgww-w46g-26qg); NuGetAudit raises NU1902 and `TreatWarningsAsErrors` turns it into 6 build errors across the shipped library + all demo hosts. *Logged from triage 2026-07-18.*
+- **REQ-FN-009** — The strict Release build (`dotnet build TrBlazeUI.sln -c Release -p:CI=true`) must restore and compile with **0 NU1902** audit errors. Currently `HtmlSanitizer 9.0.892` (referenced by `TrBlazeUI.Components` for REQ-NFR-003) drags in `AngleSharp 0.17.1`, which carries a known moderate-severity advisory (GHSA-pgww-w46g-26qg); NuGetAudit raises NU1902 and `TreatWarningsAsErrors` turns it into 6 build errors across the shipped library + all demo hosts. *Logged from triage 2026-07-18.* (extends BRD-49)
   - *Acceptance:* `dotnet build TrBlazeUI.sln -c Release -p:CI=true` returns **0 warnings / 0 errors** again — no NU1902 — achieved by upgrading `HtmlSanitizer` to a version whose transitive `AngleSharp` is patched (or an explicit patched `AngleSharp` PackageReference / a justified, scoped `NuGetAuditSuppress` with a comment); RichTextEditor sanitization (REQ-NFR-003) still functions; then REQ-NFR-005 re-verifies to `Verified`.
 
 <a id="d-req-fn-010"></a>
-- **REQ-FN-010** — Ship a library-owned Codex specialist definition with the NuGet package.
+- **REQ-FN-010** — Ship a library-owned Codex specialist definition with the NuGet package. (extends BRD-45/BRD-46)
   - *Acceptance:* `docs/skills/codex-trblazeui.toml` is packed and deployed to `.codex/agents/trblazeui.toml`; it uses plain `developer_instructions`, reads `.trblazeui/TrBlazeUI-AI-Reference.md`, follows consumer `AGENTS.md`, preserves unrelated consumer files, and is discoverable in a clean NuGet-only Codex consumer after `dotnet build`.
 
 ## Non-functional
 
 <a id="d-req-nfr-001"></a>
-- **REQ-NFR-001** — WCAG 2.1 AA: keyboard navigation, ARIA roles/states, focus management + trapping, screen-reader support on all interactive components. (Not independently audited — 90%.)
+- **REQ-NFR-001** — WCAG 2.1 AA: keyboard navigation, ARIA roles/states, focus management + trapping, screen-reader support on all interactive components. (Not independently audited — 90%.) (extends BRD-38/BRD-50)
   - *Acceptance:* When a keyboard user tabs through the primitive demo screens, then focus reaches each control and an automated WCAG 2.1 AA scan reports zero violations.
   - *(Acceptance line written 2026-09-12 by the verifier from this row's own description; no scope changed.)*
   - *Findings 2026-09-12 (first grading against a scanner — this row had no acceptance line before, so nothing had ever been able to fail it).* Scan: axe-core, tags `wcag2a`/`wcag2aa`/`wcag21a`/`wcag21aa`, over `/components/select`, `/components/datatable`, `/components/dialog` and `/components/collapsible` at 1280. Keyboard reach **passes** on all four — Tab moves focus off `<body>` every time. Seven violation types, 37 nodes, every one graded `serious`; full evidence `tests/.artifacts/verify/req-nfr-001/axe.json`.
@@ -280,22 +290,22 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
     - *Still works:* paging advances (rows 1-5 → 6-10 of 500), both popovers open from their buttons, the select-all menu opens and keeps its name, and the decorative box still paints its state. Regressions green: `ui-tflens-2` 37/37, `ui-tflens` 44/44, `ui-techieblog` 76/76, `ui-ui016` 23/23, `ui-demo-2-1-0` 15/15, `ui-ui014` 8/8, `ui-ui004` PASS, plus 29/30 row-mapped tests (1 skipped: the owner-gated publish).
 
 <a id="d-req-nfr-002"></a>
-- **REQ-NFR-002** — Zero-config adoption: pre-built minified CSS (~83 KB) shipped; no Tailwind/Node required by consumers; `-p:CI=true` skips the Tailwind compile.
+- **REQ-NFR-002** — Zero-config adoption: pre-built minified CSS (~83 KB) shipped; no Tailwind/Node required by consumers; `-p:CI=true` skips the Tailwind compile. (extends BRD-37)
   - *Acceptance:* When a consumer with no Node installed opens a page, then the pre-built stylesheet is served and paints the components.
   - *(Acceptance line written 2026-09-12 by the verifier from this row's own description; no scope changed.)*
 
 <a id="d-req-nfr-003"></a>
-- **REQ-NFR-003** — Security: RichTextEditor HTML output sanitized (HtmlSanitizer); no secrets in the library.
+- **REQ-NFR-003** — Security: RichTextEditor HTML output sanitized (HtmlSanitizer); no secrets in the library. (extends BRD-49)
   - *Acceptance:* When a user submits script-bearing HTML on the rich-text editor screen, then the script is stripped, benign markup survives, and no credential ships in the library.
   - *(Acceptance line written 2026-09-12 by the verifier from this row's own description; no scope changed.)*
 
 <a id="d-req-nfr-004"></a>
-- **REQ-NFR-004** — Render-mode parity: identical component behavior across Server, WASM, Auto from one shared RCL.
+- **REQ-NFR-004** — Render-mode parity: identical component behavior across Server, WASM, Auto from one shared RCL. (extends BRD-40/BRD-41)
   - *Acceptance:* When a developer opens the same component screen on the Server, WASM and Auto hosts, then all three render from one shared project and behave identically.
   - *(Acceptance line written 2026-09-12 by the verifier from this row's own description; no scope changed.)*
 
 <a id="d-req-nfr-005"></a>
-- **REQ-NFR-005** — Clean Release build under `TreatWarningsAsErrors`: `dotnet build TrBlazeUI.sln -c Release -p:CI=true` must report 0 warnings / 0 errors.
+- **REQ-NFR-005** — Clean Release build under `TreatWarningsAsErrors`: `dotnet build TrBlazeUI.sln -c Release -p:CI=true` must report 0 warnings / 0 errors. (extends BRD-42/BRD-43/BRD-44/BRD-52)
   - *Acceptance:* When a developer builds the solution in Release, then it returns 0 warnings and 0 errors under warnings-as-errors.
   - *(Acceptance line written 2026-09-12 by the verifier from this row's own description; no scope changed.)*
   - *Resolved (2026-06-30):* the 5 IDE0031 sites were all `if (x != null) { x.StateChanged += / -= handler; }` guards around an **event** accessor. The analyzer's null-propagation fix (`x?.StateChanged -= h`) is illegal C# (CS0131 — `?.` can't be on the left of `+=`/`-=`), so there is no legal in-code simplification. Resolved by downgrading just that rule — `dotnet_diagnostic.IDE0031.severity = suggestion` in the repo-root `.editorconfig`, with an explanatory comment. Release build now clean (0/0, exit 0) via WSL rung #4.
@@ -443,3 +453,28 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 
 - <a id="d-req-ui-052"></a> **REQ-UI-052** (extends BRD-4 Button) InputGroupButton is the button itself: the reference shows one button, and its attributes reach it (Lekhak TR-007)
   - *Acceptance:* When a consumer copies the reference's InputGroup example on the InputGroup demo screen, then exactly one button renders, carrying its own attributes.
+
+## Toast
+
+- <a id="d-req-ui-053"></a> **REQ-UI-053** (extends BRD-24 Toast) Toast description draws at full opacity so it clears WCAG 2.1 AA contrast (Sevak TR-045)
+  - *Acceptance:* When a description toast is shown on the Toast demo screen, then the description carries no `opacity-90` and its colour clears 4.5:1 contrast.
+
+## FileUpload
+
+- <a id="d-req-ui-054"></a> **REQ-UI-054** (extends BRD-11 FileUpload) FileUpload AriaLabel and InputId reach the rendered file input (Sevak TR-046)
+  - *Acceptance:* When a FileUpload with `AriaLabel` and `InputId` is rendered on the FileUpload demo screen, then the underlying `<input type="file">` carries the matching `aria-label` and `id` attributes.
+
+## Select
+
+- <a id="d-req-ui-055"></a> **REQ-UI-055** (extends BRD-21 floating panels and menus) Select returns focus to its trigger after selection so Escape still dismisses a parent Dialog (TechieBlog TR-075)
+  - *Acceptance:* When a Select option is chosen inside a Dialog on the Dialog demo screen, then focus returns to the Select trigger and Escape closes the dialog.
+
+## NumericInput
+
+- <a id="d-req-ui-056"></a> **REQ-UI-056** (extends BRD-9 numeric input) NumericInput supports nullable binding so an empty box binds null (Lekhak TR-008)
+  - *Acceptance:* When a NumericInput with `@bind-NullableValue` is cleared on the NumericInput demo screen, then the bound value is `null` rather than the numeric type's default.
+
+## Card
+
+- <a id="d-req-ui-057"></a> **REQ-UI-057** (extends BRD-16 layout) CardAction sits at the right edge of the title row when placed inside CardHeader (Lekhak TR-009)
+  - *Acceptance:* When a CardAction is placed inside a CardHeader on the Card demo screen, then its right edge aligns with the header area and it sits on the title row.

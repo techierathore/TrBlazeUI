@@ -6,7 +6,10 @@
 @source "../../Components";
 /* The submenu classes shared by Menubar, DropdownMenu and ContextMenu (Chatur TR-020). */
 @source "../../Utilities/SubmenuPlacer.cs";
-
+/* Code-behind files (.razor.cs) contain computed class strings such as CardHeader's
+ * has-[data-slot=card-action] variants (Lekhak TR-009); the default scan only picks up Razor/HTML,
+ * so include them explicitly. */
+@source "../../Components/**/*.razor.cs";
 /* Component structural variables. Declared through zero-specificity :where(:root), like the
  * design-token fallbacks below, so any host declaration of the same token wins (Lekhak TR-004). */
 @layer base {
@@ -750,8 +753,9 @@
  * far edge with `ms-auto` and SortableList draws its row number with `tabular-nums`; both are
  * single-use, so they lean entirely on the source scan. Safelisted so a scan that misses one
  * degrades into a slightly larger bundle rather than a step whose trailing badge sits against
- * its title (REQ-UI-006 / REQ-UI-017). */
-@source inline("{ms,me}-auto tabular-nums");
+ * its title (REQ-UI-006 / REQ-UI-017). CardAction uses `ms-4` to keep the action away from the
+ * title only when an action is actually rendered (Lekhak TR-009). */
+@source inline("{ms,me}-auto tabular-nums ms-4");
 
 /* Container-scale sizing (min-w-3xl etc). A wide DataTable inside an `overflow-x-auto` wrapper
  * needs a minimum width, and only the arbitrary-value form `min-w-[720px]` used to be reachable -

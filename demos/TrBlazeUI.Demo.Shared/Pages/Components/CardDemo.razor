@@ -1,6 +1,7 @@
 @page "/components/card"
 @using TrBlazeUI.Components.Card
 @using TrBlazeUI.Components.Button
+@using TrBlazeUI.Components.Checkbox
 @using TrBlazeUI.Icons
 
 <PageTitle>Card Component - TrBlazeUI</PageTitle>
@@ -248,6 +249,33 @@
         </div>
     </div>
 
+    <!-- TR-009: card action in header -->
+    <div class="space-y-4" data-testid="card-tr009">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Card with Header Action</h2>
+            <p class="text-sm text-muted-foreground">
+                <code class="bg-muted px-1 py-0.5 rounded">CardAction</code> sits at the right edge of
+                the title row when it is placed inside <code class="bg-muted px-1 py-0.5 rounded">CardHeader</code>
+                (Lekhak TR-009).
+            </p>
+        </div>
+        <div class="grid gap-4" style="max-width: 400px;">
+            <Card>
+                <CardHeader data-testid="card-tr009-header">
+                    <CardTitle>Review queue</CardTitle>
+                    <CardDescription>Stories waiting for review</CardDescription>
+                    <CardAction>
+                        <Checkbox Id="card-tr009-action" @bind-Checked="objShowVerified" data-testid="card-tr009-action" />
+                        <label for="card-tr009-action" class="text-sm">Show verified</label>
+                    </CardAction>
+                </CardHeader>
+                <CardContent>
+                    <p class="text-sm text-muted-foreground">3 stories pending</p>
+                </CardContent>
+            </Card>
+        </div>
+    </div>
+
     <!-- Custom Styling -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -354,5 +382,5 @@
 </div>
 
 @code {
-    // No code-behind needed for this demo
+    private bool objShowVerified;
 }
