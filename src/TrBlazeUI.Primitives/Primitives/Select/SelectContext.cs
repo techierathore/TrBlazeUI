@@ -55,6 +55,13 @@ public class SelectContext<TValue> : PrimitiveContextWithEvents<SelectState<TVal
     public Action<TValue?>? OnValueChange { get; set; }
 
     /// <summary>
+    /// Callback invoked when the dropdown closes and focus should return to the trigger.
+    /// Returning focus keeps a Select inside a Dialog from dropping focus to <c>&lt;body&gt;</c>,
+    /// which would leave Escape unable to dismiss the dialog (TechieBlog TR-075).
+    /// </summary>
+    public Func<Task>? OnFocusTriggerRequested { get; set; }
+
+    /// <summary>
     /// Initializes a new instance of the SelectContext.
     /// </summary>
     public SelectContext() : base(new SelectState<TValue>(), "select")
@@ -128,11 +135,17 @@ public class SelectContext<TValue> : PrimitiveContextWithEvents<SelectState<TVal
     /// </summary>
     public void Close()
     {
+        var vWasOpen = State.IsOpen;
         UpdateState(state =>
         {
             state.IsOpen = false;
             state.FocusedIndex = -1;
         });
+
+        if (vWasOpen)
+        {
+            _ = OnFocusTriggerRequested?.Invoke();
+        }
     }
 
     /// <summary>
@@ -173,6 +186,10 @@ public class SelectContext<TValue> : PrimitiveContextWithEvents<SelectState<TVal
 
         // Invoke value change callback
         OnValueChange?.Invoke(value);
+
+        // Return focus to the trigger so a Select inside a Dialog does not leave focus on <body>
+        // after the listbox unmounts (TechieBlog TR-075).
+        _ = OnFocusTriggerRequested?.Invoke();
     }
 
     /// <summary>

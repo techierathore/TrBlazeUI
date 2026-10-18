@@ -4,15 +4,23 @@
 |---|---|
 | App | TrBlazeUI |
 | Upstream | TechieFlow |
-| Updated | 2026-10-09 |
+| Updated | 2026-10-18 |
 
 ## Summary
 
-6 entries: 0 blockers, 2 majors (TF-001 and TF-005 closed), 4 minors (TF-002, TF-003, TF-004 closed; TF-006 open), 0 nice-to-haves. 0 blocking now, 1 open (TF-006 the closing-message guard mixes up feedback entries that share a number across consumers), 0 fixed upstream and waiting, 5 closed.
+6 entries: 0 blockers, 2 majors (TF-001 and TF-005 closed), 4 minors (TF-002, TF-003, TF-004 closed; TF-006 fixed upstream), 0 nice-to-haves. 0 blocking now, 0 open, 1 fixed upstream and waiting (TF-006, fixed 2026-10-18, ships in TechieFlow v1.2.0), 5 closed.
 
-Last consolidated: 2026-10-09. Entries are sorted by severity.
+Last consolidated: 2026-10-18. Entries are sorted by severity.
 
-Nothing is blocked. TF-003, TF-004 and TF-005 were re-checked on 2026-10-09 during the Chatur TR-019 and Lekhak runs and are closed. TF-006 was found on the 2026-10-09 Lekhak run.
+Nothing is blocked. TF-003, TF-004 and TF-005 were re-checked on 2026-10-09 during the Chatur TR-019 and Lekhak runs and are closed. TF-006 was found on the 2026-10-09 Lekhak run and fixed upstream on 2026-10-18; re-check it here.
+
+## Resolution status (TechieFlow team, 2026-10-18)
+
+The fix ships in **TechieFlow v1.2.0**. It is already in this project's `.tfcore/` through the framework update.
+
+| ID | Fix | Check it here |
+|---|---|---|
+| TF-006 | Fixed upstream, as you suggested. The closing-message check (`tf-owner-text`, run by `guard-status-html.sh`) now reads every feedback file that holds an id, not only the last one read. An id is resolved in the file whose project the same sentence or table row names: in "Lekhak TR-002", Lekhak's file, `docs/Lekhak-TrBlazeUI-Feedback.md`. When the line names no project, the projects the whole message names are used. If the id is still in several files that disagree, the message is asked to say whose it is (`TR-002 is an entry in several feedback files (…); name whose it is with the id, as in "Lekhak TR-002"`), and no other consumer's state is ever reported as this one's. A closed entry written about as open, with its own consumer named, is still refused. Regression case `tb_006` fails 2 of its 3 checks against the script you had and passes now. | Proved on your ten feedback files: for a message naming "Lekhak TR-006" as still open, your script reported it against `docs/TrStudio-TrBlazeUI-Feedback.md, Resolution status 2026-07-12`; the new one reads `docs/Lekhak-TrBlazeUI-Feedback.md`, where it is closed on 2026-10-09. On your next `*triage-and-fix`, name the consumer with each id ("Lekhak TR-002"), as your workaround already does; the guard then checks each against its own file. |
 
 ## Resolution status (TechieFlow team, 2026-10-08)
 

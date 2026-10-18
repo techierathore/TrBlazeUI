@@ -34,6 +34,24 @@
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
+    protected override void OnInitialized()
+    {
+        if (objContext != null)
+        {
+            objContext.OnFocusTriggerRequested = FocusTriggerAsync;
+        }
+    }
+
+    private Task FocusTriggerAsync()
+    {
+        if (objButtonElement.Context != null)
+        {
+            return objButtonElement.FocusAsync().AsTask();
+        }
+
+        return Task.CompletedTask;
+    }
+
     /// <summary>
     /// Additional attributes to be applied to the button element.
     /// </summary>

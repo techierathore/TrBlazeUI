@@ -48,8 +48,11 @@ public partial class CardHeader : ComponentBase
     /// Gets the computed CSS classes for the card header element.
     /// </summary>
     private string CssClass => ClassNames.cn(
-        // Base header styles (from shadcn/ui)
-        "flex flex-col space-y-1.5 p-6",
+        // Base header styles (from shadcn/ui). Always rendered as a two-column grid so a
+        // CardAction placed inside the header sits at the right edge of the title row
+        // (Lekhak TR-009). The action supplies its own start margin so headers without an
+        // action do not pay for unused column gap.
+        "grid gap-1.5 p-6 grid-cols-[1fr_auto] items-start",
         // Custom classes (if provided)
         Class
     );

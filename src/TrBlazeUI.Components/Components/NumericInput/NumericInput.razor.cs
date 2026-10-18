@@ -29,6 +29,26 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
     public EventCallback<TValue> ValueChanged { get; set; }
 
     /// <summary>
+    /// Gets or sets the current value when the field is optional. An empty box binds <c>null</c>
+    /// instead of the type's default, so <c>int?</c> and similar nullable number types can be used
+    /// (Lekhak TR-008).
+    /// </summary>
+    [Parameter]
+    public TValue? NullableValue { get; set; }
+
+    /// <summary>
+    /// Gets or sets the callback invoked when the nullable value changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<TValue?> NullableValueChanged { get; set; }
+
+    /// <summary>
+    /// Whether the nullable value binding is in use. When true, empty input clears the value to
+    /// <c>null</c>; otherwise the component behaves as before.
+    /// </summary>
+    private bool IsNullableBound => NullableValueChanged.HasDelegate;
+
+    /// <summary>
     /// Gets or sets the minimum allowed value.
     /// </summary>
     [Parameter]
@@ -120,8 +140,8 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
 
     private TValue StepValue => Step ?? TValue.One;
 
-    private bool IsAtMax => Max.HasValue && Value >= Max.Value;
-    private bool IsAtMin => Min.HasValue && Value <= Min.Value;
+    private bool IsAtMax => Max.HasValue && (IsNullableBound ? NullableValue : Value) is { } vCurrent && vCurrent >= Max.Value;
+    private bool IsAtMin => Min.HasValue && (IsNullableBound ? NullableValue : Value) is { } vCurrent && vCurrent <= Min.Value;
 
     private string DisplayValue
     {
@@ -132,17 +152,25 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
                 return objEditingValue;
             }
 
+            var vCurrent = IsNullableBound ? NullableValue : (TValue?)Value;
+            if (vCurrent == null)
+            {
+                return string.Empty;
+            }
+
+            var vNonNull = vCurrent.Value;
+
             if (Format != null)
             {
-                return string.Format(CultureInfo.InvariantCulture, $"{{0:{Format}}}", Value);
+                return string.Format(CultureInfo.InvariantCulture, $"{{0:{Format}}}", vNonNull);
             }
 
             if (DecimalPlaces.HasValue && IsFloatingPoint)
             {
-                return string.Format(CultureInfo.InvariantCulture, $"{{0:F{DecimalPlaces.Value}}}", Value);
+                return string.Format(CultureInfo.InvariantCulture, $"{{0:F{DecimalPlaces.Value}}}", vNonNull);
             }
 
-            return Value.ToString() ?? string.Empty;
+            return vNonNull.ToString() ?? string.Empty;
         }
     }
 
@@ -152,7 +180,7 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
 
     private string? AriaValueMax => Max?.ToString(null, CultureInfo.InvariantCulture);
 
-    private string AriaValueNow => Value.ToString(null, CultureInfo.InvariantCulture);
+    private string? AriaValueNow => (IsNullableBound ? NullableValue : Value)?.ToString(null, CultureInfo.InvariantCulture);
 
     private static bool IsFloatingPoint =>
         typeof(TValue) == typeof(double) ||
@@ -187,36 +215,79 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
         "transition-colors"
     );
 
-    private void HandleInput(ChangeEventArgs args)
+    private async Task HandleInput(ChangeEventArgs args)
     {
         var inputValue = args.Value?.ToString() ?? string.Empty;
         objEditingValue = inputValue;
         objIsEditing = true;
 
+        if (string.IsNullOrWhiteSpace(inputValue))
+        {
+            if (IsNullableBound && NullableValue.HasValue)
+            {
+                NullableValue = null;
+                await NullableValueChanged.InvokeAsync(null);
+            }
+            else if (!IsNullableBound && !Value.Equals(default))
+            {
+                Value = default;
+                await ValueChanged.InvokeAsync(default);
+            }
+            return;
+        }
+
         // Try to parse and update value in real-time
         if (TryParseValue(inputValue, out var parsedValue))
         {
             var clampedValue = ClampValue(parsedValue);
-            if (!clampedValue.Equals(Value))
+            if (IsNullableBound)
+            {
+                if (!NullableValue.Equals(clampedValue))
+                {
+                    NullableValue = clampedValue;
+                    await NullableValueChanged.InvokeAsync(clampedValue);
+                }
+            }
+            else if (!clampedValue.Equals(Value))
             {
                 Value = clampedValue;
-                ValueChanged.InvokeAsync(clampedValue);
+                await ValueChanged.InvokeAsync(clampedValue);
             }
         }
     }
 
-    private void HandleBlur(FocusEventArgs args)
+    private async Task HandleBlur(FocusEventArgs args)
     {
         objIsEditing = false;
 
-        // On blur, ensure we have a valid value
-        if (TryParseValue(objEditingValue, out var parsedValue))
+        if (string.IsNullOrWhiteSpace(objEditingValue))
+        {
+            if (IsNullableBound && NullableValue.HasValue)
+            {
+                NullableValue = null;
+                await NullableValueChanged.InvokeAsync(null);
+            }
+            else if (!IsNullableBound && !Value.Equals(default))
+            {
+                Value = default;
+                await ValueChanged.InvokeAsync(default);
+            }
+        }
+        else if (TryParseValue(objEditingValue, out var parsedValue))
         {
             var clampedValue = ClampValue(parsedValue);
-            if (!clampedValue.Equals(Value))
+            if (IsNullableBound)
+            {
+                if (!NullableValue.Equals(clampedValue))
+                {
+                    NullableValue = clampedValue;
+                    await NullableValueChanged.InvokeAsync(clampedValue);
+                }
+            }
+            else if (!clampedValue.Equals(Value))
             {
                 Value = clampedValue;
-                ValueChanged.InvokeAsync(clampedValue);
+                await ValueChanged.InvokeAsync(clampedValue);
             }
         }
 
@@ -225,7 +296,8 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
 
     private void HandleFocus(FocusEventArgs args)
     {
-        objEditingValue = Value.ToString() ?? string.Empty;
+        var vCurrent = IsNullableBound ? NullableValue : (TValue?)Value;
+        objEditingValue = vCurrent?.ToString() ?? string.Empty;
         objIsEditing = true;
     }
 
@@ -305,7 +377,16 @@ public partial class NumericInput<TValue> : ComponentBase where TValue : struct,
     {
         var clampedValue = ClampValue(value);
 
-        if (!clampedValue.Equals(Value))
+        if (IsNullableBound)
+        {
+            if (!NullableValue.Equals(clampedValue))
+            {
+                NullableValue = clampedValue;
+                objEditingValue = clampedValue.ToString() ?? string.Empty;
+                await NullableValueChanged.InvokeAsync(clampedValue);
+            }
+        }
+        else if (!clampedValue.Equals(Value))
         {
             Value = clampedValue;
             objEditingValue = clampedValue.ToString() ?? string.Empty;

@@ -477,6 +477,45 @@
         </Dialog>
     </div>
 
+    <!-- TR-075: focus returns to SelectTrigger after a pick inside a Dialog -->
+    <div class="space-y-4" data-testid="dialog-tr075">
+        <h2 class="text-2xl font-semibold">Select Focus Return</h2>
+        <p class="text-sm text-muted-foreground">
+            After choosing an option in a styled <code class="bg-muted px-1 py-0.5 rounded">Select</code>
+            inside a dialog, focus returns to the trigger so <strong>Escape</strong> still dismisses
+            the dialog (TechieBlog TR-075).
+        </p>
+
+        <Dialog>
+            <DialogTrigger AsChild>
+                <Button data-testid="dialog-tr075-open">Open dialog with select</Button>
+            </DialogTrigger>
+            <DialogContent data-testid="dialog-tr075-panel">
+                <DialogHeader>
+                    <DialogTitle>Choose a fruit</DialogTitle>
+                    <DialogDescription>
+                        Pick an option, then press Escape to close the dialog.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <Select TValue="string" @bind-Value="objTr075Fruit">
+                    <SelectTrigger data-testid="dialog-tr075-select">
+                        <SelectValue Placeholder="Select a fruit" />
+                    </SelectTrigger>
+                    <SelectContent data-testid="dialog-tr075-options">
+                        <SelectItem TValue="string" Value="@("apple")" Text="Apple">Apple</SelectItem>
+                        <SelectItem TValue="string" Value="@("banana")" Text="Banana">Banana</SelectItem>
+                        <SelectItem TValue="string" Value="@("blueberry")" Text="Blueberry">Blueberry</SelectItem>
+                    </SelectContent>
+                </Select>
+
+                <p data-testid="dialog-tr075-value" class="text-sm text-muted-foreground">
+                    Selected: <strong>@(objTr075Fruit ?? "none")</strong>
+                </p>
+            </DialogContent>
+        </Dialog>
+    </div>
+
     <!-- TR-014: Escape after the dialog body re-renders -->
     <div class="space-y-4">
         <h2 class="text-2xl font-semibold">Escape After a Body Re-render</h2>
@@ -570,6 +609,7 @@
     private int objValidationRuns;
     private string? objPicked;
     private string? objReleaseChannel;
+    private string? objTr075Fruit;
 
     private bool isDialogOpen = false;
     private string? selectedComboboxFramework;

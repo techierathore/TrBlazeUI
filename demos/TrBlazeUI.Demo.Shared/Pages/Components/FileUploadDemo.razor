@@ -117,6 +117,24 @@
         <FileUpload Disabled="true" />
     </div>
 
+    <!-- TR-046: accessible file input -->
+    <div class="space-y-4" data-testid="fileupload-tr046">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Accessible File Input</h2>
+            <p class="text-sm text-muted-foreground">
+                <code class="bg-muted px-1 py-0.5 rounded">AriaLabel</code> and
+                <code class="bg-muted px-1 py-0.5 rounded">InputId</code> reach the rendered
+                <code class="bg-muted px-1 py-0.5 rounded">&lt;input type="file"&gt;</code>, so the
+                control has an accessible name and can be wired to a <code class="bg-muted px-1 py-0.5 rounded">&lt;label for&gt;</code>
+                (Sevak TR-046).
+            </p>
+        </div>
+        <label for="tr046-upload" class="text-sm font-medium">Profile photo</label>
+        <FileUpload InputId="tr046-upload"
+                    AriaLabel="Profile photo upload"
+                    data-testid="fileupload-tr046-control" />
+    </div>
+
     <!-- API Reference -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -135,6 +153,8 @@
                     <p><strong>Disabled:</strong> <code class="bg-muted px-1 py-0.5 rounded">bool</code> - Disables the upload</p>
                     <p><strong>OnValidationError:</strong> <code class="bg-muted px-1 py-0.5 rounded">EventCallback&lt;FileValidationError&gt;</code> - Validation error callback</p>
                     <p><strong>DropzoneContent:</strong> <code class="bg-muted px-1 py-0.5 rounded">RenderFragment?</code> - Custom dropzone content</p>
+                    <p><strong>AriaLabel:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Accessible name for the file input</p>
+                    <p><strong>InputId:</strong> <code class="bg-muted px-1 py-0.5 rounded">string?</code> - Stable id for the file input</p>
                 </div>
             </div>
             <div>

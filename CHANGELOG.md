@@ -9,9 +9,11 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ---
 
-## [Unreleased]
+## [2.1.9] — 2026-10-18
 
 ### Build Validation restore failure — fixed on 2026-10-15
+
+#### Security
 
 #### Security
 
@@ -102,6 +104,39 @@ Answers the four entries Lekhak re-checked as still open on 2.1.6
 - **Every `Button` variant but Outline carries `border-0` (TR-006).** A filled button relied on
   Preflight's `border-width:0`, which a host reboot in a later layer outranked, leaving a 1px
   hairline. A `Class="border"` from the caller still wins.
+
+### Consumer feedback sweep — built and verified on 2026-10-18, after 2.1.8
+
+Answers the open entries in `docs/Sevak-TrBlazeUI-Feedback.md` (TR-045, TR-046),
+`docs/TechieBlog-TrBlazeUI-Feedback.md` (TR-075), and
+`docs/Lekhak-TrBlazeUI-Feedback.md` (TR-008, TR-009).
+
+#### Added
+
+- **`NumericInput.NullableValue` / `NullableValueChanged` (TR-008)**: an optional number field that
+  binds `null` when the box is empty, without changing the existing non-nullable `Value` API.
+  The demo at `/components/numeric-input` shows a nullable integer; `tests/verify/req-ui-056.spec.ts`
+  checks that clearing the input binds `null`.
+- **`CardAction` positioned at the header right edge (TR-009)**: `CardHeader` renders a
+  two-column grid and `CardAction` carries the column placement, so the action sits at the end of
+  the title row. The demo at `/components/card` shows the layout;
+  `tests/verify/req-ui-057.spec.ts` checks the alignment.
+
+#### Fixed
+
+- **Toast description contrast (TR-045)**: removed the `opacity-90` class from the description so
+  it paints at full foreground opacity and clears WCAG 2.1 AA against the toast background. The
+  demo at `/components/toast` shows a contrast probe;
+  `tests/verify/req-ui-053.spec.ts` measures the ratio.
+- **`FileUpload` file input is nameable (TR-046)**: new `AriaLabel` and `InputId` parameters are
+  forwarded to the rendered `<input type="file">`, fixing the axe `label` violation and letting a
+  page wire a `<label for>` to the input. The demo at `/components/file-upload` shows both;
+  `tests/verify/req-ui-054.spec.ts` checks the attributes.
+- **`Select` returns focus to its trigger after selection (TR-075)**: `SelectContext` exposes an
+  `OnFocusTriggerRequested` callback that `SelectTrigger` wires to `FocusAsync`, so picking an
+  option inside a `Dialog` leaves focus on the trigger and `Escape` still dismisses the dialog.
+  The demo at `/components/dialog` exercises this; `tests/verify/req-ui-055.spec.ts` checks the
+  focus return and Escape dismissal.
 
 ### Sevak and Chatur TR-019 — built and verified on 2026-10-07 to 2026-10-09, after 2.1.4
 

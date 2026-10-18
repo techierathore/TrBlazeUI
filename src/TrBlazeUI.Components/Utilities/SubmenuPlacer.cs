@@ -41,8 +41,8 @@ internal sealed class SubmenuPlacer : IAsyncDisposable
         try
         {
             objModule ??= await aJsRuntime.InvokeAsync<IJSObjectReference>(
-                "import", "./_content/TrBlazeUI.Components/js/submenu.js");
-            return await objModule.InvokeAsync<string>("fitSide", aList);
+                "import", "./_content/TrBlazeUI.Components/js/submenu.js").ConfigureAwait(false);
+            return await objModule.InvokeAsync<string>("fitSide", aList).ConfigureAwait(false);
         }
         catch (JSException)
         {
@@ -74,7 +74,7 @@ internal sealed class SubmenuPlacer : IAsyncDisposable
 
         try
         {
-            await objModule.DisposeAsync();
+            await objModule.DisposeAsync().ConfigureAwait(false);
         }
         catch (JSDisconnectedException)
         {

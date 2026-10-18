@@ -102,6 +102,20 @@
         </Button>
     </div>
 
+    <!-- TR-045: description contrast -->
+    <div class="space-y-4" data-testid="toast-tr045-contrast">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Description Contrast</h2>
+            <p class="text-sm text-muted-foreground">
+                The description uses the full foreground colour so it clears WCAG 2.1 AA against the
+                toast background (Sevak TR-045).
+            </p>
+        </div>
+        <Button Variant="ButtonVariant.Outline" data-testid="toast-tr045-trigger" OnClick="@ShowContrastToast">
+            Show contrast toast
+        </Button>
+    </div>
+
     <!-- Position Options -->
     <div class="space-y-4">
         <div class="space-y-2">
@@ -232,6 +246,16 @@
             Description = "Your post has been deleted.",
             ActionText = "Undo",
             OnAction = () => ToastService.Success("Post restored!")
+        });
+    }
+
+    private void ShowContrastToast()
+    {
+        ToastService.Show(new ToastData
+        {
+            Title = "Contrast check",
+            Description = "This description is drawn at full opacity so it stays legible.",
+            Duration = 0
         });
     }
 

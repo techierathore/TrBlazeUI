@@ -43,8 +43,10 @@ public partial class CardAction : ComponentBase
     /// Gets the computed CSS classes for the card action element.
     /// </summary>
     private string CssClass => ClassNames.cn(
-        // Base action styles
-        "flex items-center gap-2",
+        // Position at the end of the title row when CardHeader renders the two-column grid
+        // (Lekhak TR-009). The start margin replaces the header column gap so the spacing only
+        // appears when an action is actually rendered.
+        "col-start-2 row-start-1 row-span-2 self-start justify-self-end flex items-center gap-2 ms-4",
         // Custom classes (if provided)
         Class
     );
