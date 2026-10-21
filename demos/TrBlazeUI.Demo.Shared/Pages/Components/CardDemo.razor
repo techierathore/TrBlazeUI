@@ -276,6 +276,32 @@
         </div>
     </div>
 
+    <!-- TR-010: description without action stays under the title at narrow widths -->
+    <div class="space-y-4" data-testid="card-tr010">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Card Description Layout at Phone Width</h2>
+            <p class="text-sm text-muted-foreground">
+                A <code class="bg-muted px-1 py-0.5 rounded">CardHeader</code> without a
+                <code class="bg-muted px-1 py-0.5 rounded">CardAction</code> stays a single column,
+                so a <code class="bg-muted px-1 py-0.5 rounded">CardDescription</code> sits under the
+                title and the card does not overflow a 390 px viewport (Lekhak TR-010).
+            </p>
+        </div>
+        <div class="grid gap-4" style="max-width: 400px;">
+            <Card>
+                <CardHeader data-testid="card-tr010-header">
+                    <CardTitle>Embedding model</CardTitle>
+                    <CardDescription>
+                        <Badge>BGE-M3 · 1024-d</Badge>
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p class="text-sm text-muted-foreground">Use this folder for embeddings.</p>
+                </CardContent>
+            </Card>
+        </div>
+    </div>
+
     <!-- Custom Styling -->
     <div class="space-y-4">
         <div class="space-y-2">

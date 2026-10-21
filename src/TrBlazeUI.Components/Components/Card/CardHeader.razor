@@ -1,5 +1,7 @@
 @namespace TrBlazeUI.Components.Card
 
 <div class="@CssClass" @attributes="AdditionalAttributes">
-    @ChildContent
+    <CascadingValue Value="@objContext" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
 </div>
