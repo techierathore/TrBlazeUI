@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Status</h1>
-    <div class="sub">Last rendered: 2026-10-18</div>
+    <div class="sub">Last rendered: 2026-10-21</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#where-i-am">Where I am</a></li>
@@ -121,18 +121,18 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Status</h1>
-    <div class="subtitle">Rendered 2026-10-18 &middot; source <code>PROJECT-STATUS.md</code></div>
+    <div class="subtitle">Rendered 2026-10-21 &middot; source <code>PROJECT-STATUS.md</code></div>
     <div class="cta-next" style="padding:20px; background:var(--cta-bg); border:2px solid var(--accent); border-radius:10px; margin:20px 0;">
       <div style="font-size:11px; color:var(--muted); letter-spacing:.5px;">NEXT COMMAND TO RUN</div>
-      <div style="font-family:var(--mono); font-size:18px; margin-top:6px;">(owner) create the GitHub Release/tag v2.1.9 and push the five .nupkg files to GitHub Packages</div>
+      <div style="font-family:var(--mono); font-size:18px; margin-top:6px;">(owner) create the GitHub Release/tag v2.1.10 and push the five .nupkg files to GitHub Packages</div>
     </div>
 <table>
 <tbody>
 <tr><th>project</th><td>TrBlazeUI</td></tr>
-<tr><th>last_updated</th><td>2026-10-18</td></tr>
-<tr><th>current_phase</th><td>Verify — 2.1.9 package prepared, new feedback rows Verified, pending owner tag/release</td></tr>
+<tr><th>last_updated</th><td>2026-10-21</td></tr>
+<tr><th>current_phase</th><td>Release — 2.1.10 package prepared, TR-010 fixed and verified, handoff pending owner tag</td></tr>
 <tr><th>last_verified_build</th><td>PASS</td></tr>
-<tr><th>last_verified_date</th><td>2026-10-18</td></tr>
+<tr><th>last_verified_date</th><td>2026-10-21</td></tr>
 </tbody>
 </table>
     <div class="toc-inline">
@@ -149,17 +149,13 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
       </ol>
     </div>
 <h2 id="where-i-am">Where I am<a class="anchor-link" href="#where-i-am">#</a></h2>
-<p>Release 2.1.9 is prepared. Source fixes are in place for Sevak TR-045/TR-046, TechieBlog TR-075,
-and Lekhak TR-008/TR-009; doc attribution is updated for Chatur TR-020/TR-021, TechieFlow TR-004
-and TrSetup TR-001. The five new checklist rows REQ-UI-053…057 are Verified, the build is clean,
-and 2.1.9 NuGet packages live under <code>/tmp/opencode/packages</code>.</p>
+<p>Release 2.1.10 is prepared. TR-010 is fixed: CardHeader now renders a single-column grid unless it contains a CardAction, so a CardDescription stays under the title at 390 px. A new checklist row REQ-UI-058 is Verified, the build is clean, and 2.1.10 NuGet packages live under <code>/tmp/opencode/packages</code>.</p>
 <h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2>
 <p>Claude Code:</p>
-<pre><code>(owner) create the GitHub Release/tag v2.1.9 and push the five .nupkg files to GitHub Packages</code></pre>
+<pre><code>(owner) create the GitHub Release/tag v2.1.10 and push the five .nupkg files to GitHub Packages</code></pre>
 <p>OpenCode:</p>
-<pre><code>(owner) create the GitHub Release/tag v2.1.9 and push the five .nupkg files to GitHub Packages</code></pre>
-<p>Why: the verifier has already written <code>Verified</code> for the five new rows; only the owner can create the
-git tag and GitHub Release, and agents cannot run git.</p>
+<pre><code>(owner) create the GitHub Release/tag v2.1.10 and push the five .nupkg files to GitHub Packages</code></pre>
+<p>Why: the verifier has written <code>Verified</code> for REQ-UI-058; only the owner can create the git tag and GitHub Release, and agents cannot run git.</p>
 <h2 id="open-requirements">Open requirements<a class="anchor-link" href="#open-requirements">#</a></h2>
 <table>
 <thead><tr><th>Status</th><th>Count</th></tr></thead>
@@ -179,8 +175,6 @@ git tag and GitHub Release, and agents cannot run git.</p>
 <ul>
 <li>The CI fix is proven on a clean local copy only; the owner's next push to <code>Dev</code> is the final check. Agents cannot run git.
 </li>
-<li>Lekhak TR-007 reaches the feed only when the owner cuts the next release.
-</li>
 <li>CHANGELOG <code>[Unreleased]</code> still holds entries that shipped by 2.1.6 and 2.1.7; the owner moves them.
 </li>
 </ul>
@@ -189,27 +183,25 @@ git tag and GitHub Release, and agents cannot run git.</p>
 <table>
 <thead><tr><th>Date</th><th>Phase</th><th>Result</th><th>Status table</th></tr></thead>
 <tbody>
-<tr><td>2026-10-09</td><td>triage-and-fix + handoff</td><td>66/66 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-10-13</td><td>triage-and-fix + handoff</td><td>68/68 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-10-15</td><td>triage-and-fix + handoff</td><td>69/69 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-10-15</td><td>fix-issues + handoff</td><td>69/69 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-10-18</td><td>consumer-feedback sweep + 2.1.9 prep</td><td>5 new rows Verified (REQ-UI-053…057); packages built</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-10-21</td><td>triage-and-fix TrBlazeUI /mnt/c/3AIGenCode/Lekhak/docs/Lekhak-TrBlazeUI-Feedback.md TR-010</td><td>75/75 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 </tbody>
 </table>
 <h2 id="library-feedback-summary">Library feedback summary<a class="anchor-link" href="#library-feedback-summary">#</a></h2>
 <ul>
-<li>TechieFlow: 1 open · 5 closed — docs/TrBlazeUI-TechieFlow-Feedback.md
+<li>TechieFlow: 0 open · 1 fixed upstream, not yet re-checked (TF-006) · 5 closed — docs/TrBlazeUI-TechieFlow-Feedback.md
 </li>
 </ul>
 <h2 id="standards-compliance">Standards compliance<a class="anchor-link" href="#standards-compliance">#</a></h2>
 <ul>
-<li>Last check 2026-10-03: 0 findings, see the checklist Remarks.
+<li>Last check 2026-10-21: 0 findings, see the checklist Remarks.
 </li>
 </ul>
 <h2 id="deferred-future"><a id="deferred--future"></a>Deferred / future<a class="anchor-link" href="#deferred-future">#</a></h2>
 <ul>
-<li>REQ-UI-030 to 052 and REQ-FN-012 extend BRD items; <code>*amend-docs</code> can split them.
-</li>
 <li>Dark Destructive Button text is 2.77:1, under 3:1.
 </li>
 <li>InputGroup demo menu items only log; show the choice.
