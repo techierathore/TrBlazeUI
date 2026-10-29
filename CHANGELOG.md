@@ -9,6 +9,32 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ---
 
+## [2.2.1] — 2026-10-29
+
+### TechieBlog TR-076 — fixed on 2026-10-29
+
+Answers the entry TechieBlog filed on 2026-10-27 and re-checked on 2.2.0
+(`/mnt/c/1MyCode/TechieBlog/docs/TechieBlog-TrBlazeUI-Feedback.md`; REQ-UI-059).
+
+#### Fixed
+
+- **An active `SidebarMenuButton` or `SidebarMenuSubButton` now looks active (TR-076).** `IsActive="true"`
+  rendered the bare attribute `data-active=""` (an inactive item rendered none), while the class list
+  keys its active style on `data-[active=true]`, so the active item painted exactly like its
+  neighbours. Both now render `data-active="true"` or `data-active="false"`, and keep
+  `aria-current="page"` on the active item. Present since at least 2.0.3.
+- **An `Href` link that matches the current URL now paints the active style too.** `Match`
+  auto-activation set `aria-current="page"` but its active class was itself gated on
+  `data-[active=true]`, so it never applied. The matched link now gets the sidebar accent
+  background and text (and medium weight on `SidebarMenuButton`). An app that added its own
+  `[aria-current="page"]` or `[data-active]` rule to get this can drop it, or keep it to draw a
+  different colour: an app rule with a class selector still wins.
+- Checked every other component that writes a `data-*` attribute from a bool: none renders the
+  empty-string form against a `=true` selector. The menu items that write `data-disabled=""` are
+  styled by the presence selector `data-[disabled]`, which matches it.
+
+---
+
 ## [2.1.9] — 2026-10-18
 
 ### Build Validation restore failure — fixed on 2026-10-15

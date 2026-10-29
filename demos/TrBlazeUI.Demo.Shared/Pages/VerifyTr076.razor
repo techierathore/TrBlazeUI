@@ -1,0 +1,63 @@
+@page "/verify-tr076"
+@using TrBlazeUI.Components.Sidebar
+@using Microsoft.AspNetCore.Components.Routing
+
+@* Verification harness for TechieBlog TR-076 (docs/TechieBlog-TrBlazeUI-Feedback.md).
+   Not a documentation demo: every block exists so tests/verify/req-ui-059.spec.ts can assert that
+   an active sidebar item renders data-active="true" and paints differently from its neighbours. *@
+
+<PageTitle>Verify TR-076 - TrBlazeUI</PageTitle>
+
+<div class="mx-auto max-w-md space-y-8 p-6">
+    <h1 class="text-2xl font-bold" data-testid="verify-heading">TR-076 sidebar active item</h1>
+
+    <section class="space-y-2 rounded-md bg-sidebar p-2 text-sidebar-foreground">
+        <h2 class="text-lg font-semibold">IsActive</h2>
+        <SidebarMenu>
+            <SidebarMenuItem>
+                <SidebarMenuButton IsActive="true" data-testid="btn-active"><span>Active button</span></SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton data-testid="btn-inactive"><span>Inactive button</span></SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton Href="/elsewhere-a" IsActive="true" data-testid="link-active"><span>Active link</span></SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton Href="/elsewhere-b" data-testid="link-inactive"><span>Inactive link</span></SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                        <SidebarMenuSubButton IsActive="true" data-testid="sub-active"><span>Active sub</span></SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                        <SidebarMenuSubButton data-testid="sub-inactive"><span>Inactive sub</span></SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                </SidebarMenuSub>
+            </SidebarMenuItem>
+        </SidebarMenu>
+    </section>
+
+    <section class="space-y-2 rounded-md bg-sidebar p-2 text-sidebar-foreground">
+        <h2 class="text-lg font-semibold">Href + Match auto-activation</h2>
+        <SidebarMenu>
+            <SidebarMenuItem>
+                <SidebarMenuButton Href="/verify-tr076" Match="NavLinkMatch.All" data-testid="match-active"><span>This page</span></SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton Href="/elsewhere-c" Match="NavLinkMatch.All" data-testid="match-inactive"><span>Another page</span></SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                        <SidebarMenuSubButton Href="/verify-tr076" Match="NavLinkMatch.All" data-testid="sub-match-active"><span>This page</span></SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                        <SidebarMenuSubButton Href="/elsewhere-d" Match="NavLinkMatch.All" data-testid="sub-match-inactive"><span>Another page</span></SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                </SidebarMenuSub>
+            </SidebarMenuItem>
+        </SidebarMenu>
+    </section>
+</div>

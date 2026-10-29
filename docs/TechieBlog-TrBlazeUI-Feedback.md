@@ -1,11 +1,13 @@
 # TechieBlog → TrBlazeUI feedback
 
 ## Summary
-- **Current disposition through TR-074: all TrBlazeUI findings are closed in library source.** Historical numbering has gaps and sub-findings (`TR-072b`…`TR-072d`), so this document deliberately reports the highest assigned ID instead of repeating the stale “66 entries” count.
-- **Open library defects:** none from this report. TR-066/TR-067 and TR-068…TR-074 (including TR-072b/c/d) are resolved and verified.
-- **Ships in: TrBlazeUI 2.0.3** — source complete and verified on 2026-08-25; **publication remains owner-manual**.
-- **Consumer action after 2.0.3 is published:** upgrade TechieBlog, rerun its focused UAT, then remove only the workarounds named in the 2.0.3 resolution table below. Do not remove a workaround before the consumer is actually restored against 2.0.3.
-- Last consolidated: **2026-08-25** from `REQ-UI-004`, `REQ-UI-012`, and `REQ-UI-018` verifier evidence. Next free ID remains **TR-075**.
+- **Current disposition through TR-076: all TrBlazeUI findings are closed in library source.** Historical numbering has gaps and sub-findings (`TR-072b`…`TR-072d`), so this document deliberately reports the highest assigned ID instead of repeating the stale “66 entries” count.
+- **Open library defects:** none in library source. TR-066/TR-067 and TR-068…TR-076 (including TR-072b/c/d) are resolved and verified; TR-076's fix ships in **2.2.1**, which is not on the feed until the TrBlazeUI owner publishes that release.
+- **Ships in: TrBlazeUI 2.0.3** — published to the feed and **consumed by TechieBlog since 2026-08-25** (`TrBlazeUI.Components` + `TrBlazeUI.Icons.Lucide` 2.0.3 in all three csprojs; build 0 errors, `dotnet test` 1551/0). TR-075 ships in **2.1.9**.
+- **Consumer action — DONE 2026-08-25.** Every row of the resolution table below was measured against a running TechieBlog host on 2.0.3 *before* its workaround was removed (`tests/verify/trblazeui-203-upgrade.spec.ts`, 8/8; evidence `tests/.artifacts/trblazeui-203/notes.json`). See "Consumer verification on 2.0.3" under the table for what was removed, what was kept, and why.
+- **One new finding on 2.0.3 — TR-075** (2026-08-26, Low–Medium a11y): a styled `Select` inside `DialogContent` drops focus to `<body>` after a pick, so `Escape` cannot dismiss the dialog until the user Tabs back in; mouse paths unaffected. **Fixed upstream in 2.1.9.**
+- **TR-076** (2026-10-27): `SidebarMenuButton IsActive` rendered `data-active=""`, so the active nav item painted like its neighbours. **Fixed upstream in 2.2.1** (not on the feed until that release is published; see the entry).
+- Last consolidated: **2026-10-29** (TR-076 reply). Next free ID **TR-077** (the bottom counter line is authoritative).
 
 ## ✅ Resolution — 2026-08-25, TrBlazeUI **2.0.3** (pending publish)
 
@@ -36,11 +38,30 @@ Verification baseline for the 2.0.3 source:
 | `tests/verify/ui-ui004.spec.js` | **PASS desktop + mobile** — nested Dialog, focus, mouse/keyboard Select, visual bounds |
 | `tests/verify/ui-techieblog.spec.js` | **76/76 PASS** — desktop + 390px, zero page errors / horizontal overflow |
 
-### Remaining owner/team actions
+### Consumer verification on 2.0.3 — TechieBlog, 2026-08-25
 
-1. TrBlazeUI owner publishes `TrBlazeUI.Components` **2.0.3** (and the matching dependency packages required by its package graph).
-2. TechieBlog restores 2.0.3, applies any required `_Imports.razor` additions, and reruns its own build/UAT against real application screens.
-3. TechieBlog removes the documented workarounds only after those consumer checks pass; the historical repro sections below remain useful if a consumer regression is found.
+All three "remaining actions" are closed: 2.0.3 is on the feed, TechieBlog restored it (no new
+`_Imports.razor` namespaces were needed — no new component was adopted), and each workaround was
+removed only after the matching claim held on a running host (headless Chromium, admin circuit,
+1280 + 390). Measured values, not inspection:
+
+| Finding | Measured on TechieBlog @ 2.0.3 | Workaround disposition |
+|---|---|---|
+| TR-066 | Not exercised — TechieBlog composes stacked dialogs as siblings and had no literal nested-dialog markup to restore. | Nothing to remove. |
+| TR-067 | `/admin/images` upload dialog Select: **7** options; mouse → "Icons" moves the caption to *Max 200 KB, formats: png, svg, webp*; keyboard Enter/ArrowDown/Enter → "Blog". `/users` edit dialog: **5** options. `/admin/skills` add-skill dialog: **7** options. | **Removed** — `ManageImages.razor` is back on the styled `Select`; `verify-all-admin.spec.ts` now asserts 0 native `<select>` and drives the popover. |
+| TR-068 | Not exercised — every TechieBlog call site binds `ValueChanged`. | No workaround existed; the bUnit probe comment updated. |
+| TR-069 | Not re-tested — the resolution table itself says to keep the document-identity latch. | **Kept** — `PostMarkdownEditor` `ResetKey`/`hasLocalEdits` stays. |
+| TR-070 | No app-side workaround ever existed. | — |
+| TR-071 | `/admin` at 390px: rendered `ItemContent` class is `flex min-w-0 flex-1 flex-col gap-1`, computed `min-width: 0px`, document hScroll **0**. | **Removed** — `AdminDashboard.razor` `ItemContent Class="min-w-0"` dropped. |
+| TR-072 | `publish-date-picker` / `publish-time-picker` (`/ManagePost`) and `experience-start-date` / `experience-end-date` (`/admin/experience`) all resolve to a `<button type="button">`. | **Removed** — all four `<span>` wrappers gone; `data-testid` rides on the components. |
+| TR-072b | Home stats band: `stat-tile-value` and `stat-tile-label` slots **1:1** with `home-stat-card`. | No consumer change needed; specs may target the slots. |
+| TR-072c | `min-h-28` → 112px, `min-h-36` → 144px, `md:-mx-6` → −24px at 1280, `hover:opacity-90` served by `trblazeui.css` (plus focus/disabled variants). | **Removed** — the four hand-written rules deleted from `utilities.css`; only arbitrary values remain there. |
+| TR-073 | `bg-gradient-to-br from-muted to-card` on the no-banner post card computes to `linear-gradient(to right bottom, oklch(0.269 0 0) 0%, oklch(0.205 0 0) 100%)` — both stops resolved. | **Removed** — `.post-card-fallback` deleted; `PostCard.razor` + `SearchResults.razor` use the utilities. |
+| TR-074 | Moot for this app — the post-page TOC rail and `post-toc-rail.js` were deleted in UAT-029. | Nothing to remove. |
+
+Two probe notes for the next consumer: Chromium serialises `to bottom right` as `to right bottom`,
+and Tailwind v4 nests utilities inside `@layer`, so a `selectorText` sweep over `document.styleSheets`
+must recurse into grouping rules or it reports the shipped rule as missing.
 
 ---
 
@@ -1732,7 +1753,98 @@ TR-073 recorded 2026-08-24 by *trblazeui (UAT-025 / REQ-UI-049 — PostCard no-b
   either adding a `Level`/`Depth` parameter or documenting the label-prefix workaround directly.
 
 TR-074 recorded 2026-08-24 by *trblazeui (UAT-027 / REQ-UI-045 — post detail page rebuild, TOC rail).
-**Next free ID: TR-075.**
+
+---
+
+## Found verifying the 2.0.3 upgrade (2026-08-26, *verify REQ-UI-048 · REQ-FN-025 · REQ-UI-049)
+
+> ✅ **TR-075 — FIXED upstream, in 2.1.9** — after an option is picked in a styled `Select` nested in `DialogContent`, focus returns to the `SelectTrigger` so `Escape` still dismisses the dialog. Demo at `/components/dialog`; test `tests/verify/req-ui-055.spec.ts`.
+
+- **TR-075 — after an option is picked in a styled `Select` nested in `DialogContent`, focus is
+  dropped to `<body>` instead of returning to the `SelectTrigger`, so `Escape` no longer dismisses
+  the dialog until the user Tabs back in.**
+
+  *Severity:* **Low–Medium** (accessibility — WCAG 2.4.3 Focus Order; not a keyboard trap).
+  *Measured on:* `TrBlazeUI.Components 2.0.3`, TechieBlog 2026-08-26, headless Chromium against a
+  running Blazor Server host, three dialogs (`/admin/images` upload category, `/users` edit-user
+  role, `/admin/skills` add-skill category). Identical result on all three, by mouse and by keyboard.
+  *Repro (keyboard):* open the dialog → focus the trigger (`document.activeElement` is the trigger,
+  inside the dialog) → `Enter` opens the listbox (7 options) → `ArrowDown`, `Enter`.
+  *Expected:* focus returns to the trigger (the WAI-ARIA listbox/combobox pattern), so `Escape`
+  still reaches the dialog and closes it.
+  *Actual:* `document.activeElement === document.body`; `Escape` ×2 leaves the dialog open
+  (`data-state="open"`, no `inert`, no `aria-hidden`, circuit alive). `Tab` #1 re-enters the
+  dialog (lands on its first focusable — the file input / the Cancel button), and `Escape` then
+  closes it. Mouse `Cancel` / `X` / backdrop work throughout. Baseline control: the same dialog
+  opened WITHOUT touching the Select closes on the first `Escape`, so this is the Select's focus
+  hand-back, not the dialog.
+  *Also observed:* Playwright's `locator.click()` on `Cancel` stalls in its actionability wait in
+  this state while a raw coordinate click lands — harness-side symptom of the same focus/overlay
+  bookkeeping, recorded so the next consumer does not misread it as an app hang.
+  *Relationship:* this is the residue of TR-066/TR-067 — the nested content now renders and
+  selects correctly; what it does not yet do is restore focus to its trigger after closing inside a
+  portalled dialog.
+  *Workaround (not adopted):* none needed by TechieBlog — no acceptance requires Escape-dismissal
+  after a pick, and the dialogs' Cancel buttons are one Tab away. Recorded, not demoted.
+  *Suggested fix:* on item selection (mouse or keyboard) `await trigger.FocusAsync()` after the
+  listbox closes, the same `OnAfterRenderAsync`-timed focus return TR-070 added for `Rating`; and
+  add the nested-in-Dialog case to `tests/verify/ui-ui004.spec.js` with an `Escape`-closes-dialog
+  assertion after a pick.
+
+TR-075 recorded 2026-08-26 by *verify (REQ-UI-048 / REQ-FN-025 / REQ-UI-049 — 2.0.3 re-verification).
+### TR-076 - SidebarMenuButton renders `data-active=""`, so its `data-[active=true]` styles never apply (2.0.3)
+
+> ✅ **TR-076 — FIXED upstream, in TrBlazeUI 2.2.1** (2026-10-29, TrBlazeUI REQ-UI-059 — Verified).
+> **Not on the feed yet:** the 2.2.1 packages are built and checked, but the push to GitHub Packages
+> was refused (the only stored token can read packages, not publish them). They appear when the
+> TrBlazeUI owner publishes the 2.2.1 release. Until then the feed's newest is still 2.2.0, which has the bug.
+>
+> - `SidebarMenuButton` and `SidebarMenuSubButton` now render `data-active="true"` or
+>   `data-active="false"`, never the bare `data-active=""`, and keep `aria-current="page"` on the
+>   active item. The shipped `data-[active=true]:bg-sidebar-accent font-medium
+>   text-sidebar-accent-foreground` styles now apply.
+> - `Href` + `Match` auto-activation now paints too: a link that matches the current URL gets the
+>   sidebar accent background and text (and medium weight on `SidebarMenuButton`), still with
+>   `aria-current="page"`. `IsActive` is no longer needed for a nav link to look current.
+> - Checked every other TrBlazeUI component that writes a `data-*` attribute from a bool: none other
+>   had this mismatch. The menu items that write `data-disabled=""` are styled by `data-[disabled]`,
+>   which matches it.
+> - Proof, in TrBlazeUI: rendered-markup and computed-style test `tests/verify/req-ui-059.spec.ts` on
+>   the harness page `/verify-tr076` (both states, `IsActive` and `Href`+`Match`, light and dark):
+>   active background `oklch(0.97 0 0)` light / `oklch(0.269 0 0)` dark against `rgba(0, 0, 0, 0)`
+>   for the inactive item, font-weight 500 against 400.
+>
+> **Sevak's grey dark-theme nav item (REQ-UI-066, REQ-UI-074, 21–22 Oct) — related, but not the
+> same cause.** Sevak's nav links use `Href` without `IsActive`, so they never rendered
+> `data-active` at all. Their missing highlight was the second half of this entry (`Href`+`Match` set
+> `aria-current` but no style), which is why Sevak added its own `a[aria-current="page"]` rule. The
+> grey-instead-of-indigo in dark mode came from that app rule (a 12% accent mix on the dark
+> sidebar), not from the library. Sevak's rule is more specific than the library's classes, so it
+> keeps winning after 2.2.1. Sevak still needs it for indigo, because the library's own active colour
+> is the theme's neutral `--sidebar-accent`.
+>
+> **Verify from here** (after moving the pins to 2.2.1): on `/admin/series`, the active
+> `<a data-testid="nav-series">` has `data-active="true"` and a non-transparent computed
+> `background-color`, and its inactive neighbours have `data-active="false"` and a transparent one.
+> The hand-written `[data-active]` rule was never added here, so there is nothing to remove.
+
+*Found:* 2026-10-27, build-phase cluster A, REQ-UI-047 (admin active-item highlight).
+*Expected:* `<SidebarMenuButton IsActive="true">` paints the active style (`data-[active=true]:bg-sidebar-accent ...`).
+*Actual:* `IsActive="true"` emits the boolean-style attribute `data-active=""` (inactive buttons emit no attribute), but the
+shipped class list keys its active styling on `data-[active=true]`. Measured on `/admin/series`: the active
+`<a data-testid="nav-series">` has `data-active=""`, computed `background-color: rgba(0, 0, 0, 0)`, font-weight 400, identical to
+its inactive neighbours. `Href`+`Match` auto-activation does set `aria-current` but no visible style either.
+*Workaround (not adopted):* a hand-written `[data-active]` rule in utilities.css would paint it; not added because
+library gaps are logged, not patched.
+*Suggested fix:* render `data-active="@(IsActive ? "true" : "false")"`, or change the classes to `data-[active]:`.
+
+*Re-checked against the latest release:* 2026-10-27. The feed's newest stable version is **2.2.0** (the project pins 2.0.3).
+`HtmlRenderer` probe (`tests/.artifacts/build-phase-20261027/tr220-probe/`) rendering `<SidebarMenuButton IsActive="true">`:
+2.0.3 and 2.2.0 both emit `<button … data-active data-state="closed" aria-current="page">`, and 2.2.0's class list still
+keys on `data-[active=true]`. **Still open in 2.2.0**; upgrading does not fix it.
+
+TR-076 recorded 2026-10-27 by *build-phase cluster A (REQ-UI-047).
+**Next free ID: TR-077.**
 
 > **Note on this file's own "next free ID" bookkeeping:** the task brief that led to TR-073 named
 > **TR-067** as the next free id, following the SUMMARY section at the top of this file rather than

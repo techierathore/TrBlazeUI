@@ -620,10 +620,12 @@ SidebarProvider
 | Tooltip | string? | null | Tooltip in collapsed state |
 | Size | SidebarMenuButtonSize | Default | Size: Default, Small, Large |
 | Variant | SidebarMenuButtonVariant | Default | Style: Default, Outline |
-| IsActive | bool | false | Active/selected state |
+| IsActive | bool | false | Active/selected state. Renders `data-active="true"`/`"false"` and `aria-current="page"`, and paints the active style (after 2.2.0; up to 2.2.0 it rendered `data-active=""` and painted nothing, TechieBlog TR-076) |
 | Href | string? | null | URL (auto-renders as NavLink) |
-| Match | NavLinkMatch | Prefix | URL match mode |
+| Match | NavLinkMatch | Prefix | URL match mode. A link whose `Href` matches the current URL paints the active style without `IsActive` (after 2.2.0) — do not add an app-side `[aria-current="page"]` or `[data-active]` rule to get it |
 | Class | string? | null | Additional CSS |
+
+`SidebarMenuSubButton` takes the same `IsActive`, `Href` and `Match` and behaves the same way (after 2.2.0).
 
 ```razor
 <SidebarProvider DefaultOpen="true">

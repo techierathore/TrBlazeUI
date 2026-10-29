@@ -41,7 +41,7 @@ The demo app exposes the whole library through a sidebar navigation. Walk these 
 - **Covers:** BRD-4…BRD-12 (REQ-UI-002)
 
 ### Layout & navigation (Sidebar, `/components/sidebar`, NavigationMenu, Tabs, Pagination)
-- **Steps:** collapse/expand the Sidebar (and Ctrl/Cmd+B); reload; open a horizontal NavigationMenu dropdown; switch Tabs; page through Pagination; at 390px wide, open the phone menu.
+- **Steps:** collapse/expand the Sidebar (and Ctrl/Cmd+B); check the current page's item is highlighted; open `/verify-tr076` and check each active item has a background its neighbour lacks, in light and dark; reload; open a horizontal NavigationMenu dropdown; switch Tabs; page through Pagination; at 390px wide, open the phone menu.
 - **Expected:** sidebar collapse persists across reload; nav dropdown does not clip; tabs/pagination work; the phone menu is 288px (18rem) wide.
 - **Covers:** BRD-13…BRD-18 (REQ-UI-003)
 

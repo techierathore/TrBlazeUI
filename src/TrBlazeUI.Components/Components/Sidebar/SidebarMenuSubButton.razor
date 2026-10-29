@@ -14,13 +14,13 @@
 
 @if (shouldRenderAsAnchor)
 {
-    <NavLink href="@Href" class="@GetClasses()" data-active="@IsActive" aria-current="@(IsActive ? "page" : null)" Match="@Match" ActiveClass="data-[active=true]:bg-sidebar-accent" @attributes="AdditionalAttributes">
+    <NavLink href="@Href" class="@GetClasses()" data-active="@(IsActive ? "true" : "false")" aria-current="@(IsActive ? "page" : null)" Match="@Match" ActiveClass="bg-sidebar-accent text-sidebar-accent-foreground" @attributes="AdditionalAttributes">
         @ChildContent
     </NavLink>
 }
 else
 {
-    <button type="button" class="@GetClasses()" data-active="@IsActive" aria-current="@(IsActive ? "page" : null)" @attributes="AdditionalAttributes">
+    <button type="button" class="@GetClasses()" data-active="@(IsActive ? "true" : "false")" aria-current="@(IsActive ? "page" : null)" @attributes="AdditionalAttributes">
         @ChildContent
     </button>
 }
@@ -51,7 +51,9 @@ else
     public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
 
     /// <summary>
-    /// Whether this submenu item is active/selected.
+    /// Whether this submenu item is active/selected. Renders <c>data-active="true"</c> (or
+    /// <c>"false"</c>) and <c>aria-current="page"</c>; an <see cref="Href"/> link that matches the
+    /// current URL under <see cref="Match"/> gets the same active style without it.
     /// </summary>
     [Parameter]
     public bool IsActive { get; set; }

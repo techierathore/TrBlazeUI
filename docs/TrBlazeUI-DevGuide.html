@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="sub">Last rendered: 2026-10-15</div>
+    <div class="sub">Last rendered: 2026-10-29</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#table-of-contents">Table of Contents</a></li>
@@ -126,7 +126,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="subtitle">Rendered 2026-10-15 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
+    <div class="subtitle">Rendered 2026-10-29 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -311,6 +311,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>DataTable</td><td><code>/components/datatable</code></td><td><code>Pages/Components/DataTableDemo.razor</code></td><td><code>DataTable</code> (<code>RowAttributes</code>/<code>HeaderRowAttributes</code>/<code>SelectAllAttributes</code> 2.1.0, <code>SelectedCount</code> 2.0.9), <code>DataTableColumn.HideBelow</code> (after 2.1.4, Chatur TR-019, section <code>req-ui-046</code>)</td><td>renders at 1366 and 390; at 390 the <code>req-ui-046-table</code> grid shows Name and Status only, at 700 Email returns, at 1280 all four</td></tr>
 <tr><td>Button</td><td><code>/components/button</code></td><td><code>Pages/Components/ButtonDemo.razor</code></td><td><code>Button</code> (<code>border-0</code> on every variant but Outline, after 2.1.6, Lekhak TR-006)</td><td>renders at 1280; under a host <code>button { border }</code> rule in <code>trblazeui-host</code>, filled buttons 0px, Outline 1px in <code>--input</code></td></tr>
 <tr><td>Sidebar</td><td><code>/components/sidebar</code></td><td><code>Pages/Components/SidebarDemo.razor</code></td><td><code>--sidebar-width*</code> from <code>trblazeui.css</code> <code>:where(:root)</code> only (after 2.1.6, Lekhak TR-004)</td><td>renders at 1280; sidebar 256px; a host <code>html { --sidebar-width }</code> wins</td></tr>
+<tr><td>Sidebar active item (2026-10-29)</td><td><code>/verify-tr076</code></td><td><code>Pages/VerifyTr076.razor</code></td><td><code>SidebarMenuButton</code>, <code>SidebarMenuSubButton</code> → <code>data-active="true"/"false"</code> + NavLink <code>ActiveClass</code> for <code>Href</code>+<code>Match</code> (after 2.2.0, TechieBlog TR-076)</td><td>renders at 1280 in light and dark; each active item's background differs from its inactive neighbour's; <code>aria-current="page"</code> kept (req-ui-059.spec.ts)</td></tr>
 <tr><td>InputGroup (2026-10-15)</td><td><code>/components/input-group</code></td><td><code>Pages/Components/InputGroupDemo.razor</code></td><td><code>InputGroupButton</code> → <code>Button</code> (one <code>&lt;button&gt;</code>; unmatched attributes forwarded after 2.1.7, Lekhak TR-007), section <code>ig-reference-example</code></td><td>renders at 1280 in light and dark; no <code>button button</code> on the page; Go carries <code>ig-reference-go</code>, <code>title</code> and <code>aria-label</code> (req-ui-052.spec.ts)</td></tr>
 <tr><td>Tree View</td><td><code>/components/tree-view</code></td><td><code>Pages/Components/TreeViewDemo.razor</code></td><td><code>TreeView</code>, <code>TreeItem</code> (2.0.8)</td><td>renders at 1366 and 390</td></tr>
 <tr><td>Diff View</td><td><code>/components/diff-view</code></td><td><code>Pages/Components/DiffViewDemo.razor</code></td><td><code>DiffView</code>, <code>TextDiff</code> (2.0.8)</td><td>renders at 1366 and 390</td></tr>
