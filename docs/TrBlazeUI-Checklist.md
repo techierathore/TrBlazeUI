@@ -98,6 +98,7 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-UI-056 | NumericInput supports nullable binding so an empty box binds null (Lekhak TR-008) | Verified | 100% | 2026-10-21 verify: PASS — test `Lekhak TR-008 — NumericInput nullable value binding REQ-UI-0` | [d](#d-req-ui-056) |
 | REQ-UI-057 | CardAction sits at the right edge of the title row when placed inside CardHeader (Lekhak TR-009) | Verified | 100% | 2026-10-21 verify: PASS — test `Lekhak TR-009 — CardAction positioned at the header right ed` | [d](#d-req-ui-057) |
 | REQ-UI-058 | A CardHeader without a CardAction keeps its description under the title and fits a 390 px viewport (Lekhak TR-010) | Verified | 100% | 2026-10-21 verify: PASS — test `Lekhak TR-010 — CardHeader without CardAction keeps descript` | [d](#d-req-ui-058) |
+| REQ-UI-059 | Sidebar active item renders data-active="true"/"false" and paints its active style (TechieBlog TR-076) | Verified | 100% | 2026-10-29 verify: PASS — test `TechieBlog TR-076 — sidebar active item renders and paints i` | [d](#d-req-ui-059) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -482,3 +483,9 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 
 - <a id="d-req-ui-058"></a> **REQ-UI-058** (extends BRD-16 layout) A CardHeader without a CardAction keeps its description under the title and fits a 390 px viewport (Lekhak TR-010)
   - *Acceptance:* When a CardHeader with CardTitle and CardDescription but no CardAction renders at 390 px on the Card demo screen, then the description sits below the title and the card fits.
+
+
+## Sidebar
+
+- <a id="d-req-ui-059"></a> **REQ-UI-059** (extends BRD-13) Sidebar active item renders data-active="true"/"false" and paints its active style (TechieBlog TR-076)
+  - *Acceptance:* When a SidebarMenuButton has IsActive or a matching Href on any page, then it renders data-active="true" and paints the active background.

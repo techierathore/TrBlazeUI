@@ -58,7 +58,9 @@ else
     public SidebarMenuButtonVariant Variant { get; set; } = SidebarMenuButtonVariant.Default;
 
     /// <summary>
-    /// Whether this menu item is active/selected.
+    /// Whether this menu item is active/selected. Renders <c>data-active="true"</c> (or
+    /// <c>"false"</c>) and <c>aria-current="page"</c>; an <see cref="Href"/> link that matches the
+    /// current URL under <see cref="Match"/> gets the same active style without it.
     /// </summary>
     [Parameter]
     public bool IsActive { get; set; }
@@ -108,12 +110,12 @@ else
         {
             <NavLink href="@Href"
                      class="@GetClasses()"
-                     data-active="@IsActive"
+                     data-active="@(IsActive ? "true" : "false")"
                      data-state="@(CollapsibleContext?.Open ?? false ? "open" : "closed")"
                      aria-current="@(IsActive ? "page" : null)"
                      aria-expanded="@((CollapsibleContext?.Open ?? false) ? "true" : "false")"
                      Match="@Match"
-                     ActiveClass="data-[active=true]:bg-sidebar-accent"
+                     ActiveClass="bg-sidebar-accent font-medium text-sidebar-accent-foreground"
                      @attributes="AdditionalAttributes">
                 @ChildContent
             </NavLink>
@@ -122,7 +124,7 @@ else
         {
             <button type="button"
                     class="@GetClasses()"
-                    data-active="@IsActive"
+                    data-active="@(IsActive ? "true" : "false")"
                     data-state="@(CollapsibleContext?.Open ?? false ? "open" : "closed")"
                     aria-current="@(IsActive ? "page" : null)"
                     aria-expanded="@((CollapsibleContext?.Open ?? false) ? "true" : "false")"

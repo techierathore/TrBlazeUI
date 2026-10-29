@@ -1,29 +1,29 @@
 ---
 project: TrBlazeUI
-last_updated: 2026-10-21
-current_phase: Release — 2.1.10 package prepared, TR-010 fixed and verified, handoff pending owner tag
+last_updated: 2026-10-29
+current_phase: Release — handoff done, 76 of 76 verified
 last_verified_build: PASS
-last_verified_date: 2026-10-21
+last_verified_date: 2026-10-29
 ---
 
 # TrBlazeUI — Status
 
 ## Where I am
 
-Release 2.1.10 is prepared. TR-010 is fixed: CardHeader now renders a single-column grid unless it contains a CardAction, so a CardDescription stays under the title at 390 px. A new checklist row REQ-UI-058 is Verified, the build is clean, and 2.1.10 NuGet packages live under `/tmp/opencode/packages`.
+TechieBlog TR-076 is fixed: SidebarMenuButton and SidebarMenuSubButton render data-active="true"/"false", and an Href+Match link paints the active style. REQ-UI-059 is Verified. The 2.2.1 packages are built from this tree but not published: GitHub Packages refused the push because the stored token can only read packages. The TechieBlog reply, CHANGELOG [2.2.1], agent reference, UsageGuide and DevGuide are updated.
 
 ## Next command to run
 
 Claude Code:
 ```
-(owner) create the GitHub Release/tag v2.1.10 and push the five .nupkg files to GitHub Packages
+(owner) commit, then build and publish the package — its shipped documents are current; no agent command
 ```
 
 OpenCode:
 ```
-(owner) create the GitHub Release/tag v2.1.10 and push the five .nupkg files to GitHub Packages
+(owner) commit, then build and publish the package — its shipped documents are current; no agent command
 ```
-Why: the verifier has written `Verified` for REQ-UI-058; only the owner can create the git tag and GitHub Release, and agents cannot run git.
+Why: every row in this phase's scope is terminal and the shipped documents were brought up to date.
 
 ## Open requirements
 
@@ -39,8 +39,8 @@ Why: the verifier has written `Verified` for REQ-UI-058; only the owner can crea
 
 ## Known blockers
 
-- The CI fix is proven on a clean local copy only; the owner's next push to `Dev` is the final check. Agents cannot run git.
-- CHANGELOG `[Unreleased]` still holds entries that shipped by 2.1.6 and 2.1.7; the owner moves them.
+- 2.2.1 is not on GitHub Packages: the push was refused (403) because the stored token has only the `read:packages` scope. Publish it through the usual GitHub Release with tag `2.2.1`.
+- CHANGELOG has no section for 2.1.10 or 2.2.0, which are already published; the owner fills them in.
 
 ## Verification log
 
@@ -48,11 +48,11 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 | Date | Phase | Result | Status table |
 |---|---|---|---|
-| 2026-10-13 | triage-and-fix + handoff | 68/68 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-15 | triage-and-fix + handoff | 69/69 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-15 | fix-issues + handoff | 69/69 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-18 | consumer-feedback sweep + 2.1.9 prep | 5 new rows Verified (REQ-UI-053…057); packages built | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-10-21 | triage-and-fix TrBlazeUI /mnt/c/3AIGenCode/Lekhak/docs/Lekhak-TrBlazeUI-Feedback.md TR-010 | 75/75 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-10-29 | fix-issues + handoff | 76/76 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 
@@ -60,7 +60,7 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 ## Standards compliance
 
-- Last check 2026-10-21: 0 findings, see the checklist Remarks.
+- Last check 2026-10-29: 0 findings, see the checklist Remarks.
 
 ## Deferred / future
 
