@@ -527,6 +527,16 @@
   .trblazeui-col-xl-12 { grid-column: span 12 / span 12; }
 }
 
+/* Label before a field (Chatur TR-022): a <Label> followed directly by its field, in an ordinary
+ * block container, gets a 6px gap so the field's focus ring does not run into the label. A flex or
+ * grid container (the shadcn `grid gap-2` pattern, Field) already sets its own gap, so it is left
+ * alone. Zero specificity: any margin utility on the field still wins. */
+@layer components {
+  :where(:not(.flex, .inline-flex, .grid, .inline-grid) > [data-slot="label"] + *) {
+    margin-top: 0.375rem;
+  }
+}
+
 /* Prose - styling for HTML the developer RECEIVES (Markdown output, a CMS body).
  *
  * The reflow rules matter more than the typography: a wide table or a long <pre> inside a page

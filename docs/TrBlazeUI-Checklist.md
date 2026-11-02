@@ -94,11 +94,13 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-UI-052 | InputGroupButton is the button itself: the reference shows one button, and its attributes reach it (Lekhak TR-007) | Verified | 100% | 2026-10-21 verify: PASS — test `REQ-UI-052 InputGroupButton is the button itself REQ-UI-052 ` | [d](#d-req-ui-052) |
 | REQ-UI-053 | Toast description draws at full opacity so it clears WCAG 2.1 AA contrast (Sevak TR-045) | Verified | 100% | 2026-10-21 verify: PASS — test `Sevak TR-045 — toast description contrast REQ-UI-053 the toa` | [d](#d-req-ui-053) |
 | REQ-UI-054 | FileUpload AriaLabel and InputId reach the rendered file input (Sevak TR-046) | Verified | 100% | 2026-10-21 verify: PASS — test `Sevak TR-046 — FileUpload aria-label and input id REQ-UI-054` | [d](#d-req-ui-054) |
-| REQ-UI-055 | Select returns focus to its trigger after selection so Escape still dismisses a parent Dialog (TechieBlog TR-075) | Verified | 100% | 2026-10-21 verify: PASS — test `TechieBlog TR-075 — Select focus returns to trigger inside a` | [d](#d-req-ui-055) |
+| REQ-UI-055 | Select returns focus to its trigger after selection so Escape still dismisses a parent Dialog (TechieBlog TR-075) | Verified | 100% | 2026-11-02 verify: PASS — test `TechieBlog TR-075 — Select focus returns to trigger inside a` | [d](#d-req-ui-055) |
 | REQ-UI-056 | NumericInput supports nullable binding so an empty box binds null (Lekhak TR-008) | Verified | 100% | 2026-10-21 verify: PASS — test `Lekhak TR-008 — NumericInput nullable value binding REQ-UI-0` | [d](#d-req-ui-056) |
 | REQ-UI-057 | CardAction sits at the right edge of the title row when placed inside CardHeader (Lekhak TR-009) | Verified | 100% | 2026-10-21 verify: PASS — test `Lekhak TR-009 — CardAction positioned at the header right ed` | [d](#d-req-ui-057) |
 | REQ-UI-058 | A CardHeader without a CardAction keeps its description under the title and fits a 390 px viewport (Lekhak TR-010) | Verified | 100% | 2026-10-21 verify: PASS — test `Lekhak TR-010 — CardHeader without CardAction keeps descript` | [d](#d-req-ui-058) |
-| REQ-UI-059 | Sidebar active item renders data-active="true"/"false" and paints its active style (TechieBlog TR-076) | Verified | 100% | 2026-10-29 verify: PASS — test `TechieBlog TR-076 — sidebar active item renders and paints i` | [d](#d-req-ui-059) |
+| REQ-UI-059 | Sidebar active item renders data-active="true"/"false" and paints its active style (TechieBlog TR-076) | Verified | 100% | 2026-11-02 verify: PASS — test `TechieBlog TR-076 — sidebar active item renders and paints i` | [d](#d-req-ui-059) |
+| REQ-UI-061 | SelectValue renders its placeholder, not an exception, when its Select is bound to a value no item carries and the page re-renders (TechieBlog TR-077) | Verified | 100% | 2026-11-02 verify: PASS — test `TechieBlog TR-077 — Select bound to an unmatched value survi` | [d](#d-req-ui-061) |
+| REQ-UI-062 | A focused Input or SelectTrigger draws its ring on the border, a Label before a field keeps its own gap, and menu items are 10px across (Chatur TR-022) | Verified | 100% | 2026-11-02 verify: PASS — test `REQ-UI-062 a focused field in a Dialog has no ring offset an` | [d](#d-req-ui-062) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -471,6 +473,9 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 - <a id="d-req-ui-055"></a> **REQ-UI-055** (extends BRD-21 floating panels and menus) Select returns focus to its trigger after selection so Escape still dismisses a parent Dialog (TechieBlog TR-075)
   - *Acceptance:* When a Select option is chosen inside a Dialog on the Dialog demo screen, then focus returns to the Select trigger and Escape closes the dialog.
 
+- <a id="d-req-ui-061"></a> **REQ-UI-061** (extends BRD-7 dropdown selection) SelectValue renders its placeholder, not an exception, when its Select is bound to a value no item carries and the page re-renders (TechieBlog TR-077)
+  - *Acceptance:* When a Select bound to an empty string re-renders on the TR-077 harness screen, then it shows its placeholder and does not throw.
+
 ## NumericInput
 
 - <a id="d-req-ui-056"></a> **REQ-UI-056** (extends BRD-9 numeric input) NumericInput supports nullable binding so an empty box binds null (Lekhak TR-008)
@@ -489,3 +494,9 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 
 - <a id="d-req-ui-059"></a> **REQ-UI-059** (extends BRD-13) Sidebar active item renders data-active="true"/"false" and paints its active style (TechieBlog TR-076)
   - *Acceptance:* When a SidebarMenuButton has IsActive or a matching Href on any page, then it renders data-active="true" and paints the active background.
+
+
+## Input
+
+- <a id="d-req-ui-062"></a> **REQ-UI-062** (extends BRD-5 text inputs) A focused Input or SelectTrigger draws its ring on the border, a Label before a field keeps its own gap, and menu items are 10px across (Chatur TR-022)
+  - *Acceptance:* When a field under a Label is focused in a Dialog on the TR-022 harness screen, then the ring has no offset and the label keeps a gap.

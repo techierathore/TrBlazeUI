@@ -184,7 +184,9 @@ public partial class Input : ComponentBase, IDisposable
         "ring-offset-background",
         "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground",
         "placeholder:text-muted-foreground",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        // The ring sits on the border: no ring offset, so a focused input does not reach a Label
+        // placed above it (Chatur TR-022).
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         "disabled:cursor-not-allowed disabled:opacity-50",
         // aria-invalid state styling (destructive error colors)
         "aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive",

@@ -106,12 +106,12 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Development Metrics</h1>
-    <div class="sub">Last rendered: 2026-10-21</div>
+    <div class="sub">Last rendered: 2026-11-02</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#first-pass-rate">1. First-pass rate</a></li>
         <li><a href="#gate-catch-distribution">2. Gate catch distribution</a></li>
-        <li class="h3"><a href="#live-library-107-failures">Live · library — 107 failures</a></li>
+        <li class="h3"><a href="#live-library-109-failures">Live · library — 109 failures</a></li>
         <li><a href="#escape-rate">3. Escape rate</a></li>
         <li><a href="#throughput-and-rework">4. Throughput and rework</a></li>
         <li><a href="#misses">5. Misses</a></li>
@@ -125,14 +125,14 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Development Metrics</h1>
-    <div class="subtitle">Rendered 2026-10-21 &middot; source <code>METRICS.md</code></div>
+    <div class="subtitle">Rendered 2026-11-02 &middot; source <code>METRICS.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
       <ol>
         <li><a href="#first-pass-rate">1. First-pass rate</a></li>
         <li><a href="#gate-catch-distribution">2. Gate catch distribution</a></li>
-        <li class="h3"><a href="#live-library-107-failures">Live · library — 107 failures</a></li>
+        <li class="h3"><a href="#live-library-109-failures">Live · library — 109 failures</a></li>
         <li><a href="#escape-rate">3. Escape rate</a></li>
         <li><a href="#throughput-and-rework">4. Throughput and rework</a></li>
         <li><a href="#misses">5. Misses</a></li>
@@ -144,15 +144,15 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li><a href="#what-is-missing">7. What is missing</a></li>
       </ol>
     </div>
-<p><strong>Snapshot as of 2026-10-21</strong> · project_type <code>library</code> · schema v1</p>
+<p><strong>Snapshot as of 2026-11-02</strong> · project_type <code>library</code> · schema v1</p>
 <table>
-<thead><tr><th>Stream</th><th>Records</th><th>Span</th></tr></thead>
+<thead><tr><th>Stream</th><th>Records</th></tr></thead>
 <tbody>
-<tr><td><code>runs.jsonl</code></td><td>95</td><td>2026-08-08 → 2026-10-21</td></tr>
-<tr><td><code>gates.jsonl</code></td><td>239 (0 backfilled)</td><td>2026-08-08 → 2026-10-21</td></tr>
-<tr><td><code>sessions.jsonl</code></td><td>19</td><td>2026-08-08 → 2026-10-21</td></tr>
-<tr><td><code>commits.jsonl</code></td><td>100</td><td>2026-08-08 → 2026-10-21</td></tr>
-<tr><td><code>misses.jsonl</code></td><td>75 miss + 69 miss-fix</td><td>2026-08-09 → 2026-10-21</td></tr>
+<tr><td><code>runs.jsonl</code></td><td>103 live (11 voided, excluded)</td></tr>
+<tr><td><code>gates.jsonl</code></td><td>245 (0 backfilled, 0 malformed)</td></tr>
+<tr><td><code>sessions.jsonl</code></td><td>22 (1 duplicate collapsed)</td></tr>
+<tr><td><code>commits.jsonl</code></td><td>106 (commit hook installed)</td></tr>
+<tr><td><code>misses.jsonl</code></td><td>77 miss + 71 miss-fix (7 misses voided, 1 amendment applied, 0 orphans)</td></tr>
 </tbody>
 </table>
 <hr>
@@ -160,79 +160,92 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <table>
 <thead><tr><th>Provenance</th><th>project_type</th><th>REQs scored</th><th>First-pass</th><th>Rate</th></tr></thead>
 <tbody>
-<tr><td><strong>Live</strong></td><td>library</td><td>62</td><td>10</td><td>16%</td></tr>
+<tr><td><strong>Live</strong></td><td>library</td><td>65</td><td>11</td><td>17%</td></tr>
 <tr><td>Backfilled†</td><td>—</td><td>0</td><td>0</td><td>—</td></tr>
 </tbody>
 </table>
 <p>† No backfilled REQ records exist.</p>
-<p><strong>Excluded from the live rate:</strong> 0 REQs.</p>
+<p><strong>Excluded from the live rate:</strong> 0 REQs (no backfill-tainted REQs).</p>
 <hr>
 <h2 id="gate-catch-distribution"><a id="2-gate-catch-distribution"></a>2. Gate catch distribution<a class="anchor-link" href="#gate-catch-distribution">#</a></h2>
-<h3 id="live-library-107-failures"><a id="live--library--107-failures"></a>Live · <code>library</code> — 107 failures<a class="anchor-link" href="#live-library-107-failures">#</a></h3>
+<h3 id="live-library-109-failures"><a id="live--library--109-failures"></a>Live · <code>library</code> — 109 failures<a class="anchor-link" href="#live-library-109-failures">#</a></h3>
 <table>
 <thead><tr><th>Gate</th><th>Caught</th><th>Share</th></tr></thead>
 <tbody>
 <tr><td>acceptance</td><td>1</td><td>1%</td></tr>
-<tr><td><strong>escaped</strong> — no gate caught it</td><td>106</td><td>99%</td></tr>
+<tr><td><strong>escaped</strong> — no gate caught it</td><td>108</td><td>99%</td></tr>
 </tbody>
 </table>
-<p><strong>Most common failure classes:</strong> unspecified-gap ×38, wrong-behaviour ×17, regression ×14.</p>
+<p><strong>Late gates that have never run here:</strong> perf (since 2026-08-10), assets (since 2026-08-31), mockup-parity (since 2026-08-31), test-users (since 2026-11-01) — 0 runs, 0 catches each.</p>
+<p><strong>Most common failure classes:</strong> unspecified-gap ×40, wrong-behaviour ×17, regression ×14.</p>
 <hr>
 <h2 id="escape-rate"><a id="3-escape-rate"></a>3. Escape rate<a class="anchor-link" href="#escape-rate">#</a></h2>
 <table>
-<thead><tr><th>Provenance</th><th>project_type</th><th>REQs with any failure</th><th>Escaped to UAT/prod</th><th>Rate</th></tr></thead>
+<thead><tr><th>Provenance</th><th>project_type</th><th>REQs scored</th><th>Escaped failures</th><th>Rate</th></tr></thead>
 <tbody>
-<tr><td><strong>Live</strong></td><td>library</td><td>62</td><td>106</td><td>98%</td></tr>
+<tr><td><strong>Live</strong></td><td>library</td><td>65</td><td>108</td><td>98%</td></tr>
 </tbody>
 </table>
+<p>The miss stream's own escape share (91%, §5) is computed from different records by a different definition and is reported there, not merged here.</p>
 <hr>
 <h2 id="throughput-and-rework"><a id="4-throughput-and-rework"></a>4. Throughput and rework<a class="anchor-link" href="#throughput-and-rework">#</a></h2>
+<p>Commit-derived rows are exempt from the provenance split; the rest are live <code>library</code> only.</p>
 <table>
 <thead><tr><th>Metric</th><th>Value</th></tr></thead>
 <tbody>
-<tr><td>Runs total</td><td>95</td></tr>
-<tr><td>Rework ratio (fix-mode ÷ build-phase runs)</td><td>1150%</td></tr>
+<tr><td>Runs total</td><td>103</td></tr>
+<tr><td>Rework ratio (fix-mode ÷ build-phase runs)</td><td>1275%</td></tr>
 <tr><td>Batch size — median REQs per <code>build-phase</code> run</td><td>2.5</td></tr>
-<tr><td>REQ throughput — median REQs/hour</td><td>13.74</td></tr>
-<tr><td>Sessions / total tokens</td><td>19 / 9,489,212</td></tr>
-<tr><td>Tokens per <code>Verified</code> REQ</td><td>71,888</td></tr>
-<tr><td>Commit cadence</td><td>2.7 commits/active day over 37 days</td></tr>
+<tr><td>REQ throughput — median REQs/hour</td><td>13.54</td></tr>
+<tr><td>Sessions / total tokens</td><td>22 / 10,080,727</td></tr>
+<tr><td>Tokens per <code>Verified</code> REQ</td><td>74,123</td></tr>
+<tr><td>Commit cadence</td><td>2.65 commits/active day over 40 days</td></tr>
 </tbody>
 </table>
-<p>Cost in USD is not reported here. Claude Code transcripts carry token counts but no per-message dollar cost; this framework runs on subscriptions where marginal per-token cost is not the real unit. OpenCode runs do carry real provider cost — see §5b.</p>
+<p>Cost in USD is not reported here. Claude Code transcripts carry token counts but no per-message dollar cost (<code>cost_usd</code> is <code>null</code> on every Claude Code record); this framework runs on subscriptions where marginal per-token cost is not the real unit, and no rate-card estimate is printed. OpenCode runs do carry real provider cost — see §6.</p>
 <hr>
 <h2 id="misses"><a id="5-misses"></a>5. Misses<a class="anchor-link" href="#misses">#</a></h2>
 <table>
 <thead><tr><th>Metric</th><th>Value</th></tr></thead>
 <tbody>
-<tr><td>Misses logged</td><td>75 (10 open, 65 resolved, 0 wont-fix)</td></tr>
-<tr><td>Design-miss share (<code>unspecified-gap</code>)</td><td>51%</td></tr>
-<tr><td>Found by a human (<code>owner</code> / <code>production</code>)</td><td>91%</td></tr>
+<tr><td>Misses logged</td><td>77 (10 open, 67 resolved, 0 wont-fix)</td></tr>
+<tr><td>Design-miss share (<code>unspecified-gap</code>)</td><td>52%</td></tr>
+<tr><td>Escape share (found by a human / outside a gate)</td><td>91%</td></tr>
+<tr><td>Found by</td><td>owner 69 · library-feedback 6 · gate 1 · production 1</td></tr>
 </tbody>
 </table>
 <p><strong>Miss classes</strong></p>
 <table>
-<thead><tr><th>Class</th><th>n</th><th>Share</th></tr></thead>
+<thead><tr><th>Class</th><th>n</th></tr></thead>
 <tbody>
-<tr><td>unspecified-gap</td><td>38</td><td>51%</td></tr>
-<tr><td>wrong-behaviour</td><td>17</td><td>23%</td></tr>
-<tr><td>regression</td><td>14</td><td>19%</td></tr>
-<tr><td>partial-implementation</td><td>4</td><td>5%</td></tr>
-<tr><td>missed-requirement</td><td>1</td><td>1%</td></tr>
-<tr><td>scope-creep</td><td>1</td><td>1%</td></tr>
+<tr><td>unspecified-gap</td><td>40</td></tr>
+<tr><td>wrong-behaviour</td><td>17</td></tr>
+<tr><td>regression</td><td>14</td></tr>
+<tr><td>partial-implementation</td><td>4</td></tr>
+<tr><td>missed-requirement</td><td>1</td></tr>
+<tr><td>scope-creep</td><td>1</td></tr>
 </tbody>
 </table>
-<p><strong>Why it was missed</strong> — 74 of 75 misses assessed</p>
+<p><strong>Why it was missed</strong> — 76 of 77 eligible misses assessed (0 predate the field; 0 escapes missing it)</p>
 <table>
-<thead><tr><th>Practice</th><th>n</th><th>Share</th></tr></thead>
+<thead><tr><th>Practice</th><th>n</th></tr></thead>
 <tbody>
-<tr><td>missing-checklist-item</td><td>40</td><td>54%</td></tr>
-<tr><td>insufficient-verify-method</td><td>32</td><td>43%</td></tr>
-<tr><td>instruction-ignored</td><td>2</td><td>3%</td></tr>
+<tr><td>missing-checklist-item</td><td>42</td></tr>
+<tr><td>insufficient-verify-method</td><td>32</td></tr>
+<tr><td>instruction-ignored</td><td>2</td></tr>
+</tbody>
+</table>
+<p><strong>Gap sort</strong> — 66 of 66 eligible (11 misses predate the field and are outside the denominator)</p>
+<table>
+<thead><tr><th>Sort</th><th>n</th></tr></thead>
+<tbody>
+<tr><td>spec</td><td>40</td></tr>
+<tr><td>weak-check</td><td>25</td></tr>
+<tr><td>ignored</td><td>1</td></tr>
 </tbody>
 </table>
 <h3 id="a-attribution-linked-records-only"><a id="5a-attribution--linked-records-only"></a>5a. Attribution — <code>linked</code> records only<a class="anchor-link" href="#a-attribution-linked-records-only">#</a></h3>
-<p><strong>12 of 75 misses are attributed; 63 excluded</strong> because they name a phase no <code>runs.jsonl</code> record backs.</p>
+<p><strong>12 of 77 misses are attributed; 65 excluded</strong> (<code>origin_confidence</code> not <code>linked</code>).</p>
 <table>
 <thead><tr><th>By</th><th>Counts</th></tr></thead>
 <tbody>
@@ -241,60 +254,72 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>Origin model</td><td>claude-opus-5=11, ?=1</td></tr>
 </tbody>
 </table>
+<p>Per-model and per-phase figures are observational, not causal: which model and phase get the hard work is not random, so this ranking is not a routing signal.</p>
 <h3 id="b-rework-cost"><a id="5b-rework-cost"></a>5b. Rework cost<a class="anchor-link" href="#b-rework-cost">#</a></h3>
 <table>
 <thead><tr><th></th><th>Fix records</th><th>Tokens out per miss</th></tr></thead>
 <tbody>
-<tr><td><strong>Measured</strong> (<code>sole</code>)</td><td>10</td><td>97,197</td></tr>
-<tr><td>Apportioned (<code>shared:n</code>)</td><td>52</td><td>81,889</td></tr>
+<tr><td><strong>Measured</strong> (<code>sole</code>)</td><td>12 (12 carry <code>tokens_out</code>, 0 unrecorded)</td><td>89,934</td></tr>
+<tr><td>Apportioned (<code>shared:n</code>)</td><td>52 (0 unrecorded)</td><td>81,889</td></tr>
 <tr><td>Unattributable (<code>none</code>)</td><td>7</td><td>—</td></tr>
 </tbody>
 </table>
-<p>No measured dollars for Claude Code runs. OpenCode cost appears only on the one OpenCode run and is not pooled here.</p>
+<p>No measured dollars per miss (0 records carry money). OpenCode cost appears only on OpenCode runs and is not pooled here.</p>
 <hr>
 <h2 id="effort-per-phase"><a id="6-effort-per-phase"></a>6. Effort per phase<a class="anchor-link" href="#effort-per-phase">#</a></h2>
-<p>Aggregated over <strong>95 live run records</strong>.</p>
+<p>Aggregated over <strong>103 live run records</strong> (11 voided runs excluded). Token-window scope: tree 57 · main 36 · none 8 · absent 2 — <code>none</code>/absent windows are excluded from token figures, never counted as zero.</p>
 <table>
 <thead><tr><th>Phase (<code>cmd</code>)</th><th>Runs</th><th>Wall clock (total / median)</th><th>Tokens out</th><th>% of all output</th><th>Tokens measured on</th></tr></thead>
 <tbody>
-<tr><td><code>triage-and-fix</code></td><td>28</td><td>34,283 s / 672 s</td><td>3,700,707</td><td>49%</td><td>28 of 28</td></tr>
-<tr><td><code>fix-issues</code></td><td>16</td><td>25,266 s / 626 s</td><td>1,931,025</td><td>26%</td><td>13 of 16</td></tr>
+<tr><td><code>triage-and-fix</code></td><td>30</td><td>35,271 s / 672 s</td><td>3,760,344</td><td>49%</td><td>29 of 30</td></tr>
+<tr><td><code>fix-issues</code></td><td>19</td><td>26,755 s / 604 s</td><td>2,024,579</td><td>26%</td><td>16 of 19</td></tr>
 <tr><td><code>build-phase</code></td><td>4</td><td>22,899 s / 2,056 s</td><td>473,090</td><td>6%</td><td>3 of 4</td></tr>
-<tr><td><code>verify-phase</code></td><td>21</td><td>9,578 s / 284 s</td><td>288,741</td><td>4%</td><td>20 of 21</td></tr>
+<tr><td><code>verify-phase</code></td><td>23</td><td>9,830 s / 271 s</td><td>291,178</td><td>4%</td><td>22 of 23</td></tr>
 <tr><td><code>handoff-phase</code></td><td>3</td><td>3,947 s / 776 s</td><td>415,709</td><td>5%</td><td>2 of 3</td></tr>
-<tr><td><code>metrics-report</code></td><td>12</td><td>2,129 s / 163 s</td><td>455,335</td><td>6%</td><td>12 of 12</td></tr>
-<tr><td><code>amend-docs</code></td><td>5</td><td>2,478 s / 162 s</td><td>99,550</td><td>1%</td><td>4 of 5</td></tr>
 <tr><td><code>triage-issues</code></td><td>3</td><td>3,747 s / 801 s</td><td>153,350</td><td>2%</td><td>2 of 3</td></tr>
+<tr><td><code>amend-docs</code></td><td>5</td><td>2,478 s / 162 s</td><td>99,550</td><td>1%</td><td>4 of 5</td></tr>
+<tr><td><code>metrics-report</code></td><td>13</td><td>2,249 s / 160 s</td><td>457,404</td><td>6%</td><td>13 of 13</td></tr>
+<tr><td><code>refresh-status</code></td><td>1</td><td>524 s / 524 s</td><td>—</td><td>0%</td><td>0 of 1</td></tr>
 <tr><td><code>log-miss</code></td><td>2</td><td>349 s / 175 s</td><td>52,482</td><td>1%</td><td>2 of 2</td></tr>
-<tr><td><code>refresh-status</code></td><td>1</td><td>524 s / 524 s</td><td>0</td><td>0%</td><td>0 of 1</td></tr>
 </tbody>
 </table>
+<p>Phase differences reflect what the phases are, not a finding about any of them. Measured dollars (OpenCode only, never pooled): <code>fix-issues</code> $8.40 (1 run), <code>triage-and-fix</code> $1.55 (1 run), <code>metrics-report</code> $0.11 (1 run) — plan allowance, not an invoice.</p>
 <h3 id="a-which-model-did-the-work"><a id="6a-which-model-did-the-work"></a>6a. Which model did the work<a class="anchor-link" href="#a-which-model-did-the-work">#</a></h3>
 <table>
 <thead><tr><th>Phase</th><th>Model</th><th>Output tokens</th><th>Share of the phase</th><th>Runs</th></tr></thead>
 <tbody>
 <tr><td><code>triage-and-fix</code></td><td>claude-opus-5</td><td>1,523,274</td><td>41%</td><td>6</td></tr>
-<tr><td><code>triage-and-fix</code></td><td>claude-fable-5-1</td><td>1,499,018</td><td>41%</td><td>10</td></tr>
-<tr><td><code>triage-and-fix</code></td><td>claude-opus-5-5</td><td>667,342</td><td>18%</td><td>11</td></tr>
-<tr><td><code>fix-issues</code></td><td>claude-opus-5</td><td>1,545,016</td><td>80%</td><td>7</td></tr>
-<tr><td><code>fix-issues</code></td><td>claude-fable-5-1</td><td>307,044</td><td>16%</td><td>2</td></tr>
+<tr><td><code>triage-and-fix</code></td><td>claude-fable-5-1</td><td>1,499,018</td><td>40%</td><td>10</td></tr>
+<tr><td><code>triage-and-fix</code></td><td>claude-opus-5-5</td><td>726,979</td><td>19%</td><td>12</td></tr>
+<tr><td><code>fix-issues</code></td><td>claude-opus-5</td><td>1,545,016</td><td>76%</td><td>7</td></tr>
+<tr><td><code>fix-issues</code></td><td>claude-fable-5-1</td><td>307,044</td><td>15%</td><td>2</td></tr>
+<tr><td><code>fix-issues</code></td><td>claude-opus-5-5</td><td>137,944</td><td>7%</td><td>6</td></tr>
+<tr><td><code>metrics-report</code></td><td>claude-fable-5-1</td><td>220,420</td><td>48%</td><td>4</td></tr>
+<tr><td><code>metrics-report</code></td><td>claude-opus-5-5</td><td>175,412</td><td>38%</td><td>5</td></tr>
+<tr><td><code>build-phase</code></td><td>claude-fable-5-1</td><td>392,238</td><td>83%</td><td>2</td></tr>
 </tbody>
 </table>
 <h3 id="b-subagent-fan-out"><a id="6b-subagent-fan-out"></a>6b. Subagent fan-out<a class="anchor-link" href="#b-subagent-fan-out">#</a></h3>
+<p>Fan-out is observed on <code>tree</code>-scope windows only; every unobserved run below was excluded because its window was not <code>tree</code> scope (0 predate the field).</p>
 <table>
-<thead><tr><th>Phase</th><th>Runs observed</th><th>Spawns (total / median / max)</th><th>Runs that fanned out</th><th>Output tokens in subagents</th><th>Subagent share</th></tr></thead>
+<thead><tr><th>Phase</th><th>Runs observed</th><th>Spawns (total / median / max)</th><th>Runs that fanned out</th><th>Output tokens in subagents</th><th>Subagent share</th><th>Declared vs measured</th></tr></thead>
 <tbody>
-<tr><td><code>fix-issues</code></td><td>9 of 16</td><td>13 / 0 / 6</td><td>3</td><td>518,258</td><td>44%</td></tr>
-<tr><td><code>metrics-report</code></td><td>10 of 12</td><td>9 / 1 / 1</td><td>9</td><td>126,550</td><td>30%</td></tr>
-<tr><td><code>triage-and-fix</code></td><td>18 of 28</td><td>14 / 1 / 3</td><td>12</td><td>161,666</td><td>9%</td></tr>
+<tr><td><code>fix-issues</code></td><td>9 of 19</td><td>13 / 0 / 6</td><td>3</td><td>518,258</td><td>44%</td><td>—</td></tr>
+<tr><td><code>metrics-report</code></td><td>11 of 13</td><td>9 / 1 / 1</td><td>9</td><td>126,550</td><td>29%</td><td>3 declared vs 9 measured</td></tr>
+<tr><td><code>triage-and-fix</code></td><td>18 of 30</td><td>14 / 1 / 3</td><td>12</td><td>161,666</td><td>9%</td><td>13 declared vs 14 measured</td></tr>
+<tr><td><code>triage-issues</code></td><td>2 of 3</td><td>4 / 2 / 4</td><td>1</td><td>43,947</td><td>29%</td><td>1 declared vs 4 measured</td></tr>
+<tr><td><code>build-phase</code></td><td>1 of 4</td><td>0 / 0 / 0</td><td>0</td><td>0</td><td>0%</td><td>2 declared vs 0 measured</td></tr>
 </tbody>
 </table>
+<p>Where declared and measured disagree, the measured <code>subagent_runs</code> (counted from the harness store) is authoritative.</p>
 <hr>
 <h2 id="what-is-missing"><a id="7-what-is-missing"></a>7. What is missing<a class="anchor-link" href="#what-is-missing">#</a></h2>
 <ul>
-<li>Per-model miss rate for OpenCode — insufficient data (n=1).
+<li>Per-run token averages for <code>handoff-phase</code>, <code>triage-issues</code>, <code>log-miss</code> — insufficient data (n=2 each); <code>refresh-status</code> — insufficient data (n=0).
 </li>
-<li>Mockup-parity / visual gate catches — no library project screens were driven for these gates.
+<li>Perf / assets / mockup-parity / test-users gate catches — those gates have never run on this library.
+</li>
+<li>Review records (owner corrections) — none logged (n=0).
 </li>
 </ul>
   </main>

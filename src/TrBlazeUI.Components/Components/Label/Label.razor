@@ -1,6 +1,8 @@
 @namespace TrBlazeUI.Components.Label
 @using TrBlazeUI.Primitives.Label
 
-<TrBlazeUI.Primitives.Label.Label For="@For" class="@CssClass" @attributes="AdditionalAttributes">
+@* data-slot="label" lets the stylesheet give a field placed right after this label a gap of its own
+   (Chatur TR-022); it comes before the splat so a consumer can still override it. *@
+<TrBlazeUI.Primitives.Label.Label For="@For" class="@CssClass" data-slot="label" @attributes="AdditionalAttributes">
     @ChildContent
 </TrBlazeUI.Primitives.Label.Label>

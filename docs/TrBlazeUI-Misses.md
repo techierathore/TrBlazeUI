@@ -3,9 +3,9 @@
 | | |
 |---|---|
 | App | TrBlazeUI |
-| Count | 83 logged: 10 open, 66 fixed, 0 will not fix, 7 withdrawn |
+| Count | 85 logged: 10 open, 68 fixed, 0 will not fix, 7 withdrawn |
 | Source | `docs/metrics/misses.jsonl`, one row per miss record. Rewritten by `tf-misses-md.sh` on every new record. Never edit it: a wrong row is corrected by a new record. |
-| Updated | 2026-10-29 |
+| Updated | 2026-11-02 |
 
 **Whose gap** answers the four questions of the miss protocol: **the app's spec** did not say it, so the checklist line is fixed; **the framework never said it**, so one requirement line and a check are added; **the check was too weak** (a review, or a script that did not fire), so the check is fixed; **said and ignored**, so the rule becomes a hook or is deleted. **not sorted** means the record predates the sort or nobody has answered yet; `bash .tfcore/utils/tf-emit.sh --amend <miss> sort <spec|unsaid|weak-check|ignored>` completes it.
 
@@ -24,10 +24,12 @@
 | MISS-TrBlazeUI-20260912-09 (REQ-UI-008) | 2026-09-12 by owner | the check was too weak | TfLens TR-028 (High, reproduced live on /charts/bar @1280): BarChart exposes no axis, grid or data-label control and no route to ApexChartOptions, so a chart cannot be made to match an approved design. Measured: 32 .apexcharts-gridline and 30 .apexcharts-yaxis-label rendered with no parameter to tur |
 | MISS-TrBlazeUI-20260912-08 (REQ-UI-020) | 2026-09-12 by owner | the app's spec | TfLens post-2.1.0 consumer-feedback fixes (TR-028…TR-035) |
 
-## Fixed (66)
+## Fixed (68)
 
 | Miss | Found | Closed | Whose gap | What went wrong |
 |---|---|---|---|---|
+| MISS-TrBlazeUI-20261102-02 (REQ-UI-062) | 2026-11-02 by production | 2026-11-02 by fix-issues | the app's spec | A focused Input or SelectTrigger draws its ring on the border, a Label before a field keeps its own gap, and menu items are 10px across (Chatur TR-022) |
+| MISS-TrBlazeUI-20261102-01 (REQ-UI-061) | 2026-11-02 by production | 2026-11-02 by fix-issues | the app's spec | SelectValue renders its placeholder, not an exception, when its Select is bound to a value no item carries and the page re-renders (TechieBlog TR-077) |
 | MISS-TrBlazeUI-20261029-01 (REQ-UI-059) | 2026-10-29 by owner | 2026-10-29 by fix-issues | the app's spec | Sidebar active item renders data-active="true"/"false" and paints its active style (TechieBlog TR-076) |
 | MISS-TrBlazeUI-20261015-02 (REQ-NFR-005) | 2026-10-15 by owner | 2026-10-15 by fix-issues | the check was too weak | CI run 38773955449 (Build Validation, Dev, ce677f4) fails at Restore: NU1903 — Microsoft.AspNetCore.Components.WebAssembly.Server 10.0.3 has high-severity advisories GHSA-g27p-qf6j-c96c and GHSA-qjpx-jqm5-h2c4 (published 2026-10-13; patched 10.0.13) |
 | MISS-TrBlazeUI-20261015-01 (REQ-UI-052) | 2026-10-15 by owner | 2026-10-15 by fix-issues | the app's spec | InputGroupButton is the button itself: the reference shows one button, and its attributes reach it (Lekhak TR-007) |

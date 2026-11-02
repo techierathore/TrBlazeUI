@@ -9,6 +9,54 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ---
 
+## [Unreleased]
+
+### TechieBlog TR-077 — fixed on 2026-11-02
+
+Answers the entry TechieBlog filed on 2026-11-02 against 2.2.1
+(`/mnt/c/1MyCode/TechieBlog/docs/TechieBlog-TrBlazeUI-Feedback.md`; REQ-UI-061).
+
+#### Fixed
+
+- **`SelectValue` no longer throws `RuntimeBinderException` when its page re-renders (TR-077).**
+  `SelectValue` reached the parent `Select`'s context through `dynamic` and passed the bound value
+  as a variable typed `object`. The C# runtime binder resolves such an argument by its static type,
+  so it looked for `HasItemWithValue(object)` and found only `HasItemWithValue(TValue)`. It threw
+  whenever the value was not null, not its type's default, matched no item, and the items had
+  registered, which is any re-render after first paint. Example: a `string` Select bound to `""`,
+  or an `int` Select bound to 9 with items 1 and 2. In a Server app that kills the circuit or trips
+  the error boundary. `SelectValue` now receives
+  the context through the new non-generic `TrBlazeUI.Primitives.Select.ISelectValueDisplay`
+  interface, and the lookup runs typed inside `SelectContext<TValue>.ResolveDisplayText()`. What it
+  displays is unchanged: the item text, the raw value until the items register, then the
+  placeholder when no item carries the value.
+- No other component in `src/` uses `dynamic`.
+
+### Chatur TR-022 — fixed on 2026-11-02
+
+Answers the entry Chatur filed on 2026-10-30 against 2.1.6
+(`/mnt/c/1MyCode/Chatur/docs/Chatur-TrBlazeUI-Feedback.md`; REQ-UI-062).
+
+#### Changed
+
+- **A focused `Input` or `SelectTrigger` draws its ring on the border (TR-022).** Both carried
+  `ring-offset-2`, which drew a 2px gap and then a 2px ring, so a 4px band sat outside the border
+  and touched a `Label` placed right above the field. That read as missing padding in every dialog.
+  The offset is gone, and the 2px ring now sits on the border. `Textarea` already drew its ring
+  without an offset and is unchanged.
+- **A field placed right after a `Label` gets a 6px gap.** `Label` now renders `data-slot="label"`,
+  and the stylesheet gives the element after it a 6px top margin when the parent is an ordinary
+  block. A parent with the class `flex`, `inline-flex`, `grid` or `inline-grid` keeps its own gap
+  and gets nothing extra, which covers the `grid gap-2` pattern and `Field`. The rule has zero
+  specificity, so a margin class on the field still wins.
+- **Menu items are 10px across.** Items, sub-triggers and labels in `DropdownMenu`, `Menubar` and
+  `ContextMenu` move from `px-2` to `px-2.5`. Checkbox items move from `pr-2` to `pr-2.5` and keep
+  their check-mark inset. The menu panels keep `p-1`.
+- An app that set `--tw-ring-offset-width: 0`, a label gap, or 10px menu padding in its own CSS to
+  get this can drop those rules.
+
+---
+
 ## [2.2.1] — 2026-10-29
 
 ### TechieBlog TR-076 — fixed on 2026-10-29
