@@ -1,0 +1,68 @@
+@page "/verify-chatur-tr022"
+@using TrBlazeUI.Components.Dialog
+@using TrBlazeUI.Components.Input
+@using TrBlazeUI.Components.Textarea
+@using TrBlazeUI.Components.Label
+@using TrBlazeUI.Components.DropdownMenu
+
+@* Verification harness for Chatur TR-022 (docs/Chatur-TrBlazeUI-Feedback.md).
+   Not a documentation demo: every block exists so tests/verify/req-ui-062.spec.ts can measure, on a
+   focused field inside a Dialog, that the focus ring sits on the border (no ring offset) and that a
+   Label placed directly before the field keeps a gap of its own; and that menu items are 10px across. *@
+
+<PageTitle>Verify Chatur TR-022 - TrBlazeUI</PageTitle>
+
+<div class="mx-auto max-w-md space-y-8 p-6">
+    <h1 class="text-2xl font-bold" data-testid="verify-heading">Chatur TR-022 focus ring and label gap</h1>
+
+    <Button data-testid="open-dialog" OnClick="@(() => objIsOpen = true)">New project</Button>
+    <Dialog Modal="true" @bind-Open="objIsOpen">
+        <DialogContent data-testid="dialog">
+            <DialogHeader>
+                <DialogTitle>New project</DialogTitle>
+            </DialogHeader>
+            <div>
+                <Label For="project-name" data-testid="label-input">Project name</Label>
+                <Input Id="project-name" data-testid="field-input" />
+            </div>
+            <div>
+                <Label For="project-notes" data-testid="label-textarea">Notes</Label>
+                <Textarea Id="project-notes" data-testid="field-textarea" />
+            </div>
+            <div>
+                <Label data-testid="label-select">Template</Label>
+                <Select TValue="string" @bind-Value="objTemplate">
+                    <SelectTrigger data-testid="field-select">
+                        <SelectValue Placeholder="Pick a template" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem Value="@("blank")" Text="Blank">Blank</SelectItem>
+                        <SelectItem Value="@("blog")" Text="Blog">Blog</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+            @* The shadcn pattern: a grid with its own gap. The library must not add a second gap here. *@
+            <div class="grid gap-2" data-testid="grid-pair">
+                <Label For="project-owner" data-testid="label-grid">Owner</Label>
+                <Input Id="project-owner" data-testid="field-grid" />
+            </div>
+        </DialogContent>
+    </Dialog>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">Menu item padding</h2>
+        <DropdownMenu>
+            <DropdownMenuTrigger data-testid="menu-trigger">Open menu</DropdownMenuTrigger>
+            <DropdownMenuContent>
+                <DropdownMenuLabel data-testid="menu-label">Project</DropdownMenuLabel>
+                <DropdownMenuItem data-testid="menu-item">Rename</DropdownMenuItem>
+                <DropdownMenuItem>Delete</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    </section>
+</div>
+
+@code {
+    private bool objIsOpen;
+    private string objTemplate = string.Empty;
+}

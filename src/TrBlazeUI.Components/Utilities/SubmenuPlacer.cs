@@ -17,7 +17,7 @@ internal sealed class SubmenuPlacer : IAsyncDisposable
 
     /// <summary>The classes every submenu trigger row carries; the ▸ sits at its right edge.</summary>
     internal const string TriggerClasses =
-        "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none " +
+        "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2.5 py-1.5 text-sm outline-none " +
         "focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground " +
         "data-[state=open]:bg-accent data-[state=open]:text-accent-foreground " +
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50";

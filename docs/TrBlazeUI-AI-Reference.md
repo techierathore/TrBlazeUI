@@ -1223,6 +1223,17 @@ Sub-components: `ButtonIcon`
 <Input Id="email" Type="InputType.Email" @bind-Value="email" />
 ```
 
+**Spacing and focus ring (after 2.2.1, Chatur TR-022).**
+- `Label` renders `data-slot="label"`. When a field comes right after a `Label` inside an ordinary
+  block container, the field gets a 6px top margin, so a label sits clear of its field without
+  extra classes.
+- A parent with the class `flex`, `inline-flex`, `grid` or `inline-grid` sets its own gap, so the
+  library adds nothing there. That covers the shadcn `<div class="grid gap-2">` pattern and `Field`.
+- The rule has zero specificity, so a margin class on the field (`mt-0`, `mt-3`) wins.
+- A focused `Input` or `SelectTrigger` draws its 2px ring on the border, with no ring offset.
+  `Textarea` already drew a 3px ring with no offset. Up to 2.2.1, `Input` and `SelectTrigger`
+  carried `ring-offset-2`: a 4px band outside the border that touched a label placed above.
+
 ### Checkbox
 
 | Parameter | Type | Default | Description |
@@ -1330,6 +1341,12 @@ Sub-components: `SelectTrigger`, `SelectValue`, `SelectContent`, `SelectItem`, `
 
 If `DisplayTextSelector` returns null or empty, `SelectValue` falls back to `Value.ToString()` rather
 than the placeholder. Map sentinel values explicitly.
+
+A bound value that no `SelectItem` carries (a `string` bound to `""`, an `int` bound to a number with
+no item) shows the placeholder once the items have registered. Up to 2.2.1 such a Select threw
+`RuntimeBinderException` from `SelectValue` on the first re-render after first paint (TechieBlog
+TR-077). After 2.2.1 it renders the placeholder and does not throw, so `""` is a safe "nothing
+chosen" value for a `string` Select.
 
 #### Grouped Select
 
@@ -2778,6 +2795,10 @@ Sub-components: `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`
 A submenu works exactly as the Menubar's (§4): a ▸ row that opens a list beside it, ArrowRight to
 open, ArrowLeft or Escape to close one level, nested to any depth.
 
+Items, sub-triggers and labels in `DropdownMenu`, `Menubar` and `ContextMenu` are 10px across
+(`px-2.5`, after 2.2.1, Chatur TR-022; 8px before). Checkbox items keep their 32px left inset for the
+check mark and are 10px on the right.
+
 ```razor
 <DropdownMenuContent>
     <DropdownMenuItem>Copy link</DropdownMenuItem>
@@ -3987,6 +4008,7 @@ source* — see the next heading — and only rarely *wait for it to be built*.
 
 | Version | Released | Component namespaces | What it added |
 |---|---|---|---|
+| **After 2.2.1** | — | 87 | A `Select` bound to a value no item carries no longer throws on re-render (TechieBlog TR-077); a focused `Input`/`SelectTrigger` draws its ring on the border (no `ring-offset-2`); a field right after a `Label` in a block container gets a 6px gap; menu items, sub-triggers and menu labels in `DropdownMenu`, `Menubar` and `ContextMenu` are 10px across (`px-2.5`) (Chatur TR-022) |
 | **After 2.1.6** | — | 87 | `trblazeui-layers.css` and the `trblazeui-host` cascade layer; submenus for `Menubar`, `DropdownMenu` and `ContextMenu` (`…Sub`, `…SubTrigger`, `…SubContent`); a disabled `MenubarItem`, `MenubarCheckboxItem` or `ContextMenuItem` renders `aria-disabled="true"` and `data-disabled` |
 | **After 2.1.4** | — | 87 | `Chat` family (`ChatThread`, `ChatMessage`, `ChatComposer`); a `Select` inside a `Dialog` never freezes the page (script, positioning and portal failures fall back and log); `Table` family (plain markup table); `ToastVariant.Success`/`Info`/`Warning` + `ToastService.Warning`/`Info`; `AlertDialogAction`/`AlertDialogCancel` `OnClick`/`PreventClose`; `Textarea.Rows`/`MaxRows`; `CardTitle`/`AlertTitle` `As`; `NumericInput` always `role="spinbutton"`, invariant ARIA numbers on `NumericInput` and `Slider`; `NumberInput` is a compile error naming `NumericInput`; a `Select` bound to a value no item carries shows its placeholder; the empty toast viewport lets clicks through; `HtmlSanitizer` on a stable 9.1.x |
 | **2.1.4** | 2026-10-07 | 85 | `EditorTabs.CloseContent` — draw a tab's close mark yourself (a text `×`) in place of the svg |

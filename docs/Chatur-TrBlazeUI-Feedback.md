@@ -4,11 +4,11 @@
 |---|---|
 | App | Chatur |
 | Upstream | TrBlazeUI |
-| Updated | 2026-10-13 |
+| Updated | 2026-11-02 |
 
 ## Summary
 
-21 entries: nothing is blocked. 2 fixed upstream, awaiting re-check (TR-020, TR-021, fixed 2026-10-13, ship in the release after 2.1.6 — see the 2026-10-13 reply), 19 closed (TR-019 re-checked and closed 2026-10-11 on 2.1.6).
+22 entries: nothing is blocked. 3 fixed upstream, awaiting re-check: TR-020, TR-021 (in 2.1.9) and TR-022 (in 2.2.2, see the 2026-11-02 reply). 19 closed.
 
 All ten were answered on 2026-09-22 and all ten have now been re-checked in Chatur against
 2.0.9. Six were fixed in code; four needed no code, because the control already existed. Each
@@ -298,9 +298,65 @@ The first ten were found on day one, against the 2.0.7 reference; each entry say
 - **Workaround:** the verify spec reads the `pointer-events-none` class.
 - **Suggested fix:** set `aria-disabled` on a disabled `MenubarItem` and `MenubarCheckboxItem`.
 
+### TR-022 — A focused field's ring stands off its border and runs into the label above; menu items are tighter than the design
+
+- **Status:** fixed upstream 2026-11-02 (no ring offset on `Input` and `SelectTrigger`, a 6px gap after a `Label`, 10px menu items, in 2.2.2 — see the 2026-11-02 reply), filed 2026-10-30
+- **Severity:** minor
+- **Blocks:** no — Chatur overrides it in one shared stylesheet (`src/ChaturUI/wwwroot/chatur.css`) until a fix ships.
+- **Repro:** TrBlazeUI 2.1.6 `<Label>Project name</Label><Input />` inside a `Dialog`, then focus the input. `Input` carries `focus-visible:ring-2 focus-visible:ring-offset-2`, so a 4px band is drawn outside the border: it touches the label above and comes 4px closer to the dialog edge (the owner's screenshot `docs/screenshots/2026-10-29-first-use/New-Project-Incorrect-Paddings.png`). `DropdownMenuItem` / `MenubarItem` are `px-2 py-1.5` (8px across) and their content `p-1`, against shadcn-style designs that use 10px and 5px.
+- **Expected:** the ring sits on the border (`ring-offset-0`, or an inset ring), and a `Label` placed before a field keeps a gap of its own; menu items with 10px across.
+- **Actual:** the focused field looks as if it has no room around it, which the owner reported as missing padding on every dialog.
+- **Encountered in:** REQ-UI-080
+- **Workaround:** `chatur.css` sets `--tw-ring-offset-width: 0` on focused fields, a 6px gap after a label, and 5px / 6px 10px on menus and lists.
+- **Suggested fix:** drop `ring-offset-2` from `Input`, `Textarea` and `SelectTrigger` (or make it a parameter), and widen menu items to `px-2.5`.
+
+Copied into TrBlazeUI 2026-11-02 by *fix-issues from `/mnt/c/1MyCode/Chatur/docs/Chatur-TrBlazeUI-Feedback.md`.
+
 ## Replies from TrBlazeUI
 
 <!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
+
+### 2026-11-02 — TR-022 is fixed; it ships in 2.2.2
+
+Fixed and tested in the library. It ships in **2.2.2** on GitHub Packages
+(`https://nuget.pkg.github.com/techierathore/index.json`). That release is not on the feed until
+the TrBlazeUI owner publishes it. Until then, keep the `chatur.css` rules.
+
+| Part | State | What you get |
+|---|---|---|
+| **Ring offset** | fixed | A focused `Input` or `SelectTrigger` draws a 2px ring on its border, with no offset. Before, a 2px gap and then a 2px ring made a 4px band. `Textarea` never had the offset: it already drew a 3px ring on the border, so it is unchanged. |
+| **Label gap** | fixed | `Label` renders `data-slot="label"`. The element right after it gets a 6px top margin when their parent is an ordinary block, as in your `<Label/><Input/>`. A parent with the class `flex`, `inline-flex`, `grid` or `inline-grid` already sets its own gap and gets nothing extra, so `<div class="grid gap-2">` and `Field` look as before. The rule has zero specificity, so `mt-0` or any margin class on the field wins. |
+| **Menu items** | fixed | Items, sub-triggers and labels in `DropdownMenu`, `Menubar` and `ContextMenu` are 10px across (`px-2.5`). They keep 6px top and bottom (`py-1.5`). Checkbox items are 10px on the right and keep their 32px check-mark inset. |
+| **Menu panel padding** | not changed | The panels keep `p-1` (4px). Your 5px is one pixel off the library's spacing scale. Keep it in `chatur.css` if the design needs it exactly. |
+
+Measured on the TrBlazeUI demo, in a `Dialog`, at 1280 and 390 wide, before and after the fix:
+
+| | Before (2.2.1) | After |
+|---|---|---|
+| ring offset on a focused `Input` | 2px | 0px (`Input`, `Textarea`, `SelectTrigger`) |
+| band outside the border | 4px | 2px (`Input`, `SelectTrigger`), 3px (`Textarea`) |
+| label bottom to field top | 4px, so the band touched the label | 10px |
+| `grid gap-2` label and field | 8px | 8px, unchanged |
+| `DropdownMenuItem` and `DropdownMenuLabel` padding across | 8px | 10px |
+
+Test `tests/verify/req-ui-062.spec.ts` on the harness page `/verify-chatur-tr022`. Every other
+browser test in the library still passes (93), as do the Chatur specs `ui-chatur*.spec.js`
+(86/86, 80/80, 67/67).
+
+#### What we need from you
+
+Upgrade once 2.2.2 is on the feed. Check that `.trblazeui/TrBlazeUI-AI-Reference.md` has an
+"After 2.2.1" row in "Which version added what"; if it does not, the upgrade has not landed.
+
+- In `src/ChaturUI/wwwroot/chatur.css`, remove the `--tw-ring-offset-width: 0` rule, the label gap
+  and the 10px menu-item padding. Keep the 5px panel padding if the design needs it.
+- Open the New Project dialog (REQ-UI-080) at 1280 and 390 and focus each field. The ring sits on
+  the border and does not touch its label. Compare with
+  `docs/screenshots/2026-10-29-first-use/New-Project-Incorrect-Paddings.png`.
+- Close the entry:
+  `bash .tfcore/utils/tf-feedback.sh Chatur --close TR-022 "<what you ran and what it showed>"`.
+
+Tell us what does not fit.
 
 ### 2026-10-13 — TR-020 and TR-021 are fixed; they ship in the release after 2.1.6
 

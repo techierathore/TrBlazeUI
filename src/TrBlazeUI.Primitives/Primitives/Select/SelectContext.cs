@@ -47,7 +47,7 @@ public class SelectState<TValue>
 /// Manages select state, provides IDs for ARIA attributes, and handles keyboard navigation.
 /// </summary>
 /// <typeparam name="TValue">The type of the selected value.</typeparam>
-public class SelectContext<TValue> : PrimitiveContextWithEvents<SelectState<TValue>>
+public class SelectContext<TValue> : PrimitiveContextWithEvents<SelectState<TValue>>, ISelectValueDisplay
 {
     /// <summary>
     /// Callback invoked when the selected value changes.
@@ -293,6 +293,51 @@ public class SelectContext<TValue> : PrimitiveContextWithEvents<SelectState<TVal
     /// <returns>True when a registered item has that value.</returns>
     public bool HasItemWithValue(TValue? value) =>
         Items.Exists(item => EqualityComparer<TValue?>.Default.Equals(item.Value, value));
+
+    /// <summary>
+    /// Resolves the text the value display shows: the registered display text first, then the raw
+    /// bound value as a fallback while the items have not registered yet.
+    /// </summary>
+    /// <remarks>
+    /// Sevak TR-024: once the items have registered and none of them carries the bound value, the raw
+    /// value is not shown - an <c>int</c> select bound to 0 with items 1 to 5 read "0" where its
+    /// placeholder belonged. A null value, or a value equal to its type's default, is "nothing
+    /// selected" whenever no item matches it. The lookup is typed, so a value no item carries (a
+    /// <c>string</c> bound to <c>""</c>) returns null instead of throwing (TechieBlog TR-077).
+    /// </remarks>
+    /// <returns>The display text, the raw value, or null when the placeholder belongs there.</returns>
+    public string? ResolveDisplayText()
+    {
+        if (!string.IsNullOrWhiteSpace(State.DisplayText))
+        {
+            return State.DisplayText;
+        }
+
+        var vValue = State.Value;
+        if (vValue is null || IsDefaultValue(vValue))
+        {
+            return null;
+        }
+
+        if (Items.Count > 0 && !HasItemWithValue(vValue))
+        {
+            return null;
+        }
+
+        return vValue.ToString();
+    }
+
+    /// <summary>
+    /// Gets whether a value equals the default of its runtime value type (0 for an <c>int</c>,
+    /// including an <c>int?</c> holding 0). Reference types are never "default" here once non-null.
+    /// </summary>
+    /// <param name="aValue">The non-null value to test.</param>
+    /// <returns>True when the value is its value type's default.</returns>
+    private static bool IsDefaultValue(object aValue)
+    {
+        var vType = aValue.GetType();
+        return vType.IsValueType && Equals(aValue, Activator.CreateInstance(vType));
+    }
 
     /// <summary>
     /// Moves focus to the next item that is not disabled.

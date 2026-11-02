@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="sub">Last rendered: 2026-10-29</div>
+    <div class="sub">Last rendered: 2026-11-02</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#table-of-contents">Table of Contents</a></li>
@@ -126,7 +126,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="subtitle">Rendered 2026-10-29 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
+    <div class="subtitle">Rendered 2026-11-02 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -312,6 +312,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <tr><td>Button</td><td><code>/components/button</code></td><td><code>Pages/Components/ButtonDemo.razor</code></td><td><code>Button</code> (<code>border-0</code> on every variant but Outline, after 2.1.6, Lekhak TR-006)</td><td>renders at 1280; under a host <code>button { border }</code> rule in <code>trblazeui-host</code>, filled buttons 0px, Outline 1px in <code>--input</code></td></tr>
 <tr><td>Sidebar</td><td><code>/components/sidebar</code></td><td><code>Pages/Components/SidebarDemo.razor</code></td><td><code>--sidebar-width*</code> from <code>trblazeui.css</code> <code>:where(:root)</code> only (after 2.1.6, Lekhak TR-004)</td><td>renders at 1280; sidebar 256px; a host <code>html { --sidebar-width }</code> wins</td></tr>
 <tr><td>Sidebar active item (2026-10-29)</td><td><code>/verify-tr076</code></td><td><code>Pages/VerifyTr076.razor</code></td><td><code>SidebarMenuButton</code>, <code>SidebarMenuSubButton</code> → <code>data-active="true"/"false"</code> + NavLink <code>ActiveClass</code> for <code>Href</code>+<code>Match</code> (after 2.2.0, TechieBlog TR-076)</td><td>renders at 1280 in light and dark; each active item's background differs from its inactive neighbour's; <code>aria-current="page"</code> kept (req-ui-059.spec.ts)</td></tr>
+<tr><td>Select re-render with an unmatched value (2026-11-02)</td><td><code>/verify-tr077</code></td><td><code>Pages/VerifyTr077.razor</code></td><td><code>SelectValue</code> → <code>ISelectValueDisplay</code> (<code>Primitives/Select/ISelectValueDisplay.cs</code>) → <code>SelectContext&lt;TValue&gt;.ResolveDisplayText()</code>, a typed lookup in place of the <code>dynamic</code> one (after 2.2.1, TechieBlog TR-077)</td><td>a <code>string</code> Select bound to <code>""</code> and an <code>int</code> Select bound to 9 keep their placeholders through typing, button re-renders and an open/close; no <code>RuntimeBinderException</code>, no error bar (req-ui-061.spec.ts)</td></tr>
+<tr><td>Field focus ring and label gap (2026-11-02)</td><td><code>/verify-chatur-tr022</code></td><td><code>Pages/VerifyTr022Chatur.razor</code></td><td><code>Input.CssClass</code> and <code>SelectTrigger.CssClass</code> (no <code>ring-offset-2</code>), <code>Label</code> → <code>data-slot="label"</code> + the <code>[data-slot=label] + *</code> rule in <code>wwwroot/css/trblazeui-input.css</code>, <code>px-2.5</code> on menu items/labels and <code>SubmenuPlacer.TriggerClasses</code> (after 2.2.1, Chatur TR-022)</td><td>in a Dialog at 1280 and 390: ring offset 0, band 2–3px, label gap 10px, <code>grid gap-2</code> pair stays 8px, menu items 10px across (req-ui-062.spec.ts)</td></tr>
 <tr><td>InputGroup (2026-10-15)</td><td><code>/components/input-group</code></td><td><code>Pages/Components/InputGroupDemo.razor</code></td><td><code>InputGroupButton</code> → <code>Button</code> (one <code>&lt;button&gt;</code>; unmatched attributes forwarded after 2.1.7, Lekhak TR-007), section <code>ig-reference-example</code></td><td>renders at 1280 in light and dark; no <code>button button</code> on the page; Go carries <code>ig-reference-go</code>, <code>title</code> and <code>aria-label</code> (req-ui-052.spec.ts)</td></tr>
 <tr><td>Tree View</td><td><code>/components/tree-view</code></td><td><code>Pages/Components/TreeViewDemo.razor</code></td><td><code>TreeView</code>, <code>TreeItem</code> (2.0.8)</td><td>renders at 1366 and 390</td></tr>
 <tr><td>Diff View</td><td><code>/components/diff-view</code></td><td><code>Pages/Components/DiffViewDemo.razor</code></td><td><code>DiffView</code>, <code>TextDiff</code> (2.0.8)</td><td>renders at 1366 and 390</td></tr>

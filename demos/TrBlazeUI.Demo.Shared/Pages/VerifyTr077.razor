@@ -1,0 +1,58 @@
+@page "/verify-tr077"
+@using TrBlazeUI.Components.Select
+@using TrBlazeUI.Components.Button
+
+@* Verification harness for TechieBlog TR-077 (docs/TechieBlog-TrBlazeUI-Feedback.md).
+   Not a documentation demo: every block exists so tests/verify/req-ui-061.spec.ts can assert that a
+   Select whose bound value matches no item keeps rendering its placeholder when the page re-renders,
+   instead of throwing RuntimeBinderException from SelectValue. *@
+
+<PageTitle>Verify TR-077 - TrBlazeUI</PageTitle>
+
+<div class="mx-auto max-w-md space-y-8 p-6">
+    <h1 class="text-2xl font-bold" data-testid="verify-heading">TR-077 Select re-render with an unmatched value</h1>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">string bound to ""</h2>
+        <Select TValue="string" @bind-Value="objBulkAction">
+            <SelectTrigger Class="w-[220px]" data-testid="bulk-trigger">
+                <SelectValue Placeholder="Bulk Actions" data-testid="bulk-value" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem Value="@("publish")" Text="Publish">Publish</SelectItem>
+                <SelectItem Value="@("delete")" Text="Delete">Delete</SelectItem>
+            </SelectContent>
+        </Select>
+    </section>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">int bound to 9 (no item carries 9)</h2>
+        <Select TValue="int" @bind-Value="objNumber">
+            <SelectTrigger Class="w-[220px]" data-testid="number-trigger">
+                <SelectValue Placeholder="Pick a number" data-testid="number-value" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem Value="1" Text="One">One</SelectItem>
+                <SelectItem Value="2" Text="Two">Two</SelectItem>
+            </SelectContent>
+        </Select>
+    </section>
+
+    <section class="space-y-2">
+        <label for="search" class="text-sm font-medium">Search (re-renders the page on every change)</label>
+        <input id="search" class="block w-full rounded-md border px-3 py-2" data-testid="search"
+               @bind="objSearch" @bind:event="oninput" />
+        <Button data-testid="rerender" OnClick="Rerender">Re-render</Button>
+        <p data-testid="render-count">@objRenderCount</p>
+        <p data-testid="search-echo">@objSearch</p>
+    </section>
+</div>
+
+@code {
+    private string objBulkAction = string.Empty;
+    private int objNumber = 9;
+    private string objSearch = string.Empty;
+    private int objRenderCount;
+
+    private void Rerender() => objRenderCount++;
+}

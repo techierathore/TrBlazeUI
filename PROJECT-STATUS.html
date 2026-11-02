@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Status</h1>
-    <div class="sub">Last rendered: 2026-10-29</div>
+    <div class="sub">Last rendered: 2026-11-02</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#where-i-am">Where I am</a></li>
@@ -121,7 +121,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Status</h1>
-    <div class="subtitle">Rendered 2026-10-29 &middot; source <code>PROJECT-STATUS.md</code></div>
+    <div class="subtitle">Rendered 2026-11-02 &middot; source <code>PROJECT-STATUS.md</code></div>
     <div class="cta-next" style="padding:20px; background:var(--cta-bg); border:2px solid var(--accent); border-radius:10px; margin:20px 0;">
       <div style="font-size:11px; color:var(--muted); letter-spacing:.5px;">NEXT COMMAND TO RUN</div>
       <div style="font-family:var(--mono); font-size:18px; margin-top:6px;">(owner) commit, then build and publish the package — its shipped documents are current; no agent command</div>
@@ -129,10 +129,10 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <table>
 <tbody>
 <tr><th>project</th><td>TrBlazeUI</td></tr>
-<tr><th>last_updated</th><td>2026-10-29</td></tr>
-<tr><th>current_phase</th><td>Release — handoff done, 76 of 76 verified</td></tr>
+<tr><th>last_updated</th><td>2026-11-02</td></tr>
+<tr><th>current_phase</th><td>Release — handoff done, 78 of 78 verified</td></tr>
 <tr><th>last_verified_build</th><td>PASS</td></tr>
-<tr><th>last_verified_date</th><td>2026-10-29</td></tr>
+<tr><th>last_verified_date</th><td>2026-11-02</td></tr>
 </tbody>
 </table>
     <div class="toc-inline">
@@ -149,7 +149,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
       </ol>
     </div>
 <h2 id="where-i-am">Where I am<a class="anchor-link" href="#where-i-am">#</a></h2>
-<p>TechieBlog TR-076 is fixed: SidebarMenuButton and SidebarMenuSubButton render data-active="true"/"false", and an Href+Match link paints the active style. REQ-UI-059 is Verified. The 2.2.1 packages are built from this tree but not published: GitHub Packages refused the push because the stored token can only read packages. The TechieBlog reply, CHANGELOG [2.2.1], agent reference, UsageGuide and DevGuide are updated.</p>
+<p>Two consumer fixes ready for 2.2.2. TechieBlog TR-077: SelectValue no longer throws on a re-render (REQ-UI-061). Chatur TR-022: a focused Input or SelectTrigger draws its ring on the border, a field after a Label gets a 6px gap, and menu items are 10px across (REQ-UI-062). REQ-UI-055, 059, 061 and 062 are Verified. CHANGELOG [Unreleased], agent reference, DevGuide and both feedback replies are updated. The TechieBlog feedback file now follows the template; the document checker shows no FAIL.</p>
 <h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2>
 <p>Claude Code:</p>
 <pre><code>(owner) commit, then build and publish the package — its shipped documents are current; no agent command</code></pre>
@@ -173,7 +173,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </ul>
 <h2 id="known-blockers">Known blockers<a class="anchor-link" href="#known-blockers">#</a></h2>
 <ul>
-<li>2.2.1 is not on GitHub Packages: the push was refused (403) because the stored token has only the <code>read:packages</code> scope. Publish it through the usual GitHub Release with tag <code>2.2.1</code>.
+<li>2.2.2 is not on GitHub Packages until the owner publishes it through the usual GitHub Release; the stored token can only read packages.
 </li>
 <li>CHANGELOG has no section for 2.1.10 or 2.2.0, which are already published; the owner fills them in.
 </li>
@@ -183,11 +183,11 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <table>
 <thead><tr><th>Date</th><th>Phase</th><th>Result</th><th>Status table</th></tr></thead>
 <tbody>
-<tr><td>2026-10-15</td><td>triage-and-fix + handoff</td><td>69/69 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-<tr><td>2026-10-15</td><td>fix-issues + handoff</td><td>69/69 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
-<tr><td>2026-10-18</td><td>consumer-feedback sweep + 2.1.9 prep</td><td>5 new rows Verified (REQ-UI-053…057); packages built</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-10-21</td><td>triage-and-fix TrBlazeUI /mnt/c/3AIGenCode/Lekhak/docs/Lekhak-TrBlazeUI-Feedback.md TR-010</td><td>75/75 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-10-29</td><td>fix-issues + handoff</td><td>76/76 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-11-02</td><td>triage-and-fix + handoff</td><td>77/77 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-11-02</td><td>fix-issues + handoff</td><td>78/78 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-11-02</td><td>amend-docs</td><td>78/78 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 </tbody>
 </table>
 <h2 id="library-feedback-summary">Library feedback summary<a class="anchor-link" href="#library-feedback-summary">#</a></h2>
@@ -197,12 +197,12 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </ul>
 <h2 id="standards-compliance">Standards compliance<a class="anchor-link" href="#standards-compliance">#</a></h2>
 <ul>
-<li>Last check 2026-10-29: 0 findings, see the checklist Remarks.
+<li>Last check 2026-11-02: 0 findings, see the checklist Remarks.
 </li>
 </ul>
 <h2 id="deferred-future"><a id="deferred--future"></a>Deferred / future<a class="anchor-link" href="#deferred-future">#</a></h2>
 <ul>
-<li>Dark Destructive Button text is 2.77:1, under 3:1.
+<li>Dark Destructive Button text is 2.77:1, under 3:1 (demo <code>theme.css</code> dark <code>--destructive-foreground</code>; seen again on <code>/components/dialog</code> 2026-11-02).
 </li>
 <li>InputGroup demo menu items only log; show the choice.
 </li>
