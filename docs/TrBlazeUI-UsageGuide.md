@@ -156,7 +156,7 @@ bash tests/package/codex-agent-deployment.sh
 
 ### Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)
 
-- **Submenus**: `MenubarSub` + `MenubarSubTrigger` + `MenubarSubContent`, and the same three for `DropdownMenu` and `ContextMenu`. The row draws a ▸; hover, click, ArrowRight or Enter opens the list beside it; ArrowLeft or Escape closes one level. Nests to any depth.
+- **Submenus**: `MenubarSub` + `MenubarSubTrigger` + `MenubarSubContent`, and the same three for `DropdownMenu` and `ContextMenu`. The row draws a ▸; hover, click, ArrowRight or Enter opens the list beside it; ArrowLeft or Escape closes one level. Nests to any depth. After 2.2.2 the arrow keys reach a ▸ row in its on-screen place (Chatur TR-023), and a list that fits neither side of the window is pulled back inside it (Chatur TR-024).
 - **Disabled menu items announce themselves**: a disabled `MenubarItem`, `MenubarCheckboxItem` or `ContextMenuItem` renders `aria-disabled="true"` and `data-disabled`. A spec that read the `pointer-events-none` class can use `toBeDisabled()`.
 - **⚠ Menu panels no longer clip**: `MenubarContent`, `DropdownMenuContent` and `ContextMenuContent` dropped `overflow-hidden` so a submenu can sit outside them. A menu that relied on it to clip a long list needs `Class="max-h-80 overflow-y-auto"`, and then holds no submenu.
 
@@ -253,5 +253,4 @@ bash tests/package/codex-agent-deployment.sh
 - **Arbitrary Tailwind values are not pre-generated** (`min-w-[720px]`). Use the utility scale or a component parameter such as `DataTable.MinWidth`.
 - **NativeSelect inside MAUI Blazor Hybrid overlays** — the native popup is clipped in WebView2. Use `<Select>` inside dialogs and sheets. `docs/OldDocs/TrBlazeUI-Issues-Report-1.md` #2.
 - **`HtmlSanitizer 9.1.949-beta` is a pre-release dependency**, taken for the AngleSharp CVE-2026-54570 fix. Revisit when 9.1.x is stable.
-- **REQ-UI-015's harness page `/verify-trstudio` is missing**, so its 14 checks cannot be re-run. Its verdict rests on the 2026-07-12 run.
 - **Consumer feedback fixed library-side, waiting for the consumer's own re-check:** Chatur TR-018 (fixed 2026-10-07, not yet released; TR-015/TR-016/TR-017 were re-checked and closed by Chatur on 2.1.3 the same day); TfLens TR-036/TR-037/TR-038 (fixed 2026-09-13, in 2.0.6); TrStudio TR-011 (fixed 2026-07-12); AstroLyfe TR-001…TR-012 and TechieRag TR-001…TR-004 (fixed under REQ-UI-014/015/016, their files carry no closing mark).

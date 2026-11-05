@@ -11,6 +11,57 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
+### Package advisory on the demo hosts — fixed on 2026-11-05
+
+#### Security
+
+- **The demo apps move to ASP.NET Core 10.0.14** (`Microsoft.AspNetCore.Components.WebAssembly.Server`,
+  `WebAssembly`, `WebAssembly.DevServer`). Read fresh from the feed on 2026-11-05, 10.0.13 is now
+  inside the range of GHSA-g27p-qf6j-c96c (High), so a clean restore fails NU1903 and the
+  REQ-NFR-005 advisory test failed. The library packages are unchanged. Apps on the WebAssembly or
+  Auto render mode should move their own `Microsoft.AspNetCore.Components.WebAssembly.Server`
+  reference to 10.0.14.
+
+### Auto demo host served no Blazor script — fixed on 2026-11-05 (REQ-FN-013)
+
+#### Fixed
+
+- **The Auto demo host now calls `MapStaticAssets()` instead of `UseStaticFiles()`.** With the
+  WebAssembly render mode and no static-asset map, ASP.NET Core 10 maps a catch-all
+  `_framework/{*path}` endpoint that excludes `blazor.web.js`, so the published host answered 404
+  for the script and nothing on its pages was interactive. The Server host was never affected.
+  An app of yours on the Auto render mode that still uses `UseStaticFiles()` has the same gap;
+  move it to `app.MapStaticAssets()` before `MapRazorComponents`, as the .NET 10 template does.
+- The harness page `/verify-trstudio` for the TrStudio checks (REQ-UI-015) is back in the demo
+  after going missing; `tests/verify/ui-trstudio.spec.js` runs against it again.
+
+### Chatur TR-023 and TR-024 — fixed on 2026-11-05
+
+Answers the two entries Chatur filed on 2026-11-04 against 2.2.2
+(`/mnt/c/1MyCode/Chatur/docs/Chatur-TrBlazeUI-Feedback.md`; REQ-UI-063, REQ-UI-064).
+
+#### Fixed
+
+- **The arrow keys reach a `MenubarSubTrigger` in its on-screen place (TR-023).** A Menubar list
+  held its rows in the order their components initialised. A `MenubarItem` is a direct child of the
+  list, but a `MenubarSubTrigger` sits inside `MenubarSub`, and Blazor initialises a nested component
+  only after every direct child has initialised, so a ▸ row was registered after every plain item
+  wherever it was drawn: New, Open, Clone, Close, Exit, *then* Recent projects. The list now holds
+  the `MenubarSub` itself, which initialises in document order with its sibling items, and the
+  submenu answers for its row (disabled while the row is disabled or not yet drawn; focusing it
+  focuses the row). ArrowDown, ArrowUp, Home, End and the mouse now follow the order on screen.
+  `ContextMenuSubTrigger` registers the same way and was not changed in this release.
+- **A submenu with no room on either side stays inside the window (TR-024).** `submenu.js` chose a
+  side and stopped: a list that fitted neither side at 390 px kept the right and ran off the window.
+  It now keeps the side with more room and pulls the list back by the overflow, so its far edge sits
+  8 px inside the window, over part of its parent list; a list wider than the window minus the
+  margins also gets a `max-width` so its rows wrap. The pull-back is an inline `left: calc(100% -
+  Npx)` (or `right:` on the left side) on the list, after any `style` the caller passed. The same
+  placer serves `DropdownMenuSubContent` and `ContextMenuSubContent`, so they gain it too. A list
+  that fits on one side is drawn exactly as before.
+- The Menubar demo's File menu gains Recent folders ▸ (long rows) and Close project after the
+  disabled Save, so the demo shows both cases. Tests `tests/verify/req-ui-063.spec.ts`.
+
 ### TechieBlog TR-077 — fixed on 2026-11-02
 
 Answers the entry TechieBlog filed on 2026-11-02 against 2.2.1

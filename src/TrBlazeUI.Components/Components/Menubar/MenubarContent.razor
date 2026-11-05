@@ -106,7 +106,8 @@
 
             case "ArrowRight":
                 // On a submenu row ArrowRight opens the submenu (Chatur TR-020); elsewhere it moves to the next menu.
-                if (Menu.Level.Focused is MenubarSubTrigger vTrigger && !vTrigger.IsDisabled)
+                // The list's entry for a submenu is the MenubarSub itself, registered in its on-screen place (Chatur TR-023).
+                if (Menu.Level.Focused is MenubarSub { Trigger: { IsDisabled: false } vTrigger })
                 {
                     vTrigger.OpenFromKeyboard();
                 }

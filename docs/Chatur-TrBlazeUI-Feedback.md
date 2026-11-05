@@ -4,11 +4,11 @@
 |---|---|
 | App | Chatur |
 | Upstream | TrBlazeUI |
-| Updated | 2026-11-02 |
+| Updated | 2026-11-05 |
 
 ## Summary
 
-22 entries: nothing is blocked. 3 fixed upstream, awaiting re-check: TR-020, TR-021 (in 2.1.9) and TR-022 (in 2.2.2, see the 2026-11-02 reply). 19 closed.
+24 entries: nothing is blocked. 2 fixed upstream, awaiting re-check: TR-023 and TR-024 (in the release after 2.2.2, see the 2026-11-05 reply). 22 closed.
 
 All ten were answered on 2026-09-22 and all ten have now been re-checked in Chatur against
 2.0.9. Six were fixed in code; four needed no code, because the control already existed. Each
@@ -276,6 +276,8 @@ The first ten were found on day one, against the 2.0.7 reference; each entry say
 
 ### TR-020 — Menubar has no submenu
 
+> ✅ **Closed 2026-11-05** — re-checked here: Re-checked by Chatur 2026-11-04 on 2.2.2: File ▸ Recent projects ▸ and View ▸ Zoom ▸ are MenubarSub; tests/verify/workbench-menus.spec.ts 24/24 PASS; mockup parity File 9 of 9, View 7 of 7.
+
 - **Status:** fixed upstream 2026-10-13 (`MenubarSub`, `MenubarSubTrigger`, `MenubarSubContent`, and the same for `DropdownMenu` and `ContextMenu`, in the release after 2.1.6 — see the 2026-10-13 reply), filed 2026-10-13
 - **Severity:** minor
 - **Blocks:** no — the items work; only the way they are grouped differs from the mockup.
@@ -287,6 +289,8 @@ The first ten were found on day one, against the 2.0.7 reference; each entry say
 - **Suggested fix:** add `MenubarSub`, `MenubarSubTrigger` and `MenubarSubContent`.
 
 ### TR-021 — A disabled MenubarItem is not announced as disabled
+
+> ✅ **Closed 2026-11-05** — re-checked here: Re-checked by Chatur 2026-11-04 on 2.2.2: disabled items pass toBeDisabled() and enabled ones toBeEnabled() in workbench-menus.spec.ts, 24/24 PASS.
 
 - **Status:** fixed upstream 2026-10-13 (`aria-disabled="true"` and `data-disabled` on a disabled `MenubarItem`, `MenubarCheckboxItem` and `ContextMenuItem`, in the release after 2.1.6 — see the 2026-10-13 reply), filed 2026-10-13
 - **Severity:** minor
@@ -300,6 +304,8 @@ The first ten were found on day one, against the 2.0.7 reference; each entry say
 
 ### TR-022 — A focused field's ring stands off its border and runs into the label above; menu items are tighter than the design
 
+> ✅ **Closed 2026-11-05** — re-checked here: Re-checked by Chatur 2026-11-04 on 2.2.2: chatur.css ring-offset, label-gap and menu-item overrides removed; control-spacing.spec.ts 2/2 PASS on the library alone.
+
 - **Status:** fixed upstream 2026-11-02 (no ring offset on `Input` and `SelectTrigger`, a 6px gap after a `Label`, 10px menu items, in 2.2.2 — see the 2026-11-02 reply), filed 2026-10-30
 - **Severity:** minor
 - **Blocks:** no — Chatur overrides it in one shared stylesheet (`src/ChaturUI/wwwroot/chatur.css`) until a fix ships.
@@ -312,9 +318,106 @@ The first ten were found on day one, against the 2.0.7 reference; each entry say
 
 Copied into TrBlazeUI 2026-11-02 by *fix-issues from `/mnt/c/1MyCode/Chatur/docs/Chatur-TrBlazeUI-Feedback.md`.
 
+### TR-023 — In a Menubar menu, ArrowDown reaches a submenu row last, not in its place
+
+- **Status:** fixed upstream 2026-11-05 (the ▸ row sits in the arrow-key order where it is drawn, in the release after 2.2.2 — see the 2026-11-05 reply), filed 2026-11-04
+- **Severity:** minor
+- **Blocks:** no — every item, the ▸ row included, is reachable by keyboard and by mouse; only the order the arrow keys take is wrong.
+- **Repro:** TrBlazeUI 2.2.2. A `MenubarContent` with `MenubarItem` New, Open a solution, Open a folder, Clone; then a `MenubarSub` (`MenubarSubTrigger` "Recent projects"); then `MenubarItem` Save (disabled), Save all (disabled), Close project, Exit. Open the menu and press ArrowDown repeatedly: the focus goes New → Open a solution → Open a folder → Clone → Close project → Exit → Recent projects (Chatur's File menu, `src/ChaturUI/Shell/MenuBar.razor`; seen 2026-11-04 by focusing each step and reading `document.activeElement`).
+- **Expected:** the arrow keys follow the order on screen: … Clone → Recent projects → Close project → Exit.
+- **Actual:** a `MenubarSubTrigger` comes after every plain item, wherever it is drawn.
+- **Encountered in:** REQ-UI-073 (File ▸ Recent projects ▸)
+- **Workaround:** none in the app. The REQ-UI-073 keyboard test walks with ArrowDown until the ▸ row has the focus, rather than counting rows.
+- **Suggested fix:** register the sub-trigger in the menu's item list at its document position (or order the list by DOM position when moving), the same as a `MenubarItem`.
+
+### TR-024 — At 390px a submenu with no room on either side runs off the window instead of staying inside it
+
+- **Status:** fixed upstream 2026-11-05 (a submenu that fits neither side is pulled back inside the window, in the release after 2.2.2 — see the 2026-11-05 reply), filed 2026-11-04
+- **Severity:** minor
+- **Blocks:** no — the list opens and every item can be clicked; at 390px only the right end of long project names is cut off.
+- **Repro:** TrBlazeUI 2.2.2, Chatur's main window at 390×800, File ▸ Recent projects ▸ (a `MenubarSubContent` whose items are project names up to about 30 characters, so the list is 235px wide). The File list spans x 60 to 250. Neither side has 235px, so the list opens on the right at x 250 and ends at x 485, 95px past the window's right edge (`tests/.artifacts/verify/shots/TR-020-file-recent-390.png`). View ▸ Zoom ▸ (128px wide) does flip to the left as the 2026-10-13 reply describes.
+- **Expected:** when neither side has room, the list stays inside the window, laid over part of the parent list, as the reply's point 3 describes for a third level ("over part of the File list").
+- **Actual:** it keeps the right side and is cut off by the window.
+- **Encountered in:** REQ-UI-073 (TR-020 re-check at 390)
+- **Workaround:** none; the app does not resize the list itself.
+- **Suggested fix:** after choosing a side, shift the list by the overflow so its right edge is at most the window's width minus a small margin (and its left edge at least that margin), or let the caller cap it with a `max-w` that wraps item text.
+
+Copied into TrBlazeUI 2026-11-05 by *triage-and-fix from `/mnt/c/1MyCode/Chatur/docs/Chatur-TrBlazeUI-Feedback.md`.
+
 ## Replies from TrBlazeUI
 
 <!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
+
+### 2026-11-05 — TR-023 and TR-024 are fixed; they ship in the release after 2.2.2
+
+Both are fixed and tested in the library the day after they were filed. They ship in the next
+release after 2.2.2 (**2.2.3** by the usual count) on GitHub Packages
+(`https://nuget.pkg.github.com/techierathore/index.json`). The release number is the owner's to set
+when the release is cut. When this reply was written, the fixes were built and verified but the
+release had not been cut yet. If the feed still stops at 2.2.2, wait; keep the keyboard test
+walking to the ▸ row until then.
+
+| Entry | State | What you get |
+|---|---|---|
+| **TR-023** ArrowDown reaches a submenu row last | fixed | The arrow keys follow the order on screen. In Chatur's File menu, ArrowDown now goes New → Open a solution → Open a folder → Clone → Recent projects → Close project → Exit (Save and Save all are disabled and skipped). ArrowUp, Home and End follow the same order, and pointing at the ▸ row makes it the current row, so ArrowDown continues from it. |
+| **TR-024** at 390 px a submenu runs off the window | fixed, for all three menus | When neither side has room, the list keeps the side with more room and is pulled back by the overflow, so its far edge sits 8 px inside the window, over part of the parent list. Your 235 px list beside a File list ending at x 250 will sit at about x 147 to 382. A list wider than the window minus 16 px also gets a `max-width`, and its rows wrap. A list that fits one side is drawn exactly as before. `DropdownMenuSubContent` and `ContextMenuSubContent` share the placer and gain the same. |
+
+Why TR-023 happened: a Menubar list held its rows in the order their components initialised. A
+`MenubarItem` is a direct child of the list, but a `MenubarSubTrigger` sits inside `MenubarSub`, and
+Blazor initialises a nested component only after every direct child has, so the ▸ row was always
+registered last. The list now holds the `MenubarSub` itself, which initialises in document order
+with its sibling items; the submenu answers for its row.
+
+Measured on the TrBlazeUI demo at 390 wide, File ▸ Recent folders ▸, a 354 px list beside a File
+list spanning x 29 to 221: it now sits at x 28 to 382, `data-side="right"`,
+`style="left:calc(100% - 192.5px)"`, and its last row is clickable. At 1280 the same list opens
+beside its row with no pull-back. The arrow walk on the demo's File menu (New project, Recent
+projects ▸, Save disabled, Recent folders ▸, Close project) is New project → Recent projects →
+Recent folders → Close project. Tests `tests/verify/req-ui-063.spec.ts` (3 of 3), the earlier
+`req-ui-050.spec.ts` (6 of 6), every other browser test in the library (86 of 87; the one failure
+is a NuGet advisory on the Auto demo host, nothing to do with menus), and the Chatur specs
+`ui-chatur*.spec.js` (86/86, 80/80, 67/67).
+
+Things to know before you use them:
+
+1. **Nothing in your markup changes.** `MenubarSubTrigger` still carries the role, the focus, the
+   ▸ and your `data-testid`; `MenubarSubContent` still carries `data-side`. The list's own record
+   of the current row is now the `MenubarSub`, which is internal.
+2. **The pull-back is an inline style on the list.** On the right side it is
+   `left: calc(100% - Npx)`, on the left side `right: calc(100% - Npx)`, plus `max-width` when
+   the list is wider than the window. A `style` you pass on `MenubarSubContent` is kept after it.
+3. **The margin is 8 px, not a parameter.** Tell us if the mockup wants the list flush with the
+   window edge or further in.
+4. **`ContextMenu` keeps the old arrow order for now.** `ContextMenuSubTrigger` registers the same
+   way `MenubarSubTrigger` used to; it was not changed in this release. Tell us if Chatur draws a
+   `ContextMenuSub` between plain items. `DropdownMenu` was never affected: it walks the rows in
+   DOM order.
+5. **The parity walker's "▸ row does nothing" is the framework's (your TF-022), not the
+   library's.** Our own screen check reports the same on the Menubar demo; nothing here changes it.
+6. **Your agent's reference describes both.** After the upgrade, the build refreshes
+   `.trblazeui/TrBlazeUI-AI-Reference.md`: "Which version added what" has an "After 2.2.2" row,
+   and the Menubar section's "How a submenu behaves" note describes the arrow order and the
+   pull-back. `CHANGELOG.md` has the full entry.
+
+#### What we need from you
+
+Upgrade once the release after 2.2.2 is on the feed. Check that
+`.trblazeui/TrBlazeUI-AI-Reference.md` has an "After 2.2.2" row; if it does not, the upgrade has
+not landed yet.
+
+- **TR-023:** in the REQ-UI-073 keyboard test, count rows instead of walking until the ▸ row has
+  the focus: from File, ArrowDown five times reaches Recent projects, and once more reaches Close
+  project. Then close the entry:
+  `bash .tfcore/utils/tf-feedback.sh Chatur --close TR-023 "<what you ran and what it showed>"`.
+- **TR-024:** in the main window at 390×800, open File ▸ Recent projects ▸ and measure the list:
+  its right edge at most 382, its left edge at least 8, the longest project name unclipped, and
+  View ▸ Zoom ▸ still flipping left. Compare with
+  `tests/.artifacts/verify/shots/TR-020-file-recent-390.png`. Then close it:
+  `bash .tfcore/utils/tf-feedback.sh Chatur --close TR-024 "<what you ran and what it showed>"`.
+
+Tell us what does not fit.
+
+---
 
 ### 2026-11-02 — TR-022 is fixed; it ships in 2.2.2
 

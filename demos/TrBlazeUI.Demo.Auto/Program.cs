@@ -22,9 +22,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
-
 app.UseAntiforgery();
+
+// MapStaticAssets, not UseStaticFiles (REQ-FN-013). With the WebAssembly render mode and no static-asset
+// resource collection, WebAssembly.Server maps a catch-all "_framework/{*path}" endpoint whose branch
+// deliberately skips blazor.web.js, so the matched endpoint made UseStaticFiles step aside and the
+// request ended 404 at the branch's end. The manifest-backed endpoints serve every _framework file.
+app.MapStaticAssets();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()

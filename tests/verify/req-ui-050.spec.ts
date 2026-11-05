@@ -87,6 +87,9 @@ test.describe('Chatur TR-020 — submenus in Menubar, DropdownMenu and ContextMe
   test('REQ-UI-050 Menubar submenu keyboard: ArrowRight opens, ArrowLeft and Escape close one level', async ({ page }) => {
     await open(page, '/components/menubar');
     await byId(page, 'menubar-sub-file').click();
+    // Let the list render and take the focus before the first key, as the DropdownMenu test does;
+    // a key sent earlier reaches the list before its handler is wired and moves nothing.
+    await page.waitForTimeout(800);
     await page.keyboard.press('ArrowDown');
     await page.keyboard.press('ArrowDown');
     await expect.poll(() => focusedText(page)).toContain('Recent projects');
@@ -111,9 +114,10 @@ test.describe('Chatur TR-020 — submenus in Menubar, DropdownMenu and ContextMe
     await expect.poll(() => focusedText(page), { message: 'Escape closes one level and focuses its row' }).toContain('Recent projects');
     await expect(byId(page, 'menubar-sub-save'), 'the File menu itself is still open').toBeVisible();
 
-    // Down from the row continues in the File menu, skipping the disabled Save.
+    // Down from the row continues in the File menu, skipping the disabled Save (the next row is
+    // the Recent folders ▸ submenu the TR-023 regression added).
     await page.keyboard.press('ArrowDown');
-    await expect.poll(() => focusedText(page)).toBe('New project');
+    await expect.poll(() => focusedText(page)).toContain('Recent folders');
 
     await page.keyboard.press('Escape');
     await expect(byId(page, 'menubar-sub-save')).toBeHidden();

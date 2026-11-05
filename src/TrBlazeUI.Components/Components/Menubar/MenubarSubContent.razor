@@ -3,7 +3,8 @@
 @implements IAsyncDisposable
 
 @* The list a submenu opens beside its trigger row (Chatur TR-020). ArrowLeft or Escape closes it
-   and puts the focus back on the row; it opens on the left when the right has no room. *@
+   and puts the focus back on the row; it opens on the left when the right has no room, and when
+   neither side has room it is pulled back inside the window (Chatur TR-024). *@
 @if (Sub?.IsOpen == true)
 {
     <div @ref="objListRef"
@@ -13,12 +14,13 @@
          tabindex="-1"
          class="@CssClass"
          data-state="open"
-         data-side="@objSide"
+         data-side="@objPlacement.Side"
          data-slot="menubar-sub-content"
          @onkeydown="HandleKeyDown"
          @onkeydown:stopPropagation="true"
          @onkeydown:preventDefault="true"
-         @attributes="AdditionalAttributes">
+         @attributes="AdditionalAttributes"
+         style="@StyleAttribute">
         <CascadingValue Name="MenubarLevel" Value="Sub.ChildLevel" IsFixed="false">
             @ChildContent
         </CascadingValue>
@@ -60,24 +62,26 @@
     private readonly SubmenuPlacer objPlacer = new();
     private ElementReference objListRef;
     private bool objWasClosed = true;
-    private string objSide = "right";
+    private SubmenuPlacement objPlacement = SubmenuPlacement.Default;
+
+    private string? StyleAttribute => SubmenuPlacer.Style(objPlacement, AdditionalAttributes?.GetValueOrDefault("style")?.ToString());
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (Sub?.IsOpen != true)
         {
             objWasClosed = true;
-            objSide = "right";
+            objPlacement = SubmenuPlacement.Default;
             return;
         }
 
         if (objWasClosed)
         {
             objWasClosed = false;
-            var vSide = await objPlacer.FitAsync(JSRuntime, objListRef);
-            if (vSide != objSide)
+            var vPlacement = await objPlacer.FitAsync(JSRuntime, objListRef);
+            if (vPlacement.Side != objPlacement.Side || vPlacement.Offset > 0 || vPlacement.MaxWidth > 0)
             {
-                objSide = vSide;
+                objPlacement = vPlacement;
                 StateHasChanged();
             }
         }
@@ -107,7 +111,8 @@
                 break;
 
             case "ArrowRight":
-                if (Sub.ChildLevel.Focused is MenubarSubTrigger vTrigger)
+                // The focused entry of a list is the MenubarSub itself, registered in its on-screen place (Chatur TR-023).
+                if (Sub.ChildLevel.Focused is MenubarSub { Trigger: { IsDisabled: false } vTrigger })
                 {
                     vTrigger.OpenFromKeyboard();
                 }
