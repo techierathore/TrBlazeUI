@@ -150,7 +150,8 @@
                 A row with a ▸ opens a second list beside it. Hover or click it, or press ArrowRight on it;
                 ArrowLeft or Escape closes the list and puts the focus back on the row. Submenus nest:
                 File ▸ Recent projects ▸ More ▸ is three levels deep. Save, Redo and Word wrap are
-                disabled and say so to a screen reader.
+                disabled and say so to a screen reader. The arrow keys reach a ▸ row in its on-screen
+                place, and a list that fits neither side of a narrow window is pulled back inside it.
             </p>
         </div>
 
@@ -180,6 +181,16 @@
                             Save
                             <MenubarShortcut>Ctrl+S</MenubarShortcut>
                         </MenubarItem>
+                        @* A submenu between plain items (Chatur TR-023), whose long rows fit neither side at 390 px (Chatur TR-024). *@
+                        <MenubarSub>
+                            <MenubarSubTrigger data-testid="menubar-sub-folders">Recent folders</MenubarSubTrigger>
+                            <MenubarSubContent data-testid="menubar-sub-folders-list">
+                                <MenubarItem OnClick="@(() => objSubChoice = "ChaturUI")">/mnt/c/1MyCode/Chatur/src/ChaturUI</MenubarItem>
+                                <MenubarItem OnClick="@(() => objSubChoice = "Lekhak.Web")">/mnt/c/1MyCode/Lekhak/src/Lekhak.Web</MenubarItem>
+                                <MenubarItem OnClick="@(() => objSubChoice = "Components")" data-testid="menubar-sub-folder-components">/mnt/c/3AIGenCode/TrBlazeUI/src/Components</MenubarItem>
+                            </MenubarSubContent>
+                        </MenubarSub>
+                        <MenubarItem OnClick="@(() => objSubChoice = "Close project")" data-testid="menubar-sub-close">Close project</MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
                 <MenubarMenu>

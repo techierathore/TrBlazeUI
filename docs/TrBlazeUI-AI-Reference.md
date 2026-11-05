@@ -217,6 +217,13 @@ builder.Services.AddTrBlazeUIPrimitives(); // PortalService, FocusManager, Posit
 builder.Services.AddScoped<ToastService>();  // Required for Toast notifications
 ```
 
+> **A host on the Auto or WebAssembly render mode calls `app.MapStaticAssets()`, not
+> `app.UseStaticFiles()`.** With the WebAssembly render mode and no static-asset map, ASP.NET Core 10
+> maps a catch-all `_framework/{*path}` endpoint that deliberately skips `blazor.web.js`, so the
+> published app answers 404 for the script and nothing on its pages is interactive, while the same
+> pages work in a Server-only host. Put `app.MapStaticAssets();` before `app.MapRazorComponents<App>()`,
+> as the .NET 10 template does. Found on the library's own Auto demo (REQ-FN-013, after 2.2.2).
+
 ### _Imports.razor
 
 > **Namespace rules — read before you copy this block.**
@@ -1071,8 +1078,12 @@ Parts: `Menubar`, `MenubarMenu`, `MenubarTrigger`, `MenubarContent`, `MenubarIte
 > level at a time. ArrowRight on an ordinary row moves to the next menu of the bar, as before.
 > Choosing an item at any depth runs it and closes the whole menu. The list opens on the right
 > and flips to the left when the window has no room on the right (at 390 px, the third level
-> opens over the first). Test hooks go on the parts: `data-testid` on `MenubarSubTrigger` lands
-> on the row, on `MenubarSubContent` on the list (`role="menu"`).
+> opens over the first). When neither side has room (after 2.2.2, Chatur TR-024), it keeps the
+> roomier side and is pulled back so its far edge sits 8 px inside the window, over part of the
+> parent list; a list wider than the window gets a `max-width` and its rows wrap. The arrow keys
+> walk the rows in the order drawn, a ▸ row in its place (after 2.2.2, Chatur TR-023). Test hooks
+> go on the parts: `data-testid` on `MenubarSubTrigger` lands on the row, on `MenubarSubContent`
+> on the list (`role="menu"`).
 
 ---
 
@@ -4008,6 +4019,7 @@ source* — see the next heading — and only rarely *wait for it to be built*.
 
 | Version | Released | Component namespaces | What it added |
 |---|---|---|---|
+| **After 2.2.2** | — | 87 | The arrow keys reach a `MenubarSubTrigger` in its on-screen place, not after every plain item (Chatur TR-023); a submenu of `Menubar`, `DropdownMenu` or `ContextMenu` that fits neither side of the window is pulled back inside it instead of running off (Chatur TR-024); the demo hosts moved to ASP.NET Core 10.0.14 (10.0.13 carries GHSA-g27p-qf6j-c96c), and the Auto demo host calls `MapStaticAssets()` so `blazor.web.js` is served (see §1) |
 | **After 2.2.1** | — | 87 | A `Select` bound to a value no item carries no longer throws on re-render (TechieBlog TR-077); a focused `Input`/`SelectTrigger` draws its ring on the border (no `ring-offset-2`); a field right after a `Label` in a block container gets a 6px gap; menu items, sub-triggers and menu labels in `DropdownMenu`, `Menubar` and `ContextMenu` are 10px across (`px-2.5`) (Chatur TR-022) |
 | **After 2.1.6** | — | 87 | `trblazeui-layers.css` and the `trblazeui-host` cascade layer; submenus for `Menubar`, `DropdownMenu` and `ContextMenu` (`…Sub`, `…SubTrigger`, `…SubContent`); a disabled `MenubarItem`, `MenubarCheckboxItem` or `ContextMenuItem` renders `aria-disabled="true"` and `data-disabled` |
 | **After 2.1.4** | — | 87 | `Chat` family (`ChatThread`, `ChatMessage`, `ChatComposer`); a `Select` inside a `Dialog` never freezes the page (script, positioning and portal failures fall back and log); `Table` family (plain markup table); `ToastVariant.Success`/`Info`/`Warning` + `ToastService.Warning`/`Info`; `AlertDialogAction`/`AlertDialogCancel` `OnClick`/`PreventClose`; `Textarea.Rows`/`MaxRows`; `CardTitle`/`AlertTitle` `As`; `NumericInput` always `role="spinbutton"`, invariant ARIA numbers on `NumericInput` and `Slider`; `NumberInput` is a compile error naming `NumericInput`; a `Select` bound to a value no item carries shows its placeholder; the empty toast viewport lets clicks through; `HtmlSanitizer` on a stable 9.1.x |

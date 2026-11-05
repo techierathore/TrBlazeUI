@@ -1,10 +1,11 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace TrBlazeUI.Components.Utilities;
 
 /// <summary>
-/// Picks the side a submenu opens on and owns the script module that measures it (Chatur TR-020).
+/// Picks where a submenu opens and owns the script module that measures it (Chatur TR-020, TR-024).
 /// Shared by MenubarSubContent, DropdownMenuSubContent and ContextMenuSubContent.
 /// </summary>
 internal sealed class SubmenuPlacer : IAsyncDisposable
@@ -27,41 +28,78 @@ internal sealed class SubmenuPlacer : IAsyncDisposable
 
     private IJSObjectReference? objModule;
 
-    /// <summary>Measures an open submenu list and tells the side it fits on.</summary>
+    /// <summary>Measures an open submenu list and tells where it fits.</summary>
     /// <remarks>
     /// 1. Loads <c>submenu.js</c> once.
-    /// 2. Asks it whether the list, drawn on the right, runs past the window.
+    /// 2. Asks it whether the list, drawn on the right, runs past the window; if so, whether the
+    ///    left has room; and when neither side does, how far to pull the list back inside (TR-024).
     /// 3. Any script failure (prerender, a closed page) keeps the default right side.
     /// </remarks>
     /// <param name="aJsRuntime">The JS runtime.</param>
     /// <param name="aList">The submenu list element.</param>
-    /// <returns>"left" or "right".</returns>
-    internal async Task<string> FitAsync(IJSRuntime aJsRuntime, ElementReference aList)
+    /// <returns>The side, the pull-back in pixels and the width cap.</returns>
+    internal async Task<SubmenuPlacement> FitAsync(IJSRuntime aJsRuntime, ElementReference aList)
     {
         try
         {
             objModule ??= await aJsRuntime.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/TrBlazeUI.Components/js/submenu.js").ConfigureAwait(false);
-            return await objModule.InvokeAsync<string>("fitSide", aList).ConfigureAwait(false);
+            var vPlacement = await objModule.InvokeAsync<SubmenuPlacement>("fit", aList).ConfigureAwait(false);
+            return vPlacement ?? SubmenuPlacement.Default;
         }
         catch (JSException)
         {
-            return "right";
+            return SubmenuPlacement.Default;
         }
         catch (JSDisconnectedException)
         {
-            return "right";
+            return SubmenuPlacement.Default;
         }
         catch (TaskCanceledException)
         {
-            return "right";
+            return SubmenuPlacement.Default;
         }
         catch (InvalidOperationException)
         {
             // Prerendering: no browser to measure yet.
-            return "right";
+            return SubmenuPlacement.Default;
         }
     }
+
+    /// <summary>Builds the inline style that pulls a list back inside the window (TR-024).</summary>
+    /// <remarks>
+    /// 1. A list on the right sits at <c>left: 100%</c>; the pull-back becomes <c>left: calc(100% - Npx)</c>.
+    /// 2. A list on the left sits at <c>right: 100%</c>; the pull-back becomes <c>right: calc(100% - Npx)</c>.
+    /// 3. A width cap becomes <c>max-width</c>, so the rows wrap instead of running off the window.
+    /// 4. The caller's own <c>style</c>, if any, is kept after these.
+    /// </remarks>
+    /// <param name="aPlacement">The measured placement.</param>
+    /// <param name="aCallerStyle">The caller's own style attribute, or null.</param>
+    /// <returns>The style attribute value, or null when nothing is needed.</returns>
+    internal static string? Style(SubmenuPlacement aPlacement, string? aCallerStyle)
+    {
+        var vParts = new List<string>();
+        if (aPlacement.Offset > 0)
+        {
+            var vEdge = aPlacement.Side == "left" ? "right" : "left";
+            vParts.Add($"{vEdge}:calc(100% - {Pixels(aPlacement.Offset)})");
+        }
+
+        if (aPlacement.MaxWidth > 0)
+        {
+            vParts.Add($"max-width:{Pixels(aPlacement.MaxWidth)}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(aCallerStyle))
+        {
+            vParts.Add(aCallerStyle.Trim().TrimEnd(';'));
+        }
+
+        return vParts.Count == 0 ? null : string.Join(";", vParts);
+    }
+
+    private static string Pixels(double aValue) =>
+        Math.Round(aValue, 1).ToString(CultureInfo.InvariantCulture) + "px";
 
     /// <summary>Releases the script module.</summary>
     /// <returns>A task that completes when the module is released.</returns>

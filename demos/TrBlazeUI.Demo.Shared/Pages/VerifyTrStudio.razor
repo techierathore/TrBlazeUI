@@ -1,0 +1,117 @@
+@page "/verify-trstudio"
+@using TrBlazeUI.Components.DataTable
+@using TrBlazeUI.Components.Alert
+@using TrBlazeUI.Components.Field
+
+@* REQ-UI-015 verification harness — TrStudio feedback TR-001..TR-011 (the UI-observable subset).
+   Not a documentation demo: every block here exists so the headless script
+   (tests/verify/ui-trstudio.spec.js) can assert one acceptance criterion. The page went missing
+   from the tree after the 2026-07-12 run and was rebuilt on 2026-11-05 from that script. *@
+
+<PageTitle>Verify REQ-UI-015 - TrBlazeUI</PageTitle>
+
+<div class="p-6 space-y-8 min-w-0" data-testid="verify-heading">
+    <h1 class="text-2xl font-bold">REQ-UI-015 verification harness</h1>
+
+    @* TR-001 — a DataTable splats data-testid onto its root and renders its rows. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-001 · DataTable carries data-testid and renders its data</h2>
+        <DataTable TData="RegistryRow" Data="@objRegistry" data-testid="registry-table">
+            <Columns>
+                <DataTableColumn TData="RegistryRow" TValue="string" Property="@(r => r.Name)" Header="Name" />
+                <DataTableColumn TData="RegistryRow" TValue="string" Property="@(r => r.Status)" Header="Status" />
+            </Columns>
+        </DataTable>
+    </section>
+
+    @* TR-002 — an Alert splats data-testid onto its root. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-002 · Alert carries data-testid</h2>
+        <Alert Variant="AlertVariant.Danger" data-testid="auth-failure-alert">
+            Auth failed: the token was refused by the registry.
+        </Alert>
+    </section>
+
+    @* TR-004 and TR-008 — Badge, FieldError, Checkbox and Switch splat data-testid. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-004 / TR-008 · Badge, FieldError, Checkbox, Switch carry data-testid</h2>
+        <div class="flex flex-wrap items-center gap-4">
+            <Badge data-testid="count-badge">@objRegistry.Count</Badge>
+            <FieldError Errors="@objPasswordErrors" data-testid="pw-error" />
+            <label class="flex items-center gap-2">
+                <Checkbox @bind-Checked="objIsSynthetic" data-testid="synthetic" />
+                Synthetic
+            </label>
+            <label class="flex items-center gap-2">
+                <Switch @bind-Checked="objIsNsfw" AriaLabel="NSFW, uncontrolled" data-testid="nsfw-plain" />
+                NSFW (uncontrolled)
+            </label>
+        </div>
+    </section>
+
+    @* TR-009 — a controlled Switch whose bound value a gate leaves unchanged must not flip. *@
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-009 · gated Switch stays as bound</h2>
+        <div class="flex items-center gap-4">
+            <Switch Checked="@objIsGated" CheckedChanged="HandleGatedChange" AriaLabel="Gated switch" data-testid="gated-switch" />
+            <span class="text-sm text-muted-foreground">bound value: <strong data-testid="gated-state">@(objIsGated ? "on" : "off")</strong>, change requests refused: @objGateRefusals</span>
+        </div>
+    </section>
+
+    @* TR-010 — a DataTable on a 390 px viewport must not widen the page. *@
+    <section class="space-y-2 min-w-0">
+        <h2 class="text-lg font-semibold">TR-010 · narrow table, no page overflow</h2>
+        <DataTable TData="RegistryRow" Data="@objNarrow" data-testid="narrow-table">
+            <Columns>
+                <DataTableColumn TData="RegistryRow" TValue="string" Property="@(r => r.Name)" Header="Name" />
+                <DataTableColumn TData="RegistryRow" TValue="string" Property="@(r => r.Status)" Header="Status" />
+                <DataTableColumn TData="RegistryRow" TValue="string" Property="@(r => r.Owner)" Header="Owner" />
+            </Columns>
+        </DataTable>
+    </section>
+</div>
+
+@code {
+    /// <summary>
+    /// Row shape backing the DataTable verification blocks.
+    /// </summary>
+    private sealed class RegistryRow
+    {
+        /// <summary>Gets or sets the entry name.</summary>
+        public string Name { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the entry status.</summary>
+        public string Status { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the entry owner.</summary>
+        public string Owner { get; set; } = string.Empty;
+    }
+
+    private readonly List<RegistryRow> objRegistry = new()
+    {
+        new RegistryRow { Name = "Alpha", Status = "Active", Owner = "core" },
+        new RegistryRow { Name = "Beta", Status = "Paused", Owner = "core" },
+        new RegistryRow { Name = "Gamma", Status = "Active", Owner = "tools" },
+    };
+
+    private readonly List<RegistryRow> objNarrow = Enumerable.Range(1, 6)
+        .Select(aIndex => new RegistryRow { Name = $"Narrow entry number {aIndex}", Status = aIndex % 2 == 0 ? "Active" : "Paused", Owner = "a long owner name that could widen the table" })
+        .ToList();
+
+    private readonly List<string> objPasswordErrors = new() { "Password must be at least 12 characters." };
+
+    private bool objIsSynthetic;
+    private bool objIsNsfw;
+    // The gate keeps this false whatever the switch asks for; it is read, never reassigned (TR-009).
+    private readonly bool objIsGated = false;
+    private int objGateRefusals;
+
+    /// <summary>
+    /// The gate: a change request arrives, is refused, and the bound value stays as it was (TR-009).
+    /// </summary>
+    /// <param name="aRequested">The value the switch asked for.</param>
+    private void HandleGatedChange(bool aRequested)
+    {
+        objGateRefusals++;
+    }
+}

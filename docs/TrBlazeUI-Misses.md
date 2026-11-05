@@ -3,16 +3,17 @@
 | | |
 |---|---|
 | App | TrBlazeUI |
-| Count | 85 logged: 10 open, 68 fixed, 0 will not fix, 7 withdrawn |
+| Count | 89 logged: 11 open, 71 fixed, 0 will not fix, 7 withdrawn |
 | Source | `docs/metrics/misses.jsonl`, one row per miss record. Rewritten by `tf-misses-md.sh` on every new record. Never edit it: a wrong row is corrected by a new record. |
-| Updated | 2026-11-02 |
+| Updated | 2026-11-05 |
 
 **Whose gap** answers the four questions of the miss protocol: **the app's spec** did not say it, so the checklist line is fixed; **the framework never said it**, so one requirement line and a check are added; **the check was too weak** (a review, or a script that did not fire), so the check is fixed; **said and ignored**, so the rule becomes a hook or is deleted. **not sorted** means the record predates the sort or nobody has answered yet; `bash .tfcore/utils/tf-emit.sh --amend <miss> sort <spec|unsaid|weak-check|ignored>` completes it.
 
-## Open (10)
+## Open (11)
 
 | Miss | Found | Whose gap | What went wrong |
 |---|---|---|---|
+| MISS-TrBlazeUI-20261105-03 (REQ-UI-050) | 2026-11-05 by gate | not sorted | no sentence recorded (regression, src) |
 | MISS-TrBlazeUI-20260914-04 (REQ-UI-020) | 2026-09-14 by owner | the check was too weak | TfLens TR-038: Badge Variant=Outline Truncate=true loses text-foreground, because text-ellipsis falls into the bare text-colour merge group (reproduced on /verify-tflens-2 tr029-truncate) |
 | MISS-TrBlazeUI-20260914-03 (REQ-UI-020) | 2026-09-14 by owner | the check was too weak | TfLens TR-037: BarChart Items/XValue/YValue shorthand with ShowDataLabels=true draws no data labels; the built-in series never passes the flag and ApexCharts takes it from the series (reproduced: 0 labels at 1280 and 390 on /verify-tflens-2) |
 | MISS-TrBlazeUI-20260914-02 (REQ-UI-001) | 2026-09-14 by owner | the check was too weak | TfLens TR-036: leaving a page that holds a Select logs 'Unhandled exception in circuit' because SelectContent.DisposeAsync awaits two JS module disposals without catching JSDisconnectedException (reproduced: 1 on /components/select) |
@@ -24,10 +25,13 @@
 | MISS-TrBlazeUI-20260912-09 (REQ-UI-008) | 2026-09-12 by owner | the check was too weak | TfLens TR-028 (High, reproduced live on /charts/bar @1280): BarChart exposes no axis, grid or data-label control and no route to ApexChartOptions, so a chart cannot be made to match an approved design. Measured: 32 .apexcharts-gridline and 30 .apexcharts-yaxis-label rendered with no parameter to tur |
 | MISS-TrBlazeUI-20260912-08 (REQ-UI-020) | 2026-09-12 by owner | the app's spec | TfLens post-2.1.0 consumer-feedback fixes (TR-028…TR-035) |
 
-## Fixed (68)
+## Fixed (71)
 
 | Miss | Found | Closed | Whose gap | What went wrong |
 |---|---|---|---|---|
+| MISS-TrBlazeUI-20261105-04 (REQ-UI-015) | 2026-11-05 by gate | 2026-11-05 by build-phase | not sorted | no sentence recorded (partial-implementation, src) |
+| MISS-TrBlazeUI-20261105-02 (REQ-UI-064) | 2026-11-05 by owner | 2026-11-05 by fix-issues | the check was too weak | A Menubar submenu with no room on either side stays inside the window (Chatur TR-024) |
+| MISS-TrBlazeUI-20261105-01 (REQ-UI-063) | 2026-11-05 by owner | 2026-11-05 by fix-issues | the check was too weak | Menubar arrow keys reach a submenu row in its on-screen place (Chatur TR-023) |
 | MISS-TrBlazeUI-20261102-02 (REQ-UI-062) | 2026-11-02 by production | 2026-11-02 by fix-issues | the app's spec | A focused Input or SelectTrigger draws its ring on the border, a Label before a field keeps its own gap, and menu items are 10px across (Chatur TR-022) |
 | MISS-TrBlazeUI-20261102-01 (REQ-UI-061) | 2026-11-02 by production | 2026-11-02 by fix-issues | the app's spec | SelectValue renders its placeholder, not an exception, when its Select is bound to a value no item carries and the page re-renders (TechieBlog TR-077) |
 | MISS-TrBlazeUI-20261029-01 (REQ-UI-059) | 2026-10-29 by owner | 2026-10-29 by fix-issues | the app's spec | Sidebar active item renders data-active="true"/"false" and paints its active style (TechieBlog TR-076) |

@@ -1,8 +1,12 @@
 @namespace TrBlazeUI.Components.Menubar
+@implements IMenubarItem
 @implements IDisposable
 
 @* A submenu inside a Menubar menu (Chatur TR-020): holds a MenubarSubTrigger and a
-   MenubarSubContent, and may sit inside another MenubarSubContent to any depth. *@
+   MenubarSubContent, and may sit inside another MenubarSubContent to any depth. The submenu, not
+   its trigger row, is what the parent list holds for the arrow keys: it registers in OnInitialized,
+   which runs in document order with its sibling items, whereas the row inside it initialises only
+   after every sibling has (Chatur TR-023). *@
 <div class="relative" data-slot="menubar-sub" @attributes="AdditionalAttributes">
     <CascadingValue Value="this" IsFixed="false">
         @ChildContent
@@ -47,11 +51,19 @@
 
     internal bool IsOpen => objHostLevel != null && ReferenceEquals(objHostLevel.OpenSub, this);
 
+    /// <summary>The arrow keys skip the submenu while its row is disabled or not yet drawn.</summary>
+    bool IMenubarItem.IsDisabled => Trigger?.IsDisabled ?? true;
+
+    /// <summary>Focusing the submenu focuses its trigger row.</summary>
+    /// <returns>A task that completes when the row has the focus.</returns>
+    Task IMenubarItem.FocusAsync() => Trigger?.FocusAsync() ?? Task.CompletedTask;
+
     protected override void OnInitialized()
     {
         objHostLevel = ParentLevel ?? Menu?.Level;
         if (objHostLevel != null)
         {
+            objHostLevel.Register(this);
             objHostLevel.OpenSubChanged += HandleOpenSubChanged;
         }
     }
@@ -81,6 +93,9 @@
         return vPending;
     }
 
+    /// <summary>Records this submenu as the focused entry of its parent list, as when the mouse enters its row.</summary>
+    internal void MarkFocused() => objHostLevel?.MarkFocused(this);
+
     /// <summary>Closes this submenu and puts the focus back on its trigger row.</summary>
     /// <returns>A task that completes when the trigger has the focus.</returns>
     internal async Task CloseAndFocusTriggerAsync()
@@ -97,7 +112,7 @@
 
         if (Trigger != null)
         {
-            objHostLevel.MarkFocused(Trigger);
+            objHostLevel.MarkFocused(this);
             await Trigger.FocusAsync();
         }
     }
@@ -119,6 +134,7 @@
         {
             objHostLevel.OpenSubChanged -= HandleOpenSubChanged;
             objHostLevel.Forget(this);
+            objHostLevel.Unregister(this);
         }
     }
 }

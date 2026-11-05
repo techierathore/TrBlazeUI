@@ -1,28 +1,24 @@
-# AstroLyfe — TrBlazeUI Library Feedback
+# TrBlazeUI feedback — found while building AstroLyfe
 
-> For the TrBlazeUI team. One file per library so it can be handed to (or picked up by) the owning team directly.
-> Schema: `.tfcore/templates/v4custom/app-library-feedback-tmpl.md`. Issue IDs are append-only (`TR-NNN`).
-
-Issues encountered while using TrBlazeUI (`trblazeui.components` / `trblazeui.primitives` / `trblazeui.icons.feather`) in AstroLyfe.
-Raised during the REQ-NFR-005 accessibility verification pass (2026-06-12, axe-core 4.x via `@axe-core/playwright`, Chromium) and the 2026-06-28 fix-issues clusters.
-Repro environment: AstroBlazeWeb (Blazor Server, .NET 10) + **TrBlazeUI 2.0.0** (upgraded from 1.0.6 on 2026-07-22).
+| | |
+|---|---|
+| App | AstroLyfe |
+| Upstream | TrBlazeUI |
+| Updated | 2026-11-05 |
 
 ## Summary
-- 2 blockers, 10 majors, 1 minor, 0 nice-to-haves (13 issues; TR-013 retracted)
-- **Open: 0.** All 13 addressed library-side: 11 fixed in 2.0.0, TR-003 fixed in 2.0.1, TR-014 defensively hardened in 2.0.1 (auto-margin dialog centering — the double-offset clip is now structurally impossible); TR-013 retracted.
-- Last consolidated: **2026-08-11** (`*handoff-phase` — re-confirmed 0 open; no disposition changed since 2026-07-22. The 2.1.0 release adds no AstroLyfe-specific fixes, but **TR-003's `SelectTrigger` and TR-010's `DataTable` are both touched by it** — see the CHANGELOG's "Behaviour changes to review before upgrading" before you upgrade past 2.0.1.) · previously 2026-07-22 (TrBlazeUI `*fix-issues` — TR-003 fixed + verified; TR-014 hardened + verified)
-- **AstroLyfe upgraded 1.0.6 → 2.0.0 on 2026-07-22 and re-verified every issue live** (headless Chromium against the running app; axe-core 4.x on the anonymous pages). Result: **11 of 13 confirmed FIXED**, **1 still open (TR-003)**, **1 NEW defect found (TR-014)**.
-- **➤ TrBlazeUI update 2026-07-22 (`*fix-issues`, REQ-UI-014 + REQ-UI-016):** **TR-003 is now FIXED library-side** — `SelectTrigger` emits a default `aria-labelledby` → the `SelectValue` span and gains an `AriaLabel` param; axe `button-name` verified 0 violations on the demo. **TR-014 is now DEFENSIVELY HARDENED** — `DialogContent`/`AlertDialogContent` center with auto margins (`inset-0 m-auto h-fit`) instead of translate/transform, so no stray −50% offset can ever clip the dialog (verified settled `transform:none` **and** `translate:none`, `top=16px`); this was done at the owner's request even though the double-offset couldn't be reproduced on current source. **After the next publish (2.0.1), AstroLyfe can drop BOTH app-side workarounds: the per-Select `aria-label` splat (TR-003) and the one-line `translate:none` dialog override (TR-014) — the latter's selector no longer even matches, since the library dropped the `left-[50%]`/`top-[50%]` tokens.**
-- ✅ **Confirmed fixed live in 2.0.0:** TR-001 (Tab now escapes the trigger), TR-002 (3 `role=option` items materialise, was 0), TR-004 (`nested-interactive` gone), TR-006 (0px page overflow @390), TR-007, TR-008, TR-009, TR-010 (0 search boxes; `ShowToolbar` now defaults `false`), TR-011 (partially — see TR-014), TR-012 (open listbox now paints `rgb(255,255,255)` panel with `rgb(26,35,126)` text, was `rgba(0,0,0,0)`), TR-005.
-- ❌ **TR-003 is NOT fixed** — reopened below with root cause. 2.0.0 renders the selected value as inner text of the trigger, but the trigger carries `role="combobox"`, which is **not a name-from-content role** in ARIA. Inner text therefore can never supply the accessible name. axe still reports `button-name` (critical). Needs `aria-label`/`aria-labelledby`.
-- 🆕 **TR-014 (major, NEW)** — 2.0.0's TR-011 fix is incomplete: `DialogContent` applies the −50% centering offset **twice** (via both `transform` and the standalone `translate` property), so tall dialogs still clip above the viewport. Details below.
-- ⚠ Behavioural breaking change confirmed: `DataTable.ShowToolbar` now defaults to `false`. Harmless for AstroLyfe (it already passed `ShowToolbar="false"` everywhere and uses `ShowToolbar="true"` nowhere).
 
-## Issues
+Nothing is blocked. 14 entries: 13 closed, 1 fixed upstream and awaiting re-check (TR-015, filed 2026-11-03 against 2.0.1, fixed in 2.0.6 — see the 2026-11-05 reply at the foot of this file; the action is: upgrade past 2.0.1). TR-013 was retracted on 2026-07-16: an app-side culture bug, no library defect.
+
+The first 13 were found during the REQ-NFR-005 accessibility pass (2026-06-12, axe-core via Playwright) and the 2026-06-28 fix clusters, against TrBlazeUI 1.0.6. Eleven were fixed in 2.0.0, TR-003 in 2.0.1, and TR-014 was hardened in 2.0.1. AstroLyfe upgraded to 2.0.1 on 2026-07-22, removed both app-side workarounds (the per-Select `aria-label`, the `translate:none` dialog override) and re-verified live: `/Login`, `/SignUp` and `/ForgotPassword` carry 0 axe violations and the tall ManagePlace dialog centres natively. The closing line under each entry was added on 2026-11-05 so the feedback reader counts them closed. Environment: AstroBlazeWeb (Blazor Server, .NET 10) on TrBlazeUI 2.0.1.
+
+## Entries
 
 _Sorted by severity: blocker → major → minor. IDs are append-only and stable; order is presentation-only._
 
 ### TR-001 — SelectTrigger is a keyboard trap (Tab and Shift+Tab do not move focus)
+
+> ✅ **Closed 2026-11-05** — re-checked here: Confirmed fixed live by AstroLyfe on 2.0.0 on 2026-07-22 (headless Chromium against the running app, axe-core on the anonymous pages); recorded in AstroLyfe's own summary, the closing line added here 2026-11-05.
 - **Severity:** blocker
 - **Repro:**
   ```razor
@@ -41,6 +37,8 @@ _Sorted by severity: blocker → major → minor. IDs are append-only and stable
 - **Suggested fix:** the trigger's keydown handler appears to `preventDefault()` Tab even while the popup is closed. Only intercept Tab when `data-state="open"`, and let it bubble when closed.
 
 ### TR-002 — SelectContent / SelectItems never render into the DOM when the Select is opened
+
+> ✅ **Closed 2026-11-05** — re-checked here: Confirmed fixed live by AstroLyfe on 2.0.0 on 2026-07-22 (headless Chromium against the running app, axe-core on the anonymous pages); recorded in AstroLyfe's own summary, the closing line added here 2026-11-05.
 - **Severity:** blocker
 - **Repro:** same markup as TR-001. Click the trigger (mouse) or press Enter/Space/ArrowDown while it is focused.
 - **Expected:** the listbox popup renders with the three `role="option"` items visible.
@@ -50,6 +48,8 @@ _Sorted by severity: blocker → major → minor. IDs are append-only and stable
 - **Suggested fix:** verify the popup portal/JS interop for `SelectContent` in Blazor Server interactive render mode — the open state propagates but the content subtree is never materialized.
 
 ### TR-003 — SelectTrigger has no accessible name at initial render (axe `button-name`, critical)
+
+> ✅ **Closed 2026-11-05** — re-checked here: Fixed in 2.0.1. AstroLyfe upgraded on 2026-07-22, removed the per-Select aria-label splat and re-verified live: axe button-name 0 on /Login, /SignUp and /ForgotPassword. tests/verify/ui-ui014.spec.js re-proved it in the library on 2026-11-05 (REQ-UI-014).
 - **Severity:** major
 - **Repro:** same markup as TR-001 with `RoleCode = "Patreon"` pre-set; run axe immediately after page load (`networkidle`).
 - **Expected:** the trigger exposes the selected value text (or the `SelectValue` placeholder) as its accessible name from the first render; ideally also supports `aria-label`/`aria-labelledby` wiring from the surrounding `FieldLabel`.
@@ -67,6 +67,8 @@ _Sorted by severity: blocker → major → minor. IDs are append-only and stable
 - **✅ FIXED library-side 2026-07-22 (REQ-UI-014, ships in 2.0.1).** The primitive `SelectTrigger` now emits a default **`aria-labelledby`** pointing at the `SelectValue` span id (`GetDefaultLabelledBy()` → `SelectContext.ValueId`), so the `role="combobox"` trigger has a non-empty accessible name from the very first render — no name-from-content dependency. It defers automatically when you supply your own name: if a **non-empty** `aria-label` or `aria-labelledby` is splatted onto the trigger, the default is omitted so yours wins (a null/unset forwarded value does not count). The styled `SelectTrigger` also gains an **`AriaLabel`** parameter that emits `aria-label` for a descriptive purpose-name (e.g. `AriaLabel="Role"`), which overrides the value-derived default per ARIA precedence. Verified on the demo (`/verify-ui014`, headless Chromium, Release 0/0): **axe `button-name` = 0 violations**; accessible name resolves to the bound value ("Patreon") for a valued trigger, to the placeholder ("Select a role") when empty, and to the `AriaLabel` when set (with no default `aria-labelledby` in that case). **Action for AstroLyfe:** on upgrade to 2.0.1 you can remove the per-Select `aria-label="…"` workaround splat in `SignUpPage.razor` (and anywhere else) — the trigger is now named by default; keep an explicit `AriaLabel` only where you want a purpose-name better than the current value.
 
 ### TR-004 — DropdownMenuTrigger wraps children in its own `<button>`, producing nested interactive controls (axe `nested-interactive`, serious)
+
+> ✅ **Closed 2026-11-05** — re-checked here: Confirmed fixed live by AstroLyfe on 2.0.0 on 2026-07-22 (headless Chromium against the running app, axe-core on the anonymous pages); recorded in AstroLyfe's own summary, the closing line added here 2026-11-05.
 - **Severity:** major
 - **Repro:**
   ```razor
@@ -84,6 +86,8 @@ _Sorted by severity: blocker → major → minor. IDs are append-only and stable
 - **Suggested fix:** add an `AsChild`-style parameter to `DropdownMenuTrigger` (and document that interactive elements must not be slotted), or detect a single `Button` child and merge attributes onto it instead of double-wrapping.
 
 ### TR-006 — DataTable `.sr-only` header spans use inline `left` in a body-level portal, forcing page horizontal-overflow on narrow viewports
+
+> ✅ **Closed 2026-11-05** — re-checked here: Confirmed fixed live by AstroLyfe on 2.0.0 on 2026-07-22 (headless Chromium against the running app, axe-core on the anonymous pages); recorded in AstroLyfe's own summary, the closing line added here 2026-11-05.
 - **Severity:** major
 - **Repro:** render any `<DataTable>` with several columns inside a width-constrained card on a ≤390px viewport (e.g. the AstroLyfe ReferenceData grids, ManageUsers, the Index/Admin-Dashboard embedded Kundali List).
 - **Expected:** visually-hidden screen-reader spans must have zero layout/scroll footprint — they should not extend the document's scroll width.
@@ -93,6 +97,8 @@ _Sorted by severity: blocker → major → minor. IDs are append-only and stable
 - **Suggested fix:** the DataTable's screen-reader spans should use the standard clipped visually-hidden pattern (no inline `left`, no body-portal placement at a content-relative offset). Either keep them in-flow next to their control, or render them with `left:0`/clipped so they can never contribute to scroll width.
 
 ### TR-007 — `<Input Label="…">` silently accepts the Label param but renders no visible label
+
+> ✅ **Closed 2026-11-05** — re-checked here: Confirmed fixed live by AstroLyfe on 2.0.0 on 2026-07-22 (headless Chromium against the running app, axe-core on the anonymous pages); recorded in AstroLyfe's own summary, the closing line added here 2026-11-05.
 - **Severity:** major
 - **Repro:**
   ```razor
@@ -106,6 +112,8 @@ _Sorted by severity: blocker → major → minor. IDs are append-only and stable
 - **Suggested fix:** either render the `Label` param as a real associated `<label>` (preferred), or remove the param so the omission is a compile error rather than a silent runtime no-op.
 
 ### TR-008 — No grid/column components ship, so partial FluentUI→TrBlazeUI migrations leave inert `xs`/`sm`/`md`/`Spacing` attributes that silently collapse layout
+
+> ✅ **Closed 2026-11-05** — re-checked here: Confirmed fixed live by AstroLyfe on 2.0.0 on 2026-07-22 (headless Chromium against the running app, axe-core on the anonymous pages); recorded in AstroLyfe's own summary, the closing line added here 2026-11-05.
 - **Severity:** major (migration-trap / guidance gap)
 - **Repro:** a page migrated from FluentUI keeps `<div class="grid grid-cols-12 gap-3" Spacing="3"><div xs="12" sm="6">…</div></div>`.
 - **Expected:** either a TrBlazeUI Grid/Column component that consumes `xs/sm/Spacing`, or migration guidance that these FluentUI/Blazorise attributes MUST be rewritten to Tailwind `col-span-*`.
@@ -115,6 +123,8 @@ _Sorted by severity: blocker → major → minor. IDs are append-only and stable
 - **Suggested fix:** ship a documented `Grid`/`GridItem` (or `Stack`/`Row`/`Col`) component, or publish a FluentUI→TrBlazeUI migration cheatsheet flagging `xs/sm/md/lg/Spacing` as must-rewrite.
 
 ### TR-009 — `<FeatherIcon Name="…">` silently renders an alert-triangle fallback for any invalid icon id
+
+> ✅ **Closed 2026-11-05** — re-checked here: Confirmed fixed live by AstroLyfe on 2.0.0 on 2026-07-22 (headless Chromium against the running app, axe-core on the anonymous pages); recorded in AstroLyfe's own summary, the closing line added here 2026-11-05.
 - **Severity:** major
 - **Repro:** `<FeatherIcon Name="add" />` (or any non-Feather id, e.g. `lockclosed`, `weathermoon`, `print`, `checkmark`).
 - **Expected:** an unknown icon id should fail loudly (build/analyzer warning) or render nothing — so a wrong name is caught.
@@ -134,6 +144,8 @@ _Sorted by severity: blocker → major → minor. IDs are append-only and stable
 - **✅ FIXED library-side 2026-07-21 (REQ-UI-016, ships in 2.0.0).** `ShowToolbar` now defaults to `false` — the toolbar is opt-in via `ShowToolbar="true"`. `ShowPagination` still defaults `true` but the bar now renders only when `TotalItems > PageSize` (new `ShouldShowPagination()` guard, replacing the old `objProcessedData.Any()`); set `ShowPagination="false"` to suppress it unconditionally. Verified: a 3-row grid @PageSize 5 renders 0 search boxes and no pagination chrome; 12 rows @PageSize 5 still shows "Page 1 of 3". **Your app-side sweep stays correct and needs no change** — `ShowToolbar="false"` is now redundant-but-harmless, and `ShowPagination="@(List?.Count > PageSize)"` simply agrees with the new built-in guard. ⚠ Note the default flip is a **behavioural breaking change** for any consumer that relied on the toolbar appearing implicitly.
 
 ### TR-011 — Dialog/DialogContent can render vertically off-viewport (negative `top`), overlapping the app's fixed header
+
+> ✅ **Closed 2026-11-05** — re-checked here: Partially fixed in 2.0.0 and completed by the TR-014 hardening in 2.0.1; AstroLyfe verified the tall ManagePlace dialog centres natively on 2026-07-22.
 - **Severity:** major
 - **Repro:** `<Dialog Modal="true" @bind-Open>...<DialogContent>` with content taller than ~60% of the viewport (ManagePlace add/edit form, 14 fields).
 - **Expected:** the dialog is clamped inside the viewport (centered, internal scroll if taller than the viewport), never under the app top-bar.
@@ -169,6 +181,8 @@ _Sorted by severity: blocker → major → minor. IDs are append-only and stable
 - **✅ FIXED library-side 2026-07-21 (REQ-UI-016, ships in 2.0.0).** `trblazeui.css` now ships default definitions for the core design tokens (`--popover`, `--popover-foreground`, `--background`, `--foreground`, `--border`, `--muted`, `--accent`, … light + `.dark`), declared inside `@layer base` and wrapped in `:where()` so they carry **zero specificity** — any host declaration, layered or not, still wins. Verified both directions: with every non-library stylesheet disabled the open listbox measures `background-color: oklch(1 0 0)` with `oklch(0.205 0 0)` text (was `rgba(0,0,0,0)`); with a themed host present the host's values still resolve (`--popover` = its own light/dark values, not the fallback). **Action for AstroLyfe:** the `<Select>` → native `<select>` conversions can be reverted on upgrade if you want the styled control back.
 
 ### TR-014 — DialogContent applies the −50% centering offset TWICE (`transform` AND `translate`), so tall dialogs still render above the viewport
+
+> ✅ **Closed 2026-11-05** — re-checked here: Hardened in 2.0.1 (auto-margin centring). AstroLyfe removed its translate:none override on 2026-07-22 and verified top=112, transform:none and translate:none live.
 - **Severity:** major (NEW 2026-07-22 — found while verifying the 2.0.0 upgrade; makes the TR-011 fix incomplete)
 - **Repro:** open any `<Dialog>` whose content is taller than half the viewport — e.g. `/Admin/Places` → "Add New Place" at 1280×720 — on TrBlazeUI **2.0.0** with no app-side dialog CSS.
 - **Expected:** the dialog is vertically centered; `getBoundingClientRect().top >= 0`.
@@ -200,6 +214,8 @@ _Sorted by severity: blocker → major → minor. IDs are append-only and stable
 - **✅ FIXED library-side 2026-07-22 (REQ-UI-016, ships in 2.0.1) — defensively hardened.** Rather than rely on the height-cap absorbing a single −50% offset, `DialogContent` and `AlertDialogContent` now **center with auto margins instead of translate/transform**: the class string changed from `fixed left-[50%] top-[50%] … translate-x/y-[-50%]` to `fixed inset-0 z-50 m-auto grid h-fit w-full max-w-lg max-h-[calc(100vh-2rem)] overflow-y-auto`. Because auto margins are never negative, the dialog top can never sit above `y=0` **no matter how many stray `transform`/`translate` −50% offsets stack** (a host sheet, a future refactor, anything) — the whole TR-014 class of clipping is structurally impossible now, not just absorbed. The slide-in/out animations (which were built around the old −50% translate base) were dropped in favour of zoom+fade; `Sheet`/`Drawer` (`inset-y-0`) are untouched. Verified on `/verify-ui016` (`tests/verify/ui-ui016.spec.js`, Release 0/0): the settled tall dialog measures `transform: none` **and** `translate: none`, `top = 16px` at 1366×720, 1280×600 and 390×844; AlertDialog centers on-screen (`top=269`, no offset). **Action for AstroLyfe:** on upgrade to 2.0.1 you can drop the one-line `[class~="left-[50%]"][class~="top-[50%]"] { translate: none !important; }` override entirely — that selector no longer matches (the library dropped the `left-[50%]`/`top-[50%]` tokens), and the dialog is correctly centered with no app-side CSS.
 
 ### TR-005 — FeatherIcon renders `role="img"` SVGs with no accessible text (axe `svg-img-alt`, serious)
+
+> ✅ **Closed 2026-11-05** — re-checked here: Confirmed fixed live by AstroLyfe on 2.0.0 on 2026-07-22 (headless Chromium against the running app, axe-core on the anonymous pages); recorded in AstroLyfe's own summary, the closing line added here 2026-11-05.
 - **Severity:** minor
 - **Repro:** `<FeatherIcon Name="calendar" Size="16" />` (package `trblazeui.icons.feather`).
 - **Expected:** decorative icons should render `aria-hidden="true"` (no `role="img"`); informative icons should accept an accessible-name parameter (`Title`/`AriaLabel`).
@@ -207,6 +223,60 @@ _Sorted by severity: blocker → major → minor. IDs are append-only and stable
 - **Encountered in:** REQ-NFR-005 (`/Index`, TopMenu icons).
 - **Workaround:** none applied.
 - **Suggested fix:** default to `aria-hidden="true"` and drop `role="img"` unless an accessible name is supplied; add an optional `AriaLabel` parameter that emits `role="img"` + `aria-label` together.
+
+### TR-015 — In 2.0.1, `TabsTrigger`, `TabsContent`, `Select` and `FileUpload` do not capture unmatched attributes, so `data-testid` on them crashes the circuit
+
+> ✅ **Fixed upstream, in 2.0.6 (2026-09-13)** — every public component takes arbitrary HTML attributes since then, these six included. AstroLyfe is on 2.0.1; upgrade to the current release and move the anchors back onto the controls. See the 2026-11-05 reply below.
+
+- **Status:** fixed upstream 2026-09-13 (attribute splatting across the whole catalogue, in 2.0.6 — see the 2026-11-05 reply), filed 2026-11-03
+- **Severity:** minor (test anchors only)
+- **Blocks:** no — the anchors sit on an inner `<span>` (tabs) or a wrapping `<div>` (Select, FileUpload); the controls work.
+- **Repro:** `<TabsTrigger Value="import" data-testid="tab-import">Import</TabsTrigger>` on TrBlazeUI.Components 2.0.1.
+- **Expected:** like `Tabs`, `Button`, `Badge`, `Switch`, `Alert`, `Card` and `DataTable`, the component takes `AdditionalAttributes` (`CaptureUnmatchedValues = true`) and renders `data-testid` on its root element.
+- **Actual:** `InvalidOperationException: Object of type 'TrBlazeUI.Components.Tabs.TabsTrigger' does not have a property matching the name 'data-testid'` — the whole page's circuit dies. The 2.0.1 XML docs list no `AdditionalAttributes` on `TabsTrigger`, `TabsContent`, `TabsList`, `Select` or `FileUpload`.
+- **Encountered in:** REQ-FN-040..044 (`/Admin/DataIngestion`, 2026-11-03), matching the `data-testid` anchors of `docs/mockups/data-ingestion.html`.
+- **Workaround:** the anchor sits on an inner `<span>` (tabs) or a wrapping `<div>` (Select, FileUpload); the controls themselves are unchanged.
+- **Suggested fix:** add `[Parameter(CaptureUnmatchedValues = true)] AdditionalAttributes` to every public component and splat it on the root element.
+
+Copied into TrBlazeUI 2026-11-05 by *build-phase from `/mnt/c/1MyCode/AstroLyfe/docs/AstroLyfe-TrBlazeUI-Feedback.md`.
+
+## Replies from TrBlazeUI
+
+<!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
+
+### 2026-11-05 — TR-015 was fixed in 2.0.6; the action is: upgrade
+
+Blocks: no. Your anchors sit on inner elements and the controls work.
+
+| Entry | State | What you get |
+|---|---|---|
+| **TR-015** `TabsTrigger`, `TabsContent`, `Select`, `FileUpload` reject `data-testid` | fixed in **2.0.6**, released 2026-09-13 | Every public component takes arbitrary HTML attributes (`data-*`, `aria-*`, `id`, `title`, event handlers) and puts them on its root element: `TabsTrigger`, `TabsContent`, `TabsList`, `Select`, `SelectTrigger` and `FileUpload` included, all 344 public types. A test scans the whole catalogue so none can lose it again. Your copy, 2.0.1, predates it. |
+
+Things to know before you upgrade:
+
+1. **The feed moved.** 2.0.7 onward are on GitHub Packages
+   (`https://nuget.pkg.github.com/techierathore/index.json`), not nuget.org. The current release is
+   2.2.2; the one after it carries this week's Menubar fixes and is cut by the owner.
+2. **Read "Behaviour changes to review before upgrading" in `CHANGELOG.md`** for every version
+   between 2.0.1 and the one you take. The ones most likely to touch you: `DataTable.ShowToolbar`
+   defaults to false (you already pass it), a `Class` text colour now replaces a component's own
+   (2.1.3), menu items are 10 px across and a focused `Input` draws its ring on the border (2.2.2),
+   and WebAssembly or Auto hosts must be on `Microsoft.AspNetCore.Components.WebAssembly.Server`
+   10.0.14 and call `app.MapStaticAssets()` (AstroLyfe is Blazor Server, so this last one does not
+   apply).
+3. **Your agent's reference says it first.** After the upgrade, the build refreshes
+   `.trblazeui/TrBlazeUI-AI-Reference.md`; its "CRITICAL: Rules You MUST Follow" section opens with
+   "Every public component accepts arbitrary HTML attributes", so an agent will put `data-testid`
+   on the control itself.
+
+#### What we need from you
+
+Upgrade, put the `data-testid` anchors of `docs/mockups/data-ingestion.html` back on the controls
+themselves (the inner `<span>` on the tabs and the wrapping `<div>` on the Select and FileUpload can
+go), run the REQ-FN-040..044 verify on `/Admin/DataIngestion` at 1280 and 390, then close the entry:
+`bash .tfcore/utils/tf-feedback.sh AstroLyfe --close TR-015 "<what you ran and what it showed>"`.
+
+Tell us what does not fit.
 
 <!-- TR-013 (retracted 2026-07-16): an earlier pass logged "<Input Type=InputType.Time> ignores
      post-render values". That was a MISDIAGNOSIS — the TrBlazeUI Time input is fine. The birth-time

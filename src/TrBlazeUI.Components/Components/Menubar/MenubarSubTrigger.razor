@@ -1,9 +1,9 @@
 @namespace TrBlazeUI.Components.Menubar
 @implements IMenubarItem
-@implements IDisposable
 
 @* The row that opens a submenu (Chatur TR-020). It draws a ▸ at its right edge; hovering it,
-   clicking it, Enter, Space or ArrowRight opens the list beside it. *@
+   clicking it, Enter, Space or ArrowRight opens the list beside it. The parent list holds the
+   MenubarSub, not this row, so the arrow keys reach the row in its on-screen place (Chatur TR-023). *@
 <div @ref="objItemRef"
      id="@Sub?.TriggerId"
      role="menuitem"
@@ -29,12 +29,6 @@
     [CascadingParameter]
     private MenubarSub? Sub { get; set; }
 
-    [CascadingParameter]
-    private MenubarMenu? Menu { get; set; }
-
-    [CascadingParameter(Name = "MenubarLevel")]
-    private MenuLevel<IMenubarItem>? ParentLevel { get; set; }
-
     /// <summary>
     /// Gets or sets additional CSS classes for the row.
     /// </summary>
@@ -48,8 +42,8 @@
     public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
-    /// Gets or sets whether the row is disabled: it cannot open its submenu, and it renders
-    /// aria-disabled="true" and data-disabled.
+    /// Gets or sets whether the row is disabled: it cannot open its submenu, the arrow keys skip
+    /// it, and it renders aria-disabled="true" and data-disabled.
     /// </summary>
     [Parameter]
     public bool Disabled { get; set; }
@@ -75,7 +69,6 @@
     private static readonly RenderFragment ChevronDefault = aBuilder => aBuilder.AddContent(0, "▸");
 
     private ElementReference objItemRef;
-    private MenuLevel<IMenubarItem>? objLevel;
 
     /// <inheritdoc />
     public bool IsDisabled => Disabled;
@@ -88,9 +81,6 @@
         {
             Sub.Trigger = this;
         }
-
-        objLevel = ParentLevel ?? Menu?.Level;
-        objLevel?.Register(this);
     }
 
     /// <inheritdoc />
@@ -130,7 +120,7 @@
             return;
         }
 
-        objLevel?.MarkFocused(this);
+        Sub?.MarkFocused();
         Sub?.Open();
     }
 
@@ -141,11 +131,6 @@
         {
             OpenFromKeyboard();
         }
-    }
-
-    public void Dispose()
-    {
-        objLevel?.Unregister(this);
     }
 
     private string CssClass => TrBlazeUI.Components.Utilities.ClassNames.cn(

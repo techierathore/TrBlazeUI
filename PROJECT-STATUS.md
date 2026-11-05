@@ -1,16 +1,16 @@
 ---
 project: TrBlazeUI
-last_updated: 2026-11-02
-current_phase: Release — handoff done, 78 of 78 verified
+last_updated: 2026-11-05
+current_phase: Release — handoff done, 81 of 81 verified
 last_verified_build: PASS
-last_verified_date: 2026-11-02
+last_verified_date: 2026-11-05
 ---
 
 # TrBlazeUI — Status
 
 ## Where I am
 
-Two consumer fixes ready for 2.2.2. TechieBlog TR-077: SelectValue no longer throws on a re-render (REQ-UI-061). Chatur TR-022: a focused Input or SelectTrigger draws its ring on the border, a field after a Label gets a 6px gap, and menu items are 10px across (REQ-UI-062). REQ-UI-055, 059, 061 and 062 are Verified. CHANGELOG [Unreleased], agent reference, DevGuide and both feedback replies are updated. The TechieBlog feedback file now follows the template; the document checker shows no FAIL.
+Every row is Verified. Ready for the release after 2.2.2: Chatur TR-023 and TR-024 (Menubar arrow order, submenu pull-back), the demo hosts on ASP.NET Core 10.0.14 (advisory clear), the Auto host serving its Blazor script again (REQ-FN-013), and the TrStudio harness page restored (REQ-UI-015). CHANGELOG [Unreleased], the agent reference, both guides and Chatur's feedback file are current.
 
 ## Next command to run
 
@@ -18,7 +18,6 @@ Claude Code:
 ```
 (owner) commit, then build and publish the package — its shipped documents are current; no agent command
 ```
-
 OpenCode:
 ```
 (owner) commit, then build and publish the package — its shipped documents are current; no agent command
@@ -39,7 +38,7 @@ Why: every row in this phase's scope is terminal and the shipped documents were 
 
 ## Known blockers
 
-- 2.2.2 is not on GitHub Packages until the owner publishes it through the usual GitHub Release; the stored token can only read packages.
+- The release after 2.2.2 is not on GitHub Packages until the owner publishes it through the usual GitHub Release; the stored token can only read packages.
 - CHANGELOG has no section for 2.1.10 or 2.2.0, which are already published; the owner fills them in.
 
 ## Verification log
@@ -48,11 +47,11 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 | Date | Phase | Result | Status table |
 |---|---|---|---|
-| 2026-10-21 | triage-and-fix TrBlazeUI /mnt/c/3AIGenCode/Lekhak/docs/Lekhak-TrBlazeUI-Feedback.md TR-010 | 75/75 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
-| 2026-10-29 | fix-issues + handoff | 76/76 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
-| 2026-11-02 | triage-and-fix + handoff | 77/77 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-11-02 | fix-issues + handoff | 78/78 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-11-02 | amend-docs | 78/78 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-11-05 | triage-and-fix + handoff | 79/80 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-11-05 | build-phase | 79/81 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-11-05 | build-phase + handoff | 81/81 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 
@@ -64,14 +63,15 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 ## Deferred / future
 
-- Dark Destructive Button text is 2.77:1, under 3:1 (demo `theme.css` dark `--destructive-foreground`; seen again on `/components/dialog` 2026-11-02).
+- Register `ContextMenuSub` in its list as Menubar now does (TR-023 cause).
+- Submenu pull-back margin as a parameter.
+- Dark Destructive Button text 2.77:1.
 - InputGroup demo menu items only log; show the choice.
-- A container-width `HideBelow`, if Chatur asks.
+- Container-width `HideBelow`, if Chatur asks.
 - No test forces the portal-timeout inline fallback.
-- The framework's `Virtualize` throws on dispose; not fixable here.
-- `tools/splat-audit` throws on the library alone; report `ApexChart.Dispose` upstream.
+- Framework `Virtualize` throws on dispose; not fixable here.
+- `tools/splat-audit`: report `ApexChart.Dispose` upstream.
 - Delete the stray `c2.0.5` tag (owner).
-- Restore `/verify-trstudio` for REQ-UI-015.
 - Test with real assistive technology.
 - Fix the badge overlap on `/verify-tflens-3`.
 - Fold the three roving scripts into one.

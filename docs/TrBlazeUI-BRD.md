@@ -72,7 +72,7 @@ This document captures, for the product owner, what TrBlazeUI delivers today (th
 
 Written by the status gate after every build, verify and handoff; not by hand.
 
-**Snapshot as of 2026-11-02.** Live per-requirement status: `PROJECT-STATUS.md` and the Requirements Status table in `docs/TrBlazeUI-Checklist.md`.
+**Snapshot as of 2026-11-05.** Live per-requirement status: `PROJECT-STATUS.md` and the Requirements Status table in `docs/TrBlazeUI-Checklist.md`.
 
 | Screen | Requirements | Verified | Open | Status |
 |---|---|---|---|---|
@@ -84,7 +84,7 @@ Written by the status gate after every build, verify and handoff; not by hand.
 | Chat | 1 | 1 | 0 | Done |
 | Run | 1 | 1 | 0 | Done |
 | Roles | 1 | 1 | 0 | Done |
-| Menubar demo | 2 | 2 | 0 | Done |
+| Menubar demo | 4 | 4 | 0 | Done |
 | InputGroup | 1 | 1 | 0 | Done |
 | Toast | 1 | 1 | 0 | Done |
 | FileUpload | 1 | 1 | 0 | Done |
@@ -93,6 +93,7 @@ Written by the status gate after every build, verify and handoff; not by hand.
 | Card | 2 | 2 | 0 | Done |
 | Sidebar | 1 | 1 | 0 | Done |
 | Input | 1 | 1 | 0 | Done |
+| Demo hosts | 1 | 1 | 0 | Done |
 
 ## 5. Stakeholders / users
 
