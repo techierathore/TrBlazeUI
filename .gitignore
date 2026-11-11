@@ -79,3 +79,6 @@ test-results-*/
 # TechieFlow framework — deployed copies, never commit (managed by scaffold/update-framework.sh)
 .codex/
 .agents/skills/
+
+# TechieFlow framework — deployed copies, never commit (managed by scaffold/update-framework.sh)
+tests/verify/testsettings.Local.json
