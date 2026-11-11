@@ -1,0 +1,70 @@
+@page "/verify-sevak-tr048"
+@using TrBlazeUI.Components.Select
+
+@* Verification harness for Sevak TR-048 (docs/Sevak-TrBlazeUI-Feedback.md).
+   Not a documentation demo: every block exists so tests/verify/req-ui-065.spec.ts can assert that a
+   Select bound to "" whose items never carry "" opens its list and keeps its placeholder, instead of
+   throwing RuntimeBinderException from SelectValue (the same cause as TechieBlog TR-077). Sevak's
+   shapes: a one-way Value, with no DisplayTextSelector or with one that answers "". *@
+
+<PageTitle>Verify Sevak TR-048 - TrBlazeUI</PageTitle>
+
+<div class="mx-auto max-w-md space-y-8 p-6">
+    <h1 class="text-2xl font-bold" data-testid="verify-heading">Sevak TR-048 Select bound to an empty string</h1>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">One-way Value="", no DisplayTextSelector</h2>
+        <Select TValue="string" Value="@string.Empty">
+            <SelectTrigger Class="w-[220px]" data-testid="plain-trigger">
+                <SelectValue Placeholder="Choose a status" data-testid="plain-value" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem Value="@("open")" Text="Open">Open</SelectItem>
+                <SelectItem Value="@("closed")" Text="Closed">Closed</SelectItem>
+            </SelectContent>
+        </Select>
+    </section>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">One-way Value="", DisplayTextSelector answers ""</h2>
+        <Select TValue="string" Value="@string.Empty" DisplayTextSelector="@(v => string.Empty)">
+            <SelectTrigger Class="w-[220px]" data-testid="selector-trigger">
+                <SelectValue Placeholder="Choose a priority" data-testid="selector-value" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem Value="@("low")" Text="Low">Low</SelectItem>
+                <SelectItem Value="@("high")" Text="High">High</SelectItem>
+            </SelectContent>
+        </Select>
+    </section>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">@@bind-Value to "", DisplayTextSelector answers ""</h2>
+        <Select TValue="string" @bind-Value="objOwner" DisplayTextSelector="@OwnerText">
+            <SelectTrigger Class="w-[220px]" data-testid="bound-trigger">
+                <SelectValue Placeholder="Choose an owner" data-testid="bound-value" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem Value="@("asha")" Text="Asha">Asha</SelectItem>
+                <SelectItem Value="@("ravi")" Text="Ravi">Ravi</SelectItem>
+            </SelectContent>
+        </Select>
+        <p data-testid="bound-echo">@objOwner</p>
+    </section>
+</div>
+
+@code {
+    private string objOwner = string.Empty;
+
+    /// <summary>
+    /// Answers the display text for an owner id, and "" for any id it does not know - Sevak's shape.
+    /// </summary>
+    /// <param name="aValue">The bound owner id.</param>
+    /// <returns>The owner's name, or an empty string.</returns>
+    private static string OwnerText(string aValue) => aValue switch
+    {
+        "asha" => "Asha",
+        "ravi" => "Ravi",
+        _ => string.Empty
+    };
+}

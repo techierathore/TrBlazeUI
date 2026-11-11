@@ -103,6 +103,8 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-UI-062 | A focused Input or SelectTrigger draws its ring on the border, a Label before a field keeps its own gap, and menu items are 10px across (Chatur TR-022) | Verified | 100% | 2026-11-05 verify: PASS — test `REQ-UI-062 a focused field in a Dialog has no ring offset an` | [d](#d-req-ui-062) |
 | REQ-UI-063 | Menubar arrow keys reach a submenu row in its on-screen place (Chatur TR-023) | Verified | 100% | 2026-11-05 verify: PASS — test `Chatur TR-023 — the arrow keys reach a submenu row in its pl` | [d](#d-req-ui-063) |
 | REQ-UI-064 | A Menubar submenu with no room on either side stays inside the window (Chatur TR-024) | Verified | 100% | 2026-11-05 verify: PASS — test `Chatur TR-024 — a submenu with no room on either side stays ` | [d](#d-req-ui-064) |
+| REQ-UI-065 | A Select bound to "" whose items never carry "" opens its list and keeps its placeholder, with or without a DisplayTextSelector that answers "" (Sevak TR-048) | Verified | 100% | 2026-11-12 verify: PASS — test `Sevak TR-048 — a Select bound to an empty string opens and k` | [d](#d-req-ui-065) |
+| REQ-UI-066 | CodeBlock's copy button takes CopyLabel, CopyButtonAttributes and reports OnCopied (Sevak TR-047) | Verified | 100% | 2026-11-12 verify: PASS — test `Sevak TR-047 — CodeBlock copy button takes a label, attribut` | [d](#d-req-ui-066) |
 | REQ-FN-013 | The published Auto demo host answers 404 for _framework/blazor.web.js, so its pages are never interactive | Verified | 100% | 2026-11-05 verify: PASS — test `Demo hosts REQ-FN-013 the host serves blazor.web.js and a me` | [d](#d-req-fn-013) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
@@ -422,6 +424,9 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 - <a id="d-req-ui-049"></a> **REQ-UI-049** (extends BRD-4 Button) A filled Button draws no border even when host CSS gives buttons one (Lekhak TR-006)
   - *Acceptance:* When host CSS in the host layer gives every button a border on the Button demo screen, then filled Buttons show none and Outline keeps its own.
 
+- <a id="d-req-ui-066"></a> **REQ-UI-066** (extends BRD-28 display components) CodeBlock's copy button takes CopyLabel, CopyButtonAttributes and reports OnCopied (Sevak TR-047)
+  - *Acceptance:* When a user clicks a CodeBlock copy button given CopyLabel on the CodeBlock demo screen, then it shows that label and the page shows its own message.
+
 
 ## Editor
 
@@ -484,6 +489,9 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 
 - <a id="d-req-ui-061"></a> **REQ-UI-061** (extends BRD-7 dropdown selection) SelectValue renders its placeholder, not an exception, when its Select is bound to a value no item carries and the page re-renders (TechieBlog TR-077)
   - *Acceptance:* When a Select bound to an empty string re-renders on the TR-077 harness screen, then it shows its placeholder and does not throw.
+
+- <a id="d-req-ui-065"></a> **REQ-UI-065** (extends BRD-7 dropdown selection) A Select bound to "" whose items never carry "" opens its list and keeps its placeholder, with or without a DisplayTextSelector that answers "" (Sevak TR-048)
+  - *Acceptance:* When a user opens a Select bound to "" on the Sevak TR-048 harness screen, then the list opens and the trigger keeps its placeholder.
 
 ## NumericInput
 

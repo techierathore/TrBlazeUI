@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Status</h1>
-    <div class="sub">Last rendered: 2026-11-05</div>
+    <div class="sub">Last rendered: 2026-11-12</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#where-i-am">Where I am</a></li>
@@ -121,7 +121,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Status</h1>
-    <div class="subtitle">Rendered 2026-11-05 &middot; source <code>PROJECT-STATUS.md</code></div>
+    <div class="subtitle">Rendered 2026-11-12 &middot; source <code>PROJECT-STATUS.md</code></div>
     <div class="cta-next" style="padding:20px; background:var(--cta-bg); border:2px solid var(--accent); border-radius:10px; margin:20px 0;">
       <div style="font-size:11px; color:var(--muted); letter-spacing:.5px;">NEXT COMMAND TO RUN</div>
       <div style="font-family:var(--mono); font-size:18px; margin-top:6px;">(owner) commit, then build and publish the package — its shipped documents are current; no agent command</div>
@@ -129,10 +129,10 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <table>
 <tbody>
 <tr><th>project</th><td>TrBlazeUI</td></tr>
-<tr><th>last_updated</th><td>2026-11-05</td></tr>
-<tr><th>current_phase</th><td>Release — handoff done, 81 of 81 verified</td></tr>
+<tr><th>last_updated</th><td>2026-11-12</td></tr>
+<tr><th>current_phase</th><td>Release — Sevak TR-047/TR-048 verified, 83 of 83 verified</td></tr>
 <tr><th>last_verified_build</th><td>PASS</td></tr>
-<tr><th>last_verified_date</th><td>2026-11-05</td></tr>
+<tr><th>last_verified_date</th><td>2026-11-12</td></tr>
 </tbody>
 </table>
     <div class="toc-inline">
@@ -149,13 +149,13 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
       </ol>
     </div>
 <h2 id="where-i-am">Where I am<a class="anchor-link" href="#where-i-am">#</a></h2>
-<p>Every row is Verified. Ready for the release after 2.2.2: Chatur TR-023 and TR-024 (Menubar arrow order, submenu pull-back), the demo hosts on ASP.NET Core 10.0.14 (advisory clear), the Auto host serving its Blazor script again (REQ-FN-013), and the TrStudio harness page restored (REQ-UI-015). CHANGELOG [Unreleased], the agent reference, both guides and Chatur's feedback file are current.</p>
+<p>Every row is Verified. The verifier passed REQ-UI-065 (Sevak TR-048 regression test; the fix itself shipped in 2.2.2) and REQ-UI-066 (Sevak TR-047, <code>CodeBlock.CopyLabel</code>, <code>CopyButtonAttributes</code>, <code>OnCopied</code>). They join Chatur TR-023/TR-024 and the demo-host fixes in the release after 2.2.2. On the Mac, four older rows fail from machine setup or test flakes (Known blockers). CHANGELOG, the agent reference and Sevak's file are current.</p>
 <h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2>
 <p>Claude Code:</p>
 <pre><code>(owner) commit, then build and publish the package — its shipped documents are current; no agent command</code></pre>
 <p>OpenCode:</p>
 <pre><code>(owner) commit, then build and publish the package — its shipped documents are current; no agent command</code></pre>
-<p>Why: every row in this phase's scope is terminal and the shipped documents were brought up to date.</p>
+<p>Why: every row is Verified and the shipped documents are current.</p>
 <h2 id="open-requirements">Open requirements<a class="anchor-link" href="#open-requirements">#</a></h2>
 <table>
 <thead><tr><th>Status</th><th>Count</th></tr></thead>
@@ -173,6 +173,10 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </ul>
 <h2 id="known-blockers">Known blockers<a class="anchor-link" href="#known-blockers">#</a></h2>
 <ul>
+<li>On the Mac (2026-11-11), four suite rows fail for reasons outside the code. REQ-NFR-001 looks for the axe scanner only under <code>/mnt/c/1MyCode/...</code> (WSL paths). REQ-UI-020 TR-031 expects <code>flex-end</code>, which Chromium 158 (Playwright 1.65) reports as <code>flow-end</code>. REQ-UI-063 and REQ-UI-021 fail only under parallel workers and pass when run alone.
+</li>
+<li>The demo's <code>app.css</code> is gitignored and built by <code>tools/tailwindcss.exe</code>, which this checkout does not have. Without the file, 8 more rows fail with a 404. It was generated here with the Tailwind 4.1.11 npm CLI.
+</li>
 <li>The release after 2.2.2 is not on GitHub Packages until the owner publishes it through the usual GitHub Release; the stored token can only read packages.
 </li>
 <li>CHANGELOG has no section for 2.1.10 or 2.2.0, which are already published; the owner fills them in.
@@ -183,11 +187,11 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <table>
 <thead><tr><th>Date</th><th>Phase</th><th>Result</th><th>Status table</th></tr></thead>
 <tbody>
-<tr><td>2026-11-02</td><td>fix-issues + handoff</td><td>78/78 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-11-02</td><td>amend-docs</td><td>78/78 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-11-05</td><td>triage-and-fix + handoff</td><td>79/80 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-11-05</td><td>build-phase</td><td>79/81 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-11-05</td><td>build-phase + handoff</td><td>81/81 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-11-12</td><td>verify REQ-UI-065, REQ-UI-066</td><td>83/83 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 </tbody>
 </table>
 <h2 id="library-feedback-summary">Library feedback summary<a class="anchor-link" href="#library-feedback-summary">#</a></h2>

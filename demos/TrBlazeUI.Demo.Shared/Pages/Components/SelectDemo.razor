@@ -162,6 +162,31 @@
         </div>
     </div>
 
+    <!-- Unmatched value -->
+    <section class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">A value no item carries shows the placeholder</h2>
+            <p class="text-sm text-muted-foreground">
+                A Select bound to <code>""</code> (or any value none of its items has) means "nothing
+                selected": the trigger shows the placeholder, before and after the list is opened, the
+                same as for <code>null</code>. So does a <code>DisplayTextSelector</code> that answers
+                an empty string. On 2.1.9 opening this list ended the session (Sevak TR-048, fixed in
+                2.2.2).
+            </p>
+        </div>
+        <div class="max-w-sm space-y-2">
+            <Select TValue="string" Value="@string.Empty" DisplayTextSelector="@(v => string.Empty)">
+                <SelectTrigger data-testid="select-unmatched-trigger">
+                    <SelectValue Placeholder="Choose a status" data-testid="select-unmatched-value" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem Value="@("open")" Text="Open">Open</SelectItem>
+                    <SelectItem Value="@("closed")" Text="Closed">Closed</SelectItem>
+                </SelectContent>
+            </Select>
+        </div>
+    </section>
+
 </div>
 
 @code {
