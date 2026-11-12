@@ -1,16 +1,16 @@
 ---
 project: TrBlazeUI
-last_updated: 2026-11-05
-current_phase: Release — handoff done, 81 of 81 verified
+last_updated: 2026-11-12
+current_phase: Release — Sevak TR-047/TR-048 verified, 83 of 83 verified
 last_verified_build: PASS
-last_verified_date: 2026-11-05
+last_verified_date: 2026-11-12
 ---
 
 # TrBlazeUI — Status
 
 ## Where I am
 
-Every row is Verified. Ready for the release after 2.2.2: Chatur TR-023 and TR-024 (Menubar arrow order, submenu pull-back), the demo hosts on ASP.NET Core 10.0.14 (advisory clear), the Auto host serving its Blazor script again (REQ-FN-013), and the TrStudio harness page restored (REQ-UI-015). CHANGELOG [Unreleased], the agent reference, both guides and Chatur's feedback file are current.
+Every row is Verified. The verifier passed REQ-UI-065 (Sevak TR-048 regression test; the fix itself shipped in 2.2.2) and REQ-UI-066 (Sevak TR-047, `CodeBlock.CopyLabel`, `CopyButtonAttributes`, `OnCopied`). They join Chatur TR-023/TR-024 and the demo-host fixes in the release after 2.2.2. On the Mac, four older rows fail from machine setup or test flakes (Known blockers). CHANGELOG, the agent reference and Sevak's file are current.
 
 ## Next command to run
 
@@ -22,7 +22,7 @@ OpenCode:
 ```
 (owner) commit, then build and publish the package — its shipped documents are current; no agent command
 ```
-Why: every row in this phase's scope is terminal and the shipped documents were brought up to date.
+Why: every row is Verified and the shipped documents are current.
 
 ## Open requirements
 
@@ -38,6 +38,9 @@ Why: every row in this phase's scope is terminal and the shipped documents were 
 
 ## Known blockers
 
+- On the Mac (2026-11-11), four suite rows fail for reasons outside the code. REQ-NFR-001 looks for the axe scanner only under `/mnt/c/1MyCode/...` (WSL paths). REQ-UI-020 TR-031 expects `flex-end`, which Chromium 158 (Playwright 1.65) reports as `flow-end`. REQ-UI-063 and REQ-UI-021 fail only under parallel workers and pass when run alone.
+- The demo's `app.css` is gitignored and built by `tools/tailwindcss.exe`, which this checkout does not have. Without the file, 8 more rows fail with a 404. It was generated here with the Tailwind 4.1.11 npm CLI.
+
 - The release after 2.2.2 is not on GitHub Packages until the owner publishes it through the usual GitHub Release; the stored token can only read packages.
 - CHANGELOG has no section for 2.1.10 or 2.2.0, which are already published; the owner fills them in.
 
@@ -47,11 +50,11 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 | Date | Phase | Result | Status table |
 |---|---|---|---|
-| 2026-11-02 | fix-issues + handoff | 78/78 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-11-02 | amend-docs | 78/78 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-11-05 | triage-and-fix + handoff | 79/80 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-11-05 | build-phase | 79/81 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-11-05 | build-phase + handoff | 81/81 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-11-12 | verify REQ-UI-065, REQ-UI-066 | 83/83 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 

@@ -66,6 +66,26 @@
         <CodeBlock Language="razor" Code="@objRazorPlain" Html="@objRazorHighlighted" />
     </div>
 
+    <!-- Own label and own message -->
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">Your own label and your own message</h2>
+            <p class="text-sm text-muted-foreground">
+                <code>CopyLabel</code> replaces the button's text and accessible name, for example with
+                a translation. <code>CopyButtonAttributes</code> lands on the button itself (a
+                <code>data-testid</code>, a <code>title</code>). <code>OnCopied</code> reports
+                <code>Copied</code> or <code>Failed</code>, so the page can say it in its own words.
+            </p>
+        </div>
+        <CodeBlock Language="bash"
+                   Code="dotnet add package TrBlazeUI.Components"
+                   CopyLabel="Kopieren"
+                   CopyButtonAttributes="@objCopyButtonAttributes"
+                   OnCopied="OnInstallCopied"
+                   data-testid="code-block-own-label" />
+        <p class="text-sm" role="status" data-testid="code-block-copy-message">@objCopyMessage</p>
+    </div>
+
     <!-- Usage -->
     <div class="space-y-4">
         <h2 class="text-2xl font-semibold">Usage</h2>
@@ -106,5 +126,28 @@
 
         @* Your own highlighter's output; Code still drives the copy button *@
         <CodeBlock Language="razor" Code="@plain" Html="@highlighted" />
+
+        @* Your own label, attributes on the button, your own message *@
+        <CodeBlock Code="@snippet"
+                   CopyLabel="@L["Copy"]"
+                   CopyButtonAttributes="@(new Dictionary<string, object> { ["data-testid"] = "copy-install" })"
+                   OnCopied="@(r => message = r == CodeBlockCopyResult.Copied ? L["Copied"] : L["CopyFailed"])" />
         """;
+
+    private readonly Dictionary<string, object> objCopyButtonAttributes = new()
+    {
+        ["data-testid"] = "code-block-copy-button",
+        ["title"] = "In die Zwischenablage kopieren"
+    };
+
+    private string? objCopyMessage;
+
+    /// <summary>
+    /// Shows the page's own message for a copy attempt (Sevak TR-047).
+    /// </summary>
+    /// <param name="aResult">The outcome the code block reported.</param>
+    private void OnInstallCopied(CodeBlockCopyResult aResult) =>
+        objCopyMessage = aResult == CodeBlockCopyResult.Copied
+            ? "Befehl kopiert."
+            : "Kopieren nicht möglich – bitte markieren und Strg+C drücken.";
 }

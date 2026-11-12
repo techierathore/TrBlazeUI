@@ -11,6 +11,32 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
+### Sevak TR-047 and TR-048 — 2026-11-11
+
+Answers the two entries Sevak filed against 2.1.9 (`docs/Sevak-TrBlazeUI-Feedback.md`;
+REQ-UI-065, REQ-UI-066).
+
+#### Added
+
+- **`CodeBlock` takes `CopyLabel`, `CopyButtonAttributes` and `OnCopied` (TR-047).** `CopyLabel`
+  replaces the copy button's text and accessible name before a copy, so an app can translate it.
+  `CopyButtonAttributes` is written on the button itself, after the component's own attributes
+  (`AdditionalAttributes` still goes on the block's root). `OnCopied` is an
+  `EventCallback<CodeBlockCopyResult>` raised with `Copied` or `Failed` after each attempt, so a page
+  can show its own message; it is not raised when the copy never ran (prerendering, or a Blazor
+  Server circuit going away). The button's "Copied" / "Press Ctrl+C" texts and the live-region
+  announcement are unchanged. The CodeBlock demo gains a section using all three. Tests
+  `tests/verify/req-ui-066.spec.ts`.
+
+#### Fixed
+
+- **TR-048 was already fixed in 2.2.2.** A `Select` bound to `""` whose items never carry `""` threw
+  `RuntimeBinderException` from `SelectValue` when its list was opened; it is the same cause as
+  TechieBlog TR-077 below. A regression test now covers Sevak's shape — opening the list as the
+  first interaction, with a one-way `Value`, with no `DisplayTextSelector` and with one that answers
+  `""` (`tests/verify/req-ui-065.spec.ts`, harness `/verify-sevak-tr048`), and the Select demo shows
+  the case. Library code unchanged for this entry.
+
 ### Package advisory on the demo hosts — fixed on 2026-11-05
 
 #### Security

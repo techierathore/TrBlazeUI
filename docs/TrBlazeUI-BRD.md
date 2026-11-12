@@ -72,14 +72,14 @@ This document captures, for the product owner, what TrBlazeUI delivers today (th
 
 Written by the status gate after every build, verify and handoff; not by hand.
 
-**Snapshot as of 2026-11-05.** Live per-requirement status: `PROJECT-STATUS.md` and the Requirements Status table in `docs/TrBlazeUI-Checklist.md`.
+**Snapshot as of 2026-11-12.** Live per-requirement status: `PROJECT-STATUS.md` and the Requirements Status table in `docs/TrBlazeUI-Checklist.md`.
 
 | Screen | Requirements | Verified | Open | Status |
 |---|---|---|---|---|
 | UI / Pages | 19 | 19 | 0 | Done |
 | Functional requirements | 10 | 10 | 0 | Done |
 | Non-functional | 5 | 5 | 0 | Done |
-| Component demos | 28 | 28 | 0 | Done |
+| Component demos | 29 | 29 | 0 | Done |
 | Editor | 1 | 1 | 0 | Done |
 | Chat | 1 | 1 | 0 | Done |
 | Run | 1 | 1 | 0 | Done |
@@ -88,7 +88,7 @@ Written by the status gate after every build, verify and handoff; not by hand.
 | InputGroup | 1 | 1 | 0 | Done |
 | Toast | 1 | 1 | 0 | Done |
 | FileUpload | 1 | 1 | 0 | Done |
-| Select | 2 | 2 | 0 | Done |
+| Select | 3 | 3 | 0 | Done |
 | NumericInput | 1 | 1 | 0 | Done |
 | Card | 2 | 2 | 0 | Done |
 | Sidebar | 1 | 1 | 0 | Done |

@@ -4,7 +4,7 @@
 |---|---|
 | App | Sevak |
 | Upstream | TrBlazeUI |
-| Updated | 2026-10-08 |
+| Updated | 2026-11-11 |
 
 ## Summary (filled by /flow-master on consolidation)
 
@@ -711,9 +711,67 @@ Recorded because the "these components THROW on `AriaLabel`" phrasing is circula
 - **Workaround:** (applied) `data-testid` moved to a wrapping `<div>`; `AlertDialogAction OnClick` replaced by `<Button OnClick>` (both handlers already close their dialog). The census and the scanner that checks every `.razor` against it are in `tests/.artifacts/verify/phase3-fix/probe/` (`splat.cs`, `scan.py`, `out.tsv`, `nosplat-styled.txt`); after the fix the scanner finds no unknown attributes.
 - **Suggested fix:** add `AdditionalAttributes` with `CaptureUnmatchedValues` to every styled component and splat it onto the root element; give `AlertDialogAction` an `OnClick` that runs before it closes the dialog; add a build-time test that fails when a public component lacks the splat.
 
+### TR-047 — `CodeBlock`'s copy button takes no label, no `data-testid` and reports nothing back (minor)
+
+> ✅ **Fixed upstream 2026-11-11, in the next release after 2.2.2** (TrBlazeUI REQ-UI-066). `CodeBlock` takes `CopyLabel` (the button's text and accessible name before a copy), `CopyButtonAttributes` (attributes written on the button itself, after the component's own, so an `aria-label` there wins) and `OnCopied` (`EventCallback<CodeBlockCopyResult>`, `Copied` or `Failed`). Demo: `/components/code-block`, section "Your own label and your own message". Test: `tests/verify/req-ui-066.spec.ts`.
+
+- **Severity:** minor
+- **Expected:** a `CopyLabel` parameter (text or aria-label an app can translate), a way to put attributes on the copy button (`CopyButtonAttributes`), and an `OnCopied` callback with the result, so a page can show its own message.
+- **Actual:** the button's text ("Copy") and accessible name ("Copy code") are fixed English, `AdditionalAttributes` lands on the block's root rather than the button, and the outcome of a copy is not reported.
+- **Entry text:** given in full by the owner on 2026-11-11; Sevak's own copy of this file was not on the machine where the fix was made.
+
+### TR-048 — a `Select` bound to an empty string ends the session when its list is opened (major, found on 2.1.9)
+
+> ✅ **Already fixed upstream, in 2.2.2** (TechieBlog TR-077, TrBlazeUI REQ-UI-061, fixed 2026-11-02). Same cause as you read it: `SelectValue` reached the context through `dynamic` with the value in a variable typed `object`. It now receives the context through `ISelectValueDisplay` and the lookup runs typed in `SelectContext<TValue>.ResolveDisplayText()`; a value no item carries shows the placeholder. The missing regression case (opening the list as the first interaction, one-way `Value`, with and without a `DisplayTextSelector` that answers `""`) is added as TrBlazeUI REQ-UI-065, test `tests/verify/req-ui-065.spec.ts`, harness `/verify-sevak-tr048`, demo `/components/select` section "A value no item carries shows the placeholder".
+
+- **Severity:** major (the page shows "An unhandled error has occurred")
+- **Repro:** `<Select TValue="string" Value="@string.Empty">` with no `DisplayTextSelector` (or one that answers `""`) and items none of which has the value `""`; click the trigger.
+- **Expected:** the placeholder, as for `null` (TR-024's rule: a value no item carries is "nothing selected").
+- **Actual:** `The best overloaded method match for 'SelectContext<string>.HasItemWithValue(string)' has some invalid arguments` at `Select.SelectValue.GetSelectedText()`.
+- **Cause (Sevak's reading):** `GetSelectedText` calls `HasItemWithValue` through `dynamic` with the value held in a variable typed `object`, so the run-time binder looks for `HasItemWithValue(object)` and throws inside the render.
+- **Entry text:** given in full by the owner on 2026-11-11; Sevak's own copy of this file was not on the machine where the fix was made.
+
 ## Replies from TrBlazeUI
 
 <!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
+
+### 2026-11-11 — TR-047 fixed; TR-048 was already fixed in 2.2.2
+
+| Entry | State | Ships in | Test |
+|---|---|---|---|
+| **TR-048** Select bound to `""` | Already fixed by TechieBlog TR-077 on 2026-11-02 | **2.2.2** | `tests/verify/req-ui-065.spec.ts` — new: opens the list as the first interaction, for a one-way `Value=""` with no selector, with a selector that answers `""`, and `@bind-Value` |
+| **TR-047** CodeBlock copy button | Fixed 2026-11-11 | the next release after 2.2.2 | `tests/verify/req-ui-066.spec.ts` |
+
+```razor
+@using TrBlazeUI.Components.CodeBlock
+
+<CodeBlock Code="@objSnippet"
+           CopyLabel="@L["Copy"]"
+           CopyButtonAttributes="@(new Dictionary<string, object> { ["data-testid"] = "copy-snippet" })"
+           OnCopied="OnSnippetCopied" />
+
+@code {
+    private void OnSnippetCopied(CodeBlockCopyResult aResult) =>
+        objMessage = aResult == CodeBlockCopyResult.Copied ? L["Copied"] : L["CopyFailed"];
+}
+```
+
+Things to know:
+
+1. **TR-048: upgrade from 2.1.9 to 2.2.2 or later.** No code change on your side; any guard you
+   added (binding `null` instead of `""`, or a `DisplayTextSelector` that never answers `""`) can go.
+2. **TR-047: `CopyLabel` covers the button before a copy.** After a copy the button still reads
+   "Copied" or "Press Ctrl+C" and the live region announces in English. Pass your own
+   `aria-label` in `CopyButtonAttributes` to fix the accessible name in every state, and use
+   `OnCopied` for the visible message. Tell us if you need those two texts as parameters too.
+3. `OnCopied` is not raised when the copy never ran (prerendering, or a Blazor Server circuit going
+   away), so a page only ever sees `Copied` or `Failed`.
+
+#### What we need from you
+
+Move to 2.2.2 now for TR-048 and re-run the screen that hit it; move to the release after 2.2.2 for
+TR-047. Then close each entry (`bash .tfcore/utils/tf-feedback.sh Sevak --close <ID> "<what you ran
+and what it showed>"`) or tell us what does not fit.
 
 ### 2026-10-07 — all 34 entries answered; the action is upgrade from 1.0.7 to 2.1.5
 

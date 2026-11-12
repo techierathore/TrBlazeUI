@@ -3090,7 +3090,24 @@ syntax highlighter; pass pre-highlighted markup through `Html` if you have one.
 
 ```razor
 <CodeBlock Language="csharp" Code="@snippet" />
+
+@* Your own label, attributes on the copy button, your own message (after 2.2.2) *@
+<CodeBlock Code="@snippet"
+           CopyLabel="@L["Copy"]"
+           CopyButtonAttributes="@(new Dictionary<string, object> { ["data-testid"] = "copy-snippet" })"
+           OnCopied="@(r => message = r == CodeBlockCopyResult.Copied ? L["Copied"] : L["CopyFailed"])" />
 ```
+
+| Parameter | Type | Default | Notes |
+|---|---|---|---|
+| `Code` | `string?` | — | The text shown, and what the copy button writes |
+| `Html` | `MarkupString?` | — | Pre-highlighted markup shown instead of `Code`; rendered as-is |
+| `Language` | `string?` | — | Label in the header |
+| `ShowCopyButton` | `bool` | `true` | |
+| `CopyLabel` | `string?` | "Copy" | After 2.2.2. The button's text **and** accessible name before a copy (a translation). After a copy it reads "Copied" or "Press Ctrl+C" |
+| `CopyButtonAttributes` | `IReadOnlyDictionary<string, object>?` | — | After 2.2.2. Attributes on the copy button itself (`data-testid`, `title`, `aria-label`); an `aria-label` here wins in every state. `AdditionalAttributes` goes on the block's root |
+| `OnCopied` | `EventCallback<CodeBlockCopyResult>` | — | After 2.2.2. `Copied` or `Failed` after each attempt; not raised when the copy never ran (prerender, circuit going away) |
+| `Class` | `string?` | — | |
 
 ### DiffView — compare two texts side by side (before and after)
 
@@ -4019,7 +4036,7 @@ source* — see the next heading — and only rarely *wait for it to be built*.
 
 | Version | Released | Component namespaces | What it added |
 |---|---|---|---|
-| **After 2.2.2** | — | 87 | The arrow keys reach a `MenubarSubTrigger` in its on-screen place, not after every plain item (Chatur TR-023); a submenu of `Menubar`, `DropdownMenu` or `ContextMenu` that fits neither side of the window is pulled back inside it instead of running off (Chatur TR-024); the demo hosts moved to ASP.NET Core 10.0.14 (10.0.13 carries GHSA-g27p-qf6j-c96c), and the Auto demo host calls `MapStaticAssets()` so `blazor.web.js` is served (see §1) |
+| **After 2.2.2** | — | 87 | `CodeBlock.CopyLabel`, `CopyButtonAttributes` and `OnCopied` (`CodeBlockCopyResult`) (Sevak TR-047); the arrow keys reach a `MenubarSubTrigger` in its on-screen place, not after every plain item (Chatur TR-023); a submenu of `Menubar`, `DropdownMenu` or `ContextMenu` that fits neither side of the window is pulled back inside it instead of running off (Chatur TR-024); the demo hosts moved to ASP.NET Core 10.0.14 (10.0.13 carries GHSA-g27p-qf6j-c96c), and the Auto demo host calls `MapStaticAssets()` so `blazor.web.js` is served (see §1) |
 | **After 2.2.1** | — | 87 | A `Select` bound to a value no item carries no longer throws on re-render (TechieBlog TR-077); a focused `Input`/`SelectTrigger` draws its ring on the border (no `ring-offset-2`); a field right after a `Label` in a block container gets a 6px gap; menu items, sub-triggers and menu labels in `DropdownMenu`, `Menubar` and `ContextMenu` are 10px across (`px-2.5`) (Chatur TR-022) |
 | **After 2.1.6** | — | 87 | `trblazeui-layers.css` and the `trblazeui-host` cascade layer; submenus for `Menubar`, `DropdownMenu` and `ContextMenu` (`…Sub`, `…SubTrigger`, `…SubContent`); a disabled `MenubarItem`, `MenubarCheckboxItem` or `ContextMenuItem` renders `aria-disabled="true"` and `data-disabled` |
 | **After 2.1.4** | — | 87 | `Chat` family (`ChatThread`, `ChatMessage`, `ChatComposer`); a `Select` inside a `Dialog` never freezes the page (script, positioning and portal failures fall back and log); `Table` family (plain markup table); `ToastVariant.Success`/`Info`/`Warning` + `ToastService.Warning`/`Info`; `AlertDialogAction`/`AlertDialogCancel` `OnClick`/`PreventClose`; `Textarea.Rows`/`MaxRows`; `CardTitle`/`AlertTitle` `As`; `NumericInput` always `role="spinbutton"`, invariant ARIA numbers on `NumericInput` and `Slider`; `NumberInput` is a compile error naming `NumericInput`; a `Select` bound to a value no item carries shows its placeholder; the empty toast viewport lets clicks through; `HtmlSanitizer` on a stable 9.1.x |
