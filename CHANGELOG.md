@@ -11,6 +11,37 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
+### Sevak TR-049 — 2026-11-13
+
+Answers the entry Sevak filed against 2.1.9 (`docs/Sevak-TrBlazeUI-Feedback.md`; REQ-UI-068). Not
+in 2.2.4.
+
+#### Fixed
+
+- **Removing a component whose JavaScript side is already gone no longer ends the session.**
+  `SidebarProvider.DisposeAsync` called its module's `cleanup` and caught only a closed circuit and
+  a cancelled call. When the page no longer knew the module (a WebView reload under a live .NET
+  side, or a reference released earlier in the same teardown) the call failed with `JSException`
+  "JS object instance with ID … does not exist (has it been disposed?)", which reached the renderer
+  and showed "An unhandled error has occurred". A sweep of every demo page found the same fault in
+  ten more components, all now fixed the same way: `AnchorNav`, `ChatComposer`, `CodeEditor`,
+  `FileUpload`, `NavList`, `ResponsiveNavProvider`, `RichTextEditor`, `ScrollArea`, `ToggleGroup`
+  and `TreeView`. Teardown now treats a closed circuit, a cancelled call, an unknown JavaScript
+  object and a disposed runtime as normal, and still releases the module when the clean-up call
+  failed. `SidebarProvider`'s cookie save treats the same faults the same way.
+
+#### Added
+
+- **`TrBlazeUI.Primitives.Utilities.JSTeardown`**, the helper the fix uses: `InvokeVoidAsync`
+  (a clean-up call), `ReleaseAsync` (releases the reference) and `IsTeardownFault`. Each does
+  nothing for a null reference. An app that holds its own `IJSObjectReference` can use it in its
+  own `DisposeAsync`.
+- Test `tests/verify/req-ui-068.spec.ts`, harness `/verify-sevak-tr049`. The browser releases every
+  JavaScript object reference the page holds, which is the state a WebView reload leaves, and then
+  (1) removes a `SidebarProvider`, (2) leaves every demo page inside the app, and (3) reloads the
+  pages that hold a sidebar. Before the fix, (1) failed and (2) failed on 18 pages, across 11
+  components. After it, all three pass and the server log has no unhandled exception.
+
 ### Sevak TR-047 and TR-048 — 2026-11-11
 
 Answers the two entries Sevak filed against 2.1.9 (`docs/Sevak-TrBlazeUI-Feedback.md`;

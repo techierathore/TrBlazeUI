@@ -1,5 +1,6 @@
 using System.Text.Json;
 using TrBlazeUI.Components.Utilities;
+using TrBlazeUI.Primitives.Utilities;
 using Ganss.Xss;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -788,24 +789,14 @@ public partial class RichTextEditor : ComponentBase, IAsyncDisposable
         {
             try
             {
-                await objJsModule.InvokeVoidAsync("disposeEditor", objEditorId);
-                await objJsModule.DisposeAsync();
-            }
-            catch (JSDisconnectedException)
-            {
-                // Expected during circuit disconnect in Blazor Server - safe to ignore
-            }
-            catch (ObjectDisposedException)
-            {
-                // Module already disposed - safe to ignore
+                // Sevak TR-049: a JavaScript side that is already gone (a closed circuit, a cancelled
+                // call, or a reloaded page that no longer knows the reference) is ordinary teardown.
+                await JSTeardown.InvokeVoidAsync(objJsModule, "disposeEditor", objEditorId);
+                await JSTeardown.ReleaseAsync(objJsModule);
             }
             catch (InvalidOperationException)
             {
                 // JS interop not available (prerendering) - safe to ignore
-            }
-            catch (TaskCanceledException)
-            {
-                // The page went away before it answered; the module died with it (REQ-UI-028).
             }
         }
         objDotNetRef?.Dispose();

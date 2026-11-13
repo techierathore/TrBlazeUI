@@ -106,6 +106,7 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-UI-065 | A Select bound to "" whose items never carry "" opens its list and keeps its placeholder, with or without a DisplayTextSelector that answers "" (Sevak TR-048) | Verified | 100% | 2026-11-12 verify: PASS — test `Sevak TR-048 — a Select bound to an empty string opens and k` | [d](#d-req-ui-065) |
 | REQ-UI-066 | CodeBlock's copy button takes CopyLabel, CopyButtonAttributes and reports OnCopied (Sevak TR-047) | Verified | 100% | 2026-11-12 verify: PASS — test `Sevak TR-047 — CodeBlock copy button takes a label, attribut` | [d](#d-req-ui-066) |
 | REQ-FN-013 | The published Auto demo host answers 404 for _framework/blazor.web.js, so its pages are never interactive | Verified | 100% | 2026-11-05 verify: PASS — test `Demo hosts REQ-FN-013 the host serves blazor.web.js and a me` | [d](#d-req-fn-013) |
+| REQ-UI-068 | A component torn down after its page released its JavaScript objects keeps the session (Sevak TR-049) | Verified | 100% | 2026-11-13 verify: PASS — test `Sevak TR-049 — a teardown after the page released its JavaSc` | [d](#d-req-ui-068) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -523,3 +524,9 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 
 - <a id="d-req-fn-013"></a> **REQ-FN-013** (extends BRD-40/BRD-41 demo apps) The published Auto demo host answers 404 for _framework/blazor.web.js, so its pages are never interactive
   - *Acceptance:* When the verify boot publishes and runs TrBlazeUI.Demo.Auto on any screen, then _framework/blazor.web.js is served and a menu opens on click.
+
+
+## Sidebar and every component with a JS teardown
+
+- <a id="d-req-ui-068"></a> **REQ-UI-068** (extends BRD-13 Sidebar) A component torn down after its page released its JavaScript objects keeps the session (Sevak TR-049)
+  - *Acceptance:* When the sidebar is removed on the TR-049 verify screen after its scripts are released, then the session keeps answering.

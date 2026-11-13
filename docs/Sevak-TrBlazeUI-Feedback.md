@@ -4,9 +4,13 @@
 |---|---|
 | App | Sevak |
 | Upstream | TrBlazeUI |
-| Updated | 2026-11-11 |
+| Updated | 2026-11-13 |
 
 ## Summary (filled by /flow-master on consolidation)
+
+**2026-11-13:** 37 entries in this copy, the last TR-049 (Sevak's own copy also holds TR-045 and TR-046, both fixed in 2.1.9). Sevak's three open entries are all answered. **TR-047 and TR-048 are fixed in 2.2.4**, which is on GitHub Packages. **TR-049 is fixed on 2026-11-13 and ships in the release after 2.2.4.** Sevak is on 2.1.9 (see "Replies from TrBlazeUI" at the foot).
+
+#### Summary as consolidated on 2026-10-07
 
 34 entries: 0 blocking now, 0 open, 0 fixed upstream and not yet re-checked, 34 closed as fixed upstream — 22 already in 2.1.4, 12 in 2.1.5 (TR-041 and TR-006 added on 2026-10-08). **Sevak is on 1.0.7; the action is upgrade to 2.1.5** (see "Replies from TrBlazeUI" at the foot).
 
@@ -713,7 +717,7 @@ Recorded because the "these components THROW on `AriaLabel`" phrasing is circula
 
 ### TR-047 — `CodeBlock`'s copy button takes no label, no `data-testid` and reports nothing back (minor)
 
-> ✅ **Fixed upstream 2026-11-11, in the next release after 2.2.2** (TrBlazeUI REQ-UI-066). `CodeBlock` takes `CopyLabel` (the button's text and accessible name before a copy), `CopyButtonAttributes` (attributes written on the button itself, after the component's own, so an `aria-label` there wins) and `OnCopied` (`EventCallback<CodeBlockCopyResult>`, `Copied` or `Failed`). Demo: `/components/code-block`, section "Your own label and your own message". Test: `tests/verify/req-ui-066.spec.ts`.
+> ✅ **Fixed upstream 2026-11-11, in 2.2.4** (TrBlazeUI REQ-UI-066; checked 2026-11-13 in the 2.2.4 package on GitHub Packages; 2.2.3 does not have it). `CodeBlock` takes `CopyLabel` (the button's text and accessible name before a copy), `CopyButtonAttributes` (attributes written on the button itself, after the component's own, so an `aria-label` there wins) and `OnCopied` (`EventCallback<CodeBlockCopyResult>`, `Copied` or `Failed`). Demo: `/components/code-block`, section "Your own label and your own message". Test: `tests/verify/req-ui-066.spec.ts`.
 
 - **Severity:** minor
 - **Expected:** a `CopyLabel` parameter (text or aria-label an app can translate), a way to put attributes on the copy button (`CopyButtonAttributes`), and an `OnCopied` callback with the result, so a page can show its own message.
@@ -722,7 +726,7 @@ Recorded because the "these components THROW on `AriaLabel`" phrasing is circula
 
 ### TR-048 — a `Select` bound to an empty string ends the session when its list is opened (major, found on 2.1.9)
 
-> ✅ **Already fixed upstream, in 2.2.2** (TechieBlog TR-077, TrBlazeUI REQ-UI-061, fixed 2026-11-02). Same cause as you read it: `SelectValue` reached the context through `dynamic` with the value in a variable typed `object`. It now receives the context through `ISelectValueDisplay` and the lookup runs typed in `SelectContext<TValue>.ResolveDisplayText()`; a value no item carries shows the placeholder. The missing regression case (opening the list as the first interaction, one-way `Value`, with and without a `DisplayTextSelector` that answers `""`) is added as TrBlazeUI REQ-UI-065, test `tests/verify/req-ui-065.spec.ts`, harness `/verify-sevak-tr048`, demo `/components/select` section "A value no item carries shows the placeholder".
+> ✅ **Already fixed upstream, in 2.2.2, so 2.2.4 has it too** (TechieBlog TR-077, TrBlazeUI REQ-UI-061, fixed 2026-11-02; checked 2026-11-13 in the 2.2.4 package). Same cause as you read it: `SelectValue` reached the context through `dynamic` with the value in a variable typed `object`. It now receives the context through `ISelectValueDisplay` and the lookup runs typed in `SelectContext<TValue>.ResolveDisplayText()`; a value no item carries shows the placeholder. The missing regression case (opening the list as the first interaction, one-way `Value`, with and without a `DisplayTextSelector` that answers `""`) is added as TrBlazeUI REQ-UI-065, test `tests/verify/req-ui-065.spec.ts`, harness `/verify-sevak-tr048`, demo `/components/select` section "A value no item carries shows the placeholder".
 
 - **Severity:** major (the page shows "An unhandled error has occurred")
 - **Repro:** `<Select TValue="string" Value="@string.Empty">` with no `DisplayTextSelector` (or one that answers `""`) and items none of which has the value `""`; click the trigger.
@@ -731,9 +735,79 @@ Recorded because the "these components THROW on `AriaLabel`" phrasing is circula
 - **Cause (Sevak's reading):** `GetSelectedText` calls `HasItemWithValue` through `dynamic` with the value held in a variable typed `object`, so the run-time binder looks for `HasItemWithValue(object)` and throws inside the render.
 - **Entry text:** given in full by the owner on 2026-11-11; Sevak's own copy of this file was not on the machine where the fix was made.
 
+### TR-049 — `SidebarProvider.DisposeAsync` calls a JavaScript object that is already disposed, so any teardown of the sidebar ends the session (major, found 2026-11-12 during the Sevak phase 4 triage)
+
+> ✅ **Fixed upstream 2026-11-13, in the release after 2.2.4. It is not in 2.2.4** (TrBlazeUI REQ-UI-068). Your reading of the cause is correct: `DisposeAsync` caught `JSDisconnectedException` and `TaskCanceledException`, but not the `JSException` that a reference the page no longer knows raises. Teardown now goes through `TrBlazeUI.Primitives.Utilities.JSTeardown`, which treats a closed circuit, a cancelled call, an unknown JavaScript object and a disposed runtime as normal, and still releases the module when the clean-up call fails. A sweep of every demo page found the same fault in ten more components, all fixed the same way: `AnchorNav`, `ChatComposer`, `CodeEditor`, `FileUpload`, `NavList`, `ResponsiveNavProvider`, `RichTextEditor`, `ScrollArea`, `ToggleGroup`, `TreeView`. Test: `tests/verify/req-ui-068.spec.ts`, harness `/verify-sevak-tr049`.
+
+- **Severity:** major
+- **Blocks:** no. Sevak keeps the sidebar mounted: every address is now a found route (`Pages/NotFoundPage.razor`, `@page "/{*Path}"`), so an unknown address no longer tears the shell down. A reload of the window still does (see Actual).
+- **Repro:** TrBlazeUI 2.1.9 in a .NET MAUI Blazor Hybrid (WebView2) head, `SidebarProvider` in the main layout. Either open an address no `@page` answers while the router has no catch-all (the router's not-found path disposes the layout), or reload the WebView. The console shows:
+  ```text
+  Error: JS object instance with ID 3 does not exist (has it been disposed?).
+     at Microsoft.JSInterop.JSRuntime.InvokeAsync[TValue](Int64 targetInstanceId, ...)
+     at Microsoft.JSInterop.JSObjectReferenceExtensions.InvokeVoidAsync(IJSObjectReference jsObjectReference, ...)
+     at TrBlazeUI.Components.Sidebar.SidebarProvider.DisposeAsync()
+     at Microsoft.AspNetCore.Components.RenderTree.Renderer...Dispose...HandleAsyncExceptions
+  ```
+  The page then shows "An unhandled error has occurred" and answers nothing more until the app restarts.
+- **Expected:** a component's `DisposeAsync` never throws because its JavaScript side is already gone: it catches `JSDisconnectedException` and `JSException` from the clean-up call (the pattern Microsoft documents for IJSObjectReference disposal), or skips the call once the module is released.
+- **Actual:** `SidebarProvider.DisposeAsync` awaits `InvokeVoidAsync` on its module reference unguarded; when the reference is already released (document reloaded, or disposed earlier in the same teardown) the exception escapes into the renderer.
+- **Encountered in:** Sevak, every screen (the sidebar is in `MainLayout`); first seen as TechieFlow TF-030's "not measured" on Today.
+- **Workaround:** a catch-all page; the reload case cannot be caught in the app.
+- **Suggested fix:** wrap the clean-up call in `try { … } catch (JSDisconnectedException) { } catch (JSException) { }` and dispose the module reference once; the same review for every component holding an `IJSObjectReference`.
+- **Entry text:** copied from Sevak's own file (`docs/Sevak-TrBlazeUI-Feedback.md` in the Sevak repository) on 2026-11-13.
+
 ## Replies from TrBlazeUI
 
 <!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
+
+### 2026-11-13 — TR-049 fixed after 2.2.4; TR-047 and TR-048 are in 2.2.4
+
+| Entry | State | Ships in | Test |
+|---|---|---|---|
+| **TR-049** sidebar teardown ends the session | Fixed 2026-11-13, with ten more components that had the same fault | **the release after 2.2.4** (not in 2.2.4) | `tests/verify/req-ui-068.spec.ts`, which fails on the old code and passes on the new |
+| **TR-048** Select bound to `""` | Fixed 2026-11-02 | **2.2.2**, so 2.2.4 has it too | `tests/verify/req-ui-065.spec.ts` |
+| **TR-047** CodeBlock copy button | Fixed 2026-11-11 | **2.2.4** (2.2.3 does not have it) | `tests/verify/req-ui-066.spec.ts` |
+
+How TR-049 was tested. A browser cannot reload the way a WebView does, with the .NET side still
+running. So the test makes the same state on purpose: the page releases every JavaScript object
+reference it holds (`DotNet.disposeJSObjectReference`), and then removes the sidebar. On the old
+code this gave your error, "JS object instance with ID 2 does not exist (has it been disposed?)" at
+`SidebarProvider.DisposeAsync()`, and the session ended. The same check on every demo page found
+the same fault in 18 pages, across 11 components. With the fix, all of those pages pass, the
+session keeps answering, the server log has no unhandled exception, and a plain reload of the
+demo pages that hold a sidebar leaves no error in the console. We ran this in a browser, not in
+a MAUI WebView. Your reload is the last proof.
+
+```razor
+@* Your own component that holds a module: the same guard the library now uses *@
+@using TrBlazeUI.Primitives.Utilities
+
+@code {
+    public async ValueTask DisposeAsync()
+    {
+        await JSTeardown.InvokeVoidAsync(objModule, "cleanup");
+        await JSTeardown.ReleaseAsync(objModule);
+    }
+}
+```
+
+Things to know:
+
+1. **Go to 2.2.4 now.** It holds TR-047 and TR-048. The release after 2.2.4 adds TR-049.
+2. **The catch-all page can stay.** `Pages/NotFoundPage.razor` is good on its own, but after the
+   upgrade you no longer need it to keep the sidebar alive.
+3. **Ten more components had the same fault**, and the fix covers them too: `AnchorNav`,
+   `ChatComposer`, `CodeEditor`, `FileUpload`, `NavList`, `ResponsiveNavProvider`,
+   `RichTextEditor`, `ScrollArea`, `ToggleGroup`, `TreeView`. If any of them is on a screen that
+   a reload has taken down, that screen is fixed by the same upgrade.
+
+#### What we need from you
+
+Move to 2.2.4 and close TR-047 and TR-048. Then, on the release after 2.2.4, reload the Sevak
+window on a screen with the sidebar and check that the console is clean. Close TR-049 with what
+you saw (`bash .tfcore/utils/tf-feedback.sh Sevak --close <ID> "<what you ran and what it
+showed>"`), or tell us what does not fit.
 
 ### 2026-11-11 — TR-047 fixed; TR-048 was already fixed in 2.2.2
 

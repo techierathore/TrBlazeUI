@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using TrBlazeUI.Components.Utilities;
+using TrBlazeUI.Primitives.Utilities;
 
 namespace TrBlazeUI.Components.Chat;
 
@@ -174,22 +175,10 @@ public partial class ChatComposer
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
-        if (objModule != null)
-        {
-            try
-            {
-                await objModule.InvokeVoidAsync("detach", objRoot);
-                await objModule.DisposeAsync();
-            }
-            catch (JSDisconnectedException)
-            {
-                // Expected during circuit disconnect.
-            }
-            catch (TaskCanceledException)
-            {
-                // The page went away before it answered; the module died with it (REQ-UI-028).
-            }
-        }
+        // Sevak TR-049: a JavaScript side that is already gone (a closed circuit, a cancelled call, or a
+        // reloaded page that no longer knows the reference) is ordinary teardown, not a fault.
+        await JSTeardown.InvokeVoidAsync(objModule, "detach", objRoot);
+        await JSTeardown.ReleaseAsync(objModule);
 
         objDotNetRef?.Dispose();
         GC.SuppressFinalize(this);

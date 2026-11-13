@@ -72,7 +72,7 @@ This document captures, for the product owner, what TrBlazeUI delivers today (th
 
 Written by the status gate after every build, verify and handoff; not by hand.
 
-**Snapshot as of 2026-11-12.** Live per-requirement status: `PROJECT-STATUS.md` and the Requirements Status table in `docs/TrBlazeUI-Checklist.md`.
+**Snapshot as of 2026-11-13.** Live per-requirement status: `PROJECT-STATUS.md` and the Requirements Status table in `docs/TrBlazeUI-Checklist.md`.
 
 | Screen | Requirements | Verified | Open | Status |
 |---|---|---|---|---|
@@ -94,6 +94,7 @@ Written by the status gate after every build, verify and handoff; not by hand.
 | Sidebar | 1 | 1 | 0 | Done |
 | Input | 1 | 1 | 0 | Done |
 | Demo hosts | 1 | 1 | 0 | Done |
+| Sidebar and every component with a JS teardown | 1 | 1 | 0 | Done |
 
 ## 5. Stakeholders / users
 
