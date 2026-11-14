@@ -1,0 +1,52 @@
+@page "/verify-sevak-tr049"
+@using TrBlazeUI.Components.Sidebar
+
+@* Verification harness for Sevak TR-049 (docs/Sevak-TrBlazeUI-Feedback.md).
+   Not a documentation demo: tests/verify/req-ui-068.spec.ts mounts a SidebarProvider here, has the
+   browser release every JavaScript object reference (what a WebView reload leaves behind), then
+   unmounts the provider with the button below. On 2.1.9 that teardown threw "JS object instance
+   with ID ... does not exist" out of SidebarProvider.DisposeAsync and ended the session; the
+   counter shows the session still answers afterwards. *@
+
+<PageTitle>Verify Sevak TR-049 - TrBlazeUI</PageTitle>
+
+<div class="mx-auto max-w-2xl space-y-6 p-6">
+    <h1 class="text-2xl font-bold" data-testid="verify-heading">Sevak TR-049 sidebar teardown</h1>
+
+    <div class="flex gap-3">
+        <button type="button" class="rounded border px-3 py-1" data-testid="toggle-sidebar" @onclick="ToggleSidebar">
+            @(objShowSidebar ? "Remove the sidebar" : "Show the sidebar")
+        </button>
+        <button type="button" class="rounded border px-3 py-1" data-testid="ping" @onclick="Ping">Ping</button>
+        <span data-testid="ping-count">@objPingCount</span>
+    </div>
+
+    <p data-testid="sidebar-state">@(objShowSidebar ? "mounted" : "removed")</p>
+
+    @if (objShowSidebar)
+    {
+        <div class="h-64 overflow-hidden rounded border" data-testid="sidebar-host">
+            <SidebarProvider CookieKey="verify_tr049_sidebar" HeightClass="h-full">
+                <Sidebar Collapsible="false">
+                    <SidebarContent>
+                        <SidebarGroup>
+                            <SidebarGroupLabel>Harness</SidebarGroupLabel>
+                        </SidebarGroup>
+                    </SidebarContent>
+                </Sidebar>
+                <SidebarInset>
+                    <p class="p-4">Sidebar content</p>
+                </SidebarInset>
+            </SidebarProvider>
+        </div>
+    }
+</div>
+
+@code {
+    private bool objShowSidebar = true;
+    private int objPingCount;
+
+    private void ToggleSidebar() => objShowSidebar = !objShowSidebar;
+
+    private void Ping() => objPingCount++;
+}

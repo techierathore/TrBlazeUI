@@ -2,6 +2,7 @@
 @typeparam TValue
 @implements IAsyncDisposable
 @inject IJSRuntime JS
+@using TrBlazeUI.Primitives.Utilities
 
 @* Single choice is a radio group (role="radio" + aria-checked on the items); multiple choice is a
    set of pressed buttons (aria-pressed). One item is the Tab stop and the arrow keys move between
@@ -211,25 +212,10 @@
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
-        if (objModule != null)
-        {
-            try
-            {
-                await objModule.InvokeVoidAsync("detach", objRoot);
-                await objModule.DisposeAsync();
-            }
-            catch (JSDisconnectedException)
-            {
-                // Expected during circuit disconnect.
-            }
-            catch (TaskCanceledException)
-            {
-                // The page closed or reloaded between the two calls above, so the browser never
-                // answered and the pending call was cancelled. The module died with the page;
-                // letting this escape reports an unhandled error for a circuit that is already
-                // ending (Chatur TR-013).
-            }
-        }
+        // Sevak TR-049: a JavaScript side that is already gone (a closed circuit, a cancelled call, or a
+        // reloaded page that no longer knows the reference) is ordinary teardown, not a fault.
+        await JSTeardown.InvokeVoidAsync(objModule, "detach", objRoot);
+        await JSTeardown.ReleaseAsync(objModule);
 
         GC.SuppressFinalize(this);
     }

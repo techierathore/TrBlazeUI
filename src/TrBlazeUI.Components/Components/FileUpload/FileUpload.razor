@@ -1,5 +1,6 @@
 @namespace TrBlazeUI.Components.FileUpload
 @using TrBlazeUI.Components.Utilities
+@using TrBlazeUI.Primitives.Utilities
 @using TrBlazeUI.Components.Button
 @using TrBlazeUI.Icons.Lucide.Components
 @using Microsoft.AspNetCore.Components.Forms
@@ -266,27 +267,11 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (objJsCleanup != null)
-        {
-            try
-            {
-                await objJsCleanup.InvokeVoidAsync("dispose");
-                await objJsCleanup.DisposeAsync();
-            }
-            catch (JSDisconnectedException) { }
-            // The page went away before it answered; the module died with it (REQ-UI-028).
-            catch (TaskCanceledException) { }
-        }
-
-        if (objJsModule != null)
-        {
-            try
-            {
-                await objJsModule.DisposeAsync();
-            }
-            catch (JSDisconnectedException) { }
-            catch (TaskCanceledException) { }
-        }
+        // Sevak TR-049: a JavaScript side that is already gone (a closed circuit, a cancelled call, or a
+        // reloaded page that no longer knows the reference) is ordinary teardown, not a fault.
+        await JSTeardown.InvokeVoidAsync(objJsCleanup, "dispose");
+        await JSTeardown.ReleaseAsync(objJsCleanup);
+        await JSTeardown.ReleaseAsync(objJsModule);
     }
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)

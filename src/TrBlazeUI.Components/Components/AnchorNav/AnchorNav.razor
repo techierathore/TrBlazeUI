@@ -1,6 +1,7 @@
 @namespace TrBlazeUI.Components.AnchorNav
 @implements IAsyncDisposable
 @inject IJSRuntime JS
+@using TrBlazeUI.Primitives.Utilities
 
 @* Sticky in-page section navigation with scrollspy. The active link is marked with
    aria-current="location" as well as a colour, so the current position is not conveyed by
@@ -129,22 +130,10 @@
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
-        if (objModule != null)
-        {
-            try
-            {
-                await objModule.InvokeVoidAsync("disconnect", objInstanceId);
-                await objModule.DisposeAsync();
-            }
-            catch (JSDisconnectedException)
-            {
-                // Expected during circuit disconnect.
-            }
-            catch (TaskCanceledException)
-            {
-                // The page went away before it answered; the module died with it (REQ-UI-028).
-            }
-        }
+        // Sevak TR-049: a JavaScript side that is already gone (a closed circuit, a cancelled call, or a
+        // reloaded page that no longer knows the reference) is ordinary teardown, not a fault.
+        await JSTeardown.InvokeVoidAsync(objModule, "disconnect", objInstanceId);
+        await JSTeardown.ReleaseAsync(objModule);
 
         objDotNetRef?.Dispose();
         GC.SuppressFinalize(this);

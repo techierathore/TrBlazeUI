@@ -586,6 +586,14 @@ Root wrapper that manages sidebar state, persistence, and responsive behavior.
 theme globally; the parameters above set them on this shell only, which is what you want when one
 layout differs from the rest of the app.
 
+**Teardown after a reload (after 2.2.4, Sevak TR-049).** Removing the provider is safe even when
+its JavaScript side is already gone: after a WebView reload, on the router's not-found path, or
+when the circuit has closed. Up to 2.2.4 that teardown threw "JS object instance with ID …
+does not exist" and ended the session. Do not add a catch-all route only to keep the sidebar
+mounted. In your own `DisposeAsync`, use `JSTeardown.InvokeVoidAsync(objModule, "cleanup")` and
+then `JSTeardown.ReleaseAsync(objModule)` (`TrBlazeUI.Primitives.Utilities`) instead of an
+unguarded `InvokeVoidAsync`.
+
 ### Sidebar Component Hierarchy
 
 ```
@@ -4036,6 +4044,7 @@ source* — see the next heading — and only rarely *wait for it to be built*.
 
 | Version | Released | Component namespaces | What it added |
 |---|---|---|---|
+| **After 2.2.4** | — | 87 | Removing a component whose JavaScript side is already gone no longer ends the session ("JS object instance with ID … does not exist" from `DisposeAsync`, e.g. after a WebView reload): `SidebarProvider`, `AnchorNav`, `ChatComposer`, `CodeEditor`, `FileUpload`, `NavList`, `ResponsiveNavProvider`, `RichTextEditor`, `ScrollArea`, `ToggleGroup`, `TreeView` (Sevak TR-049); `TrBlazeUI.Primitives.Utilities.JSTeardown` (`InvokeVoidAsync`, `ReleaseAsync`, `IsTeardownFault`) for an app's own `DisposeAsync` |
 | **After 2.2.2** | — | 87 | `CodeBlock.CopyLabel`, `CopyButtonAttributes` and `OnCopied` (`CodeBlockCopyResult`) (Sevak TR-047); the arrow keys reach a `MenubarSubTrigger` in its on-screen place, not after every plain item (Chatur TR-023); a submenu of `Menubar`, `DropdownMenu` or `ContextMenu` that fits neither side of the window is pulled back inside it instead of running off (Chatur TR-024); the demo hosts moved to ASP.NET Core 10.0.14 (10.0.13 carries GHSA-g27p-qf6j-c96c), and the Auto demo host calls `MapStaticAssets()` so `blazor.web.js` is served (see §1) |
 | **After 2.2.1** | — | 87 | A `Select` bound to a value no item carries no longer throws on re-render (TechieBlog TR-077); a focused `Input`/`SelectTrigger` draws its ring on the border (no `ring-offset-2`); a field right after a `Label` in a block container gets a 6px gap; menu items, sub-triggers and menu labels in `DropdownMenu`, `Menubar` and `ContextMenu` are 10px across (`px-2.5`) (Chatur TR-022) |
 | **After 2.1.6** | — | 87 | `trblazeui-layers.css` and the `trblazeui-host` cascade layer; submenus for `Menubar`, `DropdownMenu` and `ContextMenu` (`…Sub`, `…SubTrigger`, `…SubContent`); a disabled `MenubarItem`, `MenubarCheckboxItem` or `ContextMenuItem` renders `aria-disabled="true"` and `data-disabled` |

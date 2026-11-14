@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using TrBlazeUI.Primitives.Utilities;
 
 namespace TrBlazeUI.Components.Sidebar;
 
@@ -92,9 +93,9 @@ public partial class SidebarProvider
             {
                 await objModule.InvokeVoidAsync("saveSidebarState", CookieKey, Context.Open);
             }
-            catch (JSException)
+            catch (Exception vException) when (JSTeardown.IsTeardownFault(vException))
             {
-                // Ignore persistence errors
+                // Ignore persistence errors, and a JavaScript side that is already gone (Sevak TR-049).
             }
         }
 
@@ -131,22 +132,10 @@ public partial class SidebarProvider
             Context.StateChanged -= OnStateChanged;
         }
 
-        if (objModule != null)
-        {
-            try
-            {
-                await objModule.InvokeVoidAsync("cleanup");
-                await objModule.DisposeAsync();
-            }
-            catch (JSDisconnectedException)
-            {
-                // Circuit disconnected, ignore
-            }
-            catch (TaskCanceledException)
-            {
-                // The page went away before it answered; the module died with it (REQ-UI-028).
-            }
-        }
+        // Sevak TR-049: a JavaScript side that is already gone (a closed circuit, a cancelled call, or a
+        // reloaded page that no longer knows the reference) is ordinary teardown, not a fault.
+        await JSTeardown.InvokeVoidAsync(objModule, "cleanup");
+        await JSTeardown.ReleaseAsync(objModule);
 
         objDotNetRef?.Dispose();
 

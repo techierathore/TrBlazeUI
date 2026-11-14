@@ -1,16 +1,16 @@
 ---
 project: TrBlazeUI
-last_updated: 2026-11-12
-current_phase: Release — Sevak TR-047/TR-048 verified, 83 of 83 verified
+last_updated: 2026-11-13
+current_phase: Release — handoff done, 84 of 84 verified
 last_verified_build: PASS
-last_verified_date: 2026-11-12
+last_verified_date: 2026-11-13
 ---
 
 # TrBlazeUI — Status
 
 ## Where I am
 
-Every row is Verified. The verifier passed REQ-UI-065 (Sevak TR-048 regression test; the fix itself shipped in 2.2.2) and REQ-UI-066 (Sevak TR-047, `CodeBlock.CopyLabel`, `CopyButtonAttributes`, `OnCopied`). They join Chatur TR-023/TR-024 and the demo-host fixes in the release after 2.2.2. On the Mac, four older rows fail from machine setup or test flakes (Known blockers). CHANGELOG, the agent reference and Sevak's file are current.
+Every row is Verified. New row REQ-UI-068 (Sevak TR-049): removing a component whose JavaScript side is already gone no longer ends the session. The fix covers `SidebarProvider` and ten more components through the new `JSTeardown` helper, and it is not in 2.2.4. 2.2.4 is on GitHub Packages and holds TR-047 and TR-048. CHANGELOG, the agent reference and Sevak's file are current.
 
 ## Next command to run
 
@@ -22,7 +22,7 @@ OpenCode:
 ```
 (owner) commit, then build and publish the package — its shipped documents are current; no agent command
 ```
-Why: every row is Verified and the shipped documents are current.
+Why: every row in this phase's scope is terminal and the shipped documents were brought up to date.
 
 ## Open requirements
 
@@ -38,11 +38,11 @@ Why: every row is Verified and the shipped documents are current.
 
 ## Known blockers
 
-- On the Mac (2026-11-11), four suite rows fail for reasons outside the code. REQ-NFR-001 looks for the axe scanner only under `/mnt/c/1MyCode/...` (WSL paths). REQ-UI-020 TR-031 expects `flex-end`, which Chromium 158 (Playwright 1.65) reports as `flow-end`. REQ-UI-063 and REQ-UI-021 fail only under parallel workers and pass when run alone.
-- The demo's `app.css` is gitignored and built by `tools/tailwindcss.exe`, which this checkout does not have. Without the file, 8 more rows fail with a 404. It was generated here with the Tailwind 4.1.11 npm CLI.
-
-- The release after 2.2.2 is not on GitHub Packages until the owner publishes it through the usual GitHub Release; the stored token can only read packages.
-- CHANGELOG has no section for 2.1.10 or 2.2.0, which are already published; the owner fills them in.
+- Mac (2026-11-11): REQ-NFR-001, REQ-UI-020, REQ-UI-063 and REQ-UI-021 fail from machine setup (WSL-only axe path, Chromium `flow-end`) or parallel-worker flakes; each passes alone.
+- The demo's `app.css` is gitignored and needs `tools/tailwindcss.exe`, absent here; without it 8 rows 404. Generated with the Tailwind 4.1.11 npm CLI.
+- TR-049 reaches consumers only when the owner publishes the release after 2.2.4.
+- CHANGELOG `[Unreleased]` still holds what shipped in 2.2.3 and 2.2.4, beside TR-049; 2.1.10 and 2.2.0 have no section. The owner sorts the headings.
+- The MAUI WebView reload was not driven (no MAUI demo); the browser test makes the same state.
 
 ## Verification log
 
@@ -50,11 +50,11 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 
 | Date | Phase | Result | Status table |
 |---|---|---|---|
-| 2026-11-02 | amend-docs | 78/78 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-11-05 | triage-and-fix + handoff | 79/80 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-11-05 | build-phase | 79/81 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-11-05 | build-phase + handoff | 81/81 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 | 2026-11-12 | verify REQ-UI-065, REQ-UI-066 | 83/83 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
+| 2026-11-13 | triage-and-fix + handoff | 84/84 Verified | docs/TrBlazeUI-Checklist.md#requirements-status |
 
 ## Library feedback summary
 
@@ -78,3 +78,4 @@ Last five passes; older passes live in `docs/metrics/gates.jsonl`.
 - Test with real assistive technology.
 - Fix the badge overlap on `/verify-tflens-3`.
 - Fold the three roving scripts into one.
+- Module-only `DisposeAsync`s could use `JSTeardown`.
