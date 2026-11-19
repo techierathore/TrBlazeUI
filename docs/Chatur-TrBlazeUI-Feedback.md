@@ -4,25 +4,11 @@
 |---|---|
 | App | Chatur |
 | Upstream | TrBlazeUI |
-| Updated | 2026-11-05 |
+| Updated | 2026-11-19 |
 
 ## Summary
 
-24 entries: nothing is blocked. 2 fixed upstream, awaiting re-check: TR-023 and TR-024 (in the release after 2.2.2, see the 2026-11-05 reply). 22 closed.
-
-All ten were answered on 2026-09-22 and all ten have now been re-checked in Chatur against
-2.0.9. Six were fixed in code; four needed no code, because the control already existed. Each
-entry below carries the control that now does the job and the Chatur requirement that uses it.
-
-The first ten were found on day one, against the 2.0.7 reference; each entry says what was used instead.
-
-> **Upstream reply 2026-09-22 — read it before acting on this file. The action is: upgrade
-> to 2.0.9.** Four entries (TR-001, TR-002, TR-005, TR-009) and most of a fifth (TR-008)
-> report controls that already exist. Two of them shipped in **2.0.8, on 2026-09-20 — the
-> day before this batch was filed**; three were documented in the very copy of the
-> reference this file cites. The other six are in **2.0.9**, released 2026-09-22. Note the
-> feed: 2.0.7 onward are on GitHub Packages, not nuget.org. Full answer in
-> "[Replies from TrBlazeUI](#replies-from-trblazeui)" at the foot of this file.
+27 entries: nothing is blocked. 0 open, 0 fixed upstream and not yet re-checked, 27 closed. TR-025, TR-026, TR-027 and the output strip's count (an owner report, not a TR entry) are fixed in 2.2.6, prepared 2026-11-19 and not yet released; the reply of that date is at the foot.
 
 ## Entries
 
@@ -320,7 +306,9 @@ Copied into TrBlazeUI 2026-11-02 by *fix-issues from `/mnt/c/1MyCode/Chatur/docs
 
 ### TR-023 — In a Menubar menu, ArrowDown reaches a submenu row last, not in its place
 
-- **Status:** fixed upstream 2026-11-05 (the ▸ row sits in the arrow-key order where it is drawn, in the release after 2.2.2 — see the 2026-11-05 reply), filed 2026-11-04
+> ✅ **Closed 2026-11-10** — re-checked here on TrBlazeUI 2.2.3 (every Chatur project moved from 2.2.2; AI reference has the "After 2.2.2" row). The REQ-UI-073 keyboard test in `tests/verify/workbench-menus.spec.ts` now counts rows instead of walking: from File, ArrowDown five times focuses Recent projects, once more focuses Close project (Save and Save all are off and skipped). PASS.
+
+- **Status:** closed 2026-11-10 (re-checked on 2.2.3), fixed upstream 2026-11-05, filed 2026-11-04
 - **Severity:** minor
 - **Blocks:** no — every item, the ▸ row included, is reachable by keyboard and by mouse; only the order the arrow keys take is wrong.
 - **Repro:** TrBlazeUI 2.2.2. A `MenubarContent` with `MenubarItem` New, Open a solution, Open a folder, Clone; then a `MenubarSub` (`MenubarSubTrigger` "Recent projects"); then `MenubarItem` Save (disabled), Save all (disabled), Close project, Exit. Open the menu and press ArrowDown repeatedly: the focus goes New → Open a solution → Open a folder → Clone → Close project → Exit → Recent projects (Chatur's File menu, `src/ChaturUI/Shell/MenuBar.razor`; seen 2026-11-04 by focusing each step and reading `document.activeElement`).
@@ -332,7 +320,9 @@ Copied into TrBlazeUI 2026-11-02 by *fix-issues from `/mnt/c/1MyCode/Chatur/docs
 
 ### TR-024 — At 390px a submenu with no room on either side runs off the window instead of staying inside it
 
-- **Status:** fixed upstream 2026-11-05 (a submenu that fits neither side is pulled back inside the window, in the release after 2.2.2 — see the 2026-11-05 reply), filed 2026-11-04
+> ✅ **Closed 2026-11-10** — re-checked here on TrBlazeUI 2.2.3. New test "REQ-UI-073 at 390px File ▸ Recent projects ▸ stays inside the window…" in `tests/verify/workbench-menus.spec.ts`: at 390×800 the Recent projects list has its left edge at 8 px or more and its right edge at 382 or less, no project name is clipped (the long name wraps), and View ▸ Zoom ▸ stays inside the window and opens to the left of its row. PASS. Screenshots `tests/.artifacts/verify/shots/TR-024-file-recent-390.png`, `TR-024-view-zoom-390.png`.
+
+- **Status:** closed 2026-11-10 (re-checked on 2.2.3), fixed upstream 2026-11-05, filed 2026-11-04
 - **Severity:** minor
 - **Blocks:** no — the list opens and every item can be clicked; at 390px only the right end of long project names is cut off.
 - **Repro:** TrBlazeUI 2.2.2, Chatur's main window at 390×800, File ▸ Recent projects ▸ (a `MenubarSubContent` whose items are project names up to about 30 characters, so the list is 235px wide). The File list spans x 60 to 250. Neither side has 235px, so the list opens on the right at x 250 and ends at x 485, 95px past the window's right edge (`tests/.artifacts/verify/shots/TR-020-file-recent-390.png`). View ▸ Zoom ▸ (128px wide) does flip to the left as the 2026-10-13 reply describes.
@@ -342,11 +332,114 @@ Copied into TrBlazeUI 2026-11-02 by *fix-issues from `/mnt/c/1MyCode/Chatur/docs
 - **Workaround:** none; the app does not resize the list itself.
 - **Suggested fix:** after choosing a side, shift the list by the overflow so its right edge is at most the window's width minus a small margin (and its left edge at least that margin), or let the caller cap it with a `max-w` that wraps item text.
 
-Copied into TrBlazeUI 2026-11-05 by *triage-and-fix from `/mnt/c/1MyCode/Chatur/docs/Chatur-TrBlazeUI-Feedback.md`.
+### TR-025 — At 390px the pulled-back submenu sits 3.5 px inside the window, not 8 px, when its items wrap
+
+> ✅ **Fixed upstream 2026-11-19, in 2.2.6** (prepared, not yet released) — the cause we could reproduce, and most likely the one you hit, is not the wrapping itself: a submenu's place was worked out once, when it opened, and Chatur re-reads its recent projects when File is pressed (`LoadRecentAsync` on the trigger's pointerdown), so the rows can change after the list is placed. A list placed for the earlier rows then grew past the margin. `MenubarSubContent` (and the DropdownMenu and ContextMenu submenus) now place the list again on every render, from a measurement that does not depend on the last placement. Test `tests/verify/req-ui-076.spec.ts`, page `/verify-chatur-tr025`: Chatur's six names arriving 700 ms after File is pressed ran to 390.2 px on 2.2.5; now the list keeps 8 px from both edges. Row REQ-UI-076.
+
+- **Status:** open. Filed 2026-11-13.
+- **Severity:** minor
+- **Blocks:** no — the list stays inside the window and every item can be clicked; only the 8 px margin TR-024's fix promises is short by 4.5 px.
+- **Repro:** TrBlazeUI 2.2.3, Chatur's main window at 390×800, File ▸ Recent projects ▸ with the recent names WbAFilesApp, workbench-b, Fixture, ReportRealApp, reportspec-proj, SetEstFixture (one wraps to two lines). Test `REQ-UI-073 at 390px File ▸ Recent projects ▸ stays inside the window and View ▸ Zoom ▸ still opens to the left (TR-024)` in `tests/verify/workbench-menus.spec.ts`.
+- **Expected:** the list's right edge at most 382 (390 − 8), as on 2026-11-10 with shorter names.
+- **Actual:** `right edge at most 382 (390 - 8)` — `Expected: <= 382.5, Received: 385.953125`. [Likely] the list is placed from its width before a long item wraps, and the wrapped list is a little wider than the width it was placed with.
+- **Encountered in:** `*triage-and-fix Chatur`, 2026-11-13, phase 3 verify
+- **Workaround:** none in the app.
+- **Suggested fix:** place the list after its items have laid out at the capped width (or measure again after wrapping), so the 8 px margin holds whatever the names are.
+
+### TR-026 — A Select's list can never be wider than its button, so long options wrap in a narrow picker
+
+> ✅ **Fixed upstream 2026-11-19, in 2.2.6** (prepared, not yet released) — `SelectContent` takes `MatchTriggerWidth`; set it to `false` and the button's width becomes the list's minimum, so the list grows to its longest option and is capped at the window. The default stays `true`. Measured on `/verify-chatur-tr026` with your three tier names in a 160 px picker: the list is about 200 px and no option wraps, at 1280 and 390 px. Test `tests/verify/req-ui-074.spec.ts`, row REQ-UI-074. Your `w-64` buttons can go back to `w-40`.
+
+- **Status:** open. Filed 2026-11-14.
+- **Severity:** minor
+- **Blocks:** no. Chatur widened its tier pickers' buttons from `w-40` to `w-64` (Settings ▸ Routing, `SettingsRouting.razor`), so each option fits on one line. That is a workaround: the buttons are now wider than their content.
+- **Repro:** TrBlazeUI 2.2.3. `<Select TValue="string" Class="flex h-7 w-40"><SelectTrigger Class="h-7 w-40 py-0"><SelectValue /></SelectTrigger><SelectContent>` with the items "Tier 1 — the strongest", "Tier 2 — everyday" and "Tier 3 — on this machine". Open it at 1280 or 390.
+- **Expected:** the list can be wider than its button when its options need it, as shadcn's Select allows (`min-width` of the trigger, not a fixed `width`), or the component lets the page say so.
+- **Actual:** the positioner around the list carries inline `width: 160px; min-width: 160px; max-width: 160px`, the button's width, and every option wraps onto two lines. A `Class` on `SelectContent` lands on the inner list, inside that fixed box. `TrBlazeUI.Primitives.Select.SelectContent` has `MatchTriggerWidth`, but `TrBlazeUI.Components.Select.SelectContent` (2.0.9 to 2.2.3) exposes only `Class`, `CssClass`, `ChildContent` and `AdditionalAttributes`, so there is no way to turn it off.
+- **Encountered in:** `*triage-and-fix Chatur`, 2026-11-14 (opening every dropdown on the screens under check)
+- **Workaround:** a wider button (`w-64`).
+- **Suggested fix:** pass `MatchTriggerWidth` through on the component's `SelectContent`, or make the trigger's width a `min-width` for the list rather than a fixed width.
+
+### TR-027 — The shipped stylesheet has no `place-items-center`, so a grid tile's icon sits in its corner
+
+> ✅ **Fixed upstream 2026-11-19, in 2.2.6** (prepared, not yet released) — `trblazeui.css` now carries `place-items-*`, `place-content-*`, `place-self-*` and `justify-self-*` with their `sm:` to `2xl:` forms. Test `tests/verify/req-ui-072.spec.ts` loads only the shipped stylesheet and measures your Start tile: the 18 px icon sits in the centre of its 36 px tile (it sat 9 px off on 2.2.5). Row REQ-UI-072. `flex items-center justify-center` can stay; `grid place-items-center` works too.
+
+- **Status:** open. Filed 2026-11-18.
+- **Severity:** minor
+- **Blocks:** no. Chatur's Start tiles use `flex items-center justify-center` instead, which the stylesheet has.
+- **Repro:** TrBlazeUI 2.2.3 (also 2.2.5). `<span class="grid h-9 w-9 place-items-center rounded-lg bg-accent"><LucideIcon Name="folder" Size="18" /></span>` inside a `Button`. Search `staticwebassets/trblazeui.css` for `place-items-center`.
+- **Expected:** the precompiled stylesheet carries the Tailwind layout utilities a consuming app uses alongside `grid` (`place-items-center`, `place-content-center`), or the AI reference says which utilities are absent.
+- **Actual:** the class is not in the file, so the icon falls to the grid cell's top-left corner. The owner saw five tiles on Start "with the same brown shapes that say nothing" (`docs/screenshots/16-Nov-26-Run/Project -Selection-Icons.png`).
+- **Encountered in:** `*triage-and-fix Chatur`, 2026-11-18 (the owner's run on his own solution)
+- **Workaround:** `flex items-center justify-center`.
+- **Suggested fix:** add `place-items-center` (and the other `place-*` utilities) to the shipped stylesheet's safelist.
+
+### Owner report 2026-11-19 — the output strip's "N lines" count said 2 while 4 lines were shown
+
+> ✅ **Fixed upstream 2026-11-19, in 2.2.6** (prepared, not yet released) — reported by the owner, not filed
+> by Chatur, so it has no TR number. The count is `LogView`'s own status summary ("2 lines, 0 warnings,
+> 0 failures."). It was rebuilt only after 1.5 s without new output, so while a program kept writing it
+> kept the old count beside more lines. Now the summary is withdrawn in the same render that shows a new
+> line, stated again when the output pauses, and stated at the latest 3 s after it changed. Test
+> `tests/verify/req-ui-073.spec.ts`, page `/verify-chatur-log-count`, fed the way `OutputStrip` feeds it
+> (one list, appended line by line): on 2.2.5 it said "2 lines, 0 warnings, 0 failures." with 4 lines on
+> screen; now no stated count ever differs from the lines shown. Row REQ-UI-073.
+
+- **Severity:** minor
+- **Blocks:** no
+- **Repro:** a running program writes lines into the output strip with no 1.5 s pause between them.
+- **Expected:** the count the panel states matches the lines it shows.
+- **Actual:** it stated the count from the last pause ("2 lines") while 4 were shown.
+- **Encountered in:** the owner's run, Output strip (`Shell/OutputStrip.razor`).
+- **Workaround:** none needed; a page that shows its own count should read `objLines.Count`.
+- **Note:** the run line shown twice in `docs/screenshots/2026-11-17-first-use/Output-Run-Line-Twice.png` was
+  Chatur's own (MISS-Chatur-20261117-02, fixed in Chatur on 2026-11-18), not this.
+
+## Resolution status — earlier summaries
+
+The Summary as it stood before 2026-11-19, kept unchanged as the record.
+
+27 entries and one owner report: nothing is blocked. TR-023 and TR-024 closed by Chatur on 2026-11-10 (copied in from Chatur's own file, with TR-025 to TR-027). **TR-025, TR-026, TR-027 and the output strip's line count are fixed in 2.2.6** (prepared 2026-11-19, not yet released) — see the reply of that date at the foot.
+
+All ten were answered on 2026-09-22 and all ten have now been re-checked in Chatur against
+2.0.9. Six were fixed in code; four needed no code, because the control already existed. Each
+entry below carries the control that now does the job and the Chatur requirement that uses it.
+
+The first ten were found on day one, against the 2.0.7 reference; each entry says what was used instead.
+
+> **Upstream reply 2026-09-22 — read it before acting on this file. The action is: upgrade
+> to 2.0.9.** Four entries (TR-001, TR-002, TR-005, TR-009) and most of a fifth (TR-008)
+> report controls that already exist. Two of them shipped in **2.0.8, on 2026-09-20 — the
+> day before this batch was filed**; three were documented in the very copy of the
+> reference this file cites. The other six are in **2.0.9**, released 2026-09-22. Note the
+> feed: 2.0.7 onward are on GitHub Packages, not nuget.org. Full answer in
+> "[Replies from TrBlazeUI](#replies-from-trblazeui)" at the foot of this file.
 
 ## Replies from TrBlazeUI
 
 <!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
+
+### 2026-11-19 — TR-025, TR-026, TR-027 and the output strip's count are fixed in 2.2.6
+
+All four ship in **2.2.6**, prepared on 2026-11-19 and not yet cut; it is on GitHub Packages
+(`https://nuget.pkg.github.com/techierathore/index.json`) once the owner releases it. Each entry
+above carries its own line with the cause and the test.
+
+| Entry | What changes for Chatur |
+|---|---|
+| TR-025 | Nothing to change; File ▸ Recent projects ▸ keeps 8 px at 390 px whatever the scan returns |
+| TR-026 | `<SelectContent MatchTriggerWidth="false">` on the tier pickers; the buttons go back to `w-40` |
+| TR-027 | `grid place-items-center` works; the `flex` workaround can stay or go |
+| Output count | Nothing to change |
+
+#### What we need from you
+
+1. Upgrade to 2.2.6. Run `REQ-UI-073 at 390px File ▸ Recent projects ▸ …` in
+   `tests/verify/workbench-menus.spec.ts` with the six names (expect a right edge of 382 or less).
+2. Settings ▸ Routing: add `MatchTriggerWidth="false"`, set the buttons back to `w-40`, open each
+   tier picker at 1280 and 390 and check that no option wraps.
+3. Start: a tile with `grid place-items-center` shows its icon centred.
+4. Close each with `bash .tfcore/utils/tf-feedback.sh Chatur --close <ID> "<what you ran and what it showed>"`.
 
 ### 2026-11-05 — TR-023 and TR-024 are fixed; they ship in the release after 2.2.2
 

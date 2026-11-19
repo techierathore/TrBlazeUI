@@ -215,6 +215,29 @@ Screenshots: `screenshots/TrBlazeUI/code-editor.png`, `stepper.png`, `badge.png`
 
 _(The remaining ~68 component demos and ~14 primitive demos follow the identical lineage shape; they are enumerated in the demo `Pages/Components/` and `Pages/Primitives/` folders and indexed in the BRD §9 feature catalog.)_
 
+### Consumer feedback of 19 Nov 2026 (REQ-UI-069…REQ-UI-078 — runtime-verified 2026-11-19)
+
+| Screen | Route | Demo page file | Library surface exercised | Seen 2026-11-19 |
+|--------|-------|----------------|---------------------------|-----------------|
+| DatePicker (Sevak TR-050) | `/components/date-picker` | `Pages/Components/DatePickerDemo.razor` | `DatePicker` → styled `Popover` → `Primitives.Popover.PopoverTrigger` (`AsChild` toggle, Escape on the trigger) and `PopoverContent` (Escape → `FocusTriggerAsync`) | at 1280 and 390 Escape closes from the button and from inside, a second click closes, focus returns (req-ui-069.spec.ts) |
+| Badge class change (TrStudio TR-016) | `/verify-trstudio-tr016` | `Pages/VerifyTrStudioTr016.razor` | `Badge.CssClass` (computed each render) | class and colour follow both ways; not reproduced (req-ui-070.spec.ts) |
+| Column header explained (TfLens TR-041) | `/verify-tflens-tr041` | `Pages/VerifyTfLensTr041.razor` | `DataTableColumn.HeaderTitle`, `HeaderTemplate` → `ColumnData` → `DataTable.razor` header cell | `title` on the cell, sortable column still sorts, Tooltip opens (req-ui-071.spec.ts) |
+| Grid centring (Chatur TR-027) | — (stylesheet) | — | `wwwroot/css/trblazeui-input.css` `@source inline` `place-*`, `justify-self-*` → `wwwroot/trblazeui.css` | the bundle alone centres an icon in its tile (req-ui-072.spec.ts) |
+| Log count (Chatur, owner) | `/verify-chatur-log-count` | `Pages/VerifyChaturLogCount.razor` | `LogView` `OnParametersSet` (withdraws `objAnnouncement`) → `ScheduleAnnouncement` → `AnnounceWhenQuietAsync` | no stated count differs from the lines shown, while streaming or after (req-ui-073.spec.ts) |
+| Wide Select list (Chatur TR-026) | `/verify-chatur-tr026` | `Pages/VerifyChaturTr026.razor` | styled `SelectContent.MatchTriggerWidth` → `Primitives.Select.SelectContent.MinTriggerWidth` → `FloatingPortal.MinAnchorWidth` → `positioning.js` `minReferenceWidth` | 1280 and 390: list ~200 px for a 160 px button, no option wraps; the default still matches (req-ui-074.spec.ts) |
+| Sidebar phone mode (TrStudio TR-015) | any page (`MainLayout`) | `Shared/MainLayout.razor` | `SidebarProvider` → `wwwroot/js/sidebar.js` `setupMobileDetection` (`matchMedia`) → `OnMobileChange` | with `innerWidth` made late, 1280 → 390 → 1280 switches each time (req-ui-075.spec.ts) |
+| Submenu re-placed (Chatur TR-025) | `/verify-chatur-tr025` | `Pages/VerifyChaturTr025.razor` | `MenubarSubContent.OnAfterRenderAsync` → `SubmenuPlacer.FitAsync` every render → `submenu.js` `fit` + `naturalWidth` → `SubmenuPlacer.IsSame` | rows arriving after it opened keep 8 px at 390 (req-ui-076.spec.ts) |
+| Calendar marks (MyDiary TR-001) | `/verify-mydiary-tr001` | `Pages/VerifyMyDiaryTr001.razor` | `Calendar.MarkedDates`, `MarkedLabel`, `MarkClass`; `OnParametersSet` → `ShouldRender` | dots on 3, 10, 19; a mark and a `Class` added later both show (req-ui-077.spec.ts) |
+| Combobox `Id` in a Dialog (Sevak TR-042) | `/verify-sevak-tr042` | `Pages/VerifySevakTr042.razor` | `Combobox` (private `Id`, splatted `id`) inside `DialogContent` | both ids reach the page, no error (req-ui-078.spec.ts) |
+
+Call chain (Escape and second click, Sevak TR-050): `Button.HandleKeyDown` → `TriggerContext.OnKeyDown` = `PopoverTrigger.HandleKeyDownAsync` (`src/TrBlazeUI.Primitives/Primitives/Popover/PopoverTrigger.razor:142`) → `PopoverContext.Close` when open and `PopoverContext.CloseOnEscape` (set by `PopoverContent.OnParametersSet`). A click → `Button` → `TriggerContext.Toggle` (`PopoverTrigger.razor:83`) → `Close` when open, else `Open`. Escape inside the content → `PopoverContent.HandleKeyDown` → `Close` → `FocusTriggerAsync` (`PopoverContent.razor:255`) → `PopoverState.TriggerElement.FocusAsync`.
+
+Call chain (log count): `LogView.OnParametersSet` appends the new lines, sets `objAnnouncement = null` in the same render, → `ScheduleAnnouncement` (one waiter, `objFirstUnstatedTicks`) → `AnnounceWhenQuietAsync` (`LogView.razor:501`): `Task.Delay(1500)` until the stamp holds still or 3000 ms have passed → `InvokeAsync` → `objAnnouncement = BuildSummary()` (`:527`) and `objIsAnnouncePending = false`, both on the dispatcher.
+
+Call chain (submenu re-placed, Chatur TR-025): any render of an open `MenubarSubContent` → `OnAfterRenderAsync` → `SubmenuPlacer.FitAsync` → `submenu.js` `fit` (`:19`), which reads `naturalWidth` (`:56`: inline `left`/`right`/`max-width` lifted for one layout read) and the parent row's box → `SubmenuPlacer.IsSame` (`MenubarSubContent.razor:81`) → `StateHasChanged` only when the place changed. `DropdownMenuSubContent` and `ContextMenuSubContent` follow the same lines.
+
+Where to break: `PopoverTrigger.razor:142`, `LogView.razor:527`, `submenu.js:19`, `sidebar.js:64`, `positioning.js:160`, `Calendar.razor:698`, `DataTable.razor:147`.
+
 ## 4. Library lineage — how a styled component resolves
 
 ```mermaid
@@ -230,6 +253,8 @@ flowchart LR
 A reader chasing a bug starts at the demo page, drops into the styled component (`.razor` markup + `.razor.cs` logic), then into the primitive it composes (for behavior/ARIA), and finally into the relevant JS interop file or DI service. Symbols that don't resolve to a real file/component in `src/` are hallucinations — verify against the folders listed in `docs/TrBlazeUI-Architecture.md §4`.
 
 ## 5. Known issues
+
+- **✅ FIXED 2026-11-19, in 2.2.6 (prepared) — REQ-UI-069…REQ-UI-078.** Sevak TR-050, Chatur TR-025…TR-027 and the output strip's count, TfLens TR-041, TrStudio TR-015, MyDiary TR-001; Sevak TR-042 newly held by a test. TrStudio TR-016 not reproduced (WKWebView only). See §3 above.
 
 - **✅ FIXED 2026-10-08, not yet released — Sevak TR-041 and TR-006 (`REQ-UI-044`, `REQ-UI-045`).** A Select inside a Dialog can no longer freeze the page: `SelectContent` catches its script import, `FloatingPortal` places the content under its anchor when positioning fails and renders inline when the portal host times out (both failures injected by `tests/verify/req-ui-044.spec.ts`). New `Chat` family (`Components/Chat/`, `wwwroot/js/chat-composer.js`), verified by `req-ui-045.spec.ts`.
 - **✅ FIXED 2026-10-07, not yet released — Sevak feedback (`REQ-UI-034`…`REQ-UI-043`, `REQ-FN-011`).** `Table` family (`Components/Table/`), `ToastVariant` Success/Info/Warning + `ToastService.Warning`/`.Info`, `AlertDialogAction`/`AlertDialogCancel` `OnClick`/`PreventClose`, `Textarea.Rows`/`MaxRows`, `CardTitle`/`AlertTitle` `As` (now code components `CardTitle.cs`/`AlertTitle.cs`, since Razor cannot take an element name from a parameter), `NumericInput` always `role="spinbutton"` with invariant ARIA numbers (`Slider` too), the `NumberInput` obsolete shim, `SelectValue` placeholder when no item matches, `ToastProvider` viewport `pointer-events-none`, `HtmlSanitizer` stable 9.1.x. Verified by `tests/verify/req-ui-034.spec.ts`, `req-ui-037.spec.ts`, `req-ui-040.spec.ts` and `req-fn.spec.ts` (REQ-FN-011). Sevak filed against 1.0.7; 23 of its 34 entries were already fixed by 2.1.4 and are answered in `docs/Sevak-TrBlazeUI-Feedback.md`.

@@ -164,10 +164,23 @@ public class KeyboardShortcutService : IKeyboardShortcutService
     {
         if (objShortcuts.Remove(normalizedKey) && objModule != null)
         {
-            // Fire-and-forget unregister from JS
-            _ = objModule.InvokeVoidAsync("unregisterShortcut", normalizedKey).AsTask();
+            // Not awaited (a handle's Dispose is synchronous), but observed: a page left after its
+            // circuit closed used to leave a JSDisconnectedException in an unawaited task, which the
+            // finalizer logged as "Unobserved task exception" (found 2026-11-19 by req-ui-020's
+            // TR-039 test once it read the live server log).
+            _ = UnregisterInJsAsync(objModule, normalizedKey);
         }
     }
+
+    /// <summary>
+    /// Removes one shortcut from the JavaScript side, treating a page or circuit that has already
+    /// gone as nothing left to do.
+    /// </summary>
+    /// <param name="aModule">The keyboard-shortcuts module.</param>
+    /// <param name="aNormalizedKey">The shortcut's normalized key.</param>
+    /// <returns>A task that never faults with a teardown error.</returns>
+    private static async Task UnregisterInJsAsync(IJSObjectReference aModule, string aNormalizedKey) =>
+        await JSTeardown.InvokeVoidAsync(aModule, "unregisterShortcut", aNormalizedKey).ConfigureAwait(false);
 
     private sealed class ShortcutRegistration
     {

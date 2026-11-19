@@ -9,6 +9,9 @@ let dotNetRef = null;
 let cookieKey = null;
 let resizeObserver = null;
 let keyboardHandler = null;
+let mobileQuery = null;
+let checkMobile = null;
+let lastIsMobile = null;
 
 /**
  * Initialize sidebar with mobile detection and keyboard shortcuts
@@ -48,24 +51,43 @@ export function saveSidebarState(key, value) {
 }
 
 /**
- * Set up mobile detection using ResizeObserver
+ * Set up mobile detection.
+ *
+ * The mode is decided by matchMedia, never by window.innerWidth read inside a ResizeObserver: in a
+ * Mac Catalyst WKWebView the observer fires before innerWidth has taken the new size, so the old
+ * width was reported, nothing corrected it, and a one-step resize 1280 -> 390 left the docked
+ * sidebar squeezing the page (TrStudio TR-015). A media query is evaluated against the new layout
+ * viewport whenever it is read. It is read on the query's own change event, on the window's resize
+ * event, on the body's ResizeObserver, and once more on the next animation frame after each of
+ * them, and only a change of mode is sent to .NET.
  */
 function setupMobileDetection() {
     if (!dotNetRef) return;
 
-    const checkMobile = () => {
-        const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
+    mobileQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 0.02}px)`);
+    lastIsMobile = null;
+
+    const report = () => {
+        if (!dotNetRef || !mobileQuery) return;
+        const isMobile = mobileQuery.matches;
+        if (isMobile === lastIsMobile) return;
+        lastIsMobile = isMobile;
         dotNetRef.invokeMethodAsync('OnMobileChange', isMobile);
     };
 
+    checkMobile = () => {
+        report();
+        // A web view that settles its viewport late is caught on the next frame.
+        window.requestAnimationFrame(report);
+    };
+
     // Initial check
-    checkMobile();
+    report();
 
-    // Listen for resize events
-    resizeObserver = new ResizeObserver(() => {
-        checkMobile();
-    });
+    mobileQuery.addEventListener('change', checkMobile);
+    window.addEventListener('resize', checkMobile);
 
+    resizeObserver = new ResizeObserver(checkMobile);
     resizeObserver.observe(document.body);
 }
 
@@ -126,6 +148,14 @@ export function cleanup() {
         resizeObserver.disconnect();
         resizeObserver = null;
     }
+
+    if (checkMobile) {
+        if (mobileQuery) mobileQuery.removeEventListener('change', checkMobile);
+        window.removeEventListener('resize', checkMobile);
+        checkMobile = null;
+    }
+    mobileQuery = null;
+    lastIsMobile = null;
 
     if (keyboardHandler) {
         document.removeEventListener('keydown', keyboardHandler);

@@ -1,0 +1,59 @@
+@page "/verify-chatur-tr026"
+
+@* Verification harness for Chatur TR-026 (docs/Chatur-TrBlazeUI-Feedback.md).
+   Not a documentation demo: Chatur's tier picker from Settings ▸ Routing - a 160 px button whose
+   options are longer than it - with MatchTriggerWidth="false", the same picker with the default,
+   and a picker whose options are shorter than its button. tests/verify/req-ui-074.spec.ts measures
+   each list against its button. *@
+
+<PageTitle>Verify Chatur TR-026 - TrBlazeUI</PageTitle>
+
+<div class="mx-auto max-w-md space-y-8 p-4">
+    <h1 class="text-2xl font-bold" data-testid="verify-heading">Chatur TR-026 a list wider than its button</h1>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">MatchTriggerWidth="false"</h2>
+        <Select TValue="string" @bind-Value="objWideTier" Class="flex h-7 w-40">
+            <SelectTrigger Class="h-7 w-40 py-0" data-testid="tier-wide-trigger"><SelectValue Placeholder="Tier" /></SelectTrigger>
+            <SelectContent MatchTriggerWidth="false">
+                @foreach (var vTier in Tiers)
+                {
+                    <SelectItem Value="@vTier" Text="@vTier">@vTier</SelectItem>
+                }
+            </SelectContent>
+        </Select>
+    </section>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">The default: the list matches its button</h2>
+        <Select TValue="string" @bind-Value="objDefaultTier" Class="flex h-7 w-40">
+            <SelectTrigger Class="h-7 w-40 py-0" data-testid="tier-default-trigger"><SelectValue Placeholder="Tier" /></SelectTrigger>
+            <SelectContent>
+                @foreach (var vTier in Tiers)
+                {
+                    <SelectItem Value="@vTier" Text="@vTier">@vTier</SelectItem>
+                }
+            </SelectContent>
+        </Select>
+    </section>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">Short options, MatchTriggerWidth="false"</h2>
+        <Select TValue="string" @bind-Value="objSize" Class="flex w-60">
+            <SelectTrigger Class="w-60" data-testid="short-trigger"><SelectValue Placeholder="Size" /></SelectTrigger>
+            <SelectContent MatchTriggerWidth="false">
+                <SelectItem Value="@("S")" Text="S">S</SelectItem>
+                <SelectItem Value="@("M")" Text="M">M</SelectItem>
+            </SelectContent>
+        </Select>
+    </section>
+</div>
+
+@code {
+    private static readonly string[] Tiers =
+        ["Tier 1 — the strongest", "Tier 2 — everyday", "Tier 3 — on this machine"];
+
+    private string? objWideTier;
+    private string? objDefaultTier;
+    private string? objSize;
+}

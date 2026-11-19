@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="sub">Last rendered: 2026-11-05</div>
+    <div class="sub">Last rendered: 2026-11-19</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#table-of-contents">Table of Contents</a></li>
@@ -116,6 +116,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li class="h3"><a href="#screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11">2.1.0 screens (added / changed by REQ-UI-017 — all runtime-verified 2026-08-11)</a></li>
         <li class="h3"><a href="#screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes-runtime-verified-2026-09-13">2.0.6 screens (changed by REQ-UI-019 and REQ-UI-020, the TfLens passes — runtime-verified 2026-09-13)</a></li>
         <li class="h3"><a href="#chatur-screens-chatur-req-ui-021-req-ui-032-runtime-verified-2026-10-07">Chatur screens (Chatur — REQ-UI-021…REQ-UI-032 — runtime-verified 2026-10-07)</a></li>
+        <li class="h3"><a href="#consumer-feedback-of-19-nov-2026-req-ui-069-req-ui-078-runtime-verified-2026-11-19">Consumer feedback of 19 Nov 2026 (REQ-UI-069…REQ-UI-078 — runtime-verified 2026-11-19)</a></li>
         <li><a href="#library-lineage-how-a-styled-component-resolves">4. Library lineage — how a styled component resolves</a></li>
         <li><a href="#known-issues">5. Known issues</a></li>
         <li><a href="#runtime-screenshots">6. Runtime screenshots</a></li>
@@ -126,7 +127,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Developer Guide (as-built screen map)</h1>
-    <div class="subtitle">Rendered 2026-11-05 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
+    <div class="subtitle">Rendered 2026-11-19 &middot; source <code>TrBlazeUI-DevGuide.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -138,6 +139,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li class="h3"><a href="#screens-added-changed-by-req-ui-017-all-runtime-verified-2026-08-11">2.1.0 screens (added / changed by REQ-UI-017 — all runtime-verified 2026-08-11)</a></li>
         <li class="h3"><a href="#screens-changed-by-req-ui-019-and-req-ui-020-the-tflens-passes-runtime-verified-2026-09-13">2.0.6 screens (changed by REQ-UI-019 and REQ-UI-020, the TfLens passes — runtime-verified 2026-09-13)</a></li>
         <li class="h3"><a href="#chatur-screens-chatur-req-ui-021-req-ui-032-runtime-verified-2026-10-07">Chatur screens (Chatur — REQ-UI-021…REQ-UI-032 — runtime-verified 2026-10-07)</a></li>
+        <li class="h3"><a href="#consumer-feedback-of-19-nov-2026-req-ui-069-req-ui-078-runtime-verified-2026-11-19">Consumer feedback of 19 Nov 2026 (REQ-UI-069…REQ-UI-078 — runtime-verified 2026-11-19)</a></li>
         <li><a href="#library-lineage-how-a-styled-component-resolves">4. Library lineage — how a styled component resolves</a></li>
         <li><a href="#known-issues">5. Known issues</a></li>
         <li><a href="#runtime-screenshots">6. Runtime screenshots</a></li>
@@ -369,6 +371,26 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </table>
 <p>Screenshots: <code>screenshots/TrBlazeUI/code-editor.png</code>, <code>stepper.png</code>, <code>badge.png</code> and their <code>-mobile</code> versions (§6).</p>
 <p><em>(The remaining ~68 component demos and ~14 primitive demos follow the identical lineage shape; they are enumerated in the demo <code>Pages/Components/</code> and <code>Pages/Primitives/</code> folders and indexed in the BRD §9 feature catalog.)</em></p>
+<h3 id="consumer-feedback-of-19-nov-2026-req-ui-069-req-ui-078-runtime-verified-2026-11-19"><a id="consumer-feedback-of-19-nov-2026-req-ui-069req-ui-078--runtime-verified-2026-11-19"></a>Consumer feedback of 19 Nov 2026 (REQ-UI-069…REQ-UI-078 — runtime-verified 2026-11-19)<a class="anchor-link" href="#consumer-feedback-of-19-nov-2026-req-ui-069-req-ui-078-runtime-verified-2026-11-19">#</a></h3>
+<table>
+<thead><tr><th>Screen</th><th>Route</th><th>Demo page file</th><th>Library surface exercised</th><th>Seen 2026-11-19</th></tr></thead>
+<tbody>
+<tr><td>DatePicker (Sevak TR-050)</td><td><code>/components/date-picker</code></td><td><code>Pages/Components/DatePickerDemo.razor</code></td><td><code>DatePicker</code> → styled <code>Popover</code> → <code>Primitives.Popover.PopoverTrigger</code> (<code>AsChild</code> toggle, Escape on the trigger) and <code>PopoverContent</code> (Escape → <code>FocusTriggerAsync</code>)</td><td>at 1280 and 390 Escape closes from the button and from inside, a second click closes, focus returns (req-ui-069.spec.ts)</td></tr>
+<tr><td>Badge class change (TrStudio TR-016)</td><td><code>/verify-trstudio-tr016</code></td><td><code>Pages/VerifyTrStudioTr016.razor</code></td><td><code>Badge.CssClass</code> (computed each render)</td><td>class and colour follow both ways; not reproduced (req-ui-070.spec.ts)</td></tr>
+<tr><td>Column header explained (TfLens TR-041)</td><td><code>/verify-tflens-tr041</code></td><td><code>Pages/VerifyTfLensTr041.razor</code></td><td><code>DataTableColumn.HeaderTitle</code>, <code>HeaderTemplate</code> → <code>ColumnData</code> → <code>DataTable.razor</code> header cell</td><td><code>title</code> on the cell, sortable column still sorts, Tooltip opens (req-ui-071.spec.ts)</td></tr>
+<tr><td>Grid centring (Chatur TR-027)</td><td>— (stylesheet)</td><td>—</td><td><code>wwwroot/css/trblazeui-input.css</code> <code>@source inline</code> <code>place-*</code>, <code>justify-self-*</code> → <code>wwwroot/trblazeui.css</code></td><td>the bundle alone centres an icon in its tile (req-ui-072.spec.ts)</td></tr>
+<tr><td>Log count (Chatur, owner)</td><td><code>/verify-chatur-log-count</code></td><td><code>Pages/VerifyChaturLogCount.razor</code></td><td><code>LogView</code> <code>OnParametersSet</code> (withdraws <code>objAnnouncement</code>) → <code>ScheduleAnnouncement</code> → <code>AnnounceWhenQuietAsync</code></td><td>no stated count differs from the lines shown, while streaming or after (req-ui-073.spec.ts)</td></tr>
+<tr><td>Wide Select list (Chatur TR-026)</td><td><code>/verify-chatur-tr026</code></td><td><code>Pages/VerifyChaturTr026.razor</code></td><td>styled <code>SelectContent.MatchTriggerWidth</code> → <code>Primitives.Select.SelectContent.MinTriggerWidth</code> → <code>FloatingPortal.MinAnchorWidth</code> → <code>positioning.js</code> <code>minReferenceWidth</code></td><td>1280 and 390: list ~200 px for a 160 px button, no option wraps; the default still matches (req-ui-074.spec.ts)</td></tr>
+<tr><td>Sidebar phone mode (TrStudio TR-015)</td><td>any page (<code>MainLayout</code>)</td><td><code>Shared/MainLayout.razor</code></td><td><code>SidebarProvider</code> → <code>wwwroot/js/sidebar.js</code> <code>setupMobileDetection</code> (<code>matchMedia</code>) → <code>OnMobileChange</code></td><td>with <code>innerWidth</code> made late, 1280 → 390 → 1280 switches each time (req-ui-075.spec.ts)</td></tr>
+<tr><td>Submenu re-placed (Chatur TR-025)</td><td><code>/verify-chatur-tr025</code></td><td><code>Pages/VerifyChaturTr025.razor</code></td><td><code>MenubarSubContent.OnAfterRenderAsync</code> → <code>SubmenuPlacer.FitAsync</code> every render → <code>submenu.js</code> <code>fit</code> + <code>naturalWidth</code> → <code>SubmenuPlacer.IsSame</code></td><td>rows arriving after it opened keep 8 px at 390 (req-ui-076.spec.ts)</td></tr>
+<tr><td>Calendar marks (MyDiary TR-001)</td><td><code>/verify-mydiary-tr001</code></td><td><code>Pages/VerifyMyDiaryTr001.razor</code></td><td><code>Calendar.MarkedDates</code>, <code>MarkedLabel</code>, <code>MarkClass</code>; <code>OnParametersSet</code> → <code>ShouldRender</code></td><td>dots on 3, 10, 19; a mark and a <code>Class</code> added later both show (req-ui-077.spec.ts)</td></tr>
+<tr><td>Combobox <code>Id</code> in a Dialog (Sevak TR-042)</td><td><code>/verify-sevak-tr042</code></td><td><code>Pages/VerifySevakTr042.razor</code></td><td><code>Combobox</code> (private <code>Id</code>, splatted <code>id</code>) inside <code>DialogContent</code></td><td>both ids reach the page, no error (req-ui-078.spec.ts)</td></tr>
+</tbody>
+</table>
+<p>Call chain (Escape and second click, Sevak TR-050): <code>Button.HandleKeyDown</code> → <code>TriggerContext.OnKeyDown</code> = <code>PopoverTrigger.HandleKeyDownAsync</code> (<code>src/TrBlazeUI.Primitives/Primitives/Popover/PopoverTrigger.razor:142</code>) → <code>PopoverContext.Close</code> when open and <code>PopoverContext.CloseOnEscape</code> (set by <code>PopoverContent.OnParametersSet</code>). A click → <code>Button</code> → <code>TriggerContext.Toggle</code> (<code>PopoverTrigger.razor:83</code>) → <code>Close</code> when open, else <code>Open</code>. Escape inside the content → <code>PopoverContent.HandleKeyDown</code> → <code>Close</code> → <code>FocusTriggerAsync</code> (<code>PopoverContent.razor:255</code>) → <code>PopoverState.TriggerElement.FocusAsync</code>.</p>
+<p>Call chain (log count): <code>LogView.OnParametersSet</code> appends the new lines, sets <code>objAnnouncement = null</code> in the same render, → <code>ScheduleAnnouncement</code> (one waiter, <code>objFirstUnstatedTicks</code>) → <code>AnnounceWhenQuietAsync</code> (<code>LogView.razor:501</code>): <code>Task.Delay(1500)</code> until the stamp holds still or 3000 ms have passed → <code>InvokeAsync</code> → <code>objAnnouncement = BuildSummary()</code> (<code>:527</code>) and <code>objIsAnnouncePending = false</code>, both on the dispatcher.</p>
+<p>Call chain (submenu re-placed, Chatur TR-025): any render of an open <code>MenubarSubContent</code> → <code>OnAfterRenderAsync</code> → <code>SubmenuPlacer.FitAsync</code> → <code>submenu.js</code> <code>fit</code> (<code>:19</code>), which reads <code>naturalWidth</code> (<code>:56</code>: inline <code>left</code>/<code>right</code>/<code>max-width</code> lifted for one layout read) and the parent row's box → <code>SubmenuPlacer.IsSame</code> (<code>MenubarSubContent.razor:81</code>) → <code>StateHasChanged</code> only when the place changed. <code>DropdownMenuSubContent</code> and <code>ContextMenuSubContent</code> follow the same lines.</p>
+<p>Where to break: <code>PopoverTrigger.razor:142</code>, <code>LogView.razor:527</code>, <code>submenu.js:19</code>, <code>sidebar.js:64</code>, <code>positioning.js:160</code>, <code>Calendar.razor:698</code>, <code>DataTable.razor:147</code>.</p>
 <h2 id="library-lineage-how-a-styled-component-resolves"><a id="4-library-lineage--how-a-styled-component-resolves"></a>4. Library lineage — how a styled component resolves<a class="anchor-link" href="#library-lineage-how-a-styled-component-resolves">#</a></h2>
 <div class="diagram">
   <div class="dt">
@@ -391,6 +413,8 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <p>A reader chasing a bug starts at the demo page, drops into the styled component (<code>.razor</code> markup + <code>.razor.cs</code> logic), then into the primitive it composes (for behavior/ARIA), and finally into the relevant JS interop file or DI service. Symbols that don't resolve to a real file/component in <code>src/</code> are hallucinations — verify against the folders listed in <code>docs/TrBlazeUI-Architecture.md §4</code>.</p>
 <h2 id="known-issues"><a id="5-known-issues"></a>5. Known issues<a class="anchor-link" href="#known-issues">#</a></h2>
 <ul>
+<li><strong>✅ FIXED 2026-11-19, in 2.2.6 (prepared) — REQ-UI-069…REQ-UI-078.</strong> Sevak TR-050, Chatur TR-025…TR-027 and the output strip's count, TfLens TR-041, TrStudio TR-015, MyDiary TR-001; Sevak TR-042 newly held by a test. TrStudio TR-016 not reproduced (WKWebView only). See §3 above.
+</li>
 <li><strong>✅ FIXED 2026-10-08, not yet released — Sevak TR-041 and TR-006 (<code>REQ-UI-044</code>, <code>REQ-UI-045</code>).</strong> A Select inside a Dialog can no longer freeze the page: <code>SelectContent</code> catches its script import, <code>FloatingPortal</code> places the content under its anchor when positioning fails and renders inline when the portal host times out (both failures injected by <code>tests/verify/req-ui-044.spec.ts</code>). New <code>Chat</code> family (<code>Components/Chat/</code>, <code>wwwroot/js/chat-composer.js</code>), verified by <code>req-ui-045.spec.ts</code>.
 </li>
 <li><strong>✅ FIXED 2026-10-07, not yet released — Sevak feedback (<code>REQ-UI-034</code>…<code>REQ-UI-043</code>, <code>REQ-FN-011</code>).</strong> <code>Table</code> family (<code>Components/Table/</code>), <code>ToastVariant</code> Success/Info/Warning + <code>ToastService.Warning</code>/<code>.Info</code>, <code>AlertDialogAction</code>/<code>AlertDialogCancel</code> <code>OnClick</code>/<code>PreventClose</code>, <code>Textarea.Rows</code>/<code>MaxRows</code>, <code>CardTitle</code>/<code>AlertTitle</code> <code>As</code> (now code components <code>CardTitle.cs</code>/<code>AlertTitle.cs</code>, since Razor cannot take an element name from a parameter), <code>NumericInput</code> always <code>role="spinbutton"</code> with invariant ARIA numbers (<code>Slider</code> too), the <code>NumberInput</code> obsolete shim, <code>SelectValue</code> placeholder when no item matches, <code>ToastProvider</code> viewport <code>pointer-events-none</code>, <code>HtmlSanitizer</code> stable 9.1.x. Verified by <code>tests/verify/req-ui-034.spec.ts</code>, <code>req-ui-037.spec.ts</code>, <code>req-ui-040.spec.ts</code> and <code>req-fn.spec.ts</code> (REQ-FN-011). Sevak filed against 1.0.7; 23 of its 34 entries were already fixed by 2.1.4 and are answered in <code>docs/Sevak-TrBlazeUI-Feedback.md</code>.

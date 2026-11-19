@@ -4,6 +4,8 @@
 
 @* Styled SelectContent wrapper around SelectContent primitive *@
 <TrBlazeUI.Primitives.Select.SelectContent TValue="TValue"
+                                               MatchTriggerWidth="@MatchTriggerWidth"
+                                               MinTriggerWidth="@(!MatchTriggerWidth)"
                                                class="@CssClass" @attributes="AdditionalAttributes">
     <div class="p-1">
         @ChildContent
@@ -29,6 +31,18 @@
     /// </summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the list is exactly as wide as its trigger. Default is true.
+    /// </summary>
+    /// <remarks>
+    /// Set it to false to let the list grow to its longest option, as shadcn/ui's Select does: the
+    /// trigger's width becomes the list's minimum width, and the window its maximum. A picker
+    /// whose options are longer than its button no longer wraps every option onto two lines
+    /// (Chatur TR-026).
+    /// </remarks>
+    [Parameter]
+    public bool MatchTriggerWidth { get; set; } = true;
 
     /// <summary>
     /// Gets the computed CSS classes for the content container.

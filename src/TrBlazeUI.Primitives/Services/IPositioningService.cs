@@ -82,6 +82,12 @@ public class PositioningOptions
     /// Whether to match the floating element width to the reference element width.
     /// </summary>
     public bool MatchReferenceWidth { get; set; }
+
+    /// <summary>
+    /// Whether the floating element is at least as wide as the reference element, and wider when
+    /// its content needs it. Ignored when <see cref="MatchReferenceWidth"/> is true.
+    /// </summary>
+    public bool MinReferenceWidth { get; set; }
 }
 
 /// <summary>

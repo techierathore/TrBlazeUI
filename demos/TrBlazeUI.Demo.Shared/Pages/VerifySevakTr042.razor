@@ -1,0 +1,56 @@
+@page "/verify-sevak-tr042"
+@using TrBlazeUI.Components.Combobox
+@using TrBlazeUI.Components.Dialog
+
+@* Verification harness for Sevak TR-042 (docs/Sevak-TrBlazeUI-Feedback.md).
+   Not a documentation demo: Sevak's Tasks "Add task" dialog with its goal picker carrying
+   Id="task-goal-picker". On 1.0.7 Combobox had a public Id that was not a [Parameter], so setting it
+   threw on render and ended the session; since 2.1.4 Id is private and the attribute is splatted
+   onto the root. tests/verify/req-ui-078.spec.ts opens the dialog and checks both spellings. *@
+
+<PageTitle>Verify Sevak TR-042 - TrBlazeUI</PageTitle>
+
+<div class="mx-auto max-w-md space-y-6 p-6">
+    <h1 class="text-2xl font-bold" data-testid="verify-heading">Sevak TR-042 Combobox Id in a Dialog</h1>
+
+    <Dialog>
+        <DialogTrigger class="rounded border px-3 py-1" data-testid="open-add-task">Add task</DialogTrigger>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Add task</DialogTitle>
+            </DialogHeader>
+            <Combobox TItem="GoalOption"
+                      Items="@Goals"
+                      @bind-Value="objGoal"
+                      ValueSelector="@(aGoal => aGoal.Key)"
+                      DisplaySelector="@(aGoal => aGoal.Text)"
+                      Placeholder="Pick a goal"
+                      Id="task-goal-picker" />
+            <Combobox TItem="GoalOption"
+                      Items="@Goals"
+                      @bind-Value="objOtherGoal"
+                      ValueSelector="@(aGoal => aGoal.Key)"
+                      DisplaySelector="@(aGoal => aGoal.Text)"
+                      Placeholder="Pick another goal"
+                      id="task-other-goal-picker" />
+        </DialogContent>
+    </Dialog>
+
+    <button type="button" class="rounded border px-3 py-1" data-testid="ping" @onclick="@(() => objPings++)">Ping</button>
+    <span data-testid="ping-count">@objPings</span>
+</div>
+
+@code {
+    private static readonly GoalOption[] Goals = [new("health", "Health"), new("money", "Money")];
+
+    private string? objGoal;
+    private string? objOtherGoal;
+    private int objPings;
+
+    /// <summary>
+    /// One goal a task can serve.
+    /// </summary>
+    /// <param name="Key">The goal's key.</param>
+    /// <param name="Text">The goal's name.</param>
+    private sealed record GoalOption(string Key, string Text);
+}

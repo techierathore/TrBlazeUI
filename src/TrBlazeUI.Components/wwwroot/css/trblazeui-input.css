@@ -659,6 +659,12 @@
 @source inline("{sm:,md:,lg:,xl:,2xl:,}justify-items-{start,end,center,stretch}");
 @source inline("{sm:,md:,lg:,xl:,2xl:,}content-{start,end,center,between,around,evenly,stretch}");
 @source inline("self-{auto,start,end,center,stretch,baseline}");
+/* The place-* shorthands a grid tile is centred with (Chatur TR-027: `grid place-items-center`
+   left an icon in its tile's top-left corner because none of these were in the bundle). */
+@source inline("{sm:,md:,lg:,xl:,2xl:,}place-items-{start,end,center,stretch,baseline}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}place-content-{start,end,center,between,around,evenly,stretch,baseline}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}place-self-{auto,start,end,center,stretch}");
+@source inline("{sm:,md:,lg:,xl:,2xl:,}justify-self-{auto,start,end,center,stretch}");
 @source inline("{sm:,md:,lg:,xl:,2xl:,}order-{1..12}");
 @source inline("{sm:,md:,lg:,xl:,2xl:,}grid-cols-{1..12}");
 @source inline("{sm:,md:,lg:,xl:,2xl:,}grid-cols-none");

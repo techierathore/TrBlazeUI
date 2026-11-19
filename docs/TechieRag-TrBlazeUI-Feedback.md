@@ -1,26 +1,32 @@
 # TrBlazeUI Feedback — surfaced during TechieRag
 
-## Summary (filled by /flow-master on consolidation)
-- 0 blockers, 0 major, 0 open minor, 0 open nice-to-haves — **ALL RESOLVED**
-- Last consolidated: **2026-08-11** (`*handoff-phase` — re-confirmed 0 open; no disposition changed since 2026-07-02. The separate NU1902 / AngleSharp supply-chain blocker they surfaced closed 2026-07-18 under REQ-FN-009.)
-- Last consolidated: 2026-07-02 — **all 4 issues resolved by the TrBlazeUI team** (`[REQ-UI-015]`): TR-003/TR-004 fixed in the library (SidebarInset `min-w-0`; DataTable `relative overflow-auto` wrapper + wrapping pagination), TR-001 addressed with docs (README/UsageGuide/skills now state the interactive-render-tree requirement) plus a runtime inline fallback + console warning for Select/Popover/DropdownMenu when no interactive PortalHost is attached, TR-002 fixed in the integration-skill scaffolding notes. Release build 0/0; runtime-verified headless at 390px (shell capped at viewport, table scrolls internally, pagination wraps). Your app-side workarounds (`main { min-width:0 }`, DataTable wrapper divs) can be dropped after picking up the next package version.
-- Previous: 0 blockers, 0 major, 2 open minor (TR-003, TR-004 — both worked around app-side 2026-07-02; TR-001 resolved), 1 nice-to-have · consolidated 2026-07-01 (TR-003/TR-004 appended 2026-07-02 by verifier)
+| | |
+|---|---|
+| App | TechieRag |
+| Upstream | TrBlazeUI |
+| Updated | 2026-11-19 |
 
-## Issues
+## Summary
+
+4 entries: nothing is blocked. 0 open, 0 fixed upstream and not yet re-checked, 4 closed. Every entry was fixed library-side on 2026-07-02.
+
+## Entries
 
 <!-- Append entries as gaps are found. IDs are append-only, never renumbered.
      TrBlazeUI → TR-NNN -->
 
 ### TR-001 — ✅ RESOLVED (app config) — TrBlazeUI overlays (Select/Toast/Dialog) silently fail when the app root isn't interactive
 - **Severity:** minor → **RESOLVED 2026-07-01 (app-side, not a library defect)**
+- **Blocks:** no — fixed in the app config and the work carried on
+- **Expected:** every overlay renders
+- **Encountered in:** `/llm-settings`, 2026-07-01
 - **Repro:** all TrBlazeUI overlays (`Select` dropdown content, `ToastProvider`, `Dialog`) render into a `PortalHost` hosted in `MainLayout.razor`. The sample's `App.razor` rendered `<Routes />` + `<HeadOutlet />` with **no render mode** (static SSR) while each page set `@rendermode InteractiveServer` individually — so the layout + `PortalHost` sat in a static tree while pages were interactive.
-- **Symptoms observed:** (1) `ToastService.Success/Error` produced no DOM node app-wide (Save/Reset silent); (2) the **Source `<Select>` dropdown on /llm-settings would not open** — console spammed `Portal select-portal-select-N-content render timeout` + `Floating element is not ready or not in DOM` from `TrBlazeUI.Primitives/js/primitives/positioning.js`, followed by `JSDisconnectedException` in `SelectContent.DisposeAsync`; (3) the REQ-UI-013 vector-detail modal did not open.
-- **Root cause:** render-mode boundary — a `PortalHost` in a statically-rendered layout can't host portal content emitted by interactive pages, so positioning runs before the floating element is in the interactive DOM.
-- **Fix applied (app-side):** switched the sample to **global interactivity** — `App.razor` now sets `@rendermode="InteractiveServer"` on both `<HeadOutlet>` and `<Routes>`, and the 9 now-conflicting per-page `@rendermode InteractiveServer` declarations were removed. Live-verified 2026-07-01: the Source dropdown opens and all 7 options select correctly, Save shows the "LLM configuration saved and applied" toast, and `portalErrors = 0`.
-- **Suggested fix for the library team (doc-only):** document that `ToastProvider`/`PortalHost`/`Select`/`Dialog` require the hosting layout to be in an interactive render tree (global interactivity or an interactive boundary around the PortalHost) — a static layout + per-page interactivity silently breaks all overlays. Optionally emit a clearer diagnostic than "Floating element is not ready" when the PortalHost is non-interactive.
-- **Resolution (2026-07-02, TrBlazeUI):** DONE — the interactive-render-tree requirement is now documented in the README (PortalHost step), `docs/TrBlazeUI-UsageGuide.md` (Consumer integration notes), and both distributable integration skills (`docs/skills/claude-code-trblazeui.md` / `opencode-trblazeui.md`), with the exact symptom list and the global-interactivity fix you applied. Beyond docs: `FloatingPortal` now detects when no interactive `PortalHost` is attached (also true in the static-layout case, since a static host never registers with the circuit-scoped `PortalService`) and **falls back to rendering Select/Popover/DropdownMenu popups inline** with a clear one-time console warning ("no `<PortalHost />` is attached … add `<PortalHost />` to your root layout") — replacing the cryptic `Floating element is not ready` / portal-timeout spam for those components. Toast and Dialog still require an interactive host, as documented.
+- **Actual:** (1) `ToastService.Success/Error` produced no DOM node app-wide (Save/Reset silent); (2) the **Source `<Select>` dropdown on /llm-settings would not open** — console spammed `Portal select-portal-select-N-content render timeout` + `Floating element is not ready or not in DOM` from `TrBlazeUI.Primitives/js/primitives/positioning.js`, followed by `JSDisconnectedException` in `SelectContent.DisposeAsync`; (3) the REQ-UI-013 vector-detail modal did not open.
+- **Workaround:** switched the sample to **global interactivity** — `App.razor` now sets `@rendermode="InteractiveServer"` on both `<HeadOutlet>` and `<Routes>`, and the 9 now-conflicting per-page `@rendermode InteractiveServer` declarations were removed. Live-verified 2026-07-01: the Source dropdown opens and all 7 options select correctly, Save shows the "LLM configuration saved and applied" toast, and `portalErrors = 0`.
+- **Suggested fix:** (documentation only) document that `ToastProvider`/`PortalHost`/`Select`/`Dialog` require the hosting layout to be in an interactive render tree (global interactivity or an interactive boundary around the PortalHost) — a static layout + per-page interactivity silently breaks all overlays. Optionally emit a clearer diagnostic than "Floating element is not ready" when the PortalHost is non-interactive.
 
 ### TR-002 — Dangling `{Assembly}.styles.css` link 404s when a project has no scoped component CSS
+> ✅ **Fixed upstream 2026-07-02** — the Resolution line at the end of this entry; marked on 2026-11-19 so the feedback reader stops counting it open.
 - **Severity:** nice-to-have
 - **Repro:** the TrBlazeUI sample scaffold's `App.razor` links `<link rel="stylesheet" href="TechieRagWeb.styles.css" />`, but the project has no `.razor.css` companion files, so the scoped-CSS bundle is never generated and `MapStaticAssets()` returns 404 for it on every page load.
 - **Expected:** no 404 for an unused scoped bundle.
@@ -31,6 +37,7 @@
 - **Resolution (2026-07-02, TrBlazeUI):** FIXED — the scaffold guidance comes from the TrBlazeUI integration skills; both (`docs/skills/claude-code-trblazeui.md` `existing_app_notes`, `opencode-trblazeui.md` Integration Notes) now instruct: *if the project has no `.razor.css` scoped-CSS files, remove (or don't scaffold) the `<link href="{AssemblyName}.styles.css" />` line from `App.razor` — the bundle is never generated and the link 404s on every page.* Existing apps: delete the line (it comes from the stock Blazor template).
 
 ### TR-003 — `SidebarInset` doesn't contain over-wide page content: whole shell (main + header) stretches past the viewport on mobile
+> ✅ **Fixed upstream 2026-07-02** — the Resolution line at the end of this entry; marked on 2026-11-19 so the feedback reader stops counting it open.
 - **Severity:** minor
 - **Repro:** at a 390×844 viewport, load a page whose content min-width exceeds the viewport (e.g. TechieRag sample `/tool-demo`: a `flex items-center justify-between` card-header row plus a `Textarea + Button` `flex gap-2` row give ~455px min-content; `/ingestion` reaches 560px). The `SidebarInset`-rendered `<main class="relative flex h-full flex-1 flex-col …">` grows to the content's min-width (455/560px) instead of staying at viewport width — `document.scrollWidth > window.innerWidth`, and the `<header>` (with the `SidebarTrigger`) stretches with it, so the whole app shell pans horizontally and right-side controls ("Add Custom Tool", "Run Agent Loop") sit off-canvas.
 - **Expected:** the inset/main is capped at the viewport (`min-w-0` on the flex item + overflow containment), so over-wide content scrolls *inside* the content region while the header/shell stays fixed — matching shadcn sidebar behavior where the inset can't push the layout wider than the screen.
@@ -42,6 +49,7 @@
 - **Resolution (2026-07-02, TrBlazeUI):** FIXED — `SidebarInset` now includes `min-w-0` in its base classes (`src/TrBlazeUI.Components/Components/Sidebar/SidebarInset.razor`), so the inset shrinks to the viewport instead of growing to its content's min-width; over-wide content scrolls inside the content region and can never widen the shell/header. Runtime-verified at 390×844 against the demo's DataTable page (656px-wide table): `main` computed `min-width: 0px`, `main` width = 390px, `document.scrollWidth == clientWidth == 390`. Your `base.css` workaround becomes redundant on the next package version (harmless to keep).
 
 ### TR-004 — `DataTable` ships no contained scroll wrapper; its pagination's `sr-only` spans escape scroll containers and widen the page
+> ✅ **Fixed upstream 2026-07-02** — the Resolution line at the end of this entry; marked on 2026-11-19 so the feedback reader stops counting it open.
 - **Severity:** minor
 - **Repro:** render a `DataTable` whose table (or pagination bar: "Rows per page … Page N of M … first/prev/next/last") is wider than a narrow viewport. Two defects compound:
   1. The component renders `div.w-full > div.rounded-md > table` with **no `overflow-auto` wrapper** (shadcn's Table renders `<div class="relative w-full overflow-auto">` around the table), so the table's min-content width propagates to the page.
@@ -51,3 +59,17 @@
 - **Workaround applied (app-side, 2026-07-02):** wrap every `<DataTable>` in `<div class="relative overflow-x-auto">` — `relative` makes the wrapper the containing block for the sr-only spans so the scroll container clips them.
 - **Suggested fix:** render the shadcn-style `relative w-full overflow-auto` wrapper inside `DataTable` itself (covering table + pagination), and/or use the standard sr-only recipe with `clip`/`clip-path` inside a positioned parent so hidden labels can't extend the page's scrollable area.
 - **Resolution (2026-07-02, TrBlazeUI):** FIXED — three library changes: (1) `DataTable`'s table container is now the shadcn-style `relative w-full overflow-auto rounded-md border` (wide tables scroll inside the component; `relative` also makes it the containing block for any absolutely-positioned hidden spans); (2) the built-in pagination bar and its inner content row now `flex-wrap` (`gap-2`, `sm:gap-6 lg:gap-8`) so "Rows per page … Page N of M … buttons" reflows at narrow widths instead of forcing min-content width; (3) `trblazeui.css` ships a hardened `.sr-only` (`left:0 !important` + `clip`/`clip-path:inset(50%)` recipe) so visually-hidden pagination labels can never extend the page's scrollable area regardless of ancestor positioning (same fix as AstroLyfe TR-006 — the two reports corroborated each other). Runtime-verified at 390px: table 648px scrolls inside a 342px wrapper, pagination bar fits with no internal overflow, `document.scrollWidth == 390`; desktop layout unchanged. Your per-table `<div class="relative overflow-x-auto">` wrappers become redundant on the next package version.
+
+## Resolution status — earlier summaries
+
+The Summary as it stood before 2026-11-19, kept unchanged as the record, and TR-001's root-cause and resolution lines, moved here from the entry unchanged.
+
+TR-001 **Root cause:** render-mode boundary — a `PortalHost` in a statically-rendered layout can't host portal content emitted by interactive pages, so positioning runs before the floating element is in the interactive DOM.
+
+TR-001 **Resolution (2026-07-02, TrBlazeUI):** DONE — the interactive-render-tree requirement is now documented in the README (PortalHost step), `docs/TrBlazeUI-UsageGuide.md` (Consumer integration notes), and both distributable integration skills (`docs/skills/claude-code-trblazeui.md` / `opencode-trblazeui.md`), with the exact symptom list and the global-interactivity fix you applied. Beyond docs: `FloatingPortal` now detects when no interactive `PortalHost` is attached (also true in the static-layout case, since a static host never registers with the circuit-scoped `PortalService`) and **falls back to rendering Select/Popover/DropdownMenu popups inline** with a clear one-time console warning ("no `<PortalHost />` is attached … add `<PortalHost />` to your root layout") — replacing the cryptic `Floating element is not ready` / portal-timeout spam for those components. Toast and Dialog still require an interactive host, as documented.
+
+- 0 blockers, 0 major, 0 open minor, 0 open nice-to-haves — **ALL RESOLVED**
+- Last consolidated: **2026-08-11** (`*handoff-phase` — re-confirmed 0 open; no disposition changed since 2026-07-02. The separate NU1902 / AngleSharp supply-chain blocker they surfaced closed 2026-07-18 under REQ-FN-009.)
+- Last consolidated: 2026-07-02 — **all 4 issues resolved by the TrBlazeUI team** (`[REQ-UI-015]`): TR-003/TR-004 fixed in the library (SidebarInset `min-w-0`; DataTable `relative overflow-auto` wrapper + wrapping pagination), TR-001 addressed with docs (README/UsageGuide/skills now state the interactive-render-tree requirement) plus a runtime inline fallback + console warning for Select/Popover/DropdownMenu when no interactive PortalHost is attached, TR-002 fixed in the integration-skill scaffolding notes. Release build 0/0; runtime-verified headless at 390px (shell capped at viewport, table scrolls internally, pagination wraps). Your app-side workarounds (`main { min-width:0 }`, DataTable wrapper divs) can be dropped after picking up the next package version.
+- Previous: 0 blockers, 0 major, 2 open minor (TR-003, TR-004 — both worked around app-side 2026-07-02; TR-001 resolved), 1 nice-to-have · consolidated 2026-07-01 (TR-003/TR-004 appended 2026-07-02 by verifier)
+

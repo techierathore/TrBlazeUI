@@ -1,16 +1,31 @@
 # TrBlazeUI Feedback — surfaced during TechieFlow framework work
 
+| | |
+|---|---|
+| App | TechieFlow |
+| Upstream | TrBlazeUI |
+| Updated | 2026-11-19 |
+
 > For the TrBlazeUI team. Found during the 2026-06-12 framework audit (see `WorkFlow-Context.md`).
 > Per-app feedback lives in each consumer repo as `docs/<APP>-TrBlazeUI-Feedback.md` — one file
 > per library so it can be handed to (or picked up by) the owning team directly.
 
 ## Summary
-- All three findings are resolved in TrBlazeUI source.
-- Ships in: **TrBlazeUI.Components 2.0.3** — verified, pending owner-manual publish.
-- Remaining TechieFlow action after publication: restore 2.0.3 in a clean framework consumer, refresh any generated compatibility snapshot from the package-owned files, and rerun agent discovery/delegation smoke.
-- Last consolidated: 2026-08-25
 
-## Issues
+4 entries: nothing is blocked. 0 open, 0 fixed upstream and not yet re-checked, 4 closed. TR-004 copied in from TechieFlow's own file on 2026-11-19; fixed in 2.1.9.
+
+## Entries
+
+### TR-004 — A disabled menu item says so only with its styling
+> ✅ **Fixed upstream, in 2.1.9** — a disabled `MenubarItem`, `MenubarCheckboxItem` and `ContextMenuItem` renders `aria-disabled="true"` and `data-disabled`. Tests `tests/verify/req-ui-050.spec.ts`.
+
+- **Severity:** minor
+- **Status:** closed, filed 2026-10-13, fixed in 2.1.9
+- **Blocks:** no — TechieFlow's menu walk (Chatur TF-011) now also reads an item that takes no pointer events as disabled.
+- **Repro:** Chatur's `MenuBar.razor`, `<MenubarItem Disabled="@(!CanEdit)" …>Undo</MenubarItem>` with no file open. It renders `<div role="menuitem" class="… pointer-events-none opacity-50">Undo</div>`: no `aria-disabled`, no `data-disabled`.
+- **Expected:** a disabled `MenubarItem` (and `DropdownMenuItem`) carries `aria-disabled="true"` and `data-disabled`, as the WAI-ARIA menu pattern asks. A screen reader then announces it as unavailable, and a test can find it with `getByRole('menuitem', { disabled: true })`.
+- **Actual:** a screen reader announces Undo as available; a click on it times out in Playwright (no pointer events) instead of being reported as disabled.
+- **Also seen:** an open `Menubar` menu does not close on Escape, or on a click on an empty part of the page; a click on page text does close it.
 
 ### TR-003 — NuGet package does not deploy a native Codex persona
 - **Severity:** major
@@ -42,3 +57,13 @@
 - **Encountered in:** TechieFlow framework audit 2026-06-12, issue I-13 in `WorkFlow-Context.md`.
 - **Workaround:** the framework's `scaffold-*.sh` and `update-framework.sh` now shim-copy `.claude/trblazeui.md` → `.claude/commands/trblazeui.md` after every run (NuGet file stays authoritative). The shim only refreshes when a script runs, so a persona updated by `dotnet build` is stale in Claude Code until the next `update-framework.sh`.
 - **Suggested fix:** change the MSBuild deploy target to write the Claude Code copy to `.claude/commands/trblazeui.md` (keep `.opencode/command/trblazeui.md` and the `.trblazeui/` reference doc as they are). Backwards-compatible: also delete any old `.claude/trblazeui.md` on deploy. Once shipped, the framework shim becomes a harmless no-op.
+
+## Resolution status — earlier summaries
+
+The Summary as it stood before 2026-11-19, kept unchanged as the record.
+
+- All three findings are resolved in TrBlazeUI source.
+- Ships in: **TrBlazeUI.Components 2.0.3** — verified, pending owner-manual publish.
+- Remaining TechieFlow action after publication: restore 2.0.3 in a clean framework consumer, refresh any generated compatibility snapshot from the package-owned files, and rerun agent discovery/delegation smoke.
+- Last consolidated: 2026-08-25
+

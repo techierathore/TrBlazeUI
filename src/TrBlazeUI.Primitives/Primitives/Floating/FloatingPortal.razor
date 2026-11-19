@@ -77,6 +77,14 @@
     public bool MatchAnchorWidth { get; set; } = false;
 
     /// <summary>
+    /// Whether the floating content is at least as wide as the anchor element and grows with its
+    /// content, capped at the window. Ignored when <see cref="MatchAnchorWidth"/> is true.
+    /// Default is false.
+    /// </summary>
+    [Parameter]
+    public bool MinAnchorWidth { get; set; } = false;
+
+    /// <summary>
     /// CSS positioning strategy: "absolute" or "fixed".
     /// Use "fixed" for dropdowns that need to escape stacking contexts.
     /// Default is "absolute".
@@ -312,6 +320,7 @@
                 Placement = placement,
                 Offset = Offset,
                 MatchReferenceWidth = MatchAnchorWidth,
+                MinReferenceWidth = MinAnchorWidth,
                 Strategy = Strategy,
                 Flip = true,  // Enable flip to opposite side when not enough space
                 Shift = true  // Enable shift to keep in viewport

@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Status</h1>
-    <div class="sub">Last rendered: 2026-11-13</div>
+    <div class="sub">Last rendered: 2026-11-19</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#where-i-am">Where I am</a></li>
@@ -121,7 +121,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Status</h1>
-    <div class="subtitle">Rendered 2026-11-13 &middot; source <code>PROJECT-STATUS.md</code></div>
+    <div class="subtitle">Rendered 2026-11-19 &middot; source <code>PROJECT-STATUS.md</code></div>
     <div class="cta-next" style="padding:20px; background:var(--cta-bg); border:2px solid var(--accent); border-radius:10px; margin:20px 0;">
       <div style="font-size:11px; color:var(--muted); letter-spacing:.5px;">NEXT COMMAND TO RUN</div>
       <div style="font-family:var(--mono); font-size:18px; margin-top:6px;">(owner) commit, then build and publish the package — its shipped documents are current; no agent command</div>
@@ -129,10 +129,10 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <table>
 <tbody>
 <tr><th>project</th><td>TrBlazeUI</td></tr>
-<tr><th>last_updated</th><td>2026-11-13</td></tr>
-<tr><th>current_phase</th><td>Release — handoff done, 84 of 84 verified</td></tr>
+<tr><th>last_updated</th><td>2026-11-19</td></tr>
+<tr><th>current_phase</th><td>Release — handoff done, 95 of 95 verified</td></tr>
 <tr><th>last_verified_build</th><td>PASS</td></tr>
-<tr><th>last_verified_date</th><td>2026-11-13</td></tr>
+<tr><th>last_verified_date</th><td>2026-11-19</td></tr>
 </tbody>
 </table>
     <div class="toc-inline">
@@ -149,7 +149,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
       </ol>
     </div>
 <h2 id="where-i-am">Where I am<a class="anchor-link" href="#where-i-am">#</a></h2>
-<p>Every row is Verified. New row REQ-UI-068 (Sevak TR-049): removing a component whose JavaScript side is already gone no longer ends the session. The fix covers <code>SidebarProvider</code> and ten more components through the new <code>JSTeardown</code> helper, and it is not in 2.2.4. 2.2.4 is on GitHub Packages and holds TR-047 and TR-048. CHANGELOG, the agent reference and Sevak's file are current.</p>
+<p>Every row is Verified. Rows REQ-UI-069 to REQ-UI-079 answer the apps' open entries: Sevak TR-050, Chatur TR-025 to TR-027 and the log count, TfLens TR-041, TrStudio TR-015, MyDiary TR-001, plus tests for Sevak TR-042 and TrStudio TR-016 and a keyboard-shortcut teardown fix. Version 2.2.6 is prepared: base version, CHANGELOG and release notes. Full suite 139 of 139 passed.</p>
 <h2 id="next-command-to-run">Next command to run<a class="anchor-link" href="#next-command-to-run">#</a></h2>
 <p>Claude Code:</p>
 <pre><code>(owner) commit, then build and publish the package — its shipped documents are current; no agent command</code></pre>
@@ -173,13 +173,19 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </ul>
 <h2 id="known-blockers">Known blockers<a class="anchor-link" href="#known-blockers">#</a></h2>
 <ul>
-<li>Mac (2026-11-11): REQ-NFR-001, REQ-UI-020, REQ-UI-063 and REQ-UI-021 fail from machine setup (WSL-only axe path, Chromium <code>flow-end</code>) or parallel-worker flakes; each passes alone.
+<li>Replies were written only in this repository's <code>docs/</code> copies; the apps' own feedback files were not touched (owner's rule of 2026-11-19).
 </li>
-<li>The demo's <code>app.css</code> is gitignored and needs <code>tools/tailwindcss.exe</code>, absent here; without it 8 rows 404. Generated with the Tailwind 4.1.11 npm CLI.
+<li>TrStudio TR-016 did not reproduce in Chromium; it needs the rendered class from TrStudio's Mac web view.
 </li>
-<li>TR-049 reaches consumers only when the owner publishes the release after 2.2.4.
+<li>Two old checks read one shared server log and clash under two workers (REQ-UI-021 TR-013, REQ-UI-028); REQ-UI-063 presses a key before its menu takes focus under load. Each passes alone.
 </li>
-<li>CHANGELOG <code>[Unreleased]</code> still holds what shipped in 2.2.3 and 2.2.4, beside TR-049; 2.1.10 and 2.2.0 have no section. The owner sorts the headings.
+<li><code>tests/package/codex-agent-deployment.sh</code> rebuilds <code>bin/</code> without the Primitives dll; rebuild before REQ-FN-012.
+</li>
+<li>Mac (2026-11-11): REQ-NFR-001, REQ-UI-020, REQ-UI-063 and REQ-UI-021 fail from machine setup or parallel-worker flakes; each passes alone.
+</li>
+<li>The demo's gitignored <code>app.css</code> needs <code>tools/tailwindcss.exe</code>; without it 8 rows 404.
+</li>
+<li>CHANGELOG "Shipped in 2.2.3 to 2.2.5" is not yet split by release; 2.1.10 and 2.2.0 have no section.
 </li>
 <li>The MAUI WebView reload was not driven (no MAUI demo); the browser test makes the same state.
 </li>
@@ -189,11 +195,11 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <table>
 <thead><tr><th>Date</th><th>Phase</th><th>Result</th><th>Status table</th></tr></thead>
 <tbody>
-<tr><td>2026-11-05</td><td>triage-and-fix + handoff</td><td>79/80 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-11-05</td><td>build-phase</td><td>79/81 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-11-05</td><td>build-phase + handoff</td><td>81/81 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-11-12</td><td>verify REQ-UI-065, REQ-UI-066</td><td>83/83 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 <tr><td>2026-11-13</td><td>triage-and-fix + handoff</td><td>84/84 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
+<tr><td>2026-11-19</td><td>triage-and-fix + handoff</td><td>95/95 Verified</td><td>docs/TrBlazeUI-Checklist.md#requirements-status</td></tr>
 </tbody>
 </table>
 <h2 id="library-feedback-summary">Library feedback summary<a class="anchor-link" href="#library-feedback-summary">#</a></h2>
@@ -203,20 +209,18 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 </ul>
 <h2 id="standards-compliance">Standards compliance<a class="anchor-link" href="#standards-compliance">#</a></h2>
 <ul>
-<li>Last check 2026-11-02: 0 findings, see the checklist Remarks.
+<li>Last check 2026-11-19: 0 findings in the 18 source files this run changed, see the checklist Remarks.
 </li>
 </ul>
 <h2 id="deferred-future"><a id="deferred--future"></a>Deferred / future<a class="anchor-link" href="#deferred-future">#</a></h2>
 <ul>
+<li>Owner's call, not built: Chip, read-only InputOTP, Calendar day counts (MyDiary GLM-5.3).
+</li>
 <li>Register <code>ContextMenuSub</code> in its list as Menubar now does (TR-023 cause).
 </li>
 <li>Submenu pull-back margin as a parameter.
 </li>
 <li>Dark Destructive Button text 2.77:1.
-</li>
-<li>InputGroup demo menu items only log; show the choice.
-</li>
-<li>Container-width <code>HideBelow</code>, if Chatur asks.
 </li>
 <li>No test forces the portal-timeout inline fallback.
 </li>

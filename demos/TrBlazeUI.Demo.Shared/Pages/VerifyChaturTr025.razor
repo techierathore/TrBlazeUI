@@ -1,0 +1,76 @@
+@page "/verify-chatur-tr025"
+@using TrBlazeUI.Components.Menubar
+
+@* Verification harness for Chatur TR-025 (docs/Chatur-TrBlazeUI-Feedback.md).
+   Not a documentation demo: Chatur's File ▸ Recent projects ▸, behind a 52 px brand block as in
+   Chatur's window. Like Chatur's MenuBar (LoadRecentAsync on the File trigger's pointerdown), the
+   list is re-read every time File is pressed and the answer lands a moment later - here 700 ms -
+   so the list is already open when its rows change from the three names of the 2026-11-10 run to
+   the six of the 2026-11-13 run. tests/verify/req-ui-076.spec.ts checks that the list still keeps
+   8 px from the window's edges once its new rows are in. *@
+
+<PageTitle>Verify Chatur TR-025 - TrBlazeUI</PageTitle>
+
+<div class="space-y-6 py-6">
+    <h1 class="px-3 text-2xl font-bold" data-testid="verify-heading">Chatur TR-025 pulled-back submenu margin</h1>
+
+    <div class="flex items-center">
+        <div class="w-[52px] shrink-0 px-2 text-sm font-semibold">Ch</div>
+        <Menubar data-testid="tr025-menubar">
+            <MenubarMenu>
+                <MenubarTrigger @onpointerdown="LoadRecentAsync" data-testid="tr025-file">File</MenubarTrigger>
+                <MenubarContent>
+                    <MenubarItem>New project</MenubarItem>
+                    <MenubarItem>Open a solution</MenubarItem>
+                    <MenubarItem>Open a folder</MenubarItem>
+                    <MenubarItem>Clone a repository</MenubarItem>
+                    <MenubarSeparator />
+                    <MenubarSub>
+                        <MenubarSubTrigger data-testid="tr025-recent">Recent projects</MenubarSubTrigger>
+                        <MenubarSubContent data-testid="tr025-recent-list">
+                            @foreach (var vName in objRecent)
+                            {
+                                <MenubarItem OnClick="@(() => objChoice = vName)" data-testid="@($"tr025-recent-{vName}")">@vName</MenubarItem>
+                            }
+                            <MenubarSeparator />
+                            <MenubarItem OnClick="@(() => objChoice = "Project list")" data-testid="tr025-project-list">Project list</MenubarItem>
+                        </MenubarSubContent>
+                    </MenubarSub>
+                    <MenubarSeparator />
+                    <MenubarItem>Close the solution</MenubarItem>
+                    <MenubarItem>Exit</MenubarItem>
+                </MenubarContent>
+            </MenubarMenu>
+            <MenubarMenu>
+                <MenubarTrigger>Edit</MenubarTrigger>
+                <MenubarContent>
+                    <MenubarItem>Undo</MenubarItem>
+                </MenubarContent>
+            </MenubarMenu>
+        </Menubar>
+    </div>
+
+    <p class="px-3 text-sm" data-testid="tr025-choice">@objChoice</p>
+</div>
+
+@code {
+    private static readonly string[] EarlierNames = ["WbAFilesApp", "workbench-b", "Fixture"];
+
+    private static readonly string[] LaterNames =
+        ["WbAFilesApp", "workbench-b", "Fixture", "ReportRealApp", "reportspec-proj", "SetEstFixture"];
+
+    private string[] objRecent = EarlierNames;
+    private string? objChoice;
+
+    /// <summary>
+    /// Re-reads the recent projects as Chatur does when File is pressed; the answer arrives 700 ms
+    /// later, after the submenu has had time to open with the earlier rows.
+    /// </summary>
+    /// <returns>A task that completes when the new rows are rendered.</returns>
+    private async Task LoadRecentAsync()
+    {
+        objRecent = EarlierNames;
+        await Task.Delay(700);
+        objRecent = LaterNames;
+    }
+}

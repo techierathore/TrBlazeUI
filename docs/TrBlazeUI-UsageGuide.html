@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)</h1>
-    <div class="sub">Last rendered: 2026-11-05</div>
+    <div class="sub">Last rendered: 2026-11-19</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#test-users-canonical-use-these-for-all-smoke-verify-uat">Test users (canonical — use THESE for all smoke / verify / UAT)</a></li>
@@ -128,12 +128,14 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li class="h3"><a href="#theming-dark-mode-any-page">Theming &amp;amp; dark mode (any page)</a></li>
         <li class="h3"><a href="#tflens-consumer-feedback-fixes-verify-tflens-2-verify-tflens-3">TfLens consumer-feedback fixes (/verify-tflens-2, /verify-tflens-3)</a></li>
         <li class="h3"><a href="#components-added-for-chatur-components-code-editor-components-stepper-components-badge-components-switch-components-datatable-components-toggle-group-components-tree-view-components-diff-view-components-log-view-components-nav-list-components-typing">Components added for Chatur (/components/code-editor, /components/stepper, /components/badge, /components/switch, /components/datatable, /components/toggle-group, /components/tree-view, /components/diff-view, /components/log-view, /components/nav-list, /components/typing)</a></li>
+        <li class="h3"><a href="#consumer-feedback-of-19-nov-2026-components-date-picker-verify-chatur-tr025-verify-chatur-tr026-verify-chatur-log-count-verify-tflens-tr041-verify-trstudio-tr016-verify-mydiary-tr001-verify-sevak-tr042">Consumer feedback of 19 Nov 2026 (/components/date-picker, /verify-chatur-tr025, /verify-chatur-tr026, /verify-chatur-log-count, /verify-tflens-tr041, /verify-trstudio-tr016, /verify-mydiary-tr001, /verify-sevak-tr042)</a></li>
         <li class="h3"><a href="#render-mode-parity">Render-mode parity</a></li>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#setup-deployment-steps-runbook-one-command-per-line-in-order">Setup / Deployment steps (runbook — one command per line, in order)</a></li>
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
+        <li class="h3"><a href="#added-2026-11-19-sevak-tr-050-chatur-tr-025-tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001-req-ui-069-req-ui-078-2-2-6-prepared">Added 2026-11-19 (Sevak TR-050, Chatur TR-025…TR-027, TfLens TR-041, TrStudio TR-015, MyDiary TR-001 — REQ-UI-069…REQ-UI-078 — 2.2.6, prepared)</a></li>
         <li class="h3"><a href="#added-2026-10-15-asp-net-core-advisories-req-nfr-005">Added 2026-10-15 (ASP.NET Core advisories — REQ-NFR-005)</a></li>
         <li class="h3"><a href="#added-2026-10-15-lekhak-tr-007-req-ui-052-not-yet-released">Added 2026-10-15 (Lekhak TR-007 — REQ-UI-052 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-13-chatur-tr-020-tr-021-req-ui-050-req-ui-051-not-yet-released">Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)</a></li>
@@ -154,7 +156,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)</h1>
-    <div class="subtitle">Rendered 2026-11-05 &middot; source <code>TrBlazeUI-UsageGuide.md</code></div>
+    <div class="subtitle">Rendered 2026-11-19 &middot; source <code>TrBlazeUI-UsageGuide.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -178,12 +180,14 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li class="h3"><a href="#theming-dark-mode-any-page">Theming &amp;amp; dark mode (any page)</a></li>
         <li class="h3"><a href="#tflens-consumer-feedback-fixes-verify-tflens-2-verify-tflens-3">TfLens consumer-feedback fixes (/verify-tflens-2, /verify-tflens-3)</a></li>
         <li class="h3"><a href="#components-added-for-chatur-components-code-editor-components-stepper-components-badge-components-switch-components-datatable-components-toggle-group-components-tree-view-components-diff-view-components-log-view-components-nav-list-components-typing">Components added for Chatur (/components/code-editor, /components/stepper, /components/badge, /components/switch, /components/datatable, /components/toggle-group, /components/tree-view, /components/diff-view, /components/log-view, /components/nav-list, /components/typing)</a></li>
+        <li class="h3"><a href="#consumer-feedback-of-19-nov-2026-components-date-picker-verify-chatur-tr025-verify-chatur-tr026-verify-chatur-log-count-verify-tflens-tr041-verify-trstudio-tr016-verify-mydiary-tr001-verify-sevak-tr042">Consumer feedback of 19 Nov 2026 (/components/date-picker, /verify-chatur-tr025, /verify-chatur-tr026, /verify-chatur-log-count, /verify-tflens-tr041, /verify-trstudio-tr016, /verify-mydiary-tr001, /verify-sevak-tr042)</a></li>
         <li class="h3"><a href="#render-mode-parity">Render-mode parity</a></li>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#setup-deployment-steps-runbook-one-command-per-line-in-order">Setup / Deployment steps (runbook — one command per line, in order)</a></li>
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
+        <li class="h3"><a href="#added-2026-11-19-sevak-tr-050-chatur-tr-025-tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001-req-ui-069-req-ui-078-2-2-6-prepared">Added 2026-11-19 (Sevak TR-050, Chatur TR-025…TR-027, TfLens TR-041, TrStudio TR-015, MyDiary TR-001 — REQ-UI-069…REQ-UI-078 — 2.2.6, prepared)</a></li>
         <li class="h3"><a href="#added-2026-10-15-asp-net-core-advisories-req-nfr-005">Added 2026-10-15 (ASP.NET Core advisories — REQ-NFR-005)</a></li>
         <li class="h3"><a href="#added-2026-10-15-lekhak-tr-007-req-ui-052-not-yet-released">Added 2026-10-15 (Lekhak TR-007 — REQ-UI-052 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-13-chatur-tr-020-tr-021-req-ui-050-req-ui-051-not-yet-released">Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)</a></li>
@@ -370,6 +374,15 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <li><strong>Covers:</strong> REQ-UI-021…REQ-UI-032
 </li>
 </ul>
+<h3 id="consumer-feedback-of-19-nov-2026-components-date-picker-verify-chatur-tr025-verify-chatur-tr026-verify-chatur-log-count-verify-tflens-tr041-verify-trstudio-tr016-verify-mydiary-tr001-verify-sevak-tr042"><a id="consumer-feedback-of-19-nov-2026-componentsdate-picker-verify-chatur-tr025-verify-chatur-tr026-verify-chatur-log-count-verify-tflens-tr041-verify-trstudio-tr016-verify-mydiary-tr001-verify-sevak-tr042"></a>Consumer feedback of 19 Nov 2026 (<code>/components/date-picker</code>, <code>/verify-chatur-tr025</code>, <code>/verify-chatur-tr026</code>, <code>/verify-chatur-log-count</code>, <code>/verify-tflens-tr041</code>, <code>/verify-trstudio-tr016</code>, <code>/verify-mydiary-tr001</code>, <code>/verify-sevak-tr042</code>)<a class="anchor-link" href="#consumer-feedback-of-19-nov-2026-components-date-picker-verify-chatur-tr025-verify-chatur-tr026-verify-chatur-log-count-verify-tflens-tr041-verify-trstudio-tr016-verify-mydiary-tr001-verify-sevak-tr042">#</a></h3>
+<ul>
+<li><strong>Steps:</strong> open a date picker, press Escape, open it again and click its button; at 390 px open File ▸ Recent projects ▸ and wait for the six names; open the "MatchTriggerWidth=false" tier picker; press "Add 2 lines" twice and "Stream 12 lines"; hover the "i" in the drift table's window header; toggle the badges; press "Write on the 25th"; open the Add task dialog. Resize any page from 1280 to 390 in one step.
+</li>
+<li><strong>Expected:</strong> the calendar closes both times and the focus stays on its button; the recent list keeps 8 px from both edges; the tier options stay on one line; the log's spoken count never differs from the lines shown; the tooltip opens; the badges change colour; the 25th gets a dot; the dialog opens with no error; the sidebar becomes the phone menu at once.
+</li>
+<li><strong>Covers:</strong> REQ-UI-069…REQ-UI-078
+</li>
+</ul>
 <h3 id="render-mode-parity">Render-mode parity<a class="anchor-link" href="#render-mode-parity">#</a></h3>
 <ul>
 <li><strong>Steps:</strong> repeat a few of the above in Server (5183), WASM (5184) and Auto (5185).
@@ -438,8 +451,23 @@ bash tests/package/codex-agent-deployment.sh</code></pre>
 </li>
 <li>[ ] Open the InputGroup demo, type in "Search with a button" and press Go — the line below shows what you typed
 </li>
+<li>[ ] Open a date picker and press Escape — the calendar closes and the focus stays on its button
+</li>
 </ul>
 <h2 id="consumer-integration-notes">Consumer integration notes<a class="anchor-link" href="#consumer-integration-notes">#</a></h2>
+<h3 id="added-2026-11-19-sevak-tr-050-chatur-tr-025-tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001-req-ui-069-req-ui-078-2-2-6-prepared"><a id="added-2026-11-19-sevak-tr-050-chatur-tr-025tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001--req-ui-069req-ui-078--226-prepared"></a>Added 2026-11-19 (Sevak TR-050, Chatur TR-025…TR-027, TfLens TR-041, TrStudio TR-015, MyDiary TR-001 — REQ-UI-069…REQ-UI-078 — 2.2.6, prepared)<a class="anchor-link" href="#added-2026-11-19-sevak-tr-050-chatur-tr-025-tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001-req-ui-069-req-ui-078-2-2-6-prepared">#</a></h3>
+<ul>
+<li><strong>Popovers close the way menus do</strong>: Escape on a popover's trigger closes it, Escape inside it returns the focus to the trigger, and a second click on an <code>AsChild</code> trigger (DatePicker, DateRangePicker, TimePicker, ColorPicker) closes it.
+</li>
+<li><strong>A Select list wider than its button</strong>: <code>&lt;SelectContent MatchTriggerWidth="false"&gt;</code>.
+</li>
+<li><strong>A column header that explains itself</strong>: <code>DataTableColumn HeaderTitle="…"</code> or a <code>HeaderTemplate</code>.
+</li>
+<li><strong>Days with content</strong>: <code>Calendar MarkedDates="@(d =&gt; days.Contains(d.Date))" MarkedLabel="has an entry"</code>; bind the day with <code>@bind-Selected</code>, not <code>@bind-Value</code>.
+</li>
+<li><strong>Grid centring</strong>: <code>place-items-*</code>, <code>place-content-*</code>, <code>place-self-*</code>, <code>justify-self-*</code> are in <code>trblazeui.css</code>.
+</li>
+</ul>
 <h3 id="added-2026-10-15-asp-net-core-advisories-req-nfr-005"><a id="added-2026-10-15-aspnet-core-advisories--req-nfr-005"></a>Added 2026-10-15 (ASP.NET Core advisories — REQ-NFR-005)<a class="anchor-link" href="#added-2026-10-15-asp-net-core-advisories-req-nfr-005">#</a></h3>
 <ul>
 <li><strong>⚠ WebAssembly and Auto apps: move <code>Microsoft.AspNetCore.Components.WebAssembly.Server</code> to 10.0.13.</strong> 10.0.0 to 10.0.12 carry GHSA-g27p-qf6j-c96c and GHSA-qjpx-jqm5-h2c4; with warnings as errors, restore fails with NU1903. The TrBlazeUI packages need no change.
@@ -609,7 +637,11 @@ bash tests/package/codex-agent-deployment.sh</code></pre>
 </li>
 <li><strong><code>HtmlSanitizer 9.1.949-beta</code> is a pre-release dependency</strong>, taken for the AngleSharp CVE-2026-54570 fix. Revisit when 9.1.x is stable.
 </li>
-<li><strong>Consumer feedback fixed library-side, waiting for the consumer's own re-check:</strong> Chatur TR-018 (fixed 2026-10-07, not yet released; TR-015/TR-016/TR-017 were re-checked and closed by Chatur on 2.1.3 the same day); TfLens TR-036/TR-037/TR-038 (fixed 2026-09-13, in 2.0.6); TrStudio TR-011 (fixed 2026-07-12); AstroLyfe TR-001…TR-012 and TechieRag TR-001…TR-004 (fixed under REQ-UI-014/015/016, their files carry no closing mark).
+<li><strong>Consumer feedback fixed library-side, waiting for the consumer's own re-check:</strong> Sevak TR-050, Chatur TR-025…TR-027 and the output strip's count, TfLens TR-041, TrStudio TR-015, MyDiary TR-001 (all in 2.2.6, prepared 2026-11-19); Lekhak TR-007 (2.1.7).
+</li>
+<li><strong>TrStudio TR-016 (a Badge kept its first colour) did not reproduce</strong> in Chromium; it was seen in a Mac Catalyst WKWebView, which this machine cannot run. The entry asks TrStudio for the rendered class attribute.
+</li>
+<li><strong>Not built (new features, owner's decision):</strong> MyDiary GLM-5.3 TR-004 (a Chip component) and TR-005 (a read-only masked InputOTP); a per-day count or link on Calendar.
 </li>
 </ul>
   </main>

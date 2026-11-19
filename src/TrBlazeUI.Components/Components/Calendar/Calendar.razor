@@ -89,6 +89,7 @@
                                 var isSelected = day.HasValue && Selected.HasValue && day.Value.Date == Selected.Value.Date;
                                 var isDisabled = day.HasValue && (IsDisabled(day.Value) || day.Value.Month != DisplayDate.Month);
                                 var isFocused = day.HasValue && objFocusedDate.HasValue && day.Value.Date == objFocusedDate.Value.Date;
+                                var isMarked = day.HasValue && IsMarked(day.Value);
                                 <td class="@GetCellClasses(day, isSelected)"
                                     role="gridcell"
                                     aria-selected="@(isSelected ? "true" : "false")">
@@ -96,13 +97,21 @@
                                     {
                                         <button type="button"
                                                 id="@GetDayId(day.Value)"
-                                                class="@GetDayClasses(day.Value, isSelected, isDisabled, isFocused)"
+                                                class="@GetDayClasses(day.Value, isSelected, isDisabled, isFocused, isMarked)"
+                                                data-marked="@(isMarked ? "true" : null)"
+                                                aria-label="@(isMarked ? day.Value.Day.ToString(System.Globalization.CultureInfo.CurrentCulture) + ", " + MarkedLabel : null)"
                                                 disabled="@isDisabled"
                                                 tabindex="@(isFocused ? 0 : -1)"
                                                 @onclick="@(() => SelectDateAsync(day.Value))"
                                                 @onclick:stopPropagation="true"
                                                 @onfocus="@(() => HandleDayFocus(day.Value))">
                                             @day.Value.Day
+                                            @if (isMarked)
+                                            {
+                                                <span aria-hidden="true"
+                                                      data-slot="calendar-day-mark"
+                                                      class="@MarkCssClass"></span>
+                                            }
                                         </button>
                                     }
                                 </td>
@@ -139,6 +148,7 @@
     private bool objLastShowMonthYearDropdowns;
     private DateTime? objLastFocusedDate;
     private bool objLastIsKeyboardNavigating;
+    private bool objParametersChanged;
 
     /// <summary>
     /// The currently displayed month.
@@ -228,6 +238,31 @@
     public string? CellClass { get; set; }
 
     /// <summary>
+    /// Gets or sets which days carry a mark: a dot under the number, for a day that has content
+    /// (MyDiary TR-001: a journal shows at a glance which days have an entry).
+    /// </summary>
+    /// <remarks>
+    /// Asked for each day shown, like <see cref="DisabledDates"/>. A marked day can still be
+    /// picked, and screen readers hear <see cref="MarkedLabel"/> after its number. A changed set
+    /// reaches the grid on the parent's next render.
+    /// </remarks>
+    [Parameter]
+    public Func<DateTime, bool>? MarkedDates { get; set; }
+
+    /// <summary>
+    /// Gets or sets what a screen reader hears after the number of a marked day, for example
+    /// "has an entry". Default is <c>"marked"</c>.
+    /// </summary>
+    [Parameter]
+    public string MarkedLabel { get; set; } = "marked";
+
+    /// <summary>
+    /// Gets or sets additional CSS classes for the mark's dot, for example a colour.
+    /// </summary>
+    [Parameter]
+    public string? MarkClass { get; set; }
+
+    /// <summary>
     /// Additional attributes to apply to the calendar.
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
@@ -248,6 +283,11 @@
 
     protected override void OnParametersSet()
     {
+        // A render asked for by the parent always goes through: Class, DayClass, CellClass,
+        // DisabledDates and MarkedDates are not among the fields ShouldRender tracks, and a mark or
+        // a class the parent changed used to be dropped (MyDiary TR-001, and TrStudio TR-016's shape).
+        objParametersChanged = true;
+
         // Only sync display date when Selected actually changes from external source
         // This prevents overwriting user's month/year navigation
         if (Selected != objPreviousSelected)
@@ -650,7 +690,22 @@
         return string.IsNullOrEmpty(CellClass) ? baseClass : ClassNames.cn(baseClass, CellClass);
     }
 
-    private string GetDayClasses(DateTime date, bool isSelected, bool isDisabled, bool isFocused)
+    /// <summary>
+    /// Tells whether a day carries a mark.
+    /// </summary>
+    /// <param name="aDate">The day.</param>
+    /// <returns>True when <see cref="MarkedDates"/> says so.</returns>
+    private bool IsMarked(DateTime aDate) => MarkedDates?.Invoke(aDate.Date) == true;
+
+    /// <summary>
+    /// Gets the classes of a marked day's dot: centred under the number in the button's own text
+    /// colour, so it stays visible on a selected (primary) day as well as an ordinary one.
+    /// </summary>
+    private string MarkCssClass => ClassNames.cn(
+        "pointer-events-none absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-current",
+        MarkClass);
+
+    private string GetDayClasses(DateTime date, bool isSelected, bool isDisabled, bool isFocused, bool aIsMarked = false)
     {
         string baseClass;
         if (isSelected)
@@ -668,6 +723,12 @@
             baseClass = ClassNames.cn(baseClass, "ring-2 ring-ring ring-offset-2");
         }
 
+        // A marked day holds its dot absolutely, under the number.
+        if (aIsMarked)
+        {
+            baseClass = ClassNames.cn(baseClass, "relative");
+        }
+
         return string.IsNullOrEmpty(DayClass) ? baseClass : ClassNames.cn(baseClass, DayClass);
     }
 
@@ -679,6 +740,19 @@
     /// </summary>
     protected override bool ShouldRender()
     {
+        if (objParametersChanged)
+        {
+            objParametersChanged = false;
+            objLastSelected = Selected;
+            objLastDisplayDate = objDisplayDate;
+            objLastMinDate = MinDate;
+            objLastMaxDate = MaxDate;
+            objLastShowMonthYearDropdowns = ShowMonthYearDropdowns;
+            objLastFocusedDate = objFocusedDate;
+            objLastIsKeyboardNavigating = objIsKeyboardNavigating;
+            return true;
+        }
+
         var selectedChanged = objLastSelected != Selected;
         var displayDateChanged = objLastDisplayDate != objDisplayDate;
         var minDateChanged = objLastMinDate != MinDate;

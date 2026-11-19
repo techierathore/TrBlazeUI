@@ -61,7 +61,6 @@
 
     private readonly SubmenuPlacer objPlacer = new();
     private ElementReference objListRef;
-    private bool objWasClosed = true;
     private SubmenuPlacement objPlacement = SubmenuPlacement.Default;
 
     private string? StyleAttribute => SubmenuPlacer.Style(objPlacement, AdditionalAttributes?.GetValueOrDefault("style")?.ToString());
@@ -70,20 +69,19 @@
     {
         if (Sub?.IsOpen != true)
         {
-            objWasClosed = true;
             objPlacement = SubmenuPlacement.Default;
             return;
         }
 
-        if (objWasClosed)
+        // Placed again on every render while open, not only when it opens: its rows can change
+        // while it is open, and a list placed for its old rows ran past the window (Chatur TR-025).
+        // fit() measures without our last placement, so a second pass gives the same answer and
+        // the re-render below happens only when the place really changed.
+        var vPlacement = await objPlacer.FitAsync(JSRuntime, objListRef);
+        if (!SubmenuPlacer.IsSame(vPlacement, objPlacement))
         {
-            objWasClosed = false;
-            var vPlacement = await objPlacer.FitAsync(JSRuntime, objListRef);
-            if (vPlacement.Side != objPlacement.Side || vPlacement.Offset > 0 || vPlacement.MaxWidth > 0)
-            {
-                objPlacement = vPlacement;
-                StateHasChanged();
-            }
+            objPlacement = vPlacement;
+            StateHasChanged();
         }
 
         if (Sub.TakeFocusFirst())

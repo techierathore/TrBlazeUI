@@ -20,7 +20,10 @@
    build writes it is unusable, and role="log" carries an implicit aria-live="polite", so that role
    is avoided outright. The lines sit in a plain labelled region and a separate visually hidden
    role="status" announces one summary ("412 lines, 3 warnings, 1 failure.") once the output has
-   been quiet for a moment. *@
+   been quiet for a moment - or, when the output never pauses, at most every few seconds. A summary
+   is withdrawn the moment a new line makes it out of date, so the panel never states a count other
+   than the lines it shows (it used to keep saying "2 lines" beside 4 while a program kept writing,
+   Chatur's output strip, 19 Nov 2026). *@
 
 <div class="@CssClass"
      data-slot="log-view"
@@ -83,6 +86,13 @@
     /// <summary>How long the output must be quiet before the summary is announced, in milliseconds.</summary>
     private const int QuietMilliseconds = 1500;
 
+    /// <summary>
+    /// The longest a changed count goes unstated while lines keep arriving with no quiet moment,
+    /// in milliseconds. Without it a program that writes a line every second never had its count
+    /// stated at all until it stopped.
+    /// </summary>
+    private const int LongestUnstatedMilliseconds = 3000;
+
     /// <summary>Stands in for a null <see cref="Lines"/> so the rest of the code needs no null checks.</summary>
     private static readonly LogLine[] EmptyLines = [];
 
@@ -104,6 +114,7 @@
     private int objWarningCount;
     private int objFailureCount;
     private int objAppendStamp;
+    private long objFirstUnstatedTicks;
     private bool objIsAnnouncePending;
     private bool objHasSignature;
     private bool objIsAtEnd = true;
@@ -307,6 +318,10 @@
             objLastConsumedLine = vLines[^1];
             objConsumed = vLines.Count;
             objShouldRender = true;
+
+            // The stated count is out of date the moment a line arrives: withdraw it in the same
+            // render that shows the line, and state the new one when the output pauses.
+            objAnnouncement = null;
             ScheduleAnnouncement();
         }
 
@@ -469,9 +484,20 @@
         }
 
         objIsAnnouncePending = true;
+        objFirstUnstatedTicks = Environment.TickCount64;
         _ = AnnounceWhenQuietAsync();
     }
 
+    /// <summary>
+    /// Waits for the output to pause - or for <see cref="LongestUnstatedMilliseconds"/> to pass -
+    /// and then states the count.
+    /// </summary>
+    /// <returns>A task that completes once the summary has been rendered.</returns>
+    /// <remarks>
+    /// The summary is built, and the waiter released, on the renderer's dispatcher in the same step
+    /// that shows it. Built beforehand, on whatever thread the delay resumed on, a line arriving in
+    /// between found the waiter still "pending", started no new one, and the old count stayed.
+    /// </remarks>
     private async Task AnnounceWhenQuietAsync()
     {
         try
@@ -481,7 +507,8 @@
             while (true)
             {
                 await Task.Delay(QuietMilliseconds, vToken);
-                if (objAppendStamp == vSeen)
+                if (objAppendStamp == vSeen
+                    || Environment.TickCount64 - objFirstUnstatedTicks >= LongestUnstatedMilliseconds)
                 {
                     break;
                 }
@@ -489,15 +516,15 @@
                 vSeen = objAppendStamp;
             }
 
-            var vSummary = BuildSummary();
             await InvokeAsync(() =>
             {
+                objIsAnnouncePending = false;
                 if (objIsDisposed)
                 {
                     return;
                 }
 
-                objAnnouncement = vSummary;
+                objAnnouncement = BuildSummary();
                 objShouldRender = true;
                 StateHasChanged();
             });
@@ -505,13 +532,11 @@
         catch (OperationCanceledException)
         {
             // The component went away while the log was quiet.
+            objIsAnnouncePending = false;
         }
         catch (ObjectDisposedException)
         {
             // The renderer went away while the log was quiet.
-        }
-        finally
-        {
             objIsAnnouncePending = false;
         }
     }

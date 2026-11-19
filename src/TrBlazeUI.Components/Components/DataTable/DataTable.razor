@@ -141,9 +141,17 @@
                                 <TableHeaderCell TData="TData" ColumnId="@(column.Sortable ? column.Id : null)"
                                                  Class="@ClassNames.cn(HeaderCellCssClass, column.Sortable ? "cursor-pointer select-none" : "", column.AlignTextClass, column.HeaderClass, column.HideBelowClass)"
                                                  style="@GetColumnWidthStyle(column)"
+                                                 title="@column.HeaderTitle"
                                                  aria-sort="@ariaSortValue">
                                     <div class="@ClassNames.cn("flex items-center gap-2", column.HeaderJustifyClass)">
-                                        <span>@column.Header</span>
+                                        @if (column.HeaderTemplate != null)
+                                        {
+                                            <span class="inline-flex items-center gap-1">@column.HeaderTemplate</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@column.Header</span>
+                                        }
                                         @if (column.Sortable && objTableState.Sorting.SortedColumn == column.Id)
                                         {
                                             @if (objTableState.Sorting.Direction == SortDirection.Ascending)

@@ -142,6 +142,42 @@ public partial class DataTableColumn<TData, TValue> : ComponentBase where TData 
     public string? HeaderClass { get; set; }
 
     /// <summary>
+    /// Gets or sets a short explanation of the column, rendered as the header cell's
+    /// <c>title</c>, which the browser shows as a tooltip.
+    /// </summary>
+    /// <remarks>
+    /// For a column whose name is short but whose meaning is not (TfLens TR-041: "checks ran on").
+    /// The column itself is configuration only and renders no element, so an unmatched
+    /// <c>title</c> attribute on it never reached the header; this parameter does. Null or empty
+    /// renders no <c>title</c>. For richer content - an info icon with a <c>Tooltip</c> - use
+    /// <see cref="HeaderTemplate"/>.
+    /// </remarks>
+    [Parameter]
+    public string? HeaderTitle { get; set; }
+
+    /// <summary>
+    /// Gets or sets content rendered in the header cell in place of the <see cref="Header"/> text.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="Header"/> is still required: it names the column in the toolbar's column list
+    /// and is the source of the generated <see cref="Id"/>. Sorting, its arrow and the cell's
+    /// <c>aria-sort</c> are unchanged; the template replaces only the label (TfLens TR-041).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// &lt;DataTableColumn Header="window" Property="@(r => r.Window)"&gt;
+    ///     &lt;HeaderTemplate&gt;
+    ///         window
+    ///         &lt;Tooltip&gt;&lt;TooltipTrigger&gt;ⓘ&lt;/TooltipTrigger&gt;
+    ///         &lt;TooltipContent&gt;How long a run may take&lt;/TooltipContent&gt;&lt;/Tooltip&gt;
+    ///     &lt;/HeaderTemplate&gt;
+    /// &lt;/DataTableColumn&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public RenderFragment? HeaderTemplate { get; set; }
+
+    /// <summary>
     /// Gets or sets the horizontal alignment of the column's header label and of every cell in it.
     /// </summary>
     /// <remarks>

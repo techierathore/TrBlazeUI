@@ -15,6 +15,7 @@ else
             id="@Context.TriggerId"
             @ref="@objTriggerRef"
             @onclick="HandleClick"
+            @onkeydown="HandleKeyDownAsync"
             @attributes="AdditionalAttributes"
             aria-haspopup="true"
             aria-expanded="@Context.IsOpen.ToString().ToLower()"
@@ -75,12 +76,26 @@ else
     {
         TriggerId = Context.TriggerId,
         IsOpen = Context.IsOpen,
-        // Toggle now only opens when closed (to prevent Blazor event routing edge cases)
-        Toggle = () => { if (!Context.IsOpen) Context.Open(objAsChildTriggerRef); },
+        // A second click on an AsChild trigger closes the popover. The trigger's own button gets the
+        // same result through pointer-events:none while open (the click lands outside and the
+        // click-outside handler closes it); an AsChild child, such as DatePicker's Button, keeps its
+        // pointer events, and its second click used to do nothing at all (Sevak TR-050).
+        Toggle = () =>
+        {
+            if (Context.IsOpen)
+            {
+                Context.Close();
+            }
+            else
+            {
+                Context.Open(objAsChildTriggerRef);
+            }
+        },
         Open = () => Context.Open(objAsChildTriggerRef),
         Close = () => Context.Close(),
         AriaHasPopup = "true",
         AriaControls = Context.ContentId,
+        OnKeyDown = HandleKeyDownAsync,
         SetTriggerElement = (ElementReference el) => objAsChildTriggerRef = el
     };
 
@@ -112,6 +127,26 @@ else
                 await OnClick.InvokeAsync(args);
             }
         }
+    }
+
+    /// <summary>
+    /// Closes the open popover when Escape is pressed on the trigger itself.
+    /// </summary>
+    /// <param name="aArgs">The key pressed.</param>
+    /// <returns>A completed task.</returns>
+    /// <remarks>
+    /// Opening a popover with a click leaves the focus on its trigger, and the content's own
+    /// Escape handler only hears keys pressed inside the content, so Escape did nothing until the
+    /// user tabbed into it (Sevak TR-050). The content's <c>CloseOnEscape</c> is honoured here too.
+    /// </remarks>
+    private Task HandleKeyDownAsync(KeyboardEventArgs aArgs)
+    {
+        if (aArgs.Key == "Escape" && Context.IsOpen && Context.CloseOnEscape)
+        {
+            Context.Close();
+        }
+
+        return Task.CompletedTask;
     }
 
     protected override void OnInitialized()

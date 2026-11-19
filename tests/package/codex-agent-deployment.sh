@@ -12,6 +12,14 @@ vVersion="9.9.910-smoke"
 rm -rf "$vArtifactsRoot"
 mkdir -p "$vPackageRoot" "$vConsumerRoot" "$vPreserveRoot"
 
+# Every run packs the same version, so NuGet's global cache keeps the first run's packages and serves
+# them to every later run: on 2026-11-19 a copy from 2026-08-25 broke the Components pack with
+# CS0234 (ISelectValueDisplay, added later). Remove this script's own smoke version, nothing else.
+vNugetCache="${NUGET_PACKAGES:-$HOME/.nuget/packages}"
+for vPackage in trblazeui.primitives trblazeui.icons.lucide trblazeui.components; do
+  rm -rf "${vNugetCache:?}/$vPackage/$vVersion"
+done
+
 dotnet pack "$vRepoRoot/src/TrBlazeUI.Primitives/TrBlazeUI.Primitives.csproj" -c Release -o "$vPackageRoot" -p:Version="$vVersion" -p:CI=true
 dotnet pack "$vRepoRoot/src/TrBlazeUI.Icons.Lucide/TrBlazeUI.Icons.Lucide.csproj" -c Release -o "$vPackageRoot" -p:Version="$vVersion" -p:CI=true
 dotnet pack "$vRepoRoot/src/TrBlazeUI.Components/TrBlazeUI.Components.csproj" -c Release -o "$vPackageRoot" -p:Version="$vVersion" -p:CI=true -p:UsePackageReferences=true -p:RestoreSources="$vPackageRoot"

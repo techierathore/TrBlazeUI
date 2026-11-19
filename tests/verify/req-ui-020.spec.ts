@@ -341,6 +341,9 @@ test.describe('Rows the fix cycle touched', () => {
 
   test('REQ-UI-001 TR-036 leaving a page with an opened Select logs no unhandled circuit exception', async ({ browser }) => {
     test.skip(!fs.existsSync(APP_LOG), `server log not readable here (${APP_LOG}); set APP_LOG`);
+    // Two routes, each with 8 s of fixed waits plus a cold page load: the 30 s default was spent
+    // exactly when run alone (30.0 s, 2026-11-19) and overrun under two workers.
+    test.setTimeout(120000);
 
     for (const route of ['/verify-tflens-3', '/components/select']) {
       const before = fs.readFileSync(APP_LOG, 'utf8').length;
