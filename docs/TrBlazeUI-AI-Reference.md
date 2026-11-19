@@ -479,6 +479,11 @@ beats every rule in `trblazeui.css`, which is all in cascade layers. Put it in t
 > order, and a Tailwind build names them in its first line. CSS the host leaves unlayered still beats
 > everything; layer it or accept that.
 
+**Layout utilities in the bundle.** `trblazeui.css` carries the standard Tailwind layout scale with
+its `sm:` to `2xl:` forms, so an app needs no Tailwind build of its own for layout. That includes,
+after 2.2.5, `place-items-*`, `place-content-*`, `place-self-*` and `justify-self-*` (Chatur TR-027:
+`grid place-items-center` used to leave an icon in its tile's corner because the class was absent).
+
 Link the project's own scoped bundle (`<link href="{AssemblyName}.styles.css" />`) **only if the
 project has `.razor.css` files**; without them the bundle is never generated and the link 404s on
 every page (Sevak TR-002). The library needs no scoped bundle.
@@ -585,6 +590,11 @@ Root wrapper that manages sidebar state, persistence, and responsive behavior.
 `--sidebar-width-mobile` (**18rem**, not 16rem). All three ship as `:root` declarations you can
 theme globally; the parameters above set them on this shell only, which is what you want when one
 layout differs from the rest of the app.
+
+**Phone mode follows the window (after 2.2.5, TrStudio TR-015).** Below 768 px the sidebar becomes
+the slide-out phone menu. The mode is now read from a media query on every resize, so a window
+resized in one step (a script, a window-snapping tool, a Mac Catalyst web view whose `innerWidth`
+updates late) switches at once instead of one resize late.
 
 **Teardown after a reload (after 2.2.4, Sevak TR-049).** Removing the provider is safe even when
 its JavaScript side is already gone: after a WebView reload, on the router's not-found path, or
@@ -1088,7 +1098,9 @@ Parts: `Menubar`, `MenubarMenu`, `MenubarTrigger`, `MenubarContent`, `MenubarIte
 > and flips to the left when the window has no room on the right (at 390 px, the third level
 > opens over the first). When neither side has room (after 2.2.2, Chatur TR-024), it keeps the
 > roomier side and is pulled back so its far edge sits 8 px inside the window, over part of the
-> parent list; a list wider than the window gets a `max-width` and its rows wrap. The arrow keys
+> parent list; a list wider than the window gets a `max-width` and its rows wrap. Its place is
+> worked out again whenever it renders (after 2.2.5, Chatur TR-025), so rows loaded while it is open
+> — a recent-projects list re-read when File is pressed — keep the 8 px margin. The arrow keys
 > walk the rows in the order drawn, a ▸ row in its place (after 2.2.2, Chatur TR-023). Test hooks
 > go on the parts: `data-testid` on `MenubarSubTrigger` lands on the row, on `MenubarSubContent`
 > on the list (`role="menu"`).
@@ -1367,6 +1379,23 @@ no item) shows the placeholder once the items have registered. Up to 2.2.1 such 
 TR-077). After 2.2.1 it renders the placeholder and does not throw, so `""` is a safe "nothing
 chosen" value for a `string` Select.
 
+#### A list wider than its button — `SelectContent MatchTriggerWidth="false"` (after 2.2.5)
+
+By default the list is exactly as wide as its trigger, so options longer than a narrow button wrap
+onto two lines. `MatchTriggerWidth="false"` on the styled `SelectContent` makes the trigger's width
+the list's **minimum**: the list grows to its longest option, is never narrower than the button,
+and is capped at the window (Chatur TR-026). Do not widen the button to make the options fit.
+
+```razor
+<Select TValue="string" @bind-Value="tier" Class="w-40">
+    <SelectTrigger Class="w-40"><SelectValue Placeholder="Tier" /></SelectTrigger>
+    <SelectContent MatchTriggerWidth="false">
+        <SelectItem Value="@("t1")" Text="Tier 1 — the strongest">Tier 1 — the strongest</SelectItem>
+        <SelectItem Value="@("t3")" Text="Tier 3 — on this machine">Tier 3 — on this machine</SelectItem>
+    </SelectContent>
+</Select>
+```
+
 #### Grouped Select
 
 ```razor
@@ -1479,15 +1508,53 @@ Sub-components: `FieldLabel`, `FieldContent`, `FieldDescription`, `FieldError`, 
 
 ### Calendar
 
+The selected day is `Selected` / `SelectedChanged`, so bind it with `@bind-Selected`. **There is no
+`Value` parameter** — `<Calendar @bind-Value>`, which this reference showed until 2.2.5, does not
+compile (MyDiary TR-002).
+
 ```razor
-<Calendar @bind-Value="selectedDate" />
+<Calendar @bind-Selected="selectedDate" />
 ```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| Selected | DateTime? | null | The selected day; `@bind-Selected` |
+| OnSelect | EventCallback<DateTime> | - | A day was picked — open that day's entries here |
+| MinDate / MaxDate | DateTime? | null | Days outside are disabled |
+| DisabledDates | Func<DateTime, bool>? | null | Days that cannot be picked |
+| MarkedDates | Func<DateTime, bool>? | null | (after 2.2.5) Days that carry a dot under the number, for "this day has content" |
+| MarkedLabel | string | "marked" | (after 2.2.5) What a screen reader hears after a marked day's number |
+| MarkClass | string? | null | (after 2.2.5) Classes for the dot, for example a colour |
+| FirstDayOfWeek | DayOfWeek | Sunday | First column |
+| ShowOutsideDays | bool | true | Days of the next and previous month |
+| Class / DayClass / CellClass | string? | null | Classes for the calendar, each day button, each cell |
+
+**Marking the days that have content (after 2.2.5, MyDiary TR-001).** A journal marks each day with
+an entry; picking a marked day works as usual, so `OnSelect` opens that day.
+
+```razor
+<Calendar @bind-Selected="day"
+          MarkedDates="@(d => entryDays.Contains(d.Date))"
+          MarkedLabel="has an entry"
+          OnSelect="OpenDay" />
+```
+
+A marked day's button carries `data-marked="true"` and the accessible name "19, has an entry"; the
+dot is `[data-slot="calendar-day-mark"]`. The calendar draws a dot, not a count: for a count per
+day, show it beside the calendar. A changed `MarkedDates`, `DisabledDates` or `Class` reaches the
+grid on the parent's next render (up to 2.2.5 the calendar skipped those renders).
 
 ### DatePicker
 
 ```razor
 <DatePicker @bind-Value="selectedDate" Placeholder="Pick a date" />
 ```
+
+**Closing it (after 2.2.5, Sevak TR-050).** Escape closes the calendar whether the focus is on the
+button or inside the calendar, and the focus goes back to the button; a second click on the button
+closes it; picking a day or clicking outside closes it, as before. Every `Popover` whose trigger
+uses `AsChild` now closes on a second click of its trigger, and Escape pressed on any popover's
+trigger closes it unless its `PopoverContent` sets `CloseOnEscape="false"`.
 
 Unmatched attributes such as `data-testid`, `aria-*` and event handlers are forwarded to the
 visible trigger button. `TimePicker` follows the same rule.
@@ -2065,6 +2132,24 @@ Every one of these is honoured — the grid reads them when it registers and ren
 | Align | DataTableColumnAlign? | null | `Start`, `Center` or `End`. Aligns the header cell, the header's own **label box** and every body cell together — the one parameter a figure column needs |
 | CellClass | string? | null | Extra CSS classes merged (via `cn`) onto every body cell in this column |
 | HeaderClass | string? | null | Extra CSS classes merged (via `cn`) onto this column's header cell |
+| HeaderTitle | string? | null | (after 2.2.5) The header cell's `title` — the browser's tooltip — for a column whose short name needs explaining (TfLens TR-041) |
+| HeaderTemplate | RenderFragment? | null | (after 2.2.5) Content in place of the header text, such as the name plus a `Tooltip`. `Header` is still required (toolbar and `Id`); sorting is unchanged |
+
+> **Explain a column where the reader looks (after 2.2.5, TfLens TR-041).** `DataTableColumn` renders
+> no element of its own, so a `title` attribute on it is dropped. Use `HeaderTitle` for a plain
+> tooltip or `HeaderTemplate` for richer content:
+>
+> ```razor
+> <DataTableColumn TData="Row" TValue="string" Header="checks ran on" Property="@(r => r.Machines)"
+>                  HeaderTitle="The machines whose drift checks ran in the last 24 hours" />
+> <DataTableColumn TData="Row" TValue="string" Header="window" Property="@(r => r.Window)">
+>     <HeaderTemplate>
+>         window
+>         <Tooltip><TooltipTrigger aria-label="What the window is">ⓘ</TooltipTrigger>
+>         <TooltipContent>How long a run may take before it counts as late</TooltipContent></Tooltip>
+>     </HeaderTemplate>
+> </DataTableColumn>
+> ```
 
 > **Right-align a figure column with `Align`, not with `text-right`.** The header label is rendered
 > inside its own `flex` box, so a `text-right` in `HeaderClass` reaches the `<th>` and then has
@@ -3312,8 +3397,19 @@ example: `/components/sortable-list`.
 
 ```razor
 <Input Type="InputType.Password" @bind-Value="objPassword" />
-<PasswordStrength Value="@objPassword" />
+<PasswordStrength Value="@objPassword" LevelChanged="OnStrength" />
 ```
+
+It draws its own four-part bar and its own caption — "Enter a password", "Weak password", "Fair
+password", "Good password" or "Strong password" — announced politely to screen readers. Do not draw
+a caption beside it (MyDiary TR-003).
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| Value | string? | null | The password to score |
+| MinimumLength | int | 8 | A shorter password never scores above Weak |
+| LevelChanged | EventCallback<PasswordStrengthLevel> | - | The score changed: `Empty`, `Weak`, `Fair`, `Good`, `Strong` |
+| Class | string? | null | Additional CSS classes |
 
 ### CenteredPanel
 
@@ -4190,7 +4286,12 @@ Members: `ScrollToEndAsync()`, `IsAtEnd`, `HeldLineCount`, `DroppedLineCount`.
 
 There is deliberately no `role="log"`: that carries an implicit `aria-live="polite"` and would
 announce every line of a build. The panel is a labelled region, and a separate status region
-announces one summary per burst of output.
+(`[data-slot="log-view-status"]`) states one summary — "4 lines, 0 warnings, 0 failures." — when
+the output pauses for 1.5 s, or at the latest 3 s after the count changed while output keeps
+arriving. **After 2.2.5** a summary is withdrawn in the same render that shows a new line, so the
+panel never states a count other than the lines on screen; it used to keep saying "2 lines" beside
+4 while a program kept writing (Chatur's output strip). For a count your page shows itself, use the
+list you pass in (`lines.Count`), not the status text.
 
 #### Typing — an answer is still being written
 

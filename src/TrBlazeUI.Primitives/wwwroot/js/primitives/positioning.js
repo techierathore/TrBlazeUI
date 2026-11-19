@@ -125,7 +125,8 @@ export async function computePosition(reference, floating, options = {}) {
         shift = true,
         padding = 8,
         strategy = 'absolute',
-        matchReferenceWidth = false
+        matchReferenceWidth = false,
+        minReferenceWidth = false
     } = options;
 
     const middleware = [
@@ -153,6 +154,19 @@ export async function computePosition(reference, floating, options = {}) {
                     width: `${rects.reference.width}px`,
                     minWidth: `${rects.reference.width}px`,
                     maxWidth: `${rects.reference.width}px`
+                });
+            }
+        }));
+    } else if (minReferenceWidth) {
+        // At least as wide as the reference, wider when the content needs it, never wider than the
+        // window (Chatur TR-026: a Select's long options wrapped inside a list held to its button).
+        middleware.push(lib.size({
+            padding,
+            apply({ rects, elements }) {
+                Object.assign(elements.floating.style, {
+                    width: '',
+                    minWidth: `${rects.reference.width}px`,
+                    maxWidth: `calc(100vw - ${2 * padding}px)`
                 });
             }
         }));

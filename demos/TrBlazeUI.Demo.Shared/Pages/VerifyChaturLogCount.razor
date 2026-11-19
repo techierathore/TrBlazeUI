@@ -1,0 +1,61 @@
+@page "/verify-chatur-log-count"
+@using TrBlazeUI.Components.LogView
+
+@* Verification harness for the Chatur output strip's line count (the owner's report of 19 Nov 2026,
+   recorded in docs/Chatur-TrBlazeUI-Feedback.md under "Owner report — the log view's line count").
+   Not a documentation demo: the panel below is fed the
+   way Chatur's OutputStrip feeds it - one List<LogLine>, appended to and re-rendered line by line -
+   and tests/verify/req-ui-073.spec.ts compares the count the panel states (its role="status"
+   summary) with the lines on screen. Before the fix the summary was rebuilt only after 1.5 s of
+   quiet, so it kept saying "2 lines" while 4 were shown. *@
+
+<PageTitle>Verify Chatur log count - TrBlazeUI</PageTitle>
+
+<div class="mx-auto max-w-2xl space-y-6 p-6">
+    <h1 class="text-2xl font-bold" data-testid="verify-heading">Chatur LogView line count</h1>
+
+    <div class="flex flex-wrap gap-3">
+        <button type="button" class="rounded border px-3 py-1" data-testid="add-two" @onclick="AddTwoAsync">Add 2 lines</button>
+        <button type="button" class="rounded border px-3 py-1" data-testid="stream" @onclick="StreamAsync">Stream 12 lines</button>
+        <button type="button" class="rounded border px-3 py-1" data-testid="clear" @onclick="Clear">Clear</button>
+    </div>
+
+    <LogView Lines="@objLines" Height="12rem" AriaLabel="Chatur output" data-testid="chatur-log" />
+</div>
+
+@code {
+    private readonly List<LogLine> objLines = [];
+
+    /// <summary>
+    /// Appends two lines, one render each, as Chatur's stream does.
+    /// </summary>
+    /// <returns>A task that completes when both lines are on screen.</returns>
+    private async Task AddTwoAsync()
+    {
+        for (var vIndex = 0; vIndex < 2; vIndex++)
+        {
+            objLines.Add(new LogLine("line " + (objLines.Count + 1).ToString(System.Globalization.CultureInfo.InvariantCulture)));
+            StateHasChanged();
+            await Task.Delay(50);
+        }
+    }
+
+    /// <summary>
+    /// Appends twelve lines 400 ms apart: a program that keeps writing, never quiet for 1.5 s.
+    /// </summary>
+    /// <returns>A task that completes when the last line is on screen.</returns>
+    private async Task StreamAsync()
+    {
+        for (var vIndex = 0; vIndex < 12; vIndex++)
+        {
+            objLines.Add(new LogLine("streamed " + (objLines.Count + 1).ToString(System.Globalization.CultureInfo.InvariantCulture)));
+            StateHasChanged();
+            await Task.Delay(400);
+        }
+    }
+
+    /// <summary>
+    /// Empties the list in place, as Chatur does when a new build or run starts.
+    /// </summary>
+    private void Clear() => objLines.Clear();
+}

@@ -21,6 +21,7 @@
                     Align="@Align"
                     Offset="@Offset"
                     MatchAnchorWidth="@MatchTriggerWidth"
+                    MinAnchorWidth="@MinTriggerWidth"
                     Strategy="fixed"
                     ZIndex="9999"
                     InlineWhenNested="true"
@@ -88,6 +89,13 @@ else
     /// </summary>
     [Parameter]
     public bool MatchTriggerWidth { get; set; } = true;
+
+    /// <summary>
+    /// Whether the list is at least as wide as the trigger and grows to fit its longest option,
+    /// capped at the window. Used when <see cref="MatchTriggerWidth"/> is false. Default is false.
+    /// </summary>
+    [Parameter]
+    public bool MinTriggerWidth { get; set; }
 
     protected override void OnInitialized()
     {

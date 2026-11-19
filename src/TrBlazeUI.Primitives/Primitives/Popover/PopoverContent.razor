@@ -139,6 +139,8 @@
         Context.OnStateChanged += HandleContextStateChanged;
     }
 
+    protected override void OnParametersSet() => Context.CloseOnEscape = CloseOnEscape;
+
     private RenderFragment RenderPopoverContent() => __builder =>
     {
         <div id="@Context.ContentId"
@@ -240,11 +242,38 @@
                 await OnEscapeKeyDown.InvokeAsync(args);
             }
 
-            // Close popover if configured
+            // Close popover if configured, and give the focus back to the trigger: the element that
+            // had it is about to leave the page (Sevak TR-050).
             if (CloseOnEscape)
             {
                 Context.Close();
+                await FocusTriggerAsync();
             }
+        }
+    }
+
+    private async Task FocusTriggerAsync()
+    {
+        if (Context.State.TriggerElement is not ElementReference vTrigger)
+        {
+            return;
+        }
+
+        try
+        {
+            await vTrigger.FocusAsync();
+        }
+        catch (JSException)
+        {
+            // The trigger is no longer on the page.
+        }
+        catch (JSDisconnectedException)
+        {
+            // The circuit has gone.
+        }
+        catch (InvalidOperationException)
+        {
+            // Prerendering, or the reference was never attached.
         }
     }
 

@@ -49,6 +49,13 @@ public class PopoverContext : PrimitiveContextWithEvents<PopoverState>
     public bool IsOpen => State.IsOpen;
 
     /// <summary>
+    /// Gets or sets whether Escape closes the popover. Set by <c>PopoverContent</c> from its own
+    /// <c>CloseOnEscape</c>, so that Escape pressed on the trigger follows the same rule as Escape
+    /// pressed inside the content (Sevak TR-050). Default is true.
+    /// </summary>
+    public bool CloseOnEscape { get; set; } = true;
+
+    /// <summary>
     /// Opens the popover.
     /// </summary>
     /// <param name="triggerElement">Optional element that triggered the popover.</param>

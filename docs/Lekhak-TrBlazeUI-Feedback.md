@@ -8,15 +8,7 @@
 
 ## Summary
 
-Nothing is blocked.
-
-- 7 entries: 0 blockers, 1 major (TR-002), 6 minors (TR-001, TR-003 … TR-007). None blocks Lekhak: each has a working workaround in the app.
-- Last consolidated: 2026-09-29.
-- Package feed: the credentials live in this machine's NuGet configuration, not in the repository, so a fresh clone elsewhere (or CI) needs a `nuget.config` with a credential reference supplied by environment variable.
-- Theming is not a gap: Lekhak's three site themes drive TrBlazeUI through an alias layer from its tokens to Lekhak's `--color-*` variables; keep `data-site-theme` / `data-theme` on `<html>`.
-- **Re-checked on 2.1.6 (2026-10-09), when Lekhak moved from 2.0.2.** TR-001 and TR-005 are fixed and closed. TR-002, TR-003, TR-004 and TR-006 were still present in the 2.1.6 package. The TrBlazeUI team answered on 2026-10-09 (reply below) and the repository now carries this file under `docs/`.
-- **Re-checked on 2.1.7 (2026-10-15).** TR-002, TR-003, TR-004 and TR-006 are fixed and closed below; a filled Button measures 0px border live. TR-007 was still present on 2.1.7. The one wave7 failure on 2.1.7 (minimal dark `--primary`) is Lekhak's own REQ-NFR-027 mapping against a stale spec, not the library.
-- **TR-007 answered 2026-10-15 (reply below):** fixed upstream, ships after 2.1.7.
+10 entries: nothing is blocked. 0 open, 0 fixed upstream and not yet re-checked, 10 closed. TR-008 to TR-010 copied in from Lekhak's own file on 2026-11-19, each fixed upstream there.
 
 ## Entries
 
@@ -126,6 +118,8 @@ Nothing is blocked.
 
 ### TR-007 — The reference's `InputGroupButton` example nests a `<button>` inside a `<button>`
 
+> ✅ **Closed 2026-10-15** — re-checked here: 2026-10-16 on TrBlazeUI 2.1.8: shipped TrBlazeUI-AI-Reference.md §InputGroup now shows <InputGroupButton OnClick=... AriaLabel=...>Go</InputGroupButton> with no inner Button, so the example renders one <button>. Lekhak uses no InputGroupButton (Not found page keeps Input + Button).
+
 - **Status:** fixed upstream 2026-10-15 (the reference's §InputGroup example and NEVER item 11; `InputGroupButton` forwards unmatched attributes; in the release after 2.1.7 — see the 2026-10-15 reply)
 - **Severity:** minor
 - **Blocks:** no — the Not found page's search box (whose mockup draws a bordered input butted against a button anyway) is `<Input>` + `<Button>` in a flex row, so no `InputGroupButton` is used.
@@ -140,6 +134,78 @@ Nothing is blocked.
 - **Workaround:** `<Input>` + `<Button>` in a flex row, or `<Button>` as a direct child of `<InputGroup>`.
 - **Suggested fix:** either make `InputGroupButton` a non-button wrapper (like `InputGroupAddon`), or document it as the button itself (`<InputGroupButton OnClick=…>Go</InputGroupButton>`) and drop the inner `Button` from the example.
 - **Re-checked 2026-10-15 on 2.1.7:** unchanged. The shipped reference (§InputGroup) still shows `<InputGroupButton><Button Size="ButtonSize.Small">Go</Button></InputGroupButton>`, and the component source renders a `<Button>` itself, so the example still nests two buttons. The TrBlazeUI repository's copy of this file predates this entry.
+
+### TR-008 — `NumericInput` cannot be left blank: `TValue` must be a non-nullable `INumber<T>`
+
+> ✅ **Fixed upstream, in 2.1.9** — `NumericInput` exposes `NullableValue` / `NullableValueChanged`; clearing the box binds `null`. Demo at `/components/numeric-input`; test `tests/verify/req-ui-056.spec.ts`.
+>
+> **Re-checked here 2026-10-18 on 2.1.9:** LLM Provider edit's Context window now binds `NullableValue` (`int?`). `tests/verify/ui149-context-window.spec.ts` over BlogAdmin's Windows head: 2 passed; a cleared box saves `ContextWindow` as NULL and reopens blank. The 0 workaround is removed.
+
+- **Status:** closed (found on 2.1.8, 2026-10-17; fixed in 2.1.9)
+- **Severity:** minor
+- **Blocks:** no — LLM Provider edit's Context window (REQ-UI-149) uses `NumericInput<int>` with `Min="0"`, and 0 is read as "not set" (stored as NULL); the hint says so.
+- **Repro:**
+  ```
+  <NumericInput TValue="int?" @bind-Value="contextWindow" />
+  ```
+- **Expected:** an optional number field the user can clear, binding `null`.
+- **Actual:** does not compile: `NumericInput<TValue>` constrains `TValue` to `INumber<TValue>`, which `int?` does not satisfy; the XML docs list int, double, decimal, float, long and short only.
+- **Encountered in:** REQ-UI-149 (LLM Provider edit, Context window — UIDesign says "optional; blank keeps today's behaviour"), 2026-10-17
+- **Workaround:** a sentinel value (0) documented in the field's hint.
+- **Suggested fix:** accept `Nullable<T>` where `T : INumber<T>` (an empty box binds `null`), or add a `Nullable`/`AllowEmpty` mode.
+
+### TR-009 — `CardAction` stacks under the title instead of sitting at the header's right edge
+
+> ✅ **Fixed upstream, in 2.1.9** — `CardHeader` renders a two-column grid when it contains a `CardAction`, placing the action at the right edge of the title row. Demo at `/components/card`; test `tests/verify/req-ui-057.spec.ts`.
+>
+> **Re-checked here 2026-10-18 on 2.1.9:** AI Story Studio's Review queue header no longer passes layout classes (`CardHeader Class="border-b"`, plain `CardAction`). Measured live on BlogAdmin: the title and the Show verify stories toggle share one row, the toggle at the right; screen check render OK, 17 anchors, light and dark. The workaround is removed.
+
+- **Status:** closed (found on 2.1.8, 2026-10-17; fixed in 2.1.9)
+- **Severity:** minor
+- **Blocks:** no — AI Story Studio's Review queue (REQ-UI-145) passes layout classes to `CardHeader`.
+- **Repro:**
+  ```
+  <Card><CardHeader><CardTitle>Review queue</CardTitle><CardAction><Checkbox … /> Show verify stories</CardAction></CardHeader></Card>
+  ```
+- **Expected:** as in shadcn/ui, the action sits at the header's right edge, on the title's row (`CardHeader` a grid that gains a second column when it holds a `CardAction`).
+- **Actual:** `CardHeader` renders `flex flex-col space-y-1.5 p-6` and `CardAction` renders `flex items-center gap-2` with no placement, so the action lands on its own row under the title, left-aligned. Measured on AI Story Studio @1280: title at x 309, toggle at x 309, one row lower.
+- **Encountered in:** REQ-UI-145 (Review queue card), fix cycle 1, 2026-10-17. LLM Provider edit's two `CardAction` badges (REQ-UI-149) render the same way.
+- **Workaround:** `<CardHeader Class="flex-row flex-wrap items-center justify-between gap-4">` and `<CardAction Class="ml-auto">`.
+- **Suggested fix:** place `CardAction` at the end of the title row (shadcn's `has-data-[slot=card-action]:grid-cols-[1fr_auto]` on the header, `col-start-2 row-span-2 self-start justify-self-end` on the action), and say so in the reference's Card section.
+
+### TR-010 — Since 2.1.9 every `CardHeader` is a two-column grid, so a `CardDescription` sits beside the title and a long one overflows the card
+
+> ✅ **Fixed upstream, in 2.2.0** (tag v2.2.0, 22 Oct; first written here as 2.1.10, a version that was never released) — `CardHeader` renders a single-column grid unless it contains a `CardAction`; the action occupies column 2 and spans both rows so a `CardDescription` stays under the title. Demo at `/components/card`; test `tests/verify/req-ui-058.spec.ts`.
+>
+> **Correction 2026-10-23:** the 21 Oct line "re-checked here on 2.1.10" was wrong: Lekhak was still on 2.1.9 then. Lekhak moved to 2.2.0 on 2026-10-23. **Re-checked here 2026-10-23 on 2.2.0:** AI Setup passes the mockup comparison at 1280 and 390 px in light and dark mode with no clipping, and REQ-RAG-089, REQ-UI-146, REQ-UI-147 and REQ-UI-150 are Verified. The Story profiles table stays inside its card at 1280 px and scrolls sideways in its own wrapper, so no Lekhak change was needed.
+
+- **Status:** closed (found on 2.1.9, 2026-10-18; fixed in 2.2.0; re-checked here on 2.2.0, 2026-10-23)
+- **Severity:** major
+- **Blocks:** no — the run carries on. It breaks AI Setup's layout at phone width (390 px): the Embedding model card is wider than the window and its "Use this folder" button is cut off. The AI Setup rows read FAIL on the mockup check until it is fixed.
+- **Repro:**
+  ```
+  <Card><CardHeader><CardTitle>Embedding model</CardTitle><CardDescription><Badge>BGE-M3 · 1024-d</Badge></CardDescription></CardHeader>…</Card>
+  ```
+  at a 390 px window, then read the header's computed style.
+- **Expected:** as in shadcn/ui, the header is one column unless it holds a `CardAction` (`has-data-[slot=card-action]:grid-cols-[1fr_auto]`), so the description goes under the title.
+- **Actual:** `CardHeader.razor.cs` always renders `grid gap-1.5 p-6 grid-cols-[1fr_auto] items-start` (its comment: "Always rendered as a two-column grid"). Measured live on BlogAdmin: `grid-template-columns: 322.992px 126.008px`; the description is in column 2 beside the title. At 390 px the header is wider than the card and the card's content is clipped (`tf-mockup-parity`: "content is cut off horizontally; the mockup is not clipped", light and dark).
+- **Encountered in:** TR-009's fix, re-checked on AI Setup during `*build-phase Lekhak` (phase 3), 2026-10-18. Lekhak has six `CardDescription` uses (AI Setup, LLM sign-in).
+- **Workaround:** none taken. Passing layout classes to every `CardHeader` would undo the library's own layout in product code.
+- **Suggested fix:** add the second column only when the header holds a `CardAction` (a `has-[[data-slot=card-action]]:grid-cols-[1fr_auto]` variant, or a flag `CardAction` sets through a cascading parameter), and give `CardAction` `col-start-2 row-span-2 row-start-1` so a description stays in column 1 under the title.
+
+## Resolution status — earlier summaries
+
+The Summary as it stood before 2026-11-19, kept unchanged as the record.
+
+Nothing is blocked.
+
+- 7 entries: 0 blockers, 1 major (TR-002), 6 minors (TR-001, TR-003 … TR-007). None blocks Lekhak: each has a working workaround in the app.
+- Last consolidated: 2026-09-29.
+- Package feed: the credentials live in this machine's NuGet configuration, not in the repository, so a fresh clone elsewhere (or CI) needs a `nuget.config` with a credential reference supplied by environment variable.
+- Theming is not a gap: Lekhak's three site themes drive TrBlazeUI through an alias layer from its tokens to Lekhak's `--color-*` variables; keep `data-site-theme` / `data-theme` on `<html>`.
+- **Re-checked on 2.1.6 (2026-10-09), when Lekhak moved from 2.0.2.** TR-001 and TR-005 are fixed and closed. TR-002, TR-003, TR-004 and TR-006 were still present in the 2.1.6 package. The TrBlazeUI team answered on 2026-10-09 (reply below) and the repository now carries this file under `docs/`.
+- **Re-checked on 2.1.7 (2026-10-15).** TR-002, TR-003, TR-004 and TR-006 are fixed and closed below; a filled Button measures 0px border live. TR-007 was still present on 2.1.7. The one wave7 failure on 2.1.7 (minimal dark `--primary`) is Lekhak's own REQ-NFR-027 mapping against a stale spec, not the library.
+- **TR-007 answered 2026-10-15 (reply below):** fixed upstream, ships after 2.1.7.
 
 ## Replies from TrBlazeUI
 

@@ -110,6 +110,17 @@ public partial class DataTable<TData> : ComponentBase where TData : class
         public string? HeaderClass { get; set; }
 
         /// <summary>
+        /// Gets or sets the header cell's title (its tooltip), or null for none (TfLens TR-041).
+        /// </summary>
+        public string? HeaderTitle { get; set; }
+
+        /// <summary>
+        /// Gets or sets content rendered in place of the header text, or null to show
+        /// <see cref="Header"/> (TfLens TR-041).
+        /// </summary>
+        public RenderFragment? HeaderTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets the flex justification applied to the header's own label box, so that a
         /// right- or centre-aligned column's header sits over its figures rather than staying at
         /// the left of the column (TfLens TR-031).
@@ -611,6 +622,8 @@ public partial class DataTable<TData> : ComponentBase where TData : class
             CellTemplate = column.CellTemplate,
             CellClass = column.CellClass,
             HeaderClass = column.HeaderClass,
+            HeaderTitle = string.IsNullOrEmpty(column.HeaderTitle) ? null : column.HeaderTitle,
+            HeaderTemplate = column.HeaderTemplate,
             HeaderJustifyClass = column.HeaderJustifyClass,
             AlignTextClass = column.AlignTextClass,
             HideBelowClass = column.HideBelowClass

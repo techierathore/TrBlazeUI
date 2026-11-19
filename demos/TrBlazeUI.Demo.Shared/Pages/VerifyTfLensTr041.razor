@@ -1,0 +1,62 @@
+@page "/verify-tflens-tr041"
+@using TrBlazeUI.Components.DataTable
+@using TrBlazeUI.Components.Tooltip
+
+@* Verification harness for TfLens TR-041 (docs/TfLens-TrBlazeUI-Feedback.md).
+   Not a documentation demo: TfLens's Routing drift table, whose "checks ran on" column needs a word
+   of explanation where the reader looks. tests/verify/req-ui-071.spec.ts checks HeaderTitle (the
+   header cell's title), HeaderTemplate (a Tooltip in the header) and that a sortable column with a
+   HeaderTitle still sorts. *@
+
+<PageTitle>Verify TfLens TR-041 - TrBlazeUI</PageTitle>
+
+<TooltipProvider>
+    <div class="mx-auto max-w-3xl space-y-6 p-6">
+        <h1 class="text-2xl font-bold" data-testid="verify-heading">TfLens TR-041 a column header explains itself</h1>
+
+        <DataTable TData="DriftRow" Data="@objRows" ShowPagination="false" ShowToolbar="false">
+            <Columns>
+                <DataTableColumn TData="DriftRow" TValue="string" Header="route" Sortable="true"
+                                 HeaderTitle="The route the drift was measured on"
+                                 Property="@(aRow => aRow.Route)" />
+                <DataTableColumn TData="DriftRow" TValue="string" Header="checks ran on"
+                                 HeaderTitle="The machines whose drift checks ran in the last 24 hours"
+                                 Property="@(aRow => aRow.Machines)" />
+                <DataTableColumn TData="DriftRow" TValue="int" Header="drift"
+                                 Property="@(aRow => aRow.Drift)" Align="DataTableColumnAlign.End" />
+                <DataTableColumn TData="DriftRow" TValue="string" Header="window"
+                                 Property="@(aRow => aRow.Window)">
+                    <HeaderTemplate>
+                        <span>window</span>
+                        <Tooltip>
+                            <TooltipTrigger Class="inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full border text-[10px] leading-none"
+                                            aria-label="What the window is"
+                                            data-testid="window-explain">i</TooltipTrigger>
+                            <TooltipContent>
+                                <p>How long a run may take before it counts as late</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </HeaderTemplate>
+                </DataTableColumn>
+            </Columns>
+        </DataTable>
+    </div>
+</TooltipProvider>
+
+@code {
+    private readonly List<DriftRow> objRows =
+    [
+        new("/routing", "build-01, build-02", 3, "15 min"),
+        new("/admin", "build-02", 0, "10 min"),
+        new("/home", "build-01", 1, "5 min"),
+    ];
+
+    /// <summary>
+    /// One row of TfLens's Routing drift table.
+    /// </summary>
+    /// <param name="Route">The route measured.</param>
+    /// <param name="Machines">The machines the checks ran on.</param>
+    /// <param name="Drift">How many checks drifted.</param>
+    /// <param name="Window">How long a run may take.</param>
+    private sealed record DriftRow(string Route, string Machines, int Drift, string Window);
+}

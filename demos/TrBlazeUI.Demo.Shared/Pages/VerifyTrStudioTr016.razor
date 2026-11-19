@@ -1,0 +1,48 @@
+@page "/verify-trstudio-tr016"
+@using TrBlazeUI.Components.Badge
+
+@* Verification harness for TrStudio TR-016 (docs/TrStudio-TrBlazeUI-Feedback.md).
+   Not a documentation demo: tests/verify/req-ui-070.spec.ts flips the state behind each badge below
+   and checks that the rendered element's class follows the new Class value, as TrStudio's ComfyUI
+   card does (Outline badge, Class "badge-ok" or "badge-warn" from one bool). The colours are inline
+   so the test measures them without depending on any stylesheet. *@
+
+<PageTitle>Verify TrStudio TR-016 - TrBlazeUI</PageTitle>
+
+<style>
+    .badge-ok { color: rgb(21, 128, 61); }
+    .badge-warn { color: rgb(194, 65, 12); }
+</style>
+
+<div class="mx-auto max-w-md space-y-6 p-6">
+    <h1 class="text-2xl font-bold" data-testid="verify-heading">TrStudio TR-016 Badge Class follows its value</h1>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">Outline badge, Class from a bool (TrStudio's shape)</h2>
+        <Badge Variant="BadgeVariant.Outline" Class="@(objIsConnected ? "badge-ok" : "badge-warn")" data-testid="comfy-badge">
+            @(objIsConnected ? "Connected" : "Not connected")
+        </Badge>
+    </section>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">Variant and a Tailwind colour in Class, both from the same bool</h2>
+        <Badge Variant="@(objIsConnected ? BadgeVariant.Success : BadgeVariant.Warning)"
+               Class="@(objIsConnected ? "font-bold" : "italic")"
+               data-testid="variant-badge">
+            @(objIsConnected ? "Ready" : "Waiting")
+        </Badge>
+    </section>
+
+    <button type="button" class="rounded border px-3 py-1" data-testid="toggle-connected" @onclick="Toggle">
+        Toggle connected
+    </button>
+</div>
+
+@code {
+    private bool objIsConnected;
+
+    /// <summary>
+    /// Flips the connection state, which changes every badge's Class (and one badge's Variant).
+    /// </summary>
+    private void Toggle() => objIsConnected = !objIsConnected;
+}

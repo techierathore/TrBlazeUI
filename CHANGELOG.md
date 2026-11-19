@@ -11,6 +11,93 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [2.2.6] — 2026-11-19
+
+Answers the TrBlazeUI feedback entries the apps had open on 19 Nov 2026: Sevak TR-050, Chatur
+TR-025, TR-026, TR-027 and the output strip's line count, TfLens TR-041, TrStudio TR-015 and TR-016,
+MyDiary TR-001 (and the reference gaps behind MyDiary TR-002 and TR-003). Rows REQ-UI-069 to
+REQ-UI-079 in `docs/TrBlazeUI-Checklist.md`; each has a test under `tests/verify/`.
+
+### Fixed
+
+- **DatePicker closes on Escape and on a second click of its button (Sevak TR-050).** Escape was
+  heard only inside the calendar, while a click leaves the focus on the button, and an `AsChild`
+  Popover trigger never closed the popover it opened. Now Escape closes it from the button or
+  from inside the calendar and puts the focus back on the button, and a second click closes it.
+  This holds for every `Popover`: an `AsChild` trigger toggles (DatePicker, DateRangePicker,
+  TimePicker, ColorPicker and the DataTable toolbar's column menu among the library's own), Escape
+  on any trigger closes the popover unless its `PopoverContent` sets `CloseOnEscape="false"`, and
+  Escape inside the content returns the focus to the trigger. Test `req-ui-069.spec.ts`.
+- **A submenu keeps its 8 px margin when its rows change while it is open (Chatur TR-025).** Its
+  place was worked out once, when it opened. Chatur re-reads its recent projects when File is
+  pressed, so the rows grew after the list was placed and it ran past the window (385.95 px where
+  382 was the limit). `MenubarSubContent`, `DropdownMenuSubContent` and `ContextMenuSubContent` now
+  place the list again on every render, from a measurement that does not depend on the last
+  placement, and re-render only when the place really changed. Test `req-ui-076.spec.ts`.
+- **The shipped stylesheet carries the `place-*` utilities (Chatur TR-027).** `place-items-*`,
+  `place-content-*`, `place-self-*` and `justify-self-*`, with their `sm:` to `2xl:` forms, are in
+  `trblazeui.css`; `grid place-items-center` left an icon in its tile's top-left corner. Test
+  `req-ui-072.spec.ts`.
+- **LogView never states a line count other than the lines it shows (Chatur, owner's report).**
+  Its status summary ("2 lines, 0 warnings, 0 failures.") was rebuilt only after 1.5 s without new
+  output, so it kept saying "2 lines" beside 4 while a program kept writing. A summary is now
+  withdrawn in the render that shows a new line, stated again when the output pauses, and stated
+  at the latest 3 s after it changed even if the output never pauses. It is built on the renderer's
+  dispatcher, so a line that arrives while it is being stated starts a new one. Test
+  `req-ui-073.spec.ts`.
+- **The sidebar's phone mode follows a one-step window resize (TrStudio TR-015).** `sidebar.js` read
+  `window.innerWidth` inside a ResizeObserver; a Mac Catalyst web view had not updated it yet, so
+  the mode lagged one resize behind. The mode now comes from `matchMedia('(max-width: 767.98px)')`,
+  read on its change event, the window's resize event, the body's ResizeObserver and the next
+  animation frame, and only a change is sent to .NET. Test `req-ui-075.spec.ts`.
+- **Leaving a page that registered keyboard shortcuts no longer logs "Unobserved task exception".**
+  `KeyboardShortcutService` unregistered a shortcut with an un-awaited `InvokeVoidAsync`; after the
+  circuit had closed its `JSDisconnectedException` sat in a task nobody observed until the finalizer
+  logged it (8 lines for two visits to the Menubar demo). The call is now observed through
+  `JSTeardown`. Found by this release's suite run once `req-ui-020`'s teardown tests read the live
+  server log instead of a stale file. Test `req-ui-079.spec.ts`.
+- **Calendar re-renders when its parent changes `Class`, `DayClass`, `CellClass`, `DisabledDates`
+  or `MarkedDates`.** Its render guard looked only at the selected day, the shown month and the
+  keyboard focus, so those changes were dropped until something else moved. Test
+  `req-ui-077.spec.ts`.
+
+### Added
+
+- **`Calendar.MarkedDates`, `MarkedLabel` and `MarkClass` (MyDiary TR-001).** A dot under the
+  number of each day `MarkedDates` returns true for, for "this day has content"; a marked day's
+  button carries `data-marked="true"` and the accessible name "19, has an entry". Marked days are
+  still picked as usual, so `OnSelect` opens a day. Test `req-ui-077.spec.ts`.
+- **`SelectContent.MatchTriggerWidth` on the styled Select (Chatur TR-026).** Default `true`
+  (unchanged). `false` makes the trigger's width the list's minimum, so the list grows to its
+  longest option, capped at the window. Underneath: `TrBlazeUI.Primitives.Select.SelectContent
+  .MinTriggerWidth`, `FloatingPortal.MinAnchorWidth` and `PositioningOptions.MinReferenceWidth`.
+  Test `req-ui-074.spec.ts`.
+- **`DataTableColumn.HeaderTitle` and `HeaderTemplate` (TfLens TR-041).** `HeaderTitle` is the header
+  cell's `title`; `HeaderTemplate` renders any content (a `Tooltip`, say) in place of the header
+  text. Sorting is unchanged. Test `req-ui-071.spec.ts`.
+- Tests for entries fixed before and never held by a test: `req-ui-078.spec.ts` (Sevak TR-042, a
+  Combobox with `Id` inside a Dialog) and `req-ui-070.spec.ts` (TrStudio TR-016, a Badge's `Class`
+  follows its value both ways).
+
+### Documentation
+
+- `TrBlazeUI-AI-Reference.md`: `Calendar` is bound with `@bind-Selected` — the reference showed
+  `<Calendar @bind-Value>`, which does not compile (MyDiary TR-002); `PasswordStrength`'s parameters
+  and the caption it draws itself (MyDiary TR-003); the new parameters above; when LogView states
+  its count.
+
+### Not changed
+
+- **TrStudio TR-016 (a Badge keeps its first `Class`)** did not reproduce here. `Badge` builds its
+  classes on every render, and the test above flips TrStudio's exact markup both ways in Chromium
+  and passes before and after this release. TrStudio saw it in a Mac Catalyst WKWebView, which this
+  machine cannot run; the reply in `docs/TrStudio-TrBlazeUI-Feedback.md` asks for the rendered class
+  attribute from that web view.
+
+## Shipped in 2.2.3 to 2.2.5 — entries below not yet split by release
+
 ### Sevak TR-049 — 2026-11-13
 
 Answers the entry Sevak filed against 2.1.9 (`docs/Sevak-TrBlazeUI-Feedback.md`; REQ-UI-068). Not

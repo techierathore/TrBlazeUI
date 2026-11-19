@@ -98,6 +98,21 @@ internal sealed class SubmenuPlacer : IAsyncDisposable
         return vParts.Count == 0 ? null : string.Join(";", vParts);
     }
 
+    /// <summary>
+    /// Tells whether two placements put the list in the same place.
+    /// </summary>
+    /// <param name="aFirst">One placement.</param>
+    /// <param name="aSecond">The other placement.</param>
+    /// <returns>True when the side matches and the offset and width cap differ by under 0.1 px.</returns>
+    /// <remarks>
+    /// Compared to a tenth of a pixel, the precision <see cref="Style"/> writes, so sub-pixel noise
+    /// between two measurements of the same layout never causes a re-render.
+    /// </remarks>
+    internal static bool IsSame(SubmenuPlacement aFirst, SubmenuPlacement aSecond) =>
+        aFirst.Side == aSecond.Side
+        && Math.Abs(aFirst.Offset - aSecond.Offset) < 0.1
+        && Math.Abs(aFirst.MaxWidth - aSecond.MaxWidth) < 0.1;
+
     private static string Pixels(double aValue) =>
         Math.Round(aValue, 1).ToString(CultureInfo.InvariantCulture) + "px";
 

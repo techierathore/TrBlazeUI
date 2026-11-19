@@ -107,6 +107,17 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-UI-066 | CodeBlock's copy button takes CopyLabel, CopyButtonAttributes and reports OnCopied (Sevak TR-047) | Verified | 100% | 2026-11-12 verify: PASS — test `Sevak TR-047 — CodeBlock copy button takes a label, attribut` | [d](#d-req-ui-066) |
 | REQ-FN-013 | The published Auto demo host answers 404 for _framework/blazor.web.js, so its pages are never interactive | Verified | 100% | 2026-11-05 verify: PASS — test `Demo hosts REQ-FN-013 the host serves blazor.web.js and a me` | [d](#d-req-fn-013) |
 | REQ-UI-068 | A component torn down after its page released its JavaScript objects keeps the session (Sevak TR-049) | Verified | 100% | 2026-11-13 verify: PASS — test `Sevak TR-049 — a teardown after the page released its JavaSc` | [d](#d-req-ui-068) |
+| REQ-UI-069 | DatePicker closes on Escape and on a second click (Sevak TR-050) | Verified | 100% | 2026-11-19 verify: PASS — test `Sevak TR-050 — DatePicker closes on Escape and on a second c` | [d](#d-req-ui-069) |
+| REQ-UI-070 | A Badge draws its new Class when the value changes (TrStudio TR-016) | Verified | 100% | 2026-11-19 verify: PASS — test `TrStudio TR-016 — a Badge draws its new Class when the value` | [d](#d-req-ui-070) |
+| REQ-UI-071 | A DataTable column header can explain itself: HeaderTitle and HeaderTemplate (TfLens TR-041) | Verified | 100% | 2026-11-19 verify: PASS — test `TfLens TR-041 — a DataTable column header can explain itself` | [d](#d-req-ui-071) |
+| REQ-UI-072 | The shipped stylesheet carries the place-* utilities (Chatur TR-027) | Verified | 100% | 2026-11-19 verify: PASS — test `Chatur TR-027 — the shipped stylesheet carries the place-* u` | [d](#d-req-ui-072) |
+| REQ-UI-073 | LogView never states a line count other than the lines it shows (Chatur, owner report) | Verified | 100% | 2026-11-19 verify: PASS — test `Chatur — LogView never states a line count other than the li` | [d](#d-req-ui-073) |
+| REQ-UI-074 | A Select's list can be wider than its button (Chatur TR-026) | Verified | 100% | 2026-11-19 verify: PASS — test `Chatur TR-026 — a Select's list can be wider than its button` | [d](#d-req-ui-074) |
+| REQ-UI-075 | The sidebar's phone mode follows a one-step window resize (TrStudio TR-015) | Verified | 100% | 2026-11-19 verify: PASS — test `TrStudio TR-015 — the sidebar's phone mode follows a one-ste` | [d](#d-req-ui-075) |
+| REQ-UI-076 | A pulled-back submenu keeps its 8 px margin when its rows wrap (Chatur TR-025) | Verified | 100% | 2026-11-19 verify: PASS — test `Chatur TR-025 — a pulled-back submenu keeps its 8 px margin ` | [d](#d-req-ui-076) |
+| REQ-UI-077 | The Calendar can mark the days that have content (MyDiary TR-001) | Verified | 100% | 2026-11-19 verify: PASS — test `MyDiary TR-001 — the Calendar can mark the days that have co` | [d](#d-req-ui-077) |
+| REQ-UI-078 | A Combobox takes Id or id inside a Dialog without ending the session (Sevak TR-042) | Verified | 100% | 2026-11-19 verify: PASS — test `Sevak TR-042 — a Combobox takes Id or id inside a Dialog REQ` | [d](#d-req-ui-078) |
+| REQ-UI-079 | Leaving a page that registered keyboard shortcuts logs no unobserved task exception | Verified | 100% | 2026-11-19 verify: PASS — test `Keyboard shortcuts — leaving the page logs no unobserved tas` | [d](#d-req-ui-079) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -494,6 +505,9 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 - <a id="d-req-ui-065"></a> **REQ-UI-065** (extends BRD-7 dropdown selection) A Select bound to "" whose items never carry "" opens its list and keeps its placeholder, with or without a DisplayTextSelector that answers "" (Sevak TR-048)
   - *Acceptance:* When a user opens a Select bound to "" on the Sevak TR-048 harness screen, then the list opens and the trigger keeps its placeholder.
 
+- <a id="d-req-ui-074"></a> **REQ-UI-074** (BRD-pending) A Select's list can be wider than its button (Chatur TR-026)
+  - *Acceptance:* When SelectContent sets MatchTriggerWidth false on /verify-chatur-tr026, then the list is at least the button's width and its long options stay on one line
+
 ## NumericInput
 
 - <a id="d-req-ui-056"></a> **REQ-UI-056** (extends BRD-9 numeric input) NumericInput supports nullable binding so an empty box binds null (Lekhak TR-008)
@@ -513,6 +527,9 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 - <a id="d-req-ui-059"></a> **REQ-UI-059** (extends BRD-13) Sidebar active item renders data-active="true"/"false" and paints its active style (TechieBlog TR-076)
   - *Acceptance:* When a SidebarMenuButton has IsActive or a matching Href on any page, then it renders data-active="true" and paints the active background.
 
+- <a id="d-req-ui-075"></a> **REQ-UI-075** (BRD-pending) The sidebar's phone mode follows a one-step window resize (TrStudio TR-015)
+  - *Acceptance:* When the window is resized in one step across 768 px, then the sidebar switches mode at once, even where innerWidth reports late
+
 
 ## Input
 
@@ -530,3 +547,57 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 
 - <a id="d-req-ui-068"></a> **REQ-UI-068** (extends BRD-13 Sidebar) A component torn down after its page released its JavaScript objects keeps the session (Sevak TR-049)
   - *Acceptance:* When the sidebar is removed on the TR-049 verify screen after its scripts are released, then the session keeps answering.
+
+
+## DatePicker
+
+- <a id="d-req-ui-069"></a> **REQ-UI-069** (BRD-pending) DatePicker closes on Escape and on a second click (Sevak TR-050)
+  - *Acceptance:* When the calendar is open on /components/date-picker, then Escape or a second click on its button closes it, and focus returns to the button
+
+
+## Badge
+
+- <a id="d-req-ui-070"></a> **REQ-UI-070** (BRD-pending) A Badge draws its new Class when the value changes (TrStudio TR-016)
+  - *Acceptance:* When a Badge's Class changes after a click on /verify-trstudio-tr016, then the rendered badge carries the new class and colour
+
+
+## DataTable
+
+- <a id="d-req-ui-071"></a> **REQ-UI-071** (BRD-pending) A DataTable column header can explain itself: HeaderTitle and HeaderTemplate (TfLens TR-041)
+  - *Acceptance:* When a DataTableColumn sets HeaderTitle or HeaderTemplate on /verify-tflens-tr041, then the header cell shows that title or content
+
+
+## Stylesheet
+
+- <a id="d-req-ui-072"></a> **REQ-UI-072** (BRD-pending) The shipped stylesheet carries the place-* utilities (Chatur TR-027)
+  - *Acceptance:* When a grid tile uses place-items-center with only trblazeui.css loaded, then its icon sits in the tile's centre
+
+
+## LogView
+
+- <a id="d-req-ui-073"></a> **REQ-UI-073** (BRD-pending) LogView never states a line count other than the lines it shows (Chatur, owner report)
+  - *Acceptance:* When lines keep arriving on /verify-chatur-log-count, then the panel's stated count is never a number other than the lines shown
+
+
+## Menubar
+
+- <a id="d-req-ui-076"></a> **REQ-UI-076** (BRD-pending) A pulled-back submenu keeps its 8 px margin when its rows wrap (Chatur TR-025)
+  - *Acceptance:* When File ▸ Recent projects ▸ opens at 390 px on /verify-chatur-tr025, then the list keeps 8 px from each window edge
+
+
+## Calendar
+
+- <a id="d-req-ui-077"></a> **REQ-UI-077** (BRD-pending) The Calendar can mark the days that have content (MyDiary TR-001)
+  - *Acceptance:* When a Calendar sets MarkedDates on /verify-mydiary-tr001, then each marked day shows a dot and says so to screen readers
+
+
+## Combobox
+
+- <a id="d-req-ui-078"></a> **REQ-UI-078** (BRD-pending) A Combobox takes Id or id inside a Dialog without ending the session (Sevak TR-042)
+  - *Acceptance:* When a Combobox with Id set opens inside a Dialog on /verify-sevak-tr042, then the id lands on its root and the session keeps answering
+
+
+## KeyboardShortcutService
+
+- <a id="d-req-ui-079"></a> **REQ-UI-079** (BRD-pending) Leaving a page that registered keyboard shortcuts logs no unobserved task exception
+  - *Acceptance:* When a page that registered keyboard shortcuts on /components/menubar is left after its circuit closed, then the server log has no Unobserved task exception

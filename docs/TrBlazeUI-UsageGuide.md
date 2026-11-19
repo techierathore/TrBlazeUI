@@ -100,6 +100,11 @@ The demo app exposes the whole library through a sidebar navigation. Walk these 
 - **Expected:** Tab indents; each editor tab carries its own `data-testid` (`tab-program-cs`); a step with an icon shows the icon in its circle and keeps its status name; Danger is a tinted red pill; the off Outlined switch shows a border; rows, header row and choose-all carry their attributes; the chosen toggle item paints card or primary; every page renders with no console error.
 - **Covers:** REQ-UI-021…REQ-UI-032
 
+### Consumer feedback of 19 Nov 2026 (`/components/date-picker`, `/verify-chatur-tr025`, `/verify-chatur-tr026`, `/verify-chatur-log-count`, `/verify-tflens-tr041`, `/verify-trstudio-tr016`, `/verify-mydiary-tr001`, `/verify-sevak-tr042`)
+- **Steps:** open a date picker, press Escape, open it again and click its button; at 390 px open File ▸ Recent projects ▸ and wait for the six names; open the "MatchTriggerWidth=false" tier picker; press "Add 2 lines" twice and "Stream 12 lines"; hover the "i" in the drift table's window header; toggle the badges; press "Write on the 25th"; open the Add task dialog. Resize any page from 1280 to 390 in one step.
+- **Expected:** the calendar closes both times and the focus stays on its button; the recent list keeps 8 px from both edges; the tier options stay on one line; the log's spoken count never differs from the lines shown; the tooltip opens; the badges change colour; the 25th gets a dot; the dialog opens with no error; the sidebar becomes the phone menu at once.
+- **Covers:** REQ-UI-069…REQ-UI-078
+
 ### Render-mode parity
 - **Steps:** repeat a few of the above in Server (5183), WASM (5184) and Auto (5185).
 - **Expected:** identical component behaviour across all three hosts.
@@ -143,8 +148,17 @@ bash tests/package/codex-agent-deployment.sh
 - [ ] Open the Badge demo — pills sit inside sentences and long labels wrap or truncate as asked
 - [ ] Open the Menubar demo, File ▸ Recent projects ▸ More — each list opens beside its row; Save is dim and cannot be chosen
 - [ ] Open the InputGroup demo, type in "Search with a button" and press Go — the line below shows what you typed
+- [ ] Open a date picker and press Escape — the calendar closes and the focus stays on its button
 
 ## Consumer integration notes
+
+### Added 2026-11-19 (Sevak TR-050, Chatur TR-025…TR-027, TfLens TR-041, TrStudio TR-015, MyDiary TR-001 — REQ-UI-069…REQ-UI-078 — 2.2.6, prepared)
+
+- **Popovers close the way menus do**: Escape on a popover's trigger closes it, Escape inside it returns the focus to the trigger, and a second click on an `AsChild` trigger (DatePicker, DateRangePicker, TimePicker, ColorPicker) closes it.
+- **A Select list wider than its button**: `<SelectContent MatchTriggerWidth="false">`.
+- **A column header that explains itself**: `DataTableColumn HeaderTitle="…"` or a `HeaderTemplate`.
+- **Days with content**: `Calendar MarkedDates="@(d => days.Contains(d.Date))" MarkedLabel="has an entry"`; bind the day with `@bind-Selected`, not `@bind-Value`.
+- **Grid centring**: `place-items-*`, `place-content-*`, `place-self-*`, `justify-self-*` are in `trblazeui.css`.
 
 ### Added 2026-10-15 (ASP.NET Core advisories — REQ-NFR-005)
 
@@ -253,4 +267,6 @@ bash tests/package/codex-agent-deployment.sh
 - **Arbitrary Tailwind values are not pre-generated** (`min-w-[720px]`). Use the utility scale or a component parameter such as `DataTable.MinWidth`.
 - **NativeSelect inside MAUI Blazor Hybrid overlays** — the native popup is clipped in WebView2. Use `<Select>` inside dialogs and sheets. `docs/OldDocs/TrBlazeUI-Issues-Report-1.md` #2.
 - **`HtmlSanitizer 9.1.949-beta` is a pre-release dependency**, taken for the AngleSharp CVE-2026-54570 fix. Revisit when 9.1.x is stable.
-- **Consumer feedback fixed library-side, waiting for the consumer's own re-check:** Chatur TR-018 (fixed 2026-10-07, not yet released; TR-015/TR-016/TR-017 were re-checked and closed by Chatur on 2.1.3 the same day); TfLens TR-036/TR-037/TR-038 (fixed 2026-09-13, in 2.0.6); TrStudio TR-011 (fixed 2026-07-12); AstroLyfe TR-001…TR-012 and TechieRag TR-001…TR-004 (fixed under REQ-UI-014/015/016, their files carry no closing mark).
+- **Consumer feedback fixed library-side, waiting for the consumer's own re-check:** Sevak TR-050, Chatur TR-025…TR-027 and the output strip's count, TfLens TR-041, TrStudio TR-015, MyDiary TR-001 (all in 2.2.6, prepared 2026-11-19); Lekhak TR-007 (2.1.7).
+- **TrStudio TR-016 (a Badge kept its first colour) did not reproduce** in Chromium; it was seen in a Mac Catalyst WKWebView, which this machine cannot run. The entry asks TrStudio for the rendered class attribute.
+- **Not built (new features, owner's decision):** MyDiary GLM-5.3 TR-004 (a Chip component) and TR-005 (a read-only masked InputOTP); a per-day count or link on Calendar.

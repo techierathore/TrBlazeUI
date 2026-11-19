@@ -1,34 +1,16 @@
 # TrBlazeUI Feedback — surfaced during TrStudio
 
+| | |
+|---|---|
+| App | TrStudio |
+| Upstream | TrBlazeUI |
+| Updated | 2026-11-19 |
+
 ## Summary
-- **1 blocker (TR-011)**, 3 major (TR-001, TR-002, TR-007), 6 minor (TR-003, TR-005, TR-006, TR-008, TR-009, TR-010), 1 nice-to-have (TR-004)
-- Theme: leaf components (`DataTable`, `Alert`, `Checkbox`, `Switch`) don't splat `CaptureUnmatchedValues`; several AI-reference APIs (`FileUpload.OnFilesSelected`, `Empty*` family, `Pagination`, Icon slot) diverge from the shipped 1.0.7 surface; `DataTable` also keeps a min-content wider than a ≤400px viewport (TR-010, cosmetic). All worked around; no build blocked — **except TR-011 (2026-07-12): the 1.0.7 packages' `Microsoft.AspNetCore.App` FrameworkReference makes the MAUI Mac Catalyst head unbuildable on a real Mac (NETSDK1082); no workaround shipped.**
-- Entries retain their append-only IDs; read TR-011 (blocker) then TR-001/002/007 (major) first.
-- Last consolidated: **2026-08-11** (`*handoff-phase` — re-confirmed **0 open**; all 11 remain resolved, no disposition changed since 2026-07-12) · previously 2026-07-07 (TR-011 appended 2026-07-12)
 
-### ✅ Resolution status — ALL 11 RESOLVED library-side (2026-07-12, REQ-UI-015)
-Every issue is fixed in the library source (or corrected in the AI reference). Verified three ways:
-a **strict Release build** (`dotnet build TrBlazeUI.sln -c Release -p:CI=true` → **0 warning / 0 error**);
-a **pack-and-inspect** of all three nupkgs (Primitives / Components / Icons.Lucide → **0 `<frameworkReferences>`** in every nuspec — the exact pipeline check TR-011 asked for);
-and a **headless-Chromium runtime smoke** on a Blazor Server demo page exercising each fix (**14/14** checks: `data-testid` splats present on the rendered DOM, table render-truth, gated-vs-uncontrolled Switch behaviour, and `documentElement.scrollWidth == 390` at a 390px viewport, plus a desktop + mobile visual pass).
+16 entries: nothing is blocked. 1 open, 0 fixed upstream and not yet re-checked, 15 closed. TR-015 is fixed in 2.2.6, prepared 2026-11-19 and not yet released. TR-016 did not reproduce in the library and is open; its entry says what to read on the Mac.
 
-| ID | Severity | Fix kind | Status |
-|----|----------|----------|--------|
-| TR-001 | major | code (DataTable splat) | ✅ Resolved |
-| TR-002 | major | code (Alert splat) | ✅ Resolved |
-| TR-003 | minor (doc) | doc (inline-icon pattern) | ✅ Resolved |
-| TR-004 | nice-to-have | verified already-splatting | ✅ Resolved |
-| TR-005 | minor (doc) | doc (flat `Empty` API) | ✅ Resolved |
-| TR-006 | minor (doc) | doc (composite `Pagination` API + namespace) | ✅ Resolved |
-| TR-007 | major | code (`OnFilesSelected` alias) + doc | ✅ Resolved |
-| TR-008 | minor | code (Checkbox/Switch splat) | ✅ Resolved |
-| TR-009 | minor | code (controlled Switch) | ✅ Resolved |
-| TR-010 | minor | code (`min-w-0` root) | ✅ Resolved |
-| TR-011 | blocker | build (`AddRazorSupportForMvc` removed) | ✅ Resolved |
-
-> **Publish note:** these fixes ship when the package versions are bumped (> 1.0.7) and pushed. The current source packs clean nuspecs (verified); TrStudio should consume the next published Components/Primitives/Icons.Lucide versions.
-
-## Issues
+## Entries
 
 <!-- Append entries as gaps are found. IDs are append-only, never renumbered.
      TrBlazeUI → TR-NNN -->
@@ -134,10 +116,22 @@ and a **headless-Chromium runtime smoke** on a Blazor Server demo page exercisin
 - **✅ Resolution (2026-07-12, REQ-UI-015):** applied both halves. `DataTable`'s root wrapper class is now `w-full min-w-0 space-y-4` (`min-w-0` lets the component shrink inside a narrow parent so only its inner `overflow-auto` region scrolls), and its pagination footer was already `flex flex-wrap`. Smoke at a 390px viewport (a 3-column table inside a 390px box): `document.documentElement.scrollWidth == clientWidth == 390` — the ~57px residual body overflow is gone, the footer wraps, and nothing is clipped. Consumers no longer need the `.table-scroll` page-level wrapper.
 
 ### TR-011 — packages ship a `Microsoft.AspNetCore.App` FrameworkReference → MAUI Mac Catalyst head unbuildable (NETSDK1082)
+
+> ✅ **Closed 2026-11-14** — re-checked here: 2026-11-14: dotnet build src/TrStudio/TrStudio.csproj -f net10.0-maccatalyst built with 0 errors (no NETSDK1082), with the TrBlazeUI packages the solution pins.
+
+Fixed upstream (2026-07-12, TrBlazeUI 1.0.9), not yet re-checked in TrStudio.
+
 - **Severity:** blocker (for the Mac Catalyst desktop delivery; Windows head and web head unaffected)
-- **Repro:** `dotnet build src/TrStudio.Desktop -f net10.0-maccatalyst -p:EnableWindowsTargeting=true` on a real Mac (Apple Silicon, .NET SDK 10.0.301, MAUI workload 10.0.20) with TrBlazeUI.{Components,Primitives,Icons.Lucide} 1.0.7 referenced via the `TrStudioUI` RCL.
+- **Blocks:** no — the Windows desktop head and the web head were unaffected and the work carried on; at the time only the Mac Catalyst head could not build
+- **Repro:** `dotnet build src/TrStudio -f net10.0-maccatalyst -p:EnableWindowsTargeting=true` on a real Mac (Apple Silicon, .NET SDK 10.0.301, MAUI workload 10.0.20) with TrBlazeUI.{Components,Primitives,Icons.Lucide} 1.0.7 referenced via the `TrStudioUI` RCL.
 - **Expected:** the packages are consumable from a MAUI Blazor Hybrid head on every MAUI TFM — a Blazor component library should depend on `Microsoft.AspNetCore.Components.Web` as a *package*, not on the ASP.NET Core *shared framework*.
-- **Actual:** all three 1.0.7 nupkgs carry `frameworkReferences: ["Microsoft.AspNetCore.App"]` (visible in the consuming app's `project.assets.json`), and no ASP.NET Core runtime pack exists for `maccatalyst-arm64` → `error NETSDK1082: There was no runtime pack for Microsoft.AspNetCore.App available for the specified RuntimeIdentifier 'maccatalyst-arm64'`. The Windows MAUI head escapes only because Windows runtime packs for the shared framework happen to exist. Discovered 2026-07-12 on the first build attempt on a real Mac — the earlier "Mac Catalyst compile 0/0" check (2026-07-05, from Windows) never reached runtime-pack resolution, so this stayed hidden.
+- **Actual:** all three 1.0.7 nupkgs carry `frameworkReferences: ["Microsoft.AspNetCore.App"]` (visible in the consuming app's `project.assets.json`), and no ASP.NET Core runtime pack exists for `maccatalyst-arm64` → `error NETSDK1082: There was no runtime pack for Microsoft.AspNetCore.App available for the specified RuntimeIdentifier 'maccatalyst-arm64'`. The Windows MAUI head escapes only because Windows runtime packs for the shared framework happen to exist.
+- **Encountered in:** BRD-87 / REQ-FN-072 (MAUI Blazor Hybrid desktop heads — the Mac Catalyst delivery), first real-Mac run attempt per docs/TrStudio-BuildAndRun-Guide.md §3 Option A.
+- **Workaround:** none shipped. Candidate app-side mitigation (unvalidated): strip the transitive framework reference for the maccatalyst TFM in `TrStudio.csproj` via a target that removes the `TransitiveFrameworkReference` item `Microsoft.AspNetCore.App` before `ProcessFrameworkReferences`; the proper fix belongs in the library (and the app-side strip would crash at runtime if any library code path really did call a server-only API — components almost certainly don't).
+- **Suggested fix:** remove the `Microsoft.AspNetCore.App` framework reference from the three packages (depend on `Microsoft.AspNetCore.Components.Web` only), and assert after `dotnet pack` that no nuspec holds a `<frameworkReferences>` block.
+
+#### Detail
+
 - **Root cause (for the library team — the component CODE is fine, the packaging metadata is the defect):**
   - A Razor class library's compiled `net10.0` IL is platform-neutral and would run on Catalyst unchanged. The blocker is **one line of dependency metadata inside each published nupkg**. From `TrBlazeUI.Components.1.0.7.nupkg` → `TrBlazeUI.Components.nuspec`:
     ```xml
@@ -150,9 +144,7 @@ and a **headless-Chromium runtime smoke** on a Blazor Server demo page exercisin
   - That declaration means *"any app referencing this package must supply the full ASP.NET Core shared framework"* (Kestrel, MVC, SignalR — the whole server runtime). NuGet propagates it transitively to every consuming app.
   - On a **Blazor Server** app the requirement is free (the app *is* an ASP.NET Core app). On the **Windows MAUI** head it happens to be satisfiable (ASP.NET Core runtime packs exist for Windows RIDs). On **Mac Catalyst / iOS / Android** Microsoft ships **no ASP.NET Core runtime pack at all**, so the requirement is unsatisfiable by any consumer — the build fails at dependency resolution, before any code compiles.
   - Blazor *components* never need the shared framework — everything they use lives in `Microsoft.AspNetCore.Components.Web`, an ordinary platform-neutral NuGet package. Microsoft's guidance for component libraries that must also work in Blazor Hybrid / WebAssembly is explicit: **PackageReference to `Microsoft.AspNetCore.Components.Web`, never a `FrameworkReference` to `Microsoft.AspNetCore.App`**. (The FrameworkReference typically comes from the stock RCL template when the library once touched a server-side type — e.g. `AddRazorSupportForMvc`/`HtmlSanitizer`-adjacent server helpers — and it is invisible on Server/Windows, which is why it went unnoticed.)
-- **Encountered in:** BRD-87 / REQ-FN-072 (MAUI Blazor Hybrid desktop heads — the Mac Catalyst delivery), first real-Mac run attempt per docs/TrStudio-BuildAndRun-Guide.md §3 Option A.
-- **Workaround:** none shipped. Candidate app-side mitigation (unvalidated): strip the transitive framework reference for the maccatalyst TFM in `TrStudio.Desktop.csproj` via a target that removes the `TransitiveFrameworkReference` item `Microsoft.AspNetCore.App` before `ProcessFrameworkReferences`; the proper fix belongs in the library (and the app-side strip would crash at runtime if any library code path really did call a server-only API — components almost certainly don't).
-- **Suggested fix (concrete steps for the team):**
+- **The longer fix, step by step:**
   1. In each of the three package projects (`TrBlazeUI.Primitives`, `TrBlazeUI.Components`, `TrBlazeUI.Icons.Lucide`): delete `<FrameworkReference Include="Microsoft.AspNetCore.App" />` and ensure `<PackageReference Include="Microsoft.AspNetCore.Components.Web" />` covers everything used. If any type genuinely comes from the server framework (compile will say so), replace it with its package-shipped equivalent or isolate it behind a separate server-only package — do NOT put the FrameworkReference back on the component packages.
   2. `dotnet pack` → bump to **1.0.8**, push to the feed.
   3. **Verify the fix in the pipeline** (this is what kept 1.0.7's defect hidden): after pack, unzip the nupkg and assert the nuspec contains **no `<frameworkReferences>` block** — e.g. `unzip -p TrBlazeUI.Components.*.nupkg '*.nuspec' | grep -c frameworkReferences` must be 0. A "compiles on Windows" check can never catch this class of bug.
@@ -163,3 +155,100 @@ and a **headless-Chromium runtime smoke** on a Blazor Server demo page exercisin
   - **Pipeline verification (exactly step 3 above):** packed all three projects and asserted `unzip -p *.nupkg '*.nuspec' | grep -c frameworkReference == 0` — **Primitives = 0, Components = 0, Icons.Lucide = 0**. `Components.nuspec` now declares only platform-neutral package dependencies (`Microsoft.AspNetCore.Components.Web`, `Blazor-ApexCharts`, `HtmlSanitizer`, `Markdig`, and the two inter-package refs) — no `Microsoft.AspNetCore.App`. A MAUI Mac Catalyst/iOS/Android consumer can therefore resolve these packages without NETSDK1082.
   - **Note on 1.0.7 vs. now:** the on-disk 1.0.9 nuspecs were already free of the `<frameworkReferences>` block, so the defect had regressed out sometime after the 1.0.7 that TrStudio consumed; this change eliminates the source-level flag that caused it and bakes the nuspec assertion into verification so it cannot silently return.
   - **Still owner's job:** bump the package versions (> 1.0.7) and push, so TrStudio can consume the clean packages.
+
+### TR-012 — `SelectContent.DisposeAsync` does JS interop without catching `JSDisconnectedException`
+
+Closed 2026-11-15: fixed by TrBlazeUI 2.2.5 (the 2.1.1 and "after 2.2.4" dispose fixes in its version table). Proof: on the test host, three pages holding a `Select` (Image studio, Video studio, Registry & providers, one with its list open) were dropped mid-session and the server's three-minute clean-up passed; the host log (`tests/.artifacts/verify/app-5099.log`) has no `JSDisconnectedException`, no "Exceptions were encountered while disposing components" and no unhandled render error.
+
+- **Severity:** minor (log noise + AggregateException on circuit teardown; no user-visible break on its own)
+- **Blocks:** no — the renderer logs the error and continues, and the work carried on
+- **Repro:** any page containing a `Select` on a Blazor Server circuit that disconnects/navigates away (e.g. a layout redirect); observed at TrBlazeUI 1.0.9 during TrStudio's 2026-07-12 fix-issues run.
+- **Expected:** component disposal swallows `JSDisconnectedException` — the standard Blazor pattern for `DisposeAsync` doing JS interop (the circuit may already be gone).
+- **Actual:** `TrBlazeUI.Primitives.Select.SelectContent<T>.DisposeAsync()` → `JSObjectReference.DisposeAsync()` throws `Microsoft.JSInterop.JSDisconnectedException`, surfacing as `Unhandled exception rendering component` + an `AggregateException` in `CircuitHost` ("Exceptions were encountered while disposing components") in the host log on every such teardown.
+- **Encountered in:** TrStudio web-head logs while verifying the login-gate redirect (pages with model/voice `Select`s disposing on navigation).
+- **Workaround:** none needed app-side (the renderer logs and continues), but it pollutes logs and can mask real errors.
+- **Suggested fix:** wrap the JS `DisposeAsync` calls in `try { … } catch (JSDisconnectedException) { }` in `SelectContent` (and audit the other JS-interop-owning primitives for the same pattern).
+
+### TR-013 — The reference shows icon names the Lucide package does not contain (`alert-circle`)
+
+Closed 2026-11-15: fixed by TrBlazeUI.Icons.Lucide 2.2.5, which accepts all 212 pre-rename Lucide names as aliases (its README, "Old and alternate names"). Proof: `LucideIconData.IconExists` returns true for `alert-circle`, `alert-triangle` and `check-circle` on 2.2.5 (a small console program referencing only that package).
+
+- **Severity:** minor
+- **Blocks:** no — TrStudio now uses the package's names (`circle-alert`, `triangle-alert`, `circle-check`) and the work carried on
+- **Repro:** `TrBlazeUI-AI-Reference.md` shows `<LucideIcon Name="alert-circle" Size="16" />`; with `TrBlazeUI.Icons.Lucide` 1.0.9, `LucideIconData.IconExists("alert-circle")`, `("alert-triangle")` and `("check-circle")` are all false
+- **Expected:** every name the reference shows renders, or the old Lucide names are kept as aliases of the renamed ones
+- **Actual:** `LucideIcon` renders an empty `<span data-trblazeui-missing-icon="alert-triangle">`, so alerts on Login, Register, Forgot password and four admin screens showed an empty gap where the icon belongs
+- **Encountered in:** Login smoke for REQ-FN-099 (2026-11-14), both widths
+- **Workaround:** use the current Lucide names in the app
+- **Suggested fix:** add the pre-rename Lucide names as aliases in `LucideIconData`, and correct the reference's example
+
+### TR-014 — A `Select` inside a `Sheet` opens with no options
+
+Closed 2026-11-15: fixed by TrBlazeUI 2.2.5. Proof: on the test host, opening Add model on Registry & providers and pressing the Provider list shows all eight options over the panel (`tests/.artifacts/verify/tr014-select-in-sheet-2.2.5.png`), and the ten phase 2 Venice browser checks that start in that panel pass (`tests/verify/p2-venice.spec.ts`, 10 passed). No work-round was needed in TrStudio.
+
+- **Severity:** major
+- **Blocks:** no (closed; it blocked until 2026-11-15) — adding or editing a model row on Registry & providers (the Provider, Task and Tier lists sit in the Add model sheet), so the phase 2 Venice rows that need a Venice row cannot be checked
+- **Repro:** TrBlazeUI 1.0.9, Blazor Server: a page with `<Sheet><SheetContent>…<Select TValue="string"><SelectTrigger/><SelectContent><SelectItem …/></SelectContent></Select>…</SheetContent></Sheet>` and one `<PortalHost />` in the layout; open the sheet, click the trigger
+- **Expected:** the list of items shows over the sheet and an item can be picked
+- **Actual:** the trigger reports `aria-expanded="true"` but no `listbox` and no `option` element is rendered anywhere in the page; no error is logged. `Select`s on ordinary pages work
+- **Encountered in:** REQ-UI-084, REQ-UI-097 and the Venice rows that start from a Registry row (2026-11-14, test host, headless)
+- **Workaround:** none taken (the framework does not work around a library gap)
+- **Suggested fix:** render `SelectContent` through the same portal layer as the open sheet, above it, or document the setting that allows it
+
+### TR-015 — In a Mac Catalyst web view the sidebar's phone mode lags one window resize behind
+
+> ✅ **Fixed upstream 2026-11-19, in 2.2.6** (prepared, not yet released) — your diagnosis was right. `sidebar.js` now decides the mode with `matchMedia('(max-width: 767.98px)')`, read on the query's change event, the window's resize event, the body's ResizeObserver and once more on the next animation frame, and sends only a change to .NET. `window.innerWidth` is no longer read. This machine has no Mac, so the test makes Chromium report `innerWidth` late the way WKWebView does (it catches up 400 ms after each resize): 1280 → 390 → 1280 in single steps stayed docked on 2.2.5 and now switches each time; a page opened at 390 starts in phone mode; 767/768 crosses the breakpoint. Test `tests/verify/req-ui-075.spec.ts`, row REQ-UI-075. Please re-check on the Mac with your `osascript` one-step resize.
+
+- **Severity:** minor
+- **Blocks:** no — a person dragging the window edge sends many resizes and usually ends in the right mode; the headless checks of the phone menu pass; only a single jump in size (a script, a window-snapping tool) leaves the wrong mode until the next resize
+- **Repro:** TrBlazeUI 2.2.5 `Sidebar` in a .NET MAUI Blazor Hybrid app on Mac Catalyst (WKWebView, macOS 27.2). Resize the window in one step 1280 → 390 (`osascript … set size of window 1 to {390, 844}`): the desktop sidebar stays docked and the page is squeezed to about 60 px. Resize again to 391: the phone menu appears. Back to 1280 in one step: the sidebar stays folded behind the toggle
+- **Expected:** the mode follows the window after each resize
+- **Actual:** `staticwebassets/js/sidebar.js` calls `checkMobile()` from a `ResizeObserver` on `document.body` and reads `window.innerWidth` there; in the Catalyst web view that observer fires before `innerWidth` has taken the new size, so the old width is sent to `OnMobileChange` and no later callback corrects it (TrStudio, 16 Nov 2026, `tests/.artifacts/verify/mac/lag-390.png`, `lag-391.png`, `lag-1280.png`)
+- **Encountered in:** owner run of 15 Nov 2026, part B (screen check of the real Mac app at 1280 and 390)
+- **Workaround:** none taken (the framework does not work around a library gap)
+- **Suggested fix:** decide with `window.matchMedia('(max-width: 767px)')` and its `change` event, or read `document.documentElement.clientWidth` inside the observer, or check again on the next animation frame
+
+### TR-016 — A `Badge` keeps its first `Class` when the parameter changes
+
+- **Answer from TrBlazeUI, 2026-11-19 — not reproduced, no library change:** `Badge` builds its classes on every render. `tests/verify/req-ui-070.spec.ts` (page `/verify-trstudio-tr016`) flips your exact markup both ways in Chromium and the class and colour follow. This machine cannot run a Mac Catalyst WKWebView, and the badge carries `transition-colors`. On the Mac, without `@key`, read the badge's `className` after the click: `badge-ok` with an orange badge on screen is the web view's paint (work-round: `style="transition: none"`); `badge-warn` is a library defect — please add that output here.
+
+- **Severity:** minor
+- **Blocks:** no — the badge's text updates; only its colour stays wrong, and re-creating the badge with `@key` shows the new colour
+- **Repro:** TrBlazeUI 2.2.5 `<Badge Variant="BadgeVariant.Outline" Class="@(connected ? "badge-ok" : "badge-warn")">`; flip `connected` from false to true after a click (TrStudio Admin — Hardware & setup, ComfyUI card, 19 Nov 2026)
+- **Expected:** the rendered element's class follows the new `Class` value
+- **Actual:** the text changed to "Connected" but the badge stayed orange (`badge-warn`) until the page was reloaded; seen in the headless smoke of 19 Nov 2026. Not confirmed from the library's source (no decompiler on this Mac)
+- **Encountered in:** owner run of 18 Nov 2026 (night), `*build-phase`, REQ-FN-009
+- **Workaround:** `@key="objComfyConnected"` on the badge (`src/TrStudioUI/Pages/Admin/AdminHardware.razor:155`), taken by the builder; remove it when the library changes
+- **Suggested fix:** build the class list on every render (or in `OnParametersSet`), not once in `OnInitialized`
+
+## Resolution status — earlier summaries
+
+The Summary as it stood before 2026-11-19, kept unchanged as the record.
+
+- **1 blocker (TR-011)**, 3 major (TR-001, TR-002, TR-007), 6 minor (TR-003, TR-005, TR-006, TR-008, TR-009, TR-010), 1 nice-to-have (TR-004)
+- Theme: leaf components (`DataTable`, `Alert`, `Checkbox`, `Switch`) don't splat `CaptureUnmatchedValues`; several AI-reference APIs (`FileUpload.OnFilesSelected`, `Empty*` family, `Pagination`, Icon slot) diverge from the shipped 1.0.7 surface; `DataTable` also keeps a min-content wider than a ≤400px viewport (TR-010, cosmetic). All worked around; no build blocked — **except TR-011 (2026-07-12): the 1.0.7 packages' `Microsoft.AspNetCore.App` FrameworkReference makes the MAUI Mac Catalyst head unbuildable on a real Mac (NETSDK1082); no workaround shipped.**
+- Entries retain their append-only IDs; read TR-011 (blocker) then TR-001/002/007 (major) first.
+- Last consolidated: **2026-08-11** (`*handoff-phase` — re-confirmed **0 open**; all 11 remain resolved, no disposition changed since 2026-07-12) · previously 2026-07-07 (TR-011 appended 2026-07-12)
+
+### ✅ Resolution status — ALL 11 RESOLVED library-side (2026-07-12, REQ-UI-015)
+Every issue is fixed in the library source (or corrected in the AI reference). Verified three ways:
+a **strict Release build** (`dotnet build TrBlazeUI.sln -c Release -p:CI=true` → **0 warning / 0 error**);
+a **pack-and-inspect** of all three nupkgs (Primitives / Components / Icons.Lucide → **0 `<frameworkReferences>`** in every nuspec — the exact pipeline check TR-011 asked for);
+and a **headless-Chromium runtime smoke** on a Blazor Server demo page exercising each fix (**14/14** checks: `data-testid` splats present on the rendered DOM, table render-truth, gated-vs-uncontrolled Switch behaviour, and `documentElement.scrollWidth == 390` at a 390px viewport, plus a desktop + mobile visual pass).
+
+| ID | Severity | Fix kind | Status |
+|----|----------|----------|--------|
+| TR-001 | major | code (DataTable splat) | ✅ Resolved |
+| TR-002 | major | code (Alert splat) | ✅ Resolved |
+| TR-003 | minor (doc) | doc (inline-icon pattern) | ✅ Resolved |
+| TR-004 | nice-to-have | verified already-splatting | ✅ Resolved |
+| TR-005 | minor (doc) | doc (flat `Empty` API) | ✅ Resolved |
+| TR-006 | minor (doc) | doc (composite `Pagination` API + namespace) | ✅ Resolved |
+| TR-007 | major | code (`OnFilesSelected` alias) + doc | ✅ Resolved |
+| TR-008 | minor | code (Checkbox/Switch splat) | ✅ Resolved |
+| TR-009 | minor | code (controlled Switch) | ✅ Resolved |
+| TR-010 | minor | code (`min-w-0` root) | ✅ Resolved |
+| TR-011 | blocker | build (`AddRazorSupportForMvc` removed) | ✅ Resolved |
+
+> **Publish note:** these fixes ship when the package versions are bumped (> 1.0.7) and pushed. The current source packs clean nuspecs (verified); TrStudio should consume the next published Components/Primitives/Icons.Lucide versions.
+

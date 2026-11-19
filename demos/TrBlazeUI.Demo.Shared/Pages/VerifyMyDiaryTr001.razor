@@ -1,0 +1,54 @@
+@page "/verify-mydiary-tr001"
+@using TrBlazeUI.Components.Calendar
+
+@* Verification harness for MyDiary TR-001 (MyDiary-TrBlazeUI-Feedback.md).
+   Not a documentation demo: a journal's Browse calendar for November 2026 with entries on the 3rd,
+   10th and 19th. The button adds an entry on the 25th and changes the calendar's Class, so
+   tests/verify/req-ui-077.spec.ts can check that a change made after the first render reaches the
+   grid (the calendar used to skip renders unless its selected or shown month moved). *@
+
+<PageTitle>Verify MyDiary TR-001 - TrBlazeUI</PageTitle>
+
+<div class="mx-auto max-w-md space-y-6 p-6">
+    <h1 class="text-2xl font-bold" data-testid="verify-heading">MyDiary TR-001 the Calendar marks days with entries</h1>
+
+    <Calendar Selected="@objPicked"
+              SelectedChanged="@OnPicked"
+              MarkedDates="@HasEntry"
+              MarkedLabel="has an entry"
+              Class="@(objHasNewEntry ? "rounded-md border border-primary" : "rounded-md border")"
+              data-testid="diary-calendar" />
+
+    <p class="text-sm">Picked: <span data-testid="diary-picked">@objPicked?.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)</span></p>
+    <button type="button" class="rounded border px-3 py-1" data-testid="diary-add-entry" @onclick="AddEntry">Write on the 25th</button>
+</div>
+
+@code {
+    private readonly HashSet<DateTime> objEntryDays =
+        [new DateTime(2026, 11, 3), new DateTime(2026, 11, 10), new DateTime(2026, 11, 19)];
+
+    private DateTime? objPicked = new DateTime(2026, 11, 1);
+    private bool objHasNewEntry;
+
+    /// <summary>
+    /// Tells whether the journal has an entry on a day.
+    /// </summary>
+    /// <param name="aDate">The day.</param>
+    /// <returns>True when an entry was written that day.</returns>
+    private bool HasEntry(DateTime aDate) => objEntryDays.Contains(aDate.Date);
+
+    /// <summary>
+    /// Keeps the picked day.
+    /// </summary>
+    /// <param name="aDate">The day picked.</param>
+    private void OnPicked(DateTime? aDate) => objPicked = aDate;
+
+    /// <summary>
+    /// Writes an entry on the 25th and highlights the calendar's border.
+    /// </summary>
+    private void AddEntry()
+    {
+        objEntryDays.Add(new DateTime(2026, 11, 25));
+        objHasNewEntry = true;
+    }
+}

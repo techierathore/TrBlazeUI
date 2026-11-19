@@ -8,6 +8,8 @@
 
 ## Summary (filled by /flow-master on consolidation)
 
+**2026-11-19:** 40 entries in this copy, the last TR-050; TR-045, TR-046 and TR-050 copied in from Sevak's own file. **TR-050 is fixed in 2.2.6** (prepared, not yet released); TR-042 to TR-049 were fixed in earlier releases and each is now held by a test — the reply of 2026-11-19 at the foot lists them.
+
 **2026-11-13:** 37 entries in this copy, the last TR-049 (Sevak's own copy also holds TR-045 and TR-046, both fixed in 2.1.9). Sevak's three open entries are all answered. **TR-047 and TR-048 are fixed in 2.2.4**, which is on GitHub Packages. **TR-049 is fixed on 2026-11-13 and ships in the release after 2.2.4.** Sevak is on 2.1.9 (see "Replies from TrBlazeUI" at the foot).
 
 #### Summary as consolidated on 2026-10-07
@@ -715,6 +717,39 @@ Recorded because the "these components THROW on `AriaLabel`" phrasing is circula
 - **Workaround:** (applied) `data-testid` moved to a wrapping `<div>`; `AlertDialogAction OnClick` replaced by `<Button OnClick>` (both handlers already close their dialog). The census and the scanner that checks every `.razor` against it are in `tests/.artifacts/verify/phase3-fix/probe/` (`splat.cs`, `scan.py`, `out.tsv`, `nosplat-styled.txt`); after the fix the scanner finds no unknown attributes.
 - **Suggested fix:** add `AdditionalAttributes` with `CaptureUnmatchedValues` to every styled component and splat it onto the root element; give `AlertDialogAction` an `OnClick` that runs before it closes the dialog; add a build-time test that fails when a public component lacks the splat.
 
+### TR-045 — a toast's description is drawn at 90% opacity, which takes a coloured toast's text under WCAG AA contrast (minor, found 2026-10-16 during the 2.1.8 upgrade)
+
+> ✅ **Fixed upstream, in 2.1.9** — the description `<div>` no longer carries `opacity-90`; it is drawn at full foreground opacity and clears 4.5:1 against the toast background. Demo at `/components/toast`; test `tests/verify/req-ui-053.spec.ts`.
+
+- **Severity:** minor (one axe `color-contrast` violation whenever a toast is showing while a screen is checked)
+- **Blocks:** no for the run — it shows only while a toast is up, and `Sevak#REQ-NFR-005` is already held by TR-046; the app adds no patch of its own.
+- **Repro:** TrBlazeUI 2.1.8; show any toast with a description, then run axe (WCAG 2.1 AA tags) over the page.
+  ```text
+  /today: color-contrast (serious) ×1 — Elements must meet minimum color contrast ratio thresholds — .opacity-90
+  ```
+- **Expected:** a toast's description meets 4.5:1 against the toast's own background in every variant.
+- **Actual:** the description `<div class="text-sm opacity-90">` blends its colour into the background; on a coloured toast that drops it under 4.5:1.
+- **Encountered in:** `/today` during Sevak's REQ-NFR-005 check, 2026-10-16.
+- **Workaround:** none in the app (a library gap is filed, not patched around).
+- **Suggested fix:** draw the description at full opacity, or pick a description colour per variant that meets 4.5:1 on that variant's background, and add the toast variants to the shipped contrast matrix (`tools/token-contrast.py`).
+
+### TR-046 — `FileUpload`'s file input still has no accessible name in 2.1.8, and nothing passed to the component reaches it (minor, found 2026-10-16 during the 2.1.8 upgrade)
+
+> ✅ **Fixed upstream, in 2.1.9** — `FileUpload` exposes `AriaLabel` and `InputId` parameters; both reach the rendered `<input type="file">`. Demo at `/components/file-upload`; test `tests/verify/req-ui-054.spec.ts`.
+
+- **Severity:** minor (one critical axe `label` violation on every screen that shows a `FileUpload`)
+- **Blocks:** no for the run — but `Sevak#REQ-NFR-005` (no WCAG 2.1 AA violation on any screen) stays Blocked on it; the app adds no patch of its own.
+- **Repro:** TrBlazeUI 2.1.8; `<FileUpload Accept=".pdf" AriaLabel="Choose a file" Files="files" FilesChanged="OnFiles" />`, then run axe (WCAG 2.1 AA tags).
+  ```text
+  /inbox: label (critical) ×1 — Form elements must have labels — #file-upload-<guid>
+  rendered: <div class="w-full" arialabel="Choose a file"> … <input type="file" id="file-upload-<guid>" class="absolute inset-0 … opacity-0"> (no aria-label, no <label for>)
+  ```
+- **Expected:** a name for the `<input type="file">`: an `AriaLabel` parameter rendered as its `aria-label`, or unmatched `aria-*` attributes forwarded to the input. The reply to TR-034/TR-038 said `FileUpload` takes `AriaLabel` from 2.1.4.
+- **Actual:** `FileUpload` declares no `AriaLabel` (the shipped `TrBlazeUI.Components.xml` lists Accept, Class, Disabled, DropzoneContent, Files, FilesChanged, MaxFileCount, MaxFileSize, Multiple, OnFilesSelected, OnValidationError, ShowPreview and the splat); the splat lands on the outer `<div>`, so `AriaLabel` becomes a meaningless `arialabel` attribute there. The input's id is a fresh GUID, so a `<label for>` cannot point at it either.
+- **Encountered in:** `/inbox` (Sevak phase 3, Add to inbox) during the phase 1 accessibility check, 2026-10-16.
+- **Workaround:** none in the app (a library gap is filed, not patched around).
+- **Suggested fix:** an `AriaLabel` parameter rendered on the `<input type="file">` (or forward `aria-*` from the splat to it), plus an optional `InputId` so a page can point a `<label for>` at it.
+
 ### TR-047 — `CodeBlock`'s copy button takes no label, no `data-testid` and reports nothing back (minor)
 
 > ✅ **Fixed upstream 2026-11-11, in 2.2.4** (TrBlazeUI REQ-UI-066; checked 2026-11-13 in the 2.2.4 package on GitHub Packages; 2.2.3 does not have it). `CodeBlock` takes `CopyLabel` (the button's text and accessible name before a copy), `CopyButtonAttributes` (attributes written on the button itself, after the component's own, so an `aria-label` there wins) and `OnCopied` (`EventCallback<CodeBlockCopyResult>`, `Copied` or `Failed`). Demo: `/components/code-block`, section "Your own label and your own message". Test: `tests/verify/req-ui-066.spec.ts`.
@@ -757,9 +792,50 @@ Recorded because the "these components THROW on `AriaLabel`" phrasing is circula
 - **Suggested fix:** wrap the clean-up call in `try { … } catch (JSDisconnectedException) { } catch (JSException) { }` and dispose the module reference once; the same review for every component holding an `IJSObjectReference`.
 - **Entry text:** copied from Sevak's own file (`docs/Sevak-TrBlazeUI-Feedback.md` in the Sevak repository) on 2026-11-13.
 
+### TR-050 — `DatePicker`'s calendar does not close on Escape or on a second click of its button (minor, found 2026-11-16 during the Sevak triage-and-fix)
+
+> ✅ **Fixed upstream 2026-11-19, in 2.2.6** (prepared, not yet released) — Escape closes the calendar from its button or from inside it and puts the focus back on the button; a second click on the button closes it; picking a day and a click outside still close it, at 1280 and 390 px. The cause was in `Popover`: Escape was heard only inside the content, and an `AsChild` trigger (DatePicker's button) never closed what it opened. Test `tests/verify/req-ui-069.spec.ts` (fails on 2.2.5, passes now), row REQ-UI-069.
+
+- **Severity:** minor
+- **Blocks:** no. A click outside the calendar closes it; nothing in Sevak was changed.
+- **Repro:** TrBlazeUI 2.2.5; `<DatePicker @bind-Value="fromDate" Placeholder="From" />` (Sevak's Event log, `/admin/events`). Click its button: the calendar opens (`role="group"`, `aria-haspopup="true"` on the button). Press Escape: it stays open. Click the button again: it stays open. Click anywhere outside it: it closes. Same at 1280 and 390 px.
+- **Expected:** Escape closes it and gives focus back to its button, and a second click on the button closes it, as `Select` and `DropdownMenu` do.
+- **Actual:** only a click outside closes it. A keyboard user cannot close it without picking a date.
+- **Encountered in:** the screen check of the Event log (Sevak#REQ-UI-026), which opens each list, closes it with its button or Escape, and here measured the still-open calendar as overlapping the top bar (TechieFlow TF-043).
+- **Workaround:** none in Sevak.
+- **Suggested fix:** handle Escape on the calendar and its button, and toggle on the button's click.
+
 ## Replies from TrBlazeUI
 
 <!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
+
+### 2026-11-19 — TR-050 fixed in 2.2.6; TR-042 to TR-049 were already fixed, each now held by a test
+
+**TR-050** is fixed and ships in **2.2.6**, prepared on 2026-11-19 and not yet cut; it is on GitHub
+Packages once the owner releases it. Nothing in Sevak needs to change: Escape and a second click on
+the Event log's date buttons close the calendar after the upgrade.
+
+The rest of TR-042 to TR-049 needed no new code. Each is fixed in the release named under it and is
+now held by a test that runs with every release:
+
+| Entry | Fixed in | Test |
+|---|---|---|
+| TR-042 Combobox `Id` | 2.1.4 | `tests/verify/req-ui-078.spec.ts` (new: Sevak's Add task dialog with `Id` and `id`) |
+| TR-043 empty toast viewport | 2.1.5 | `tests/verify/req-ui-034.spec.ts` (REQ-UI-035) |
+| TR-044 splat sweep, `AlertDialogAction OnClick` | 2.1.4 / 2.1.5 | `tests/verify/req-ui-034.spec.ts` (REQ-UI-034), `tools/splat-audit` |
+| TR-045 toast description contrast | 2.1.9 | `tests/verify/req-ui-053.spec.ts` |
+| TR-046 `FileUpload` accessible name | 2.1.9 | `tests/verify/req-ui-054.spec.ts` |
+| TR-047 `CodeBlock` copy button | 2.2.4 | `tests/verify/req-ui-066.spec.ts` |
+| TR-048 Select bound to `""` | 2.2.2 | `tests/verify/req-ui-065.spec.ts` |
+| TR-049 sidebar teardown | 2.2.5 | `tests/verify/req-ui-068.spec.ts` |
+
+#### What we need from you
+
+1. After upgrading to 2.2.6, on `/admin/events`: open each date picker, press Escape (closes, focus
+   on the button), open it again and click its button (closes). Then close TR-050 with
+   `bash .tfcore/utils/tf-feedback.sh Sevak --close TR-050 "<what you ran and what it showed>"`.
+2. TR-047 and TR-048 still read open in Sevak's own file, which has no reply under them: Sevak is on
+   2.2.5, which carries both. Re-check and close them the same way.
 
 ### 2026-11-13 — TR-049 fixed after 2.2.4; TR-047 and TR-048 are in 2.2.4
 
