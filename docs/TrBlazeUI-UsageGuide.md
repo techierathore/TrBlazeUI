@@ -105,6 +105,11 @@ The demo app exposes the whole library through a sidebar navigation. Walk these 
 - **Expected:** the calendar closes both times and the focus stays on its button; the recent list keeps 8 px from both edges; the tier options stay on one line; the log's spoken count never differs from the lines shown; the tooltip opens; the badges change colour; the 25th gets a dot; the dialog opens with no error; the sidebar becomes the phone menu at once.
 - **Covers:** REQ-UI-069…REQ-UI-078
 
+### Consumer feedback of 21 Nov 2026 (`/verify-astrolyfe`)
+- **Steps:** open `/verify-astrolyfe`. Read the first choice list closed, open it, pick "New KP". Click the "Chart" label, open the Chart picker, choose "Horary", click the page heading, open it again and press Escape. Open the rule editor dialog and pick "Any" in its choice list. Read the text in the file drop area.
+- **Expected:** the closed list reads "KP" (not "K") and the open list shows "KP" and "New KP"; the Chart picker's button carries the id `pick-chart` and the label points at it; the picker closes on a click elsewhere and on Escape; the choice list inside the dialog opens above it and keeps "Any"; the drop area shows "Drop a CSV file here or choose one".
+- **Covers:** REQ-UI-084…REQ-UI-087 (AstroLyfe TR-016, TR-021, TR-022, TR-019)
+
 ### Render-mode parity
 - **Steps:** repeat a few of the above in Server (5183), WASM (5184) and Auto (5185).
 - **Expected:** identical component behaviour across all three hosts.
@@ -152,7 +157,15 @@ bash tests/package/codex-agent-deployment.sh
 
 ## Consumer integration notes
 
-### Added 2026-11-19 (Sevak TR-050, Chatur TR-025…TR-027, TfLens TR-041, TrStudio TR-015, MyDiary TR-001 — REQ-UI-069…REQ-UI-078 — 2.2.6, prepared)
+### Added 2026-11-21 (AstroLyfe TR-016, TR-019, TR-021, TR-022 — REQ-UI-084…REQ-UI-087 — after 2.2.6)
+
+- **A choice list item can carry its text in `Text` alone**: `<SelectItem Value="@("K")" Text="KP" />` shows "KP" in the open list, and the closed list shows "KP" too. Child content, when given, is drawn instead of `Text`.
+- **A Combobox takes `Id` on its button**: `<Combobox Id="pick-chart" … />` (or `id="pick-chart"`) puts that id on the `role="combobox"` button, so `<Label For="pick-chart">` reaches it.
+- **⚠ Behaviour change: `Combobox` `Id` no longer lands on the wrapper.** Before, an `Id` or `id` on a Combobox was written on its outer `<div>`; now it is written on the button inside. An app whose CSS, test or script styled or looked up the wrapper by that id must point at the button instead (or at a wrapper of its own).
+- **The file drop area's own text**: `<FileUpload><DropzoneContent>…</DropzoneContent></FileUpload>` replaces the default "Drag and drop files here"; set `AriaLabel` as well.
+- **A choice list inside a modal dialog** opens above it and keeps the choice (already so after 2.1.4; now held by a test).
+
+### Added 2026-11-19 (Sevak TR-050, Chatur TR-025…TR-027, TfLens TR-041, TrStudio TR-015, MyDiary TR-001 — REQ-UI-069…REQ-UI-078 — 2.2.6, released 2026-11-19)
 
 - **Popovers close the way menus do**: Escape on a popover's trigger closes it, Escape inside it returns the focus to the trigger, and a second click on an `AsChild` trigger (DatePicker, DateRangePicker, TimePicker, ColorPicker) closes it.
 - **A Select list wider than its button**: `<SelectContent MatchTriggerWidth="false">`.

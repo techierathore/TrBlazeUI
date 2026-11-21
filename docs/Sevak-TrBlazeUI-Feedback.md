@@ -8,7 +8,7 @@
 
 ## Summary (filled by /flow-master on consolidation)
 
-**2026-11-19:** 40 entries in this copy, the last TR-050; TR-045, TR-046 and TR-050 copied in from Sevak's own file. **TR-050 is fixed in 2.2.6** (prepared, not yet released); TR-042 to TR-049 were fixed in earlier releases and each is now held by a test — the reply of 2026-11-19 at the foot lists them.
+**2026-11-19:** 40 entries in this copy, the last TR-050; TR-045, TR-046 and TR-050 copied in from Sevak's own file. **TR-050 is fixed in 2.2.6** (released 2026-11-19; corrected 2026-11-21, it read "prepared, not yet released"); TR-042 to TR-049 were fixed in earlier releases and each is now held by a test — the reply of 2026-11-19 at the foot lists them.
 
 **2026-11-13:** 37 entries in this copy, the last TR-049 (Sevak's own copy also holds TR-045 and TR-046, both fixed in 2.1.9). Sevak's three open entries are all answered. **TR-047 and TR-048 are fixed in 2.2.4**, which is on GitHub Packages. **TR-049 is fixed on 2026-11-13 and ships in the release after 2.2.4.** Sevak is on 2.1.9 (see "Replies from TrBlazeUI" at the foot).
 
@@ -794,7 +794,7 @@ Recorded because the "these components THROW on `AriaLabel`" phrasing is circula
 
 ### TR-050 — `DatePicker`'s calendar does not close on Escape or on a second click of its button (minor, found 2026-11-16 during the Sevak triage-and-fix)
 
-> ✅ **Fixed upstream 2026-11-19, in 2.2.6** (prepared, not yet released) — Escape closes the calendar from its button or from inside it and puts the focus back on the button; a second click on the button closes it; picking a day and a click outside still close it, at 1280 and 390 px. The cause was in `Popover`: Escape was heard only inside the content, and an `AsChild` trigger (DatePicker's button) never closed what it opened. Test `tests/verify/req-ui-069.spec.ts` (fails on 2.2.5, passes now), row REQ-UI-069.
+> ✅ **Fixed upstream 2026-11-19, in 2.2.6** (released 2026-11-19) — Escape closes the calendar from its button or from inside it and puts the focus back on the button; a second click on the button closes it; picking a day and a click outside still close it, at 1280 and 390 px. The cause was in `Popover`: Escape was heard only inside the content, and an `AsChild` trigger (DatePicker's button) never closed what it opened. Test `tests/verify/req-ui-069.spec.ts` (fails on 2.2.5, passes now), row REQ-UI-069.
 
 - **Severity:** minor
 - **Blocks:** no. A click outside the calendar closes it; nothing in Sevak was changed.
@@ -809,10 +809,32 @@ Recorded because the "these components THROW on `AriaLabel`" phrasing is circula
 
 <!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
 
+### 2026-11-21 — TR-047, TR-048 and TR-050 re-checked against the code: all three hold
+
+Blocks: no. Nothing new was fixed; each entry was read against the code as it stands and its test
+run again on 2026-11-21 (all pass):
+
+| Entry | In the code | Test |
+|---|---|---|
+| TR-047 `CodeBlock` copy button | `CopyLabel`, `CopyButtonAttributes`, `OnCopied`; in **2.2.4** | `tests/verify/req-ui-066.spec.ts` |
+| TR-048 `Select` bound to `""` | typed `ResolveDisplayText()`, no `dynamic`; in **2.2.2** | `tests/verify/req-ui-065.spec.ts` |
+| TR-050 `DatePicker` Escape and second click | Popover trigger toggles, Escape closes and returns focus; in **2.2.6** (released 2026-11-19) | `tests/verify/req-ui-069.spec.ts` |
+
+**Correction, same day.** The first version of this reply said Sevak is on 2.1.9 and that 2.2.6 was not
+yet cut. Both were wrong. Release **2.2.6 has been out since 2026-11-19** (tag `v2.2.6` in the library
+repository), and Sevak's package file names **2.2.5**, the release before it. So Sevak **already has
+the fixes for TR-047 (2.2.4) and TR-048 (2.2.2)** and needs only the newest release, 2.2.6, for TR-050.
+
+What Sevak must re-check: TR-047 and TR-048 on the 2.2.5 it already runs: replace the
+`ShowCopyButton="false"` plus library `Button` with `CopyLabel` and `OnCopied`, and re-run the
+`/tasks` paste block; bind `""` to the flow editor's Tool picker once and open it. TR-050: update to
+2.2.6, open the Event log's date picker, press Escape, and click its button twice. Then close each with
+`tf-feedback.sh Sevak --close <ID> "<what you ran>"`.
+
 ### 2026-11-19 — TR-050 fixed in 2.2.6; TR-042 to TR-049 were already fixed, each now held by a test
 
-**TR-050** is fixed and ships in **2.2.6**, prepared on 2026-11-19 and not yet cut; it is on GitHub
-Packages once the owner releases it. Nothing in Sevak needs to change: Escape and a second click on
+**TR-050** is fixed and ships in **2.2.6**, released 2026-11-19 (corrected 2026-11-21: this read "not yet
+cut"); it is on GitHub Packages. Nothing in Sevak needs to change: Escape and a second click on
 the Event log's date buttons close the calendar after the upgrade.
 
 The rest of TR-042 to TR-049 needed no new code. Each is fixed in the release named under it and is

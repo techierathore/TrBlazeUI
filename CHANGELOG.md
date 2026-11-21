@@ -11,7 +11,47 @@ All five packages share a single version number: **TrBlazeUI.Primitives**,
 
 ## [Unreleased]
 
-Nothing yet.
+Answers AstroLyfe TR-016, TR-019, TR-021 and TR-022 (read on 21 Nov 2026), and re-checks Sevak
+TR-047, TR-048, TR-050 and TrStudio TR-015, TR-016 against the code. Rows REQ-UI-084 to REQ-UI-087;
+test `tests/verify/req-ui-084.spec.ts`, harness `/verify-astrolyfe`.
+
+### Fixed
+
+- **A `SelectItem` with only `Text` draws it (AstroLyfe TR-016).** The styled item drew only its
+  child content, so `<SelectItem Value="K" Text="KP" />` showed a blank row. It now draws `Text`
+  when it has no child content (child content still wins), and the closed trigger reads the same
+  text.
+- **`Combobox.Id` reaches the trigger button (AstroLyfe TR-021).** `Id` is now a real parameter
+  (`id="..."` binds to it too) and is written on the `role="combobox"` button, so
+  `<Label For="...">` can point at it. Before, the id went to the wrapper `<div>`, which a label
+  cannot be tied to. Underneath, a primitive `PopoverTrigger` that carries an `id` now tells its
+  context (`PopoverContext.CustomTriggerId`), so click-outside still recognises the trigger.
+  **Behaviour change:** an `Id` set on a `Combobox` used to land on the wrapper; it now lands on the
+  button.
+
+### ⚠ Behaviour changes to review before upgrading
+
+- **A `Combobox` `Id` now lands on the button, no longer on the wrapper.** Before, `Id="pick"` (or
+  `id="pick"`) was written on the Combobox's outer `<div>`; now it is written on the
+  `role="combobox"` button inside it. An app that styled the wrapper by that id, looked it up in a
+  script, or pointed a test at it must change that: select the button instead, or give the
+  wrapper an id of its own (put the Combobox in your own `<div id="…">`). A `<Label For="pick">`
+  now works, which it could not on a `<div>`.
+
+### Documentation
+
+- `TrBlazeUI-AI-Reference.md`: `FileUpload.DropzoneContent` with an example (AstroLyfe TR-019), the
+  `Combobox.Id` row, and the `SelectItem` `Text` rule.
+
+### Not changed
+
+- **AstroLyfe TR-022 (a `Select` in a modal `Dialog`)** was fixed after 2.1.4; it opens above the
+  dialog and keeps its choice. Now held by a test for the row it never had.
+- **Sevak TR-047** (2.2.4), **TR-048** (2.2.2) and **TR-050** (2.2.6) are in the code; their
+  tests pass.
+- **TrStudio TR-015** is in 2.2.6 (`matchMedia`); the test passes in Chromium and the Mac
+  WKWebView check is left to TrStudio. **TrStudio TR-016** does not reproduce here: `Badge` builds
+  its classes on every render and the test passes.
 
 ## [2.2.6] — 2026-11-19
 

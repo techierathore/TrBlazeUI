@@ -141,9 +141,29 @@ public partial class Combobox<TItem> : ComponentBase
     private bool objFocusDone;
 
     /// <summary>
-    /// Gets a unique identifier for this combobox instance.
+    /// Gets or sets the id of the trigger button, so a <c>&lt;Label For="..."&gt;</c> can point at it
+    /// (AstroLyfe TR-021).
     /// </summary>
-    private string Id { get; set; } = $"combobox-{Guid.NewGuid():N}";
+    /// <remarks>
+    /// Matching is case-insensitive, so <c>id="x"</c> binds here too. The id lands on the
+    /// <c>role="combobox"</c> button, not on the wrapper, because a label can only be tied to a
+    /// control. When it is not set the trigger keeps the id the popover generates.
+    /// </remarks>
+    [Parameter]
+    public string? Id { get; set; }
+
+    /// <summary>
+    /// Gets a unique identifier for this combobox instance, used for the listbox reference.
+    /// </summary>
+    private string objInstanceId { get; } = $"combobox-{Guid.NewGuid():N}";
+
+    /// <summary>
+    /// Gets the attributes written on the trigger button: the caller's id, when one was given.
+    /// </summary>
+    private Dictionary<string, object> TriggerAttributes =>
+        string.IsNullOrWhiteSpace(Id)
+            ? new Dictionary<string, object>()
+            : new Dictionary<string, object> { ["id"] = Id };
 
     /// <summary>
     /// Gets whether the popover is currently open.

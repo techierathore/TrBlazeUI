@@ -106,7 +106,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <div class="layout">
   <nav class="side">
     <h1>TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)</h1>
-    <div class="sub">Last rendered: 2026-11-19</div>
+    <div class="sub">Last rendered: 2026-11-21</div>
     <div class="group">Contents</div>
     <ol>
         <li><a href="#test-users-canonical-use-these-for-all-smoke-verify-uat">Test users (canonical — use THESE for all smoke / verify / UAT)</a></li>
@@ -129,13 +129,15 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li class="h3"><a href="#tflens-consumer-feedback-fixes-verify-tflens-2-verify-tflens-3">TfLens consumer-feedback fixes (/verify-tflens-2, /verify-tflens-3)</a></li>
         <li class="h3"><a href="#components-added-for-chatur-components-code-editor-components-stepper-components-badge-components-switch-components-datatable-components-toggle-group-components-tree-view-components-diff-view-components-log-view-components-nav-list-components-typing">Components added for Chatur (/components/code-editor, /components/stepper, /components/badge, /components/switch, /components/datatable, /components/toggle-group, /components/tree-view, /components/diff-view, /components/log-view, /components/nav-list, /components/typing)</a></li>
         <li class="h3"><a href="#consumer-feedback-of-19-nov-2026-components-date-picker-verify-chatur-tr025-verify-chatur-tr026-verify-chatur-log-count-verify-tflens-tr041-verify-trstudio-tr016-verify-mydiary-tr001-verify-sevak-tr042">Consumer feedback of 19 Nov 2026 (/components/date-picker, /verify-chatur-tr025, /verify-chatur-tr026, /verify-chatur-log-count, /verify-tflens-tr041, /verify-trstudio-tr016, /verify-mydiary-tr001, /verify-sevak-tr042)</a></li>
+        <li class="h3"><a href="#consumer-feedback-of-21-nov-2026-verify-astrolyfe">Consumer feedback of 21 Nov 2026 (/verify-astrolyfe)</a></li>
         <li class="h3"><a href="#render-mode-parity">Render-mode parity</a></li>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#setup-deployment-steps-runbook-one-command-per-line-in-order">Setup / Deployment steps (runbook — one command per line, in order)</a></li>
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
-        <li class="h3"><a href="#added-2026-11-19-sevak-tr-050-chatur-tr-025-tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001-req-ui-069-req-ui-078-2-2-6-prepared">Added 2026-11-19 (Sevak TR-050, Chatur TR-025…TR-027, TfLens TR-041, TrStudio TR-015, MyDiary TR-001 — REQ-UI-069…REQ-UI-078 — 2.2.6, prepared)</a></li>
+        <li class="h3"><a href="#added-2026-11-21-astrolyfe-tr-016-tr-019-tr-021-tr-022-req-ui-084-req-ui-087-after-2-2-6">Added 2026-11-21 (AstroLyfe TR-016, TR-019, TR-021, TR-022 — REQ-UI-084…REQ-UI-087 — after 2.2.6)</a></li>
+        <li class="h3"><a href="#added-2026-11-19-sevak-tr-050-chatur-tr-025-tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001-req-ui-069-req-ui-078-2-2-6-released-2026-11-19">Added 2026-11-19 (Sevak TR-050, Chatur TR-025…TR-027, TfLens TR-041, TrStudio TR-015, MyDiary TR-001 — REQ-UI-069…REQ-UI-078 — 2.2.6, released 2026-11-19)</a></li>
         <li class="h3"><a href="#added-2026-10-15-asp-net-core-advisories-req-nfr-005">Added 2026-10-15 (ASP.NET Core advisories — REQ-NFR-005)</a></li>
         <li class="h3"><a href="#added-2026-10-15-lekhak-tr-007-req-ui-052-not-yet-released">Added 2026-10-15 (Lekhak TR-007 — REQ-UI-052 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-13-chatur-tr-020-tr-021-req-ui-050-req-ui-051-not-yet-released">Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)</a></li>
@@ -156,7 +158,7 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
   </nav>
   <main>
     <h1>TrBlazeUI — Usage Guide (Test Users · Test Plan · Setup)</h1>
-    <div class="subtitle">Rendered 2026-11-19 &middot; source <code>TrBlazeUI-UsageGuide.md</code></div>
+    <div class="subtitle">Rendered 2026-11-21 &middot; source <code>TrBlazeUI-UsageGuide.md</code></div>
 
     <div class="toc-inline">
       <div>Contents</div>
@@ -181,13 +183,15 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
         <li class="h3"><a href="#tflens-consumer-feedback-fixes-verify-tflens-2-verify-tflens-3">TfLens consumer-feedback fixes (/verify-tflens-2, /verify-tflens-3)</a></li>
         <li class="h3"><a href="#components-added-for-chatur-components-code-editor-components-stepper-components-badge-components-switch-components-datatable-components-toggle-group-components-tree-view-components-diff-view-components-log-view-components-nav-list-components-typing">Components added for Chatur (/components/code-editor, /components/stepper, /components/badge, /components/switch, /components/datatable, /components/toggle-group, /components/tree-view, /components/diff-view, /components/log-view, /components/nav-list, /components/typing)</a></li>
         <li class="h3"><a href="#consumer-feedback-of-19-nov-2026-components-date-picker-verify-chatur-tr025-verify-chatur-tr026-verify-chatur-log-count-verify-tflens-tr041-verify-trstudio-tr016-verify-mydiary-tr001-verify-sevak-tr042">Consumer feedback of 19 Nov 2026 (/components/date-picker, /verify-chatur-tr025, /verify-chatur-tr026, /verify-chatur-log-count, /verify-tflens-tr041, /verify-trstudio-tr016, /verify-mydiary-tr001, /verify-sevak-tr042)</a></li>
+        <li class="h3"><a href="#consumer-feedback-of-21-nov-2026-verify-astrolyfe">Consumer feedback of 21 Nov 2026 (/verify-astrolyfe)</a></li>
         <li class="h3"><a href="#render-mode-parity">Render-mode parity</a></li>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#setup-deployment-steps-runbook-one-command-per-line-in-order">Setup / Deployment steps (runbook — one command per line, in order)</a></li>
         <li><a href="#test-automated">Test (automated)</a></li>
         <li><a href="#smoke-checklist-quick-capability-pass">Smoke checklist (quick capability pass)</a></li>
         <li><a href="#consumer-integration-notes">Consumer integration notes</a></li>
-        <li class="h3"><a href="#added-2026-11-19-sevak-tr-050-chatur-tr-025-tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001-req-ui-069-req-ui-078-2-2-6-prepared">Added 2026-11-19 (Sevak TR-050, Chatur TR-025…TR-027, TfLens TR-041, TrStudio TR-015, MyDiary TR-001 — REQ-UI-069…REQ-UI-078 — 2.2.6, prepared)</a></li>
+        <li class="h3"><a href="#added-2026-11-21-astrolyfe-tr-016-tr-019-tr-021-tr-022-req-ui-084-req-ui-087-after-2-2-6">Added 2026-11-21 (AstroLyfe TR-016, TR-019, TR-021, TR-022 — REQ-UI-084…REQ-UI-087 — after 2.2.6)</a></li>
+        <li class="h3"><a href="#added-2026-11-19-sevak-tr-050-chatur-tr-025-tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001-req-ui-069-req-ui-078-2-2-6-released-2026-11-19">Added 2026-11-19 (Sevak TR-050, Chatur TR-025…TR-027, TfLens TR-041, TrStudio TR-015, MyDiary TR-001 — REQ-UI-069…REQ-UI-078 — 2.2.6, released 2026-11-19)</a></li>
         <li class="h3"><a href="#added-2026-10-15-asp-net-core-advisories-req-nfr-005">Added 2026-10-15 (ASP.NET Core advisories — REQ-NFR-005)</a></li>
         <li class="h3"><a href="#added-2026-10-15-lekhak-tr-007-req-ui-052-not-yet-released">Added 2026-10-15 (Lekhak TR-007 — REQ-UI-052 — not yet released)</a></li>
         <li class="h3"><a href="#added-2026-10-13-chatur-tr-020-tr-021-req-ui-050-req-ui-051-not-yet-released">Added 2026-10-13 (Chatur TR-020, TR-021 — REQ-UI-050, REQ-UI-051 — not yet released)</a></li>
@@ -383,6 +387,15 @@ h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link{opacity:1}
 <li><strong>Covers:</strong> REQ-UI-069…REQ-UI-078
 </li>
 </ul>
+<h3 id="consumer-feedback-of-21-nov-2026-verify-astrolyfe">Consumer feedback of 21 Nov 2026 (<code>/verify-astrolyfe</code>)<a class="anchor-link" href="#consumer-feedback-of-21-nov-2026-verify-astrolyfe">#</a></h3>
+<ul>
+<li><strong>Steps:</strong> open <code>/verify-astrolyfe</code>. Read the first choice list closed, open it, pick "New KP". Click the "Chart" label, open the Chart picker, choose "Horary", click the page heading, open it again and press Escape. Open the rule editor dialog and pick "Any" in its choice list. Read the text in the file drop area.
+</li>
+<li><strong>Expected:</strong> the closed list reads "KP" (not "K") and the open list shows "KP" and "New KP"; the Chart picker's button carries the id <code>pick-chart</code> and the label points at it; the picker closes on a click elsewhere and on Escape; the choice list inside the dialog opens above it and keeps "Any"; the drop area shows "Drop a CSV file here or choose one".
+</li>
+<li><strong>Covers:</strong> REQ-UI-084…REQ-UI-087 (AstroLyfe TR-016, TR-021, TR-022, TR-019)
+</li>
+</ul>
 <h3 id="render-mode-parity">Render-mode parity<a class="anchor-link" href="#render-mode-parity">#</a></h3>
 <ul>
 <li><strong>Steps:</strong> repeat a few of the above in Server (5183), WASM (5184) and Auto (5185).
@@ -455,7 +468,20 @@ bash tests/package/codex-agent-deployment.sh</code></pre>
 </li>
 </ul>
 <h2 id="consumer-integration-notes">Consumer integration notes<a class="anchor-link" href="#consumer-integration-notes">#</a></h2>
-<h3 id="added-2026-11-19-sevak-tr-050-chatur-tr-025-tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001-req-ui-069-req-ui-078-2-2-6-prepared"><a id="added-2026-11-19-sevak-tr-050-chatur-tr-025tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001--req-ui-069req-ui-078--226-prepared"></a>Added 2026-11-19 (Sevak TR-050, Chatur TR-025…TR-027, TfLens TR-041, TrStudio TR-015, MyDiary TR-001 — REQ-UI-069…REQ-UI-078 — 2.2.6, prepared)<a class="anchor-link" href="#added-2026-11-19-sevak-tr-050-chatur-tr-025-tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001-req-ui-069-req-ui-078-2-2-6-prepared">#</a></h3>
+<h3 id="added-2026-11-21-astrolyfe-tr-016-tr-019-tr-021-tr-022-req-ui-084-req-ui-087-after-2-2-6"><a id="added-2026-11-21-astrolyfe-tr-016-tr-019-tr-021-tr-022--req-ui-084req-ui-087--after-226"></a>Added 2026-11-21 (AstroLyfe TR-016, TR-019, TR-021, TR-022 — REQ-UI-084…REQ-UI-087 — after 2.2.6)<a class="anchor-link" href="#added-2026-11-21-astrolyfe-tr-016-tr-019-tr-021-tr-022-req-ui-084-req-ui-087-after-2-2-6">#</a></h3>
+<ul>
+<li><strong>A choice list item can carry its text in <code>Text</code> alone</strong>: <code>&lt;SelectItem Value="@("K")" Text="KP" /&gt;</code> shows "KP" in the open list, and the closed list shows "KP" too. Child content, when given, is drawn instead of <code>Text</code>.
+</li>
+<li><strong>A Combobox takes <code>Id</code> on its button</strong>: <code>&lt;Combobox Id="pick-chart" … /&gt;</code> (or <code>id="pick-chart"</code>) puts that id on the <code>role="combobox"</code> button, so <code>&lt;Label For="pick-chart"&gt;</code> reaches it.
+</li>
+<li><strong>⚠ Behaviour change: <code>Combobox</code> <code>Id</code> no longer lands on the wrapper.</strong> Before, an <code>Id</code> or <code>id</code> on a Combobox was written on its outer <code>&lt;div&gt;</code>; now it is written on the button inside. An app whose CSS, test or script styled or looked up the wrapper by that id must point at the button instead (or at a wrapper of its own).
+</li>
+<li><strong>The file drop area's own text</strong>: <code>&lt;FileUpload&gt;&lt;DropzoneContent&gt;…&lt;/DropzoneContent&gt;&lt;/FileUpload&gt;</code> replaces the default "Drag and drop files here"; set <code>AriaLabel</code> as well.
+</li>
+<li><strong>A choice list inside a modal dialog</strong> opens above it and keeps the choice (already so after 2.1.4; now held by a test).
+</li>
+</ul>
+<h3 id="added-2026-11-19-sevak-tr-050-chatur-tr-025-tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001-req-ui-069-req-ui-078-2-2-6-released-2026-11-19"><a id="added-2026-11-19-sevak-tr-050-chatur-tr-025tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001--req-ui-069req-ui-078--226-released-2026-11-19"></a>Added 2026-11-19 (Sevak TR-050, Chatur TR-025…TR-027, TfLens TR-041, TrStudio TR-015, MyDiary TR-001 — REQ-UI-069…REQ-UI-078 — 2.2.6, released 2026-11-19)<a class="anchor-link" href="#added-2026-11-19-sevak-tr-050-chatur-tr-025-tr-027-tflens-tr-041-trstudio-tr-015-mydiary-tr-001-req-ui-069-req-ui-078-2-2-6-released-2026-11-19">#</a></h3>
 <ul>
 <li><strong>Popovers close the way menus do</strong>: Escape on a popover's trigger closes it, Escape inside it returns the focus to the trigger, and a second click on an <code>AsChild</code> trigger (DatePicker, DateRangePicker, TimePicker, ColorPicker) closes it.
 </li>

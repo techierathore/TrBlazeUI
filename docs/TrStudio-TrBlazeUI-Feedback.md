@@ -4,11 +4,13 @@
 |---|---|
 | App | TrStudio |
 | Upstream | TrBlazeUI |
-| Updated | 2026-11-19 |
+| Updated | 2026-11-21 |
 
 ## Summary
 
-16 entries: nothing is blocked. 1 open, 0 fixed upstream and not yet re-checked, 15 closed. TR-015 is fixed in 2.2.6, prepared 2026-11-19 and not yet released. TR-016 did not reproduce in the library and is open; its entry says what to read on the Mac.
+**2026-11-21:** TR-015 re-checked in the code (fixed in 2.2.6, to re-check on the Mac); TR-016 re-checked, still not reproduced here. See the reply at the foot.
+
+16 entries: nothing is blocked. 1 open, 0 fixed upstream and not yet re-checked, 15 closed. TR-015 is fixed in 2.2.6, released 2026-11-19 (corrected 2026-11-21, it read "not yet released"). TR-016 did not reproduce in the library and is open; its entry says what to read on the Mac.
 
 ## Entries
 
@@ -197,7 +199,7 @@ Closed 2026-11-15: fixed by TrBlazeUI 2.2.5. Proof: on the test host, opening Ad
 
 ### TR-015 — In a Mac Catalyst web view the sidebar's phone mode lags one window resize behind
 
-> ✅ **Fixed upstream 2026-11-19, in 2.2.6** (prepared, not yet released) — your diagnosis was right. `sidebar.js` now decides the mode with `matchMedia('(max-width: 767.98px)')`, read on the query's change event, the window's resize event, the body's ResizeObserver and once more on the next animation frame, and sends only a change to .NET. `window.innerWidth` is no longer read. This machine has no Mac, so the test makes Chromium report `innerWidth` late the way WKWebView does (it catches up 400 ms after each resize): 1280 → 390 → 1280 in single steps stayed docked on 2.2.5 and now switches each time; a page opened at 390 starts in phone mode; 767/768 crosses the breakpoint. Test `tests/verify/req-ui-075.spec.ts`, row REQ-UI-075. Please re-check on the Mac with your `osascript` one-step resize.
+> ✅ **Fixed upstream 2026-11-19, in 2.2.6** (released 2026-11-19) — your diagnosis was right. `sidebar.js` now decides the mode with `matchMedia('(max-width: 767.98px)')`, read on the query's change event, the window's resize event, the body's ResizeObserver and once more on the next animation frame, and sends only a change to .NET. `window.innerWidth` is no longer read. This machine has no Mac, so the test makes Chromium report `innerWidth` late the way WKWebView does (it catches up 400 ms after each resize): 1280 → 390 → 1280 in single steps stayed docked on 2.2.5 and now switches each time; a page opened at 390 starts in phone mode; 767/768 crosses the breakpoint. Test `tests/verify/req-ui-075.spec.ts`, row REQ-UI-075. Please re-check on the Mac with your `osascript` one-step resize.
 
 - **Severity:** minor
 - **Blocks:** no — a person dragging the window edge sends many resizes and usually ends in the right mode; the headless checks of the phone menu pass; only a single jump in size (a script, a window-snapping tool) leaves the wrong mode until the next resize
@@ -220,6 +222,26 @@ Closed 2026-11-15: fixed by TrBlazeUI 2.2.5. Proof: on the test host, opening Ad
 - **Encountered in:** owner run of 18 Nov 2026 (night), `*build-phase`, REQ-FN-009
 - **Workaround:** `@key="objComfyConnected"` on the badge (`src/TrStudioUI/Pages/Admin/AdminHardware.razor:155`), taken by the builder; remove it when the library changes
 - **Suggested fix:** build the class list on every render (or in `OnParametersSet`), not once in `OnInitialized`
+- **Read on the Mac (TrStudio, 20 Nov 2026), as asked:** real Mac app, Debug, signed, still with the `@key` workaround; user 1, Hardware & setup. Before Connect: "Not connected", orange; after Connect (a stand-in ComfyUI answer on 127.0.0.1:8188): "Connected", green, no reload (`tests/.artifacts/verify/mac/comfy-before.png`, `comfy-after.png`). The class name cannot be read on Mac Catalyst: its web view gives no DOM class list to accessibility and the app has no script console, so the colour stands in for the class. The flip without `@key` needs a code change (`*fix-issues`).
+
+## Replies from TrBlazeUI
+
+<!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
+
+### 2026-11-21 — TR-015 is fixed in 2.2.6 and to re-check on the Mac; TR-016 does not reproduce
+
+Blocks: no. Both entries were read against the code as it stands.
+
+| Entry | State | Evidence |
+|---|---|---|
+| **TR-015** sidebar phone mode lags one resize | fixed in **2.2.6** (released 2026-11-19; the first version of this reply said "not yet cut", which was wrong); **to re-check on the Mac** | `sidebar.js` decides from `matchMedia('(max-width: 767.98px)')` and re-reads on its change event, the window resize, the body observer and the next animation frame; only a change goes to .NET. `tests/verify/req-ui-075.spec.ts` passes in Chromium; Windows cannot run a WKWebView, so the Mac behaviour is read from the code only. |
+| **TR-016** `Badge` keeps its first `Class` | not reproduced in the library; stays open | `Badge.CssClass` is a property read on every render, with no `OnInitialized` copy. `tests/verify/req-ui-070.spec.ts` flips your exact markup both ways in Chromium and passes. Your Mac read (with `@key`) shows the colour follows; it cannot tell us the class. |
+
+What TrStudio must re-check: on the Mac, on 2.2.6 or later, drag the window 1280 to 390 in one step (the phone
+menu must appear without a second resize) and back. For TR-016, remove `@key` on the ComfyUI badge
+(`AdminHardware.razor:155`) and run Connect once on the Mac; if the colour still stays orange, say so and
+we will treat it as a Blazor render-tree fault on Mac Catalyst and open a new row. If it turns green,
+close the entry.
 
 ## Resolution status — earlier summaries
 

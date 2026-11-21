@@ -9,7 +9,8 @@
         <Popover Open="objIsOpen" OpenChanged="HandleOpenChanged">
             <PopoverTrigger role="combobox"
                            aria-expanded="@GetIsOpen().ToString().ToLower()"
-                           aria-controls="@($"{Id}-listbox")"
+                           aria-controls="@($"{objInstanceId}-listbox")"
+                           @attributes="TriggerAttributes"
                            aria-haspopup="listbox"
                            disabled="@Disabled"
                            class="@($"{ButtonCssClass} {Class}")">

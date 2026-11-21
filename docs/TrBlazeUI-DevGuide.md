@@ -228,7 +228,7 @@ _(The remaining ~68 component demos and ~14 primitive demos follow the identical
 | Sidebar phone mode (TrStudio TR-015) | any page (`MainLayout`) | `Shared/MainLayout.razor` | `SidebarProvider` → `wwwroot/js/sidebar.js` `setupMobileDetection` (`matchMedia`) → `OnMobileChange` | with `innerWidth` made late, 1280 → 390 → 1280 switches each time (req-ui-075.spec.ts) |
 | Submenu re-placed (Chatur TR-025) | `/verify-chatur-tr025` | `Pages/VerifyChaturTr025.razor` | `MenubarSubContent.OnAfterRenderAsync` → `SubmenuPlacer.FitAsync` every render → `submenu.js` `fit` + `naturalWidth` → `SubmenuPlacer.IsSame` | rows arriving after it opened keep 8 px at 390 (req-ui-076.spec.ts) |
 | Calendar marks (MyDiary TR-001) | `/verify-mydiary-tr001` | `Pages/VerifyMyDiaryTr001.razor` | `Calendar.MarkedDates`, `MarkedLabel`, `MarkClass`; `OnParametersSet` → `ShouldRender` | dots on 3, 10, 19; a mark and a `Class` added later both show (req-ui-077.spec.ts) |
-| Combobox `Id` in a Dialog (Sevak TR-042) | `/verify-sevak-tr042` | `Pages/VerifySevakTr042.razor` | `Combobox` (private `Id`, splatted `id`) inside `DialogContent` | both ids reach the page, no error (req-ui-078.spec.ts) |
+| Combobox `Id` in a Dialog (Sevak TR-042) | `/verify-sevak-tr042` | `Pages/VerifySevakTr042.razor` | `Combobox` (`Id` parameter, case-insensitive `id`) inside `DialogContent` | both ids reach the page, now on the buttons, no error (req-ui-078.spec.ts) |
 
 Call chain (Escape and second click, Sevak TR-050): `Button.HandleKeyDown` → `TriggerContext.OnKeyDown` = `PopoverTrigger.HandleKeyDownAsync` (`src/TrBlazeUI.Primitives/Primitives/Popover/PopoverTrigger.razor:142`) → `PopoverContext.Close` when open and `PopoverContext.CloseOnEscape` (set by `PopoverContent.OnParametersSet`). A click → `Button` → `TriggerContext.Toggle` (`PopoverTrigger.razor:83`) → `Close` when open, else `Open`. Escape inside the content → `PopoverContent.HandleKeyDown` → `Close` → `FocusTriggerAsync` (`PopoverContent.razor:255`) → `PopoverState.TriggerElement.FocusAsync`.
 
@@ -237,6 +237,18 @@ Call chain (log count): `LogView.OnParametersSet` appends the new lines, sets `o
 Call chain (submenu re-placed, Chatur TR-025): any render of an open `MenubarSubContent` → `OnAfterRenderAsync` → `SubmenuPlacer.FitAsync` → `submenu.js` `fit` (`:19`), which reads `naturalWidth` (`:56`: inline `left`/`right`/`max-width` lifted for one layout read) and the parent row's box → `SubmenuPlacer.IsSame` (`MenubarSubContent.razor:81`) → `StateHasChanged` only when the place changed. `DropdownMenuSubContent` and `ContextMenuSubContent` follow the same lines.
 
 Where to break: `PopoverTrigger.razor:142`, `LogView.razor:527`, `submenu.js:19`, `sidebar.js:64`, `positioning.js:160`, `Calendar.razor:698`, `DataTable.razor:147`.
+
+### Consumer feedback of 21 Nov 2026 (REQ-UI-084…REQ-UI-087 — AstroLyfe TR-016, TR-019, TR-021, TR-022)
+
+| Screen | Route | Demo page file | Library surface exercised | Seen 2026-11-21 |
+|--------|-------|----------------|---------------------------|-----------------|
+| Select item with `Text` only (TR-016) | `/verify-astrolyfe` | `Pages/VerifyAstroLyfe.razor` | styled `SelectItem.razor` (`ChildContent ?? GetDisplayText()`) → primitive `SelectItem` `TextValue` → `SelectContext.RegisterItem` → `SelectValue.GetSelectedText` | closed trigger "KP", open list "KP" and "New KP" (req-ui-084.spec.ts, REQ-UI-084) |
+| Combobox `Id` on its button (TR-021) | `/verify-astrolyfe` | same | `Combobox.Id` → `TriggerAttributes` → styled `PopoverTrigger` `AdditionalAttributes` → primitive `PopoverTrigger.OnParametersSet` sets `PopoverContext.CustomTriggerId` → `TriggerId` (used by `onClickOutsideByIds`) | `button#pick-chart[role=combobox]`; click elsewhere and Escape close it (REQ-UI-085) |
+| Select in a modal Dialog (TR-022) | `/verify-astrolyfe` | same | `SelectContent` → `FloatingPortal` `InlineWhenNested` inside `DialogContent` | list opens above the dialog, choice kept (REQ-UI-086; no code change) |
+| FileUpload `DropzoneContent` (TR-019) | `/verify-astrolyfe` | same | `FileUpload.razor` renders `DropzoneContent` instead of the default text; reference section "FileUpload" | app text drawn, reference names the parameter (REQ-UI-087) |
+
+- **⚠ Behaviour change (TR-021).** `Combobox.Id` used to be private and a caller's `Id`/`id` was splatted onto the wrapper `<div>`; it is now a `[Parameter]` written on the trigger button. Any code that selected the wrapper by that id (CSS, a test, a script) must change. A primitive `PopoverTrigger` that carries an `id` also reports it through `PopoverContext.CustomTriggerId`, so click-outside still knows the trigger.
+- **Never remove `CustomTriggerId`:** the click-outside handler excludes the trigger by id; an id the button carries but the context does not know makes a click on the trigger count as outside.
 
 ## 4. Library lineage — how a styled component resolves
 
@@ -254,7 +266,9 @@ A reader chasing a bug starts at the demo page, drops into the styled component 
 
 ## 5. Known issues
 
-- **✅ FIXED 2026-11-19, in 2.2.6 (prepared) — REQ-UI-069…REQ-UI-078.** Sevak TR-050, Chatur TR-025…TR-027 and the output strip's count, TfLens TR-041, TrStudio TR-015, MyDiary TR-001; Sevak TR-042 newly held by a test. TrStudio TR-016 not reproduced (WKWebView only). See §3 above.
+- **✅ FIXED 2026-11-21, after 2.2.6 — REQ-UI-084…REQ-UI-087.** AstroLyfe TR-016 (a `SelectItem` with only `Text` draws it), TR-021 (`Combobox.Id` is a parameter on the button), TR-019 (`DropzoneContent` in the reference); AstroLyfe TR-022 was already fixed and is now held by a test. **Behaviour change:** a Combobox `Id` moves from the wrapper to the button.
+
+- **✅ FIXED 2026-11-19, in 2.2.6 (released 2026-11-19) — REQ-UI-069…REQ-UI-078.** Sevak TR-050, Chatur TR-025…TR-027 and the output strip's count, TfLens TR-041, TrStudio TR-015, MyDiary TR-001; Sevak TR-042 newly held by a test. TrStudio TR-016 not reproduced (WKWebView only). See §3 above.
 
 - **✅ FIXED 2026-10-08, not yet released — Sevak TR-041 and TR-006 (`REQ-UI-044`, `REQ-UI-045`).** A Select inside a Dialog can no longer freeze the page: `SelectContent` catches its script import, `FloatingPortal` places the content under its anchor when positioning fails and renders inline when the portal host times out (both failures injected by `tests/verify/req-ui-044.spec.ts`). New `Chat` family (`Components/Chat/`, `wwwroot/js/chat-composer.js`), verified by `req-ui-045.spec.ts`.
 - **✅ FIXED 2026-10-07, not yet released — Sevak feedback (`REQ-UI-034`…`REQ-UI-043`, `REQ-FN-011`).** `Table` family (`Components/Table/`), `ToastVariant` Success/Info/Warning + `ToastService.Warning`/`.Info`, `AlertDialogAction`/`AlertDialogCancel` `OnClick`/`PreventClose`, `Textarea.Rows`/`MaxRows`, `CardTitle`/`AlertTitle` `As` (now code components `CardTitle.cs`/`AlertTitle.cs`, since Razor cannot take an element name from a parameter), `NumericInput` always `role="spinbutton"` with invariant ARIA numbers (`Slider` too), the `NumberInput` obsolete shim, `SelectValue` placeholder when no item matches, `ToastProvider` viewport `pointer-events-none`, `HtmlSanitizer` stable 9.1.x. Verified by `tests/verify/req-ui-034.spec.ts`, `req-ui-037.spec.ts`, `req-ui-040.spec.ts` and `req-fn.spec.ts` (REQ-FN-011). Sevak filed against 1.0.7; 23 of its 34 entries were already fixed by 2.1.4 and are answered in `docs/Sevak-TrBlazeUI-Feedback.md`.

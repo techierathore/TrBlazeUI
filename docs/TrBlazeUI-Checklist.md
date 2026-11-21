@@ -118,6 +118,10 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 | REQ-UI-077 | The Calendar can mark the days that have content (MyDiary TR-001) | Verified | 100% | 2026-11-19 verify: PASS — test `MyDiary TR-001 — the Calendar can mark the days that have co` | [d](#d-req-ui-077) |
 | REQ-UI-078 | A Combobox takes Id or id inside a Dialog without ending the session (Sevak TR-042) | Verified | 100% | 2026-11-19 verify: PASS — test `Sevak TR-042 — a Combobox takes Id or id inside a Dialog REQ` | [d](#d-req-ui-078) |
 | REQ-UI-079 | Leaving a page that registered keyboard shortcuts logs no unobserved task exception | Verified | 100% | 2026-11-19 verify: PASS — test `Keyboard shortcuts — leaving the page logs no unobserved tas` | [d](#d-req-ui-079) |
+| REQ-UI-084 | A Select item with only Text draws it, and the closed trigger reads it (AstroLyfe TR-016) | Verified | 100% | 2026-11-21 verify: PASS — test `AstroLyfe TR-016 — a SelectItem with only Text draws it REQ-` | [d](#d-req-ui-084) |
+| REQ-UI-085 | A Combobox Id lands on its trigger so a Label For reaches it (AstroLyfe TR-021) | Verified | 100% | 2026-11-21 verify: PASS — test `AstroLyfe TR-021 — Combobox Id reaches the trigger REQ-UI-08` | [d](#d-req-ui-085) |
+| REQ-UI-086 | A Select inside a modal Dialog opens and takes a choice (AstroLyfe TR-022) | Verified | 100% | 2026-11-21 verify: PASS — test `AstroLyfe TR-022 — a Select inside a modal Dialog opens REQ-` | [d](#d-req-ui-086) |
+| REQ-UI-087 | FileUpload DropzoneContent is drawn and listed in the AI reference (AstroLyfe TR-019) | Verified | 100% | 2026-11-21 verify: PASS — test `AstroLyfe TR-019 — FileUpload DropzoneContent is drawn and l` | [d](#d-req-ui-087) |
 
 **Status values:** `Not Started` · `In Progress` · `Implemented` · `Verified` · `Done (pre-existing)` (migrated as already complete — do NOT rebuild) · `Needs re-verify` · `PARTIAL` · `FAIL` · `Blocked` · `N/A`.
 
@@ -494,6 +498,9 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 - <a id="d-req-ui-054"></a> **REQ-UI-054** (extends BRD-11 FileUpload) FileUpload AriaLabel and InputId reach the rendered file input (Sevak TR-046)
   - *Acceptance:* When a FileUpload with `AriaLabel` and `InputId` is rendered on the FileUpload demo screen, then the underlying `<input type="file">` carries the matching `aria-label` and `id` attributes.
 
+- <a id="d-req-ui-087"></a> **REQ-UI-087** (extends BRD-4 to BRD-12) FileUpload DropzoneContent is drawn and listed in the AI reference (AstroLyfe TR-019)
+  - *Acceptance:* When a FileUpload sets DropzoneContent on /verify-astrolyfe, then the drop area shows that text and the AI reference names the parameter
+
 ## Select
 
 - <a id="d-req-ui-055"></a> **REQ-UI-055** (extends BRD-21 floating panels and menus) Select returns focus to its trigger after selection so Escape still dismisses a parent Dialog (TechieBlog TR-075)
@@ -507,6 +514,12 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 
 - <a id="d-req-ui-074"></a> **REQ-UI-074** (BRD-pending) A Select's list can be wider than its button (Chatur TR-026)
   - *Acceptance:* When SelectContent sets MatchTriggerWidth false on /verify-chatur-tr026, then the list is at least the button's width and its long options stay on one line
+
+- <a id="d-req-ui-084"></a> **REQ-UI-084** (extends BRD-4 to BRD-12) A Select item with only Text draws it, and the closed trigger reads it (AstroLyfe TR-016)
+  - *Acceptance:* When a SelectItem has Text and no child content on /verify-astrolyfe, then the closed trigger and the open list show that Text
+
+- <a id="d-req-ui-086"></a> **REQ-UI-086** (extends BRD-4 to BRD-12) A Select inside a modal Dialog opens and takes a choice (AstroLyfe TR-022)
+  - *Acceptance:* When a Select in a modal Dialog is clicked on /verify-astrolyfe, then its list opens above the dialog and a choice is kept
 
 ## NumericInput
 
@@ -594,7 +607,10 @@ Deliver and maintain TrBlazeUI — a .NET 10 Blazor UI component library (16 hea
 ## Combobox
 
 - <a id="d-req-ui-078"></a> **REQ-UI-078** (BRD-pending) A Combobox takes Id or id inside a Dialog without ending the session (Sevak TR-042)
-  - *Acceptance:* When a Combobox with Id set opens inside a Dialog on /verify-sevak-tr042, then the id lands on its root and the session keeps answering
+  - *Acceptance:* When a Combobox with Id set opens inside a Dialog on /verify-sevak-tr042, then the id lands on its combobox button and the session keeps answering
+
+- <a id="d-req-ui-085"></a> **REQ-UI-085** (extends BRD-4 to BRD-12) A Combobox Id lands on its trigger so a Label For reaches it (AstroLyfe TR-021)
+  - *Acceptance:* When a Combobox sets Id on /verify-astrolyfe, then the combobox button carries that id and still opens and closes
 
 
 ## KeyboardShortcutService

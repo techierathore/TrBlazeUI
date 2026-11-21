@@ -1,0 +1,88 @@
+@page "/verify-astrolyfe"
+@using TrBlazeUI.Components.Select
+@using TrBlazeUI.Components.Combobox
+@using TrBlazeUI.Components.Dialog
+@using TrBlazeUI.Components.FileUpload
+@using TrBlazeUI.Components.Label
+
+@* Verification harness for AstroLyfe TR-016, TR-019, TR-021 and TR-022 (docs/AstroLyfe-TrBlazeUI-Feedback.md).
+   Not a documentation demo: tests/verify/req-ui-084.spec.ts drives each block. *@
+
+<PageTitle>Verify AstroLyfe - TrBlazeUI</PageTitle>
+
+<div class="mx-auto max-w-md space-y-8 p-6">
+    <h1 class="text-2xl font-bold" data-testid="verify-heading">AstroLyfe feedback</h1>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-016 Select items with Text only</h2>
+        <Select TValue="string" @bind-Value="objAyanamsa">
+            <SelectTrigger Class="w-[220px]" data-testid="text-trigger">
+                <SelectValue Placeholder="Select..." data-testid="text-value" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem Value="@("K")" Text="KP" />
+                <SelectItem Value="@("N")" Text="New KP" />
+            </SelectContent>
+        </Select>
+        <p data-testid="text-echo">@objAyanamsa</p>
+    </section>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-021 Combobox Id and a linked label</h2>
+        <Label For="pick-chart" data-testid="chart-label">Chart</Label>
+        <Combobox TItem="ChartOption"
+                  Items="@Charts"
+                  @bind-Value="objChart"
+                  ValueSelector="@(aChart => aChart.Key)"
+                  DisplaySelector="@(aChart => aChart.Text)"
+                  Placeholder="Pick a chart"
+                  Id="pick-chart" />
+        <p data-testid="chart-echo">@objChart</p>
+    </section>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-022 Select inside a modal Dialog</h2>
+        <Dialog Modal="true">
+            <DialogTrigger class="rounded border px-3 py-1" data-testid="open-editor">Open editor</DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Rule editor</DialogTitle>
+                </DialogHeader>
+                <Select TValue="string" @bind-Value="objMode">
+                    <SelectTrigger Class="w-[220px]" data-testid="mode-trigger">
+                        <SelectValue data-testid="mode-value" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem Value="@("All")">All</SelectItem>
+                        <SelectItem Value="@("Any")">Any</SelectItem>
+                    </SelectContent>
+                </Select>
+            </DialogContent>
+        </Dialog>
+        <p data-testid="mode-echo">@objMode</p>
+    </section>
+
+    <section class="space-y-2">
+        <h2 class="text-lg font-semibold">TR-019 FileUpload DropzoneContent</h2>
+        <FileUpload Accept=".csv" AriaLabel="Rules file">
+            <DropzoneContent>
+                <p data-testid="drop-text">Drop a CSV file here or choose one</p>
+            </DropzoneContent>
+        </FileUpload>
+    </section>
+</div>
+
+@code {
+    private static readonly ChartOption[] Charts = [new("natal", "Natal"), new("horary", "Horary")];
+
+    private string? objAyanamsa = "K";
+    private string? objChart;
+    private string? objMode = "All";
+
+    /// <summary>
+    /// One chart a rule can be run on.
+    /// </summary>
+    /// <param name="Key">The chart's key.</param>
+    /// <param name="Text">The chart's name.</param>
+    private sealed record ChartOption(string Key, string Text);
+}
