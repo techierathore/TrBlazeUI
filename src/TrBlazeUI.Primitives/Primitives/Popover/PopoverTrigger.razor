@@ -29,6 +29,17 @@ else
     [CascadingParameter]
     private PopoverContext Context { get; set; } = null!;
 
+    protected override void OnParametersSet()
+    {
+        // An id the caller put on the trigger button replaces the generated one, and the context
+        // reports it, so click-outside still recognises a click on the trigger (AstroLyfe TR-021).
+        Context.CustomTriggerId =
+            !AsChild && AdditionalAttributes is not null
+            && AdditionalAttributes.TryGetValue("id", out var vId)
+                ? vId?.ToString()
+                : null;
+    }
+
     private ElementReference objTriggerRef;
 
     /// <summary>

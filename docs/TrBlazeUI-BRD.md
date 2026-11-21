@@ -72,7 +72,7 @@ This document captures, for the product owner, what TrBlazeUI delivers today (th
 
 Written by the status gate after every build, verify and handoff; not by hand.
 
-**Snapshot as of 2026-11-19.** Live per-requirement status: `PROJECT-STATUS.md` and the Requirements Status table in `docs/TrBlazeUI-Checklist.md`.
+**Snapshot as of 2026-11-21.** Live per-requirement status: `PROJECT-STATUS.md` and the Requirements Status table in `docs/TrBlazeUI-Checklist.md`.
 
 | Screen | Requirements | Verified | Open | Status |
 |---|---|---|---|---|
@@ -87,8 +87,8 @@ Written by the status gate after every build, verify and handoff; not by hand.
 | Menubar demo | 4 | 4 | 0 | Done |
 | InputGroup | 1 | 1 | 0 | Done |
 | Toast | 1 | 1 | 0 | Done |
-| FileUpload | 1 | 1 | 0 | Done |
-| Select | 4 | 4 | 0 | Done |
+| FileUpload | 2 | 2 | 0 | Done |
+| Select | 6 | 6 | 0 | Done |
 | NumericInput | 1 | 1 | 0 | Done |
 | Card | 2 | 2 | 0 | Done |
 | Sidebar | 2 | 2 | 0 | Done |
@@ -102,7 +102,7 @@ Written by the status gate after every build, verify and handoff; not by hand.
 | LogView | 1 | 1 | 0 | Done |
 | Menubar | 1 | 1 | 0 | Done |
 | Calendar | 1 | 1 | 0 | Done |
-| Combobox | 1 | 1 | 0 | Done |
+| Combobox | 2 | 2 | 0 | Done |
 | KeyboardShortcutService | 1 | 1 | 0 | Done |
 
 ## 5. Stakeholders / users

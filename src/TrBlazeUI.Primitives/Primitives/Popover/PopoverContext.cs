@@ -34,9 +34,16 @@ public class PopoverContext : PrimitiveContextWithEvents<PopoverState>
     }
 
     /// <summary>
+    /// Gets or sets an id the caller gave the trigger button (<c>id="..."</c> on the trigger). The
+    /// click-outside handler finds the trigger by this id, so the id the button carries and the id
+    /// used there must be one value (AstroLyfe TR-021).
+    /// </summary>
+    public string? CustomTriggerId { get; set; }
+
+    /// <summary>
     /// Gets the ID for the popover trigger button.
     /// </summary>
-    public string TriggerId => GetScopedId("trigger");
+    public string TriggerId => string.IsNullOrWhiteSpace(CustomTriggerId) ? GetScopedId("trigger") : CustomTriggerId;
 
     /// <summary>
     /// Gets the ID for the popover content container.

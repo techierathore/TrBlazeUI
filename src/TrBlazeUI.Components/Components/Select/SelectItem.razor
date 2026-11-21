@@ -17,7 +17,14 @@
         </span>
     }
     <span class="@(IsSelected ? "pr-6" : "")">
-        @ChildContent
+        @if (ChildContent is not null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            @GetDisplayText()
+        }
     </span>
 </TrBlazeUI.Primitives.Select.SelectItem>
 
@@ -32,8 +39,9 @@
     public TValue Value { get; set; } = default!;
 
     /// <summary>
-    /// Gets or sets the display text for this item.
-    /// If not provided, will use ChildContent text or Value.ToString().
+    /// Gets or sets the display text for this item. It is drawn in the list when the item has no
+    /// child content (AstroLyfe TR-016), and it is the text the closed trigger shows when the item
+    /// is selected. If not provided, <c>Value.ToString()</c> is used.
     /// </summary>
     [Parameter]
     public string? Text { get; set; }

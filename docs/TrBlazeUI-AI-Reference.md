@@ -1357,6 +1357,10 @@ or call `Refresh()` (see "Mutating a row in place" under `DataTable`).
 
 Sub-components: `SelectTrigger`, `SelectValue`, `SelectContent`, `SelectItem`, `SelectGroup`, `SelectLabel`, `SelectSeparator`
 
+`SelectItem` draws its child content, and its `Text` when it has none (after 2.2.6), so
+`<SelectItem Value="@("K")" Text="KP" />` shows "KP" in the list; the closed trigger shows the same
+`Text` of the selected item. Child content wins when both are given.
+
 ```razor
 <Select @bind-Value="selectedFruit" TValue="string" Class="w-[280px]">
     <SelectTrigger>
@@ -1456,6 +1460,7 @@ and is capped at the window (Chatur TR-026). Do not widen the button to make the
 | Disabled | bool | false | Disabled state |
 | PopoverWidth | string | "w-[200px]" | Dropdown width |
 | MatchTriggerWidth | bool | false | Match trigger width |
+| Id | string? | null | Id of the trigger button (`role="combobox"`), so `<Label For="pick">` reaches it; `id="pick"` binds too. Not on the wrapper (after 2.2.6) |
 
 ```razor
 <Combobox TItem="Framework"
@@ -1685,6 +1690,19 @@ The shipped API is `Files` (`IReadOnlyList<FileUploadItem>?`) + `FilesChanged`
     private IReadOnlyList<FileUploadItem>? files;
     private void HandleFiles(IReadOnlyList<FileUploadItem> selected) => files = selected;
 }
+```
+
+`DropzoneContent` (`RenderFragment?`) replaces the drop area's own text and icon; the file input
+stays over it, so a click or a drop on your content still picks files. Use it for text of your own
+("Drop a CSV file here or choose one"); without it the default "Drag and drop files here" shows.
+Set `AriaLabel` too, since the input has no visible label of its own.
+
+```razor
+<FileUpload Accept=".csv" AriaLabel="Rules file">
+    <DropzoneContent>
+        <p class="text-sm">Drop a CSV file here or choose one</p>
+    </DropzoneContent>
+</FileUpload>
 ```
 
 ### MultiSelect

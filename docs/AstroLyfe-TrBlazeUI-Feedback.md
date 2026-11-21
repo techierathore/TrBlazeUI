@@ -4,9 +4,13 @@
 |---|---|
 | App | AstroLyfe |
 | Upstream | TrBlazeUI |
-| Updated | 2026-11-05 |
+| Updated | 2026-11-21 |
 
 ## Summary
+
+**2026-11-21:** TR-016, TR-019, TR-021 and TR-022 copied in from AstroLyfe's own file (read-only), which also closed TR-015, TR-017, TR-018 and TR-020 on 2.2.6 on 2026-11-21. Of the four: **TR-016, TR-019 and TR-021 are fixed** (not yet released); **TR-022 was already fixed after 2.1.4** and is now held by a test. See the 2026-11-21 reply at the foot.
+
+#### Summary as it stood on 2026-11-05
 
 Nothing is blocked. 14 entries: 13 closed, 1 fixed upstream and awaiting re-check (TR-015, filed 2026-11-03 against 2.0.1, fixed in 2.0.6 — see the 2026-11-05 reply at the foot of this file; the action is: upgrade past 2.0.1). TR-013 was retracted on 2026-07-16: an app-side culture bug, no library defect.
 
@@ -240,9 +244,95 @@ _Sorted by severity: blocker → major → minor. IDs are append-only and stable
 
 Copied into TrBlazeUI 2026-11-05 by *build-phase from `/mnt/c/1MyCode/AstroLyfe/docs/AstroLyfe-TrBlazeUI-Feedback.md`.
 
+### TR-016 — `SelectItem` with only `Text` (no child content) draws an empty option, and a closed `Select` shows its raw value
+
+- **Blocks:** no — worked around app-side with child content and `DisplayTextSelector`.
+- **Status:** open, filed 2026-11-20
+- **Severity:** major (the owner could not read the Settings choices)
+- **Repro:** on TrBlazeUI.Components 2.0.1,
+  ```razor
+  <Select TValue="string" @bind-Value="Pref.SelAyanamsa">
+      <SelectTrigger><SelectValue Placeholder="Select..." /></SelectTrigger>
+      <SelectContent>
+          <SelectItem Value="@("K")" Text="KP" />
+          <SelectItem Value="@("N")" Text="New KP" />
+      </SelectContent>
+  </Select>
+  ```
+  with `Pref.SelAyanamsa = "K"`.
+- **Expected:** the closed trigger reads "KP"; the open list shows "KP" and "New KP".
+- **Actual:** the closed trigger reads "K" (the value) until the list has been opened once, and the open list shows blank rows (only the check mark of the selected one). The docs table lists `Text` as the item's label.
+- **Encountered in:** REQ-UI-004 (`/Admin/Settings`), 2026-11-20; also every reference-data filter Select that used `Text` alone.
+- **Re-checked on 2.2.6 (2026-11-21):** not fixed. A styled `SelectItem` still draws only its child content, and a closed `Select` falls back to the raw value; the workaround stays.
+- **Workaround:** applied: every `SelectItem` carries its text as child content, and the five Settings Selects pass `DisplayTextSelector`.
+- **Suggested fix:** render `Text` when no child content is given, and let `SelectValue` read the registered items' `Text` before the list first opens.
+
+
+### TR-019 — `FileUpload.DropzoneContent` exists in 2.0.1 but the AI reference does not list it
+
+- **Blocks:** no — the drop-area text was put beside the control and Rule import was finished.
+- **Status:** open, filed 2026-11-20
+- **Severity:** minor (documentation)
+- **Repro:** `.trblazeui/TrBlazeUI-AI-Reference.md`, FileUpload section: no `DropzoneContent` parameter is named, although the 2.0.1 package ships it.
+- **Expected:** the reference lists every public parameter, so an agent bound to "use only what the reference lists" can set the drop area's own text.
+- **Actual:** the drop-area text the mockup draws ("Drop a CSV file here or choose one") sits beside the control, and the control's default text also shows.
+- **Encountered in:** REQ-UI-026 (`/Admin/DataIngestion`, 2026-11-20).
+- **Re-checked on 2.2.6 (2026-11-21):** `DropzoneContent` is a parameter in 2.2.6 and the app now uses it on four drop areas, the Teacher's values tab included; the FileUpload section of the reference still does not list it, so this stays open as a documentation entry.
+- **Workaround:** applied app-side: the text is a plain line beside the control.
+- **Suggested fix:** add `DropzoneContent` (with an example) to the FileUpload section of the reference.
+
+
+### TR-021 — `Combobox<T>.Id` is documented as a parameter but is not one, so setting it crashes the circuit
+
+- **Blocks:** no — the picker was left without `Id`, its label stands beside it, and Rules on a chart was finished.
+- **Status:** open, filed 2026-11-20
+- **Severity:** major (a blank page, no message)
+- **Repro:** `<Combobox TItem="X" Id="pick-chart" Items="…" … />` on TrBlazeUI.Components 2.0.1.
+- **Expected:** `Id` sets the trigger's id, as the 2.0.1 XML docs (`P:…Combobox`1.Id`) suggest, so a `<Label For>` can point at it.
+- **Actual:** `InvalidOperationException: … Combobox`1 … has a property matching the name 'Id', but it does not have [Parameter]` — the circuit dies and the page is blank.
+- **Encountered in:** REQ-UI-029 (`/Rules/OnChart/{id}`, 2026-11-20).
+- **Re-checked on 2.2.6 (2026-11-21):** not fixed. `Combobox.Id` still has no `[Parameter]`; the picker stays without `Id`.
+- **Workaround:** applied app-side: no `Id`; the label stands beside the control without `For`.
+- **Suggested fix:** mark `Id` `[Parameter]` and put it on the trigger button.
+
+
+### TR-022 — A `Select` inside a modal `Dialog` does not open its list
+
+- **Blocks:** no — worked around app-side with `NativeSelect`.
+- **Status:** open, filed 2026-11-20
+- **Severity:** major (a choice cannot be made in the dialog)
+- **Repro:** on TrBlazeUI.Components 2.0.1, `<Dialog Modal="true" @bind-Open="EditorOpen"><DialogContent>` holding `<Select TValue="string" @bind-Value="EdAllOrAny"><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem Value="@("All")">All</SelectItem><SelectItem Value="@("Any")">Any</SelectItem></SelectContent></Select>`; open the dialog and click the trigger.
+- **Expected:** the list opens above the dialog and a choice can be made.
+- **Actual:** the list does not open while the modal dialog is shown, so the value cannot be changed.
+- **Encountered in:** REQ-UI-034, REQ-UI-036, REQ-UI-038, REQ-UI-040, REQ-UI-042, REQ-UI-044, REQ-UI-046 (the Rule editor on every rule page, e.g. `/ReferenceData/KpPromise`), 2026-11-20.
+- **Re-checked on 2.2.6 (2026-11-21):** the reference now says a `Select` inside a `Dialog` renders inside the dialog's layer, above the overlay (after 2.1.4). Not tried in the app: the rule editors keep `NativeSelect`, which works and which the tests drive with `selectOption`.
+- **Workaround:** applied app-side: `NativeSelect` inside the dialog (`src/AstroBlazeUI/Pages/ReferenceData/KpPromiseListPage.razor:109`, and the other rule pages).
+- **Suggested fix:** render the `SelectContent` portal above the modal dialog's layer and let it receive pointer events while the dialog is open.
+
+
 ## Replies from TrBlazeUI
 
 <!-- The upstream team's answers, newest block first. Left in full: this is the record. -->
+
+### 2026-11-21 — TR-016, TR-019 and TR-021 fixed; TR-022 was already fixed
+
+Blocks: no. Each entry was checked against the code first. Fixes are in `[Unreleased]` in `CHANGELOG.md`
+(rows REQ-UI-084 to REQ-UI-087), not yet released; the owner cuts the release. Each test failed before
+the change and passes after (`tests/verify/req-ui-084.spec.ts`, page `/verify-astrolyfe`), except
+TR-022, which passed before.
+
+| Entry | State | What you get |
+|---|---|---|
+| **TR-016** `SelectItem` with only `Text` | fixed, not yet released | A `SelectItem` with no child content draws its `Text` in the list; child content still wins. The closed trigger reads the same `Text` of the selected item. Your workaround (child content, `DisplayTextSelector`) stays correct. |
+| **TR-019** `FileUpload.DropzoneContent` not in the reference | fixed, not yet released | The FileUpload section of `TrBlazeUI-AI-Reference.md` names `DropzoneContent`, with an example; your agent gets it with the next build after the upgrade. |
+| **TR-021** `Combobox.Id` | fixed, not yet released | You wrote that `Id` crashes the page; it has not since 2.1.4 (Sevak TR-042). It went to the wrapper `<div>`, which a label cannot point at. `Id` (or `id`) is now a parameter and lands on the `role="combobox"` button, so `<Label For="pick-chart">` works. Behaviour change: an `Id` you already set moves from the wrapper to the button. |
+| **TR-022** `Select` in a modal `Dialog` | already fixed, after 2.1.4 | The reference is right. A test now holds it: the list opens above the modal dialog and a choice is kept. Your `NativeSelect` can go back to `Select`. |
+
+What AstroLyfe must re-check after the release: put `Id="pick-chart"` and `<Label For>` on the Rules
+picker and click the label; swap one Rule editor `NativeSelect` for a `Select` and run its REQ-UI-034
+check; on one Select, remove the child content and keep `Text` alone, and check the list and the closed trigger both read it. Then close each entry with
+`bash .tfcore/utils/tf-feedback.sh AstroLyfe --close <ID> "<what you ran and what it showed>"`.
+
 
 ### 2026-11-05 — TR-015 was fixed in 2.0.6; the action is: upgrade
 

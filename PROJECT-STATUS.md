@@ -10,7 +10,7 @@ last_verified_date: 2026-11-19
 
 ## Where I am
 
-Every row is Verified. Rows REQ-UI-069 to REQ-UI-079 answer the apps' open entries: Sevak TR-050, Chatur TR-025 to TR-027 and the log count, TfLens TR-041, TrStudio TR-015, MyDiary TR-001, plus tests for Sevak TR-042 and TrStudio TR-016 and a keyboard-shortcut teardown fix. Version 2.2.6 is prepared: base version, CHANGELOG and release notes. Full suite 139 of 139 passed.
+99 rows Verified. REQ-UI-084 to REQ-UI-087 (AstroLyfe TR-016, TR-019, TR-021, TR-022) are Verified and sit in [Unreleased] in the CHANGELOG, with the Combobox Id behaviour change in the guides and the release notes. Full browser suite run 2026-11-21: seven tests failed under load in one pass and passed when re-run; package and version tests pass; build 0 warnings.
 
 ## Next command to run
 
